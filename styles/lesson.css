@@ -84,6 +84,61 @@
   gap: 4px;
 }
 
+/* ── Level progression ── */
+.btn-level-up {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 10px;
+}
+.btn-level-up:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(22,163,74,0.35);
+}
+.btn-level-up:disabled { opacity: 0.7; cursor: wait; }
+
+.level-retry-msg, .level-max-msg {
+  text-align: center;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.level-retry-msg {
+  background: #fef3c7;
+  color: #92400e;
+}
+.level-max-msg {
+  background: #dcfce7;
+  color: #166534;
+}
+.level-badge {
+  display: inline-block;
+  background: var(--blue);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  vertical-align: middle;
+  margin-left: 4px;
+}
+
+.btn-restart {
+  width: 100%; padding: 14px; background: var(--blue); color: white;
+  border: none; border-radius: 12px; font-size: 0.95rem; font-weight: 600;
+  cursor: pointer; transition: all 0.2s; margin-bottom: 8px;
+}
+.btn-restart:hover { background: #003d80; }
+
 @media (max-width: 500px) {
   .phrase-card .ukrainian { font-size: 1.5rem; }
   .controls { flex-direction: column; }

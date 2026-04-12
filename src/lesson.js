@@ -7,6 +7,7 @@ import { showScreen } from './router.js';
 import { setupRecognition } from './speech.js';
 import { speakText, speakSlow } from './voice.js';
 import { t } from './i18n.js';
+import { getLessonLevel, saveLessonLevel, getLevelLabel, getNextLevelLabel, hasNextLevel, generateNextLevelPhrases } from './api/level-up.js';
 
 // BCP-47 tag for the user's native language TTS (used to speak translations).
 function getNativeTTSLang() {
@@ -63,10 +64,13 @@ export function buildCategoryCards() {
     const pct = Math.round((done / total) * 100);
     const name = escHtml(getLessonName(lesson, state.nativeLanguage));
     const tagLabel = t(`lesson.tag.${lesson.tag}`);
+    const level = getLessonLevel(lesson.id);
+    const levelLabel = getLevelLabel(level);
+    const levelBadge = level > 0 ? `<span class="level-badge">${levelLabel}</span>` : '';
     grid.innerHTML += `
       <div class="category-card" onclick="startLesson('${lesson.id}')">
         <div class="icon">${lesson.icon}</div>
-        <div class="name">${name}</div>
+        <div class="name">${name} ${levelBadge}</div>
         <div class="count">${total} ${t('lesson.phrases')} · <span class="tag tag-${lesson.tag}">${tagLabel}</span></div>
         <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
       </div>`;
@@ -145,17 +149,114 @@ export function nextPhrase() {
 
 export function showLessonComplete() {
   document.getElementById('lessonContent').style.display = 'none';
-  document.getElementById('lessonComplete').classList.add('show');
+  const completeEl = document.getElementById('lessonComplete');
+  completeEl.classList.add('show');
   const excellent = state.lessonScores.filter(s => s >= 80).length;
   const good = state.lessonScores.filter(s => s >= 50 && s < 80).length;
   const avg = state.lessonScores.length ? Math.round(state.lessonScores.reduce((a,b)=>a+b,0)/state.lessonScores.length) : 0;
   const lessonName = getLessonName(state.currentLesson, state.nativeLanguage);
+  const lessonId = state.currentLesson.id;
+  const isHomework = lessonId === '_homework';
+
   document.getElementById('completeSubtitle').textContent =
     t('lesson.completeSubtitle', { count: state.currentLesson.phrases.length, name: lessonName.toLowerCase() });
+
+  const currentLevel = isHomework ? 0 : getLessonLevel(lessonId);
+  const levelLabel = getLevelLabel(currentLevel);
+  const canLevelUp = !isHomework && avg >= 70 && hasNextLevel(currentLevel);
+  const nextLabel = canLevelUp ? getNextLevelLabel(currentLevel) : '';
+  const native = state.nativeLanguage;
+
+  // If score is good enough, save the completed level
+  if (!isHomework && avg >= 70) {
+    saveLessonLevel(lessonId, Math.max(currentLevel, currentLevel));
+  }
+
+  let levelHtml = '';
+  if (!isHomework) {
+    levelHtml = `<div class="stat-box"><div class="num">${levelLabel}</div><div class="label">${native === 'nl' ? 'Niveau' : 'Level'}</div></div>`;
+  }
+
   document.getElementById('completeStats').innerHTML = `
     <div class="stat-box"><div class="num">${excellent}</div><div class="label">${t('lesson.excellent')}</div></div>
     <div class="stat-box"><div class="num">${good}</div><div class="label">${t('lesson.good')}</div></div>
-    <div class="stat-box"><div class="num">${avg}%</div><div class="label">${t('lesson.avgScore')}</div></div>`;
+    <div class="stat-box"><div class="num">${avg}%</div><div class="label">${t('lesson.avgScore')}</div></div>
+    ${levelHtml}`;
+
+  // Add or remove the level-up button
+  let lvlBtn = completeEl.querySelector('.btn-level-up');
+  if (lvlBtn) lvlBtn.remove();
+
+  if (canLevelUp) {
+    lvlBtn = document.createElement('button');
+    lvlBtn.className = 'btn-level-up';
+    lvlBtn.textContent = native === 'nl'
+      ? `🚀 Ga naar niveau ${nextLabel}`
+      : `🚀 Go to level ${nextLabel}`;
+    lvlBtn.addEventListener('click', () => handleLevelUp(lessonId, currentLevel));
+    // Insert before the restart button
+    const restartBtn = completeEl.querySelector('.btn-restart, .btn');
+    if (restartBtn) completeEl.insertBefore(lvlBtn, restartBtn);
+    else completeEl.appendChild(lvlBtn);
+  } else if (!isHomework && !hasNextLevel(currentLevel)) {
+    // Already at max level
+    const maxMsg = document.createElement('div');
+    maxMsg.className = 'level-max-msg';
+    maxMsg.textContent = native === 'nl'
+      ? `🏆 Je hebt het hoogste niveau (${levelLabel}) bereikt!`
+      : `🏆 You've reached the highest level (${levelLabel})!`;
+    const restartBtn = completeEl.querySelector('.btn-restart, .btn');
+    if (restartBtn) completeEl.insertBefore(maxMsg, restartBtn);
+    else completeEl.appendChild(maxMsg);
+  } else if (!isHomework && avg < 70) {
+    const retryMsg = document.createElement('div');
+    retryMsg.className = 'level-retry-msg';
+    retryMsg.textContent = native === 'nl'
+      ? `💪 Haal 70% of meer om naar ${nextLabel || 'het volgende niveau'} te gaan`
+      : `💪 Score 70% or higher to unlock ${nextLabel || 'the next level'}`;
+    const restartBtn = completeEl.querySelector('.btn-restart, .btn');
+    if (restartBtn) completeEl.insertBefore(retryMsg, restartBtn);
+    else completeEl.appendChild(retryMsg);
+  }
+}
+
+async function handleLevelUp(lessonId, currentLevel) {
+  const native = state.nativeLanguage;
+  const completeEl = document.getElementById('lessonComplete');
+  const lvlBtn = completeEl.querySelector('.btn-level-up');
+  if (lvlBtn) {
+    lvlBtn.disabled = true;
+    lvlBtn.textContent = native === 'nl' ? '⏳ Zinnen genereren…' : '⏳ Generating phrases…';
+  }
+
+  try {
+    const newPhrases = await generateNextLevelPhrases(state.currentLesson, currentLevel);
+    const nextLevelIndex = currentLevel + 1;
+
+    // Save the new level
+    saveLessonLevel(lessonId, nextLevelIndex);
+
+    // Update the lesson with the new phrases and restart
+    state.currentLesson.phrases = newPhrases;
+    state.currentLesson.tag = getLevelLabel(nextLevelIndex).toLowerCase();
+    state.currentPhraseIndex = 0;
+    state.lessonScores = [];
+
+    completeEl.classList.remove('show');
+    document.getElementById('lessonContent').style.display = 'block';
+    buildNavDots();
+    renderPhrase();
+  } catch (err) {
+    if (lvlBtn) {
+      lvlBtn.disabled = false;
+      lvlBtn.textContent = `⚠️ ${err.message}`;
+      setTimeout(() => {
+        lvlBtn.textContent = native === 'nl'
+          ? `🚀 Probeer opnieuw`
+          : `🚀 Try again`;
+      }, 3000);
+    }
+  }
 }
 
 export function listenPhrase() {
