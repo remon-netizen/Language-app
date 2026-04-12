@@ -120,6 +120,14 @@
   background: #dcfce7;
   color: #166534;
 }
+.review-saved-msg {
+  grid-column: 1 / -1;
+  text-align: center;
+  font-size: 0.82rem;
+  color: #16a34a;
+  font-weight: 600;
+  padding: 6px 0;
+}
 .level-badge {
   display: inline-block;
   background: var(--blue);

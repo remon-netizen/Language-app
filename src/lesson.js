@@ -136,8 +136,10 @@ export function renderPhrase() {
   });
 
   // Auto-play: speak the phrase so the learner hears it first (audio-primary).
-  // Small delay so the screen has rendered before sound starts.
-  setTimeout(() => speakText(getTargetText(phrase), getTTSLang()), 350);
+  // Respects the autoPlayLesson toggle from settings.
+  if (state.autoPlayLesson !== false) {
+    setTimeout(() => speakText(getTargetText(phrase), getTTSLang()), 350);
+  }
 }
 
 export function nextPhrase() {
@@ -178,11 +180,16 @@ export function showLessonComplete() {
     levelHtml = `<div class="stat-box"><div class="num">${levelLabel}</div><div class="label">${native === 'nl' ? 'Niveau' : 'Level'}</div></div>`;
   }
 
+  const savedMsg = native === 'nl'
+    ? '✅ Deze zinnen zijn opgeslagen voor herhaling'
+    : '✅ These phrases are saved for review practice';
+
   document.getElementById('completeStats').innerHTML = `
     <div class="stat-box"><div class="num">${excellent}</div><div class="label">${t('lesson.excellent')}</div></div>
     <div class="stat-box"><div class="num">${good}</div><div class="label">${t('lesson.good')}</div></div>
     <div class="stat-box"><div class="num">${avg}%</div><div class="label">${t('lesson.avgScore')}</div></div>
-    ${levelHtml}`;
+    ${levelHtml}
+    <div class="review-saved-msg">${savedMsg}</div>`;
 
   // Clean up any previous level-related elements
   completeEl.querySelectorAll('.btn-level-up, .level-retry-msg, .level-max-msg').forEach(el => el.remove());

@@ -70,6 +70,14 @@
     </div>
   </div>
 
+  <!-- Auto-play toggle -->
+  <div class="drawer-section">
+    <label class="drawer-toggle">
+      <input type="checkbox" id="autoPlayToggle" onchange="toggleAutoPlay(this.checked)" checked />
+      <span class="drawer-toggle-label" id="autoPlayLabel">Auto-play phrases in lessons</span>
+    </label>
+  </div>
+
   <!-- AI settings -->
   <div class="drawer-section">
     <div class="settings-label" id="aiLabel">AI Provider &amp; API Key</div>
@@ -92,8 +100,14 @@
 
     <div class="home-center">
 
-      <!-- Native + target language pickers -->
-      <div class="lang-picker-card">
+      <!-- Language picker — compact mode (shown after first setup) -->
+      <div class="lang-compact" id="langCompact" style="display:none" onclick="expandLangPicker()">
+        <span class="lang-compact-text" id="langCompactText"></span>
+        <span class="lang-compact-edit" id="langCompactEdit">✏️</span>
+      </div>
+
+      <!-- Language picker — full mode (first visit or when editing) -->
+      <div class="lang-picker-card" id="langPickerFull">
         <div class="settings-label" id="iSpeakLabel">I speak</div>
         <div class="lang-options" id="nativeLangOptions">
           <button class="lang-choice-btn active" data-native="nl" onclick="switchNativeLanguage('nl')">🇳🇱 Nederlands</button>
@@ -107,55 +121,43 @@
         </div>
       </div>
 
-      <!-- Browser recommendation banner -->
-      <div class="browser-banner" id="browserBanner">
-        <div class="bb-icon">🌐</div>
-        <div class="bb-text">
-          <div class="bb-title" id="bbTitle">Use Microsoft Edge for the best voice quality</div>
-          <div class="bb-sub" id="bbSub">Edge has Microsoft's neural voices — they sound significantly more natural than Chrome's.</div>
-        </div>
-        <button class="bb-close" id="bbCloseBtn" onclick="dismissBanner()">Got it</button>
+      <!-- API key notice — shown when no key is set -->
+      <div class="api-notice" id="apiNotice" style="display:none">
+        <span class="api-notice-icon">🔑</span>
+        <span class="api-notice-text" id="apiNoticeText">Add an API key in Settings for AI conversations and exercises</span>
+        <button class="api-notice-btn" onclick="toggleSettingsDrawer()">Settings →</button>
       </div>
 
-      <!-- Start button -->
+      <!-- ═══ Primary actions ═══ -->
       <button class="start-btn" id="startBtn" onclick="openFreeChat()">
         <span id="startBtnFlag">🇺🇦</span> <span id="startBtnLabel">Start Conversation</span>
       </button>
 
-      <!-- Lesson phrases button -->
-      <button class="lessons-btn" id="lessonsBtn" onclick="openLessonBrowse()">
-        <span class="lessons-btn-icon">📖</span>
-        <span class="lessons-btn-text">
-          <span class="lessons-btn-title" id="lessonsBtnTitle">Lessons</span>
-          <span class="lessons-btn-sub" id="lessonsBtnSub">Practise words and phrases with speech</span>
-        </span>
-        <span class="lessons-btn-arrow">→</span>
-      </button>
-
-      <!-- Review learned phrases -->
-      <button class="review-btn" id="reviewBtn" onclick="openReviewScreen()">
-        <span class="review-btn-icon">🔄</span>
-        <span class="review-btn-text">
-          <span class="review-btn-title" id="reviewBtnTitle">Review</span>
-          <span class="review-btn-sub" id="reviewBtnSub">Practise phrases from memory</span>
-        </span>
-        <span class="review-btn-count" id="reviewBtnCount"></span>
-        <span class="review-btn-arrow">→</span>
-      </button>
-
-      <!-- Grammar Exercises card -->
-      <div class="grammar-tools-card">
-        <div class="settings-label" id="grammarLabel">Grammar Exercises</div>
-        <button class="grammar-exercises-btn" id="grammarBtn" onclick="openExercisesScreen()">🎯 Grammar Exercises →</button>
+      <!-- ═══ Learning tools (2-column grid) ═══ -->
+      <div class="home-tools-grid">
+        <button class="home-tool-card" id="lessonsBtn" onclick="openLessonBrowse()">
+          <span class="home-tool-icon">📖</span>
+          <span class="home-tool-title" id="lessonsBtnTitle">Lessons</span>
+          <span class="home-tool-sub" id="lessonsBtnSub">Words & phrases</span>
+        </button>
+        <button class="home-tool-card" id="reviewBtn" onclick="openReviewScreen()">
+          <span class="home-tool-icon">🔄</span>
+          <span class="home-tool-title" id="reviewBtnTitle">Review</span>
+          <span class="home-tool-sub" id="reviewBtnSub">From memory</span>
+          <span class="review-btn-count" id="reviewBtnCount" style="display:none"></span>
+        </button>
+        <button class="home-tool-card" id="grammarBtn" onclick="openExercisesScreen()">
+          <span class="home-tool-icon">🎯</span>
+          <span class="home-tool-title" id="grammarLabel">Grammar</span>
+          <span class="home-tool-sub">Exercises</span>
+        </button>
+        <button class="home-tool-card" onclick="openWordsScreen()">
+          <span class="home-tool-icon">📚</span>
+          <span class="home-tool-title" id="myWordsLabel">My Words</span>
+          <span class="home-tool-sub" id="myWordsSub">Saved words</span>
+          <span class="words-count-badge" id="wordsBadge" style="display:none"></span>
+        </button>
       </div>
-
-      <!-- My Words bar -->
-      <button class="my-words-bar" onclick="openWordsScreen()">
-        <span class="my-words-bar-icon">📚</span>
-        <span class="my-words-bar-text" id="myWordsLabel">My Words</span>
-        <span class="words-count-badge" id="wordsBadge" style="display:none"></span>
-        <span class="my-words-bar-arrow">→</span>
-      </button>
 
       <!-- Inburgering — only shown when Dutch is the target AND native is not Dutch -->
       <button class="inburgering-btn nl-only" id="inburgeringBtn" onclick="openInburgeringScreen()">
@@ -165,6 +167,16 @@
           <span class="ib-btn-sub" id="ibSub">Oefen KNS &amp; taalvaardigheid voor het examen</span>
         </span>
       </button>
+
+      <!-- Browser recommendation banner — moved to bottom, less intrusive -->
+      <div class="browser-banner" id="browserBanner">
+        <div class="bb-icon">🌐</div>
+        <div class="bb-text">
+          <div class="bb-title" id="bbTitle">Use Microsoft Edge for the best voice quality</div>
+          <div class="bb-sub" id="bbSub">Edge has Microsoft's neural voices — they sound significantly more natural than Chrome's.</div>
+        </div>
+        <button class="bb-close" id="bbCloseBtn" onclick="dismissBanner()">Got it</button>
+      </div>
 
     </div>
 

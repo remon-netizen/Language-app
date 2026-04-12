@@ -19,6 +19,70 @@ import { startLesson, startHomeworkLesson, restartLesson, buildCategoryCards, bu
 import { readHomeworkFile, generateHomeworkPhrases } from './api/homework.js';
 import { openReviewScreen, startNewReview, getLearnedCount } from './review.js';
 
+// ── Collapsible language picker ────────────────────────────────────────────────
+function collapseLangPicker() {
+  const hasSetup = localStorage.getItem('langPickerSetup');
+  const full    = document.getElementById('langPickerFull');
+  const compact = document.getElementById('langCompact');
+  if (!full || !compact) return;
+
+  if (hasSetup) {
+    // Show compact, hide full
+    full.style.display    = 'none';
+    compact.style.display = '';
+    updateCompactLabel();
+  } else {
+    // First visit — show full picker
+    full.style.display    = '';
+    compact.style.display = 'none';
+  }
+}
+
+function updateCompactLabel() {
+  const el = document.getElementById('langCompactText');
+  if (!el) return;
+  const nativeFlag = { nl: '🇳🇱', en: '🇬🇧' }[state.nativeLanguage] || '';
+  const targetFlag = { uk: '🇺🇦', nl: '🇳🇱', en: '🇬🇧' }[state.currentLanguage] || '';
+  const targetName = languageName(state.currentLanguage);
+  el.textContent = `${nativeFlag} → ${targetFlag} ${targetName}`;
+}
+
+function expandLangPicker() {
+  const full    = document.getElementById('langPickerFull');
+  const compact = document.getElementById('langCompact');
+  if (full)    full.style.display    = '';
+  if (compact) compact.style.display = 'none';
+}
+
+// Called after a language switch to collapse the picker and save the flag.
+function markLangPickerSetup() {
+  localStorage.setItem('langPickerSetup', '1');
+  updateCompactLabel();
+  // Collapse after a short delay so the user sees their choice take effect.
+  setTimeout(collapseLangPicker, 400);
+}
+
+// ── API key notice ────────────────────────────────────────────────────────────
+function updateApiNotice() {
+  const notice = document.getElementById('apiNotice');
+  if (!notice) return;
+  const hasKey = !!(localStorage.getItem('geminiKey') || localStorage.getItem('anthropicKey'));
+  notice.style.display = hasKey ? 'none' : '';
+}
+
+// ── Auto-play toggle ──────────────────────────────────────────────────────────
+function toggleAutoPlay(enabled) {
+  state.autoPlayLesson = enabled;
+  localStorage.setItem('autoPlayLesson', enabled ? '1' : '0');
+}
+
+function initAutoPlay() {
+  const saved = localStorage.getItem('autoPlayLesson');
+  state.autoPlayLesson = saved !== '0'; // default ON
+  const toggle = document.getElementById('autoPlayToggle');
+  if (toggle) toggle.checked = state.autoPlayLesson;
+}
+
 // ── Speech speed ──────────────────────────────────────────────────────────────
 function setSpeechRate(rate) {
   state.speechRate = rate;
@@ -238,6 +302,7 @@ function switchNativeLanguage(native) {
   }
 
   refreshNativePicker();
+  markLangPickerSetup();
 
   // Re-apply all static strings in the new native language
   applyStaticI18n();
@@ -270,6 +335,7 @@ function switchLanguage(lang) {
 
   // Update review badge for the new target language
   updateReviewCount();
+  markLangPickerSetup();
 }
 
 function updateHeaderAndChat() {
@@ -317,6 +383,9 @@ function init() {
   showBrowserBanner();
   setSpeechRate(state.speechRate);
   updateWordsCount();
+  collapseLangPicker();
+  updateApiNotice();
+  initAutoPlay();
 }
 
 init();
@@ -375,5 +444,7 @@ window.toggleLessonSpeak   = toggleLessonSpeak;
 window.nextPhrase          = nextPhrase;
 window.speakAlphabetLetter = speakAlphabetLetter;
 window.handleHomeworkUpload = handleHomeworkUpload;
+window.expandLangPicker    = expandLangPicker;
+window.toggleAutoPlay      = toggleAutoPlay;
 window.openReviewScreen    = openReviewScreen;
 window.startNewReview      = startNewReview;
