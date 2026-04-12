@@ -250,6 +250,16 @@ function openLessonBrowse() {
   if (title) title.textContent = t('home.lessons');
   const sub = document.getElementById('lessonBrowseSubtitle');
   if (sub) sub.textContent = t('home.lessonsSub');
+
+  // Update review button text + count badge
+  const reviewText = document.getElementById('lessonReviewText');
+  if (reviewText) reviewText.textContent = state.nativeLanguage === 'nl' ? 'Herhaal geleerde zinnen' : 'Review learned phrases';
+  const count = getLearnedCount();
+  const badge = document.getElementById('lessonReviewCount');
+  if (badge) {
+    badge.textContent = count > 0 ? count : '';
+    badge.style.display = count > 0 ? '' : 'none';
+  }
 }
 
 // ── Language switchers ────────────────────────────────────────────────────────
