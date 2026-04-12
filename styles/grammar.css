@@ -1,0 +1,300 @@
+/* ── Grammar Tools home card ── */
+.grammar-tools-card {
+  background: var(--card-bg);
+  border-radius: 14px;
+  padding: 16px 20px;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.07);
+  margin-top: 12px;
+}
+.grammar-btn-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+.grammar-tool-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 10px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: none;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.18s;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.grammar-tool-btn:hover {
+  border-color: var(--blue);
+  background: var(--light-blue);
+  color: var(--blue);
+}
+.grammar-tool-icon { font-size: 1.6rem; line-height: 1; }
+
+/* ── Grammar screen shared ── */
+#verbScreen .lesson-header,
+#dissectScreen .lesson-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: linear-gradient(135deg, var(--blue) 0%, #003d80 100%);
+  border-radius: 16px;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 12px rgba(0,91,187,0.2);
+}
+#verbScreen .lesson-header .back-btn,
+#dissectScreen .lesson-header .back-btn {
+  background: rgba(255,255,255,0.18);
+  border: none; border-radius: 10px;
+  color: white; font-size: 1.2rem;
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: background 0.2s; flex-shrink: 0; padding: 0;
+}
+#verbScreen .lesson-header .back-btn:hover,
+#dissectScreen .lesson-header .back-btn:hover { background: rgba(255,255,255,0.32); }
+#verbScreen .lesson-header .lesson-title,
+#dissectScreen .lesson-header .lesson-title { font-size: 1.05rem; font-weight: 700; color: white; }
+#verbScreen .lesson-header .lesson-subtitle,
+#dissectScreen .lesson-header .lesson-subtitle { font-size: 0.75rem; color: rgba(255,255,255,0.72); margin-top: 2px; }
+
+.grammar-input-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.grammar-text-input {
+  flex: 1;
+  padding: 11px 14px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.grammar-text-input:focus { border-color: var(--blue); }
+.grammar-submit-btn {
+  padding: 11px 20px;
+  background: var(--blue); color: white;
+  border: none; border-radius: 10px;
+  font-size: 0.9rem; font-weight: 700;
+  cursor: pointer; transition: background 0.2s; white-space: nowrap;
+}
+.grammar-submit-btn:hover:not(:disabled) { background: #003d80; }
+.grammar-submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.grammar-loading { color: var(--gray); font-style: italic; padding: 20px 0; text-align: center; }
+.grammar-error { color: #dc2626; background: #fee2e2; border-radius: 10px; padding: 14px; }
+
+/* ── Common verb chips ── */
+.common-verbs-label {
+  font-size: 0.72rem; font-weight: 600; color: var(--gray);
+  text-transform: uppercase; letter-spacing: 0.05em;
+  margin-bottom: 10px;
+}
+.common-verb-chips {
+  display: flex; flex-wrap: wrap; gap: 7px;
+  margin-bottom: 20px;
+}
+.common-verb-chip {
+  display: flex; flex-direction: column; align-items: flex-start;
+  padding: 7px 12px;
+  border: 2px solid var(--border); border-radius: 10px;
+  background: none; cursor: pointer;
+  transition: all 0.15s; text-align: left;
+}
+.common-verb-chip:hover { border-color: var(--blue); background: var(--light-blue); }
+.cv-verb { font-size: 0.88rem; font-weight: 700; color: var(--text); line-height: 1.2; }
+.cv-en   { font-size: 0.68rem; color: var(--gray); }
+.common-verb-chip:hover .cv-verb { color: var(--blue); }
+
+/* ── Verb conjugation result ── */
+.verb-header {
+  display: flex; align-items: baseline; gap: 12px;
+  margin-bottom: 18px;
+}
+.verb-infinitive {
+  font-size: 1.6rem; font-weight: 800; color: var(--blue);
+}
+.verb-meaning {
+  font-size: 0.95rem; color: var(--gray);
+}
+
+.tense-card {
+  background: var(--card-bg);
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+}
+.tense-title {
+  font-size: 0.95rem; font-weight: 700; color: var(--text);
+  margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.tense-title-target {
+  font-size: 0.78rem; color: var(--gray); font-weight: 500;
+}
+.conjugation-table { display: flex; flex-direction: column; gap: 6px; }
+.conjugation-row {
+  display: grid;
+  grid-template-columns: 120px 100px 1fr;
+  align-items: center;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: var(--bg);
+  gap: 8px;
+}
+.conjugation-row:nth-child(even) { background: var(--light-blue); }
+.conj-pronoun { font-weight: 700; color: var(--blue); font-size: 0.9rem; }
+.conj-pronoun-en { font-size: 0.75rem; color: var(--gray); }
+.conj-form { font-size: 1rem; font-weight: 600; color: var(--text); }
+
+.grammar-note-box {
+  background: #fffbeb; border: 1px solid #fde68a;
+  border-radius: 10px; padding: 12px 14px;
+  font-size: 0.85rem; color: #78350f; margin-top: 12px;
+  line-height: 1.5;
+}
+
+/* ── Sentence dissection result ── */
+.word-pill-row {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-bottom: 14px;
+}
+.word-pill {
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: 2px solid transparent;
+  font-size: 1rem; font-weight: 600;
+  cursor: pointer; transition: all 0.15s;
+}
+.word-pill.selected { border-color: var(--dark); transform: translateY(-2px); box-shadow: 0 3px 10px rgba(0,0,0,0.15); }
+
+/* POS colours */
+.pos-verb        { background: #dbeafe; color: #1d4ed8; }
+.pos-noun        { background: #dcfce7; color: #15803d; }
+.pos-adjective   { background: #ffedd5; color: #c2410c; }
+.pos-adverb      { background: #f3e8ff; color: #7e22ce; }
+.pos-pronoun     { background: #cffafe; color: #0e7490; }
+.pos-preposition { background: #fce7f3; color: #be185d; }
+.pos-conjunction { background: #fef9c3; color: #a16207; }
+.pos-particle    { background: #f1f5f9; color: #475569; }
+.pos-other       { background: #f3f4f6; color: #374151; }
+
+.pos-legend {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  margin-bottom: 16px;
+}
+.legend-item {
+  font-size: 0.72rem; font-weight: 600; padding: 3px 10px;
+  border-radius: 12px; text-transform: uppercase; letter-spacing: 0.04em;
+}
+
+.word-detail-panel {
+  background: var(--card-bg);
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin-bottom: 14px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+  min-height: 120px;
+}
+.detail-hint { color: var(--gray); font-size: 0.85rem; text-align: center; padding: 20px 0; }
+.detail-word {
+  font-size: 1.4rem; font-weight: 800; color: var(--blue);
+  margin-bottom: 12px;
+}
+.detail-grid { display: flex; flex-direction: column; gap: 6px; }
+.detail-row {
+  display: grid; grid-template-columns: 140px 1fr;
+  gap: 8px; font-size: 0.88rem; padding: 5px 0;
+  border-bottom: 1px solid var(--border);
+}
+.detail-row:last-child { border-bottom: none; }
+.detail-label { color: var(--gray); font-weight: 600; }
+.detail-value { color: var(--text); }
+
+.dissect-translation {
+  font-size: 0.9rem; color: var(--gray);
+  font-style: italic; margin-bottom: 12px; padding: 10px 14px;
+  background: var(--light-blue); border-radius: 10px;
+}
+
+/* ── Mobile / iPhone ── */
+@media (max-width: 600px) {
+  /* Conjugation table: drop the English pronoun column, merge into subtitle */
+  .conjugation-row {
+    grid-template-columns: 1fr 1fr;
+  }
+  .conj-pronoun-en { display: none; }
+
+  /* Verb header */
+  .verb-infinitive { font-size: 1.3rem; }
+
+  /* Sentence detail: stack label above value */
+  .detail-row {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+  .detail-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0;
+  }
+  .detail-value { font-size: 0.88rem; }
+  .detail-word { font-size: 1.2rem; }
+
+  /* Bigger word pills for touch */
+  .word-pill { padding: 10px 14px; font-size: 0.95rem; }
+
+  /* Bigger verb chips for touch */
+  .common-verb-chip { padding: 10px 12px; }
+  .cv-verb { font-size: 0.9rem; }
+
+  /* Grammar input bar: stack on very small screens */
+  .grammar-btn-row { flex-direction: column; }
+  .grammar-tool-btn { flex-direction: row; gap: 10px; justify-content: flex-start; padding: 14px 16px; }
+}
+
+/* ── My Words bar ── */
+.my-words-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px 20px;
+  margin-top: 10px;
+  background: var(--card-bg);
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.07);
+  cursor: pointer;
+  transition: all 0.18s;
+  color: var(--text);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+.my-words-bar:hover {
+  border-color: var(--blue);
+  background: var(--light-blue);
+  color: var(--blue);
+}
+.my-words-bar-icon { font-size: 1.4rem; line-height: 1; }
+.my-words-bar-text { flex: 1; text-align: left; }
+.my-words-bar-arrow { font-size: 1rem; opacity: 0.5; }
+.my-words-bar .words-count-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: var(--blue);
+  color: white;
+  border-radius: 999px;
+  padding: 2px 8px;
+  line-height: 1.4;
+}

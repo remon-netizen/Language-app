@@ -1,0 +1,140 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ── Header ── */
+header {
+  background: linear-gradient(135deg, var(--blue) 0%, #003d80 100%);
+  color: white;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+  position: relative;
+  z-index: 10;
+}
+header h1 { font-size: 1.4rem; font-weight: 700; }
+header h1 .flag { font-size: 1.3rem; }
+header p { font-size: 0.8rem; opacity: 0.8; }
+.header-info { flex: 1; text-align: center; }
+
+.settings-toggle {
+  background: rgba(255,255,255,0.15);
+  border: none; border-radius: 8px;
+  color: white; font-size: 1.2rem;
+  width: 38px; height: 38px;
+  cursor: pointer; transition: background 0.2s;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.settings-toggle:hover { background: rgba(255,255,255,0.28); }
+
+/* ── Settings drawer ── */
+.drawer-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 100;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.drawer-overlay.open { display: block; opacity: 1; }
+
+.settings-drawer {
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  width: 320px; max-width: 90vw;
+  background: var(--card-bg);
+  z-index: 101;
+  box-shadow: -4px 0 24px rgba(0,0,0,0.18);
+  transform: translateX(100%);
+  transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+  display: flex; flex-direction: column;
+  overflow-y: auto;
+}
+.settings-drawer.open { transform: translateX(0); }
+
+.drawer-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--border);
+  font-weight: 700; font-size: 1rem; color: var(--text);
+  background: linear-gradient(135deg, var(--blue) 0%, #003d80 100%);
+  color: white;
+  flex-shrink: 0;
+}
+.drawer-close {
+  background: rgba(255,255,255,0.15); border: none; color: white;
+  border-radius: 6px; width: 30px; height: 30px; font-size: 1rem;
+  cursor: pointer; transition: background 0.2s;
+  display: flex; align-items: center; justify-content: center;
+}
+.drawer-close:hover { background: rgba(255,255,255,0.3); }
+
+.drawer-section {
+  padding: 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 10px;
+}
+.drawer-voice-row {
+  display: flex; gap: 8px; align-items: center;
+}
+.drawer-voice-row .voice-select { flex: 1; min-width: 0; }
+
+.speed-btn-row {
+  display: flex; gap: 8px;
+}
+.speed-btn {
+  flex: 1;
+  padding: 9px 0;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+.speed-btn:hover { border-color: var(--blue); }
+.speed-btn.active {
+  border-color: var(--blue);
+  background: var(--blue);
+  color: white;
+}
+
+body.drawer-open { overflow: hidden; }
+
+/* ── Layout ── */
+.app { max-width: 1100px; margin: 0 auto; padding: 24px 16px; }
+@media (max-width: 500px) { .app { padding: 16px 12px; } }
+
+/* ── Screens ── */
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* ── Shared ── */
+.section-title {
+  font-size: 1rem; font-weight: 600; color: var(--gray);
+  text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 14px;
+}
+
+.tag { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
+.tag-beginner { background: #dcfce7; color: #16a34a; }
+.tag-intermediate { background: #fef9c3; color: #854d0e; }
+
+.mic-notice { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 10px; padding: 12px 16px; font-size: 0.85rem; color: #c2410c; margin-bottom: 16px; display: none; }
+.mic-notice.show { display: block; }
+
+.back-btn { background: none; border: none; font-size: 1.4rem; cursor: pointer; padding: 4px; line-height: 1; }
+
+/* ── Keyframes ── */
+@keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); } 50% { box-shadow: 0 0 0 10px rgba(239,68,68,0); } }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes typingBounce { 0%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-6px); } }

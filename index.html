@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Taal-chat</title>
+
+  <!-- PWA manifest -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#005BBB" />
+
+  <!-- iOS home screen support -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Taal-chat" />
+  <link rel="apple-touch-icon" href="icon.svg" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="styles/variables.css" />
+  <link rel="stylesheet" href="styles/base.css" />
+  <link rel="stylesheet" href="styles/home.css" />
+  <link rel="stylesheet" href="styles/lesson.css" />
+  <link rel="stylesheet" href="styles/chat.css" />
+  <link rel="stylesheet" href="styles/grammar.css" />
+  <link rel="stylesheet" href="styles/words.css" />
+  <link rel="stylesheet" href="styles/exercises.css" />
+  <link rel="stylesheet" href="styles/inburgering.css" />
+  <link rel="stylesheet" href="styles/flashcards.css" />
+  <link rel="stylesheet" href="styles/dehet.css" />
+</head>
+<body>
+
+<header>
+  <div class="header-info">
+    <h1 id="headerTitle"><span class="flag">🇺🇦</span> Ukrainian Practice</h1>
+    <p id="headerTagline">Speak. Listen. Learn.</p>
+  </div>
+  <button class="settings-toggle" id="settingsToggleBtn" onclick="toggleSettingsDrawer()" title="Settings">⚙️</button>
+</header>
+
+<!-- Settings drawer overlay -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="toggleSettingsDrawer()"></div>
+
+<!-- Settings drawer -->
+<div class="settings-drawer" id="settingsDrawer">
+  <div class="drawer-header">
+    <span id="drawerHeaderLabel">Settings</span>
+    <button class="drawer-close" onclick="toggleSettingsDrawer()">✕</button>
+  </div>
+
+  <!-- Voice selector -->
+  <div class="drawer-section">
+    <div class="settings-label" id="vcLabel">Voice</div>
+    <div class="vc-name" id="vcName">Loading voices…</div>
+    <div class="vc-quality" id="vcQuality"></div>
+    <div class="drawer-voice-row">
+      <select class="voice-select" id="voiceSelect" onchange="changeVoice()">
+        <option>Loading…</option>
+      </select>
+      <button class="voice-test-btn" id="voiceTestBtn" onclick="testVoice()">▶ Test</button>
+    </div>
+  </div>
+
+  <!-- Speech speed -->
+  <div class="drawer-section">
+    <div class="settings-label" id="speedLabel">Speech speed</div>
+    <div class="speed-btn-row">
+      <button class="speed-btn" id="speedSlowBtn" data-rate="0.7" onclick="setSpeechRate(0.7)">🐢 Slow</button>
+      <button class="speed-btn" id="speedNormalBtn" data-rate="1.0" onclick="setSpeechRate(1.0)">▶ Normal</button>
+    </div>
+  </div>
+
+  <!-- AI settings -->
+  <div class="drawer-section">
+    <div class="settings-label" id="aiLabel">AI Provider &amp; API Key</div>
+    <div class="api-provider-row">
+      <label><input type="radio" name="aiProvider" value="gemini" onchange="switchProvider('gemini')"> Gemini (free)</label>
+      <label><input type="radio" name="aiProvider" value="anthropic" onchange="switchProvider('anthropic')"> Anthropic</label>
+    </div>
+    <div class="api-key-row">
+      <input type="password" class="api-key-input" id="apiKeyInput" placeholder="AIza..." autocomplete="off" />
+      <button class="api-save-btn" id="apiSaveBtn" onclick="saveApiKey()">Save</button>
+    </div>
+    <div class="api-status" id="apiStatus"></div>
+  </div>
+</div>
+
+<div class="app">
+
+  <!-- ══════════ HOME SCREEN ══════════ -->
+  <div class="screen active" id="homeScreen">
+
+    <div class="home-center">
+
+      <!-- Native + target language pickers -->
+      <div class="lang-picker-card">
+        <div class="settings-label" id="iSpeakLabel">I speak</div>
+        <div class="lang-options" id="nativeLangOptions">
+          <button class="lang-choice-btn active" data-native="nl" onclick="switchNativeLanguage('nl')">🇳🇱 Nederlands</button>
+          <button class="lang-choice-btn"        data-native="en" onclick="switchNativeLanguage('en')">🇬🇧 English</button>
+        </div>
+        <div class="settings-label" id="iLearnLabel" style="margin-top:14px">I want to learn</div>
+        <div class="lang-options" id="targetLangOptions">
+          <button class="lang-choice-btn active" data-lang="uk" onclick="switchLanguage('uk')">🇺🇦 <span data-langname="uk">Ukrainian</span></button>
+          <button class="lang-choice-btn"        data-lang="nl" onclick="switchLanguage('nl')">🇳🇱 <span data-langname="nl">Dutch</span></button>
+          <button class="lang-choice-btn"        data-lang="en" onclick="switchLanguage('en')">🇬🇧 <span data-langname="en">English</span></button>
+        </div>
+      </div>
+
+      <!-- Browser recommendation banner -->
+      <div class="browser-banner" id="browserBanner">
+        <div class="bb-icon">🌐</div>
+        <div class="bb-text">
+          <div class="bb-title" id="bbTitle">Use Microsoft Edge for the best voice quality</div>
+          <div class="bb-sub" id="bbSub">Edge has Microsoft's neural voices — they sound significantly more natural than Chrome's.</div>
+        </div>
+        <button class="bb-close" id="bbCloseBtn" onclick="dismissBanner()">Got it</button>
+      </div>
+
+      <!-- Start button -->
+      <button class="start-btn" id="startBtn" onclick="openFreeChat()">
+        <span id="startBtnFlag">🇺🇦</span> <span id="startBtnLabel">Start Conversation</span>
+      </button>
+
+      <!-- Lesson phrases button -->
+      <button class="lessons-btn" id="lessonsBtn" onclick="openLessonBrowse()">
+        <span class="lessons-btn-icon">📖</span>
+        <span class="lessons-btn-text">
+          <span class="lessons-btn-title" id="lessonsBtnTitle">Lessons</span>
+          <span class="lessons-btn-sub" id="lessonsBtnSub">Practise words and phrases with speech</span>
+        </span>
+        <span class="lessons-btn-arrow">→</span>
+      </button>
+
+      <!-- Grammar Exercises card -->
+      <div class="grammar-tools-card">
+        <div class="settings-label" id="grammarLabel">Grammar Exercises</div>
+        <button class="grammar-exercises-btn" id="grammarBtn" onclick="openExercisesScreen()">🎯 Grammar Exercises →</button>
+      </div>
+
+      <!-- My Words bar -->
+      <button class="my-words-bar" onclick="openWordsScreen()">
+        <span class="my-words-bar-icon">📚</span>
+        <span class="my-words-bar-text" id="myWordsLabel">My Words</span>
+        <span class="words-count-badge" id="wordsBadge" style="display:none"></span>
+        <span class="my-words-bar-arrow">→</span>
+      </button>
+
+      <!-- Inburgering — only shown when Dutch is the target AND native is not Dutch -->
+      <button class="inburgering-btn nl-only" id="inburgeringBtn" onclick="openInburgeringScreen()">
+        <span class="ib-btn-icon">🇳🇱</span>
+        <span class="ib-btn-text">
+          <span class="ib-btn-title" id="ibTitle">Inburgeringsexamen</span>
+          <span class="ib-btn-sub" id="ibSub">Oefen KNS &amp; taalvaardigheid voor het examen</span>
+        </span>
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- ══════════ LESSON BROWSE SCREEN ══════════ -->
+  <div class="screen" id="lessonBrowseScreen">
+    <div class="lesson-header">
+      <button class="back-btn" onclick="showScreen('homeScreen')">←</button>
+      <div>
+        <div class="lesson-title" id="lessonBrowseTitle">📖 Lessons</div>
+        <div class="lesson-subtitle" id="lessonBrowseSubtitle">Practise words and phrases</div>
+      </div>
+    </div>
+    <!-- Homework upload -->
+    <div class="homework-upload-card" id="homeworkCard">
+      <div class="hw-icon">📄</div>
+      <div class="hw-text">
+        <div class="hw-title" id="hwTitle">Upload homework</div>
+        <div class="hw-sub" id="hwSub">Upload a .docx or .txt and practise speaking the vocabulary</div>
+      </div>
+      <input type="file" id="homeworkFileInput" accept=".docx,.txt,.text" style="display:none"
+             onchange="handleHomeworkUpload(this.files[0])" />
+      <button class="hw-btn" id="hwBtn" onclick="document.getElementById('homeworkFileInput').click()">Choose file</button>
+    </div>
+    <div class="hw-status" id="hwStatus"></div>
+
+    <div class="categories-grid" id="categoriesGrid"></div>
+    <div class="alphabet-section" id="alphabetSection">
+      <div class="alphabet-title" id="alphabetTitle">Cyrillic Alphabet</div>
+      <div class="alphabet-grid" id="alphabetGrid"></div>
+    </div>
+  </div>
+
+  <!-- ══════════ LESSON PRACTICE SCREEN ══════════ -->
+  <div class="screen" id="lessonScreen">
+    <div class="lesson-header">
+      <button class="back-btn" onclick="showScreen('lessonBrowseScreen'); openLessonBrowse()">←</button>
+      <div>
+        <div class="lesson-title" id="lessonTitle"></div>
+        <div class="lesson-subtitle" id="lessonSubtitle"></div>
+      </div>
+    </div>
+
+    <div id="lessonContent">
+      <div class="nav-dots" id="navDots"></div>
+      <div class="phrase-card">
+        <div class="phrase-counter" id="phraseCounter"></div>
+        <div class="ukrainian" id="phraseUkrainian"></div>
+        <div class="phonetic" id="phrasePhonetic"></div>
+        <div class="english" id="phraseEnglish"></div>
+        <div class="tip" id="phraseTip"></div>
+      </div>
+
+      <div class="controls">
+        <button class="btn btn-listen" id="listenBtn" onclick="listenPhrase()">🔊 Listen</button>
+        <button class="btn btn-listen-slow" id="listenSlowBtn" onclick="listenSlowPhrase()">🐢 Slow</button>
+        <button class="btn btn-translation" id="listenTranslationBtn" onclick="listenTranslation()">💬 Hear meaning</button>
+      </div>
+      <div class="controls" style="margin-top:0">
+        <button class="btn btn-speak" id="speakBtn" onclick="toggleLessonSpeak()">🎙️ Speak</button>
+      </div>
+
+      <div class="mic-notice" id="micNotice">🎙️ Microphone permission needed</div>
+
+      <div class="feedback-area" id="feedbackArea">
+        <div class="feedback-score" id="feedbackScore"></div>
+        <div class="feedback-text" id="feedbackText"></div>
+        <div class="feedback-heard" id="feedbackHeard"></div>
+        <div class="comparison" id="comparisonView"></div>
+      </div>
+
+      <button class="next-btn" id="nextBtn" onclick="nextPhrase()">Next →</button>
+    </div>
+
+    <div class="lesson-complete" id="lessonComplete">
+      <div class="complete-icon">🎉</div>
+      <div class="complete-title">Lesson Complete!</div>
+      <div class="complete-subtitle" id="completeSubtitle"></div>
+      <div class="complete-stats" id="completeStats"></div>
+      <button class="btn btn-listen" onclick="restartLesson()">🔄 Restart</button>
+      <button class="next-btn" onclick="showScreen('lessonBrowseScreen'); openLessonBrowse()">← Back to lessons</button>
+    </div>
+  </div>
+
+  <!-- ══════════ CHAT SCREEN ══════════ -->
+  <div class="screen" id="chatScreen">
+    <div class="lesson-header">
+      <button class="back-btn" onclick="showScreen('homeScreen')">←</button>
+      <div>
+        <div class="lesson-title" id="chatTitle">AI Conversation</div>
+        <div class="lesson-subtitle">Talk freely · Grammar feedback · Suggestions</div>
+      </div>
+    </div>
+
+    <div class="screen-inner">
+
+      <!-- Difficulty bar -->
+      <div class="chat-settings">
+        <div class="settings-label">Level</div>
+        <div class="difficulty-selector">
+          <button class="diff-btn active" data-diff="a1" onclick="setDifficulty('a1')">A1</button>
+          <button class="diff-btn" data-diff="a2" onclick="setDifficulty('a2')">A2</button>
+          <button class="diff-btn" data-diff="b1" onclick="setDifficulty('b1')">B1</button>
+          <button class="diff-btn" data-diff="b2" onclick="setDifficulty('b2')">B2</button>
+        </div>
+      </div>
+
+      <!-- Two-column layout -->
+      <div class="chat-layout">
+
+        <!-- LEFT: Chat -->
+        <div class="chat-main">
+          <div class="chat-area" id="chatArea"></div>
+          <div class="chat-input-bar">
+            <input class="talk-input" id="talkInput" type="text"
+              placeholder="Type or speak…"
+              onkeydown="if(event.key==='Enter') sendText()" />
+            <button class="mic-btn" id="talkMicBtn" onclick="toggleFreeSpeak()" title="Speak">🎙️</button>
+            <button class="send-btn" onclick="sendText()">Send →</button>
+          </div>
+        </div>
+
+        <!-- RIGHT: Suggestions + Translator -->
+        <div class="suggestions-sidebar">
+
+          <div class="sidebar-card" id="suggestionsCard">
+            <div class="sidebar-title">💡 Suggested replies</div>
+            <div id="suggestionsList">
+              <div class="suggestions-empty">Suggestions will appear after the AI responds.</div>
+            </div>
+          </div>
+
+          <div class="sidebar-card translator-card">
+            <div class="sidebar-title">🔤 Translate to Ukrainian</div>
+            <textarea id="translateInput" class="translate-input" placeholder="Type English here…"></textarea>
+            <button class="translate-btn" id="translateBtn" onclick="translateText()">Translate to Ukrainian →</button>
+            <div id="translateOutput" class="translate-output"></div>
+          </div>
+
+          <!-- Conversation summary — shown after ≥ 2 exchanges -->
+          <button class="sum-trigger-btn" id="chatSummaryBtn"
+                  onclick="showConversationSummary()" style="display:none">
+            📊 Conversation Summary
+          </button>
+          <div class="sidebar-card sum-card" id="summaryCard" style="display:none">
+            <div class="sidebar-title">📊 Summary</div>
+            <div id="summaryContent"></div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ VERB CONJUGATION SCREEN ══════════ -->
+  <div class="screen" id="verbScreen">
+    <div class="lesson-header">
+      <button class="back-btn" onclick="showScreen('homeScreen')">←</button>
+      <div>
+        <div class="lesson-title">📋 Verb Conjugation</div>
+        <div class="lesson-subtitle" id="verbScreenSub">🇺🇦 Ukrainian</div>
+      </div>
+    </div>
+    <div class="grammar-input-bar">
+      <input class="grammar-text-input" id="verbInput" type="text"
+        placeholder="Enter a verb, e.g. писати / schrijven…"
+        onkeydown="if(event.key==='Enter') submitVerb()" />
+      <button class="grammar-submit-btn" id="verbSubmitBtn" onclick="submitVerb()">Look up →</button>
+    </div>
+    <div id="commonVerbsContainer"></div>
+    <div id="verbResult"></div>
+  </div>
+
+  <!-- ══════════ INBURGERING SCREEN ══════════ -->
+  <div class="screen" id="inburgeringScreen">
+    <!-- Content populated dynamically by inburgering-ui.js -->
+  </div>
+
+  <!-- ══════════ GRAMMAR EXERCISES SCREEN ══════════ -->
+  <div class="screen" id="exercisesScreen">
+    <!-- Content populated dynamically by exercises-ui.js -->
+  </div>
+
+  <!-- ══════════ MY WORDS SCREEN ══════════ -->
+  <div class="screen" id="wordsScreen">
+    <div class="lesson-header">
+      <button class="back-btn" onclick="showScreen('homeScreen')">←</button>
+      <div>
+        <div class="lesson-title" id="wordsScreenTitle">📚 My Words</div>
+        <div class="lesson-subtitle" id="wordsScreenSubtitle">Words saved from conversations</div>
+      </div>
+    </div>
+    <div id="wordsListContainer"></div>
+  </div>
+
+  <!-- ══════════ SENTENCE DISSECTION SCREEN ══════════ -->
+  <div class="screen" id="dissectScreen">
+    <div class="lesson-header">
+      <button class="back-btn" onclick="showScreen('homeScreen')">←</button>
+      <div>
+        <div class="lesson-title">🔍 Sentence Dissection</div>
+        <div class="lesson-subtitle" id="dissectScreenSub">🇺🇦 Ukrainian</div>
+      </div>
+    </div>
+    <div class="grammar-input-bar">
+      <input class="grammar-text-input" id="dissectInput" type="text"
+        placeholder="Enter a sentence to analyse…"
+        onkeydown="if(event.key==='Enter') submitDissect()" />
+      <button class="grammar-submit-btn" id="dissectSubmitBtn" onclick="submitDissect()">Analyse →</button>
+    </div>
+    <div id="dissectResult"></div>
+  </div>
+
+  <!-- ══════════ FLASHCARD SCREEN ══════════ -->
+  <div class="screen" id="flashcardScreen">
+    <!-- Content populated dynamically by flashcards-ui.js -->
+  </div>
+
+  <!-- ══════════ DE/HET SCREEN ══════════ -->
+  <div class="screen" id="dehetScreen">
+    <!-- Content populated dynamically by dehet-ui.js -->
+  </div>
+
+</div><!-- /app -->
+
+<!-- Word Lookup Card -->
+<div id="wordLookupOverlay" class="wl-overlay" onclick="closeWordLookup()">
+  <div class="wl-card" onclick="event.stopPropagation()">
+    <div class="wl-header">
+      <span class="wl-word" id="wlWord"></span>
+      <button class="wl-close" onclick="closeWordLookup()">✕</button>
+    </div>
+    <div id="wlContent" class="wl-content"></div>
+  </div>
+</div>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

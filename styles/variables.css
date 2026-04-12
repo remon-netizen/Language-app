@@ -1,0 +1,14 @@
+:root {
+  --blue: #005BBB;
+  --yellow: #FFD500;
+  --light-blue: #e8f0fb;
+  --dark: #1a1a2e;
+  --text: #2d3142;
+  --gray: #6b7280;
+  --border: #e5e7eb;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --card-bg: #ffffff;
+  --bg: #f8f9ff;
+}
