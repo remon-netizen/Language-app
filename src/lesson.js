@@ -164,7 +164,7 @@ export function showLessonComplete() {
   const currentLevel = isHomework ? 0 : getLessonLevel(lessonId);
   const levelLabel = getLevelLabel(currentLevel);
   const canLevelUp = !isHomework && avg >= 70 && hasNextLevel(currentLevel);
-  const nextLabel = canLevelUp ? getNextLevelLabel(currentLevel) : '';
+  const nextLabel = hasNextLevel(currentLevel) ? getNextLevelLabel(currentLevel) : '';
   const native = state.nativeLanguage;
 
   // If score is good enough, save the completed level
@@ -183,11 +183,11 @@ export function showLessonComplete() {
     <div class="stat-box"><div class="num">${avg}%</div><div class="label">${t('lesson.avgScore')}</div></div>
     ${levelHtml}`;
 
-  // Add or remove the level-up button
-  let lvlBtn = completeEl.querySelector('.btn-level-up');
-  if (lvlBtn) lvlBtn.remove();
+  // Clean up any previous level-related elements
+  completeEl.querySelectorAll('.btn-level-up, .level-retry-msg, .level-max-msg').forEach(el => el.remove());
 
   if (canLevelUp) {
+    let lvlBtn;
     lvlBtn = document.createElement('button');
     lvlBtn.className = 'btn-level-up';
     lvlBtn.textContent = native === 'nl'
