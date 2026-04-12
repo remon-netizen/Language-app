@@ -83,9 +83,49 @@ export function openReviewScreen() {
     return;
   }
 
-  // Prioritise phrases that haven't been reviewed recently.
-  // Simple sort: least-recently-reviewed first, then oldest first.
-  all.sort((a, b) => (a.lastReviewed || 0) - (b.lastReviewed || 0));
+  // ── Smart spaced repetition ──────────────────────────────────────────────
+  // Each phrase gets an urgency score. Higher urgency = reviewed sooner.
+  //
+  // Factors:
+  //  1. Low review score → high urgency  (you struggle with this phrase)
+  //  2. Long time since last review → high urgency  (it's fading from memory)
+  //  3. Never reviewed → highest urgency  (brand new, needs first review)
+  //  4. Small random jitter so sessions don't feel repetitive
+  //
+  // Strong phrases (high reviewScore) get a longer "cooldown" before they
+  // become urgent again — this is the core spaced-repetition idea.
+
+  const now = Date.now();
+  const HOUR = 3600_000;
+
+  all.forEach(p => {
+    const score       = p.reviewScore || 0;       // 0–100 rolling average
+    const lastReview  = p.lastReviewed || 0;
+    const hoursSince  = lastReview ? (now - lastReview) / HOUR : 999;
+
+    // Cooldown: strong phrases need more hours to pass before they're urgent.
+    // score 0 → cooldown 0h (review immediately)
+    // score 50 → cooldown ~6h
+    // score 80 → cooldown ~24h
+    // score 95 → cooldown ~72h
+    const cooldownHours = Math.pow(score / 100, 2) * 72;
+    const overdue       = hoursSince - cooldownHours; // positive = overdue
+
+    // Weakness boost: phrases with low scores get extra urgency.
+    // score 0 → +100, score 50 → +50, score 90 → +10
+    const weaknessBoost = 100 - score;
+
+    // Never-reviewed bonus: brand new phrases get a big push.
+    const newBonus = lastReview === 0 ? 200 : 0;
+
+    // Random jitter (0–15) so tied phrases shuffle each session.
+    const jitter = Math.random() * 15;
+
+    p._urgency = overdue + weaknessBoost + newBonus + jitter;
+  });
+
+  // Sort by urgency descending (most urgent first).
+  all.sort((a, b) => b._urgency - a._urgency);
 
   // Take up to 10 phrases for this review session.
   review.phrases = all.slice(0, 10);
