@@ -136,7 +136,6 @@ function applyStaticI18n() {
   setText('iSpeakLabel', 'home.iSpeak');
   setText('iLearnLabel', 'home.iLearn');
   setText('grammarLabel', 'home.grammarTitle');
-  setText('grammarBtn', 'home.grammarBtn');
   setText('myWordsLabel', 'home.myWords');
   setText('startBtnLabel', 'home.start');
   setText('lessonsBtnTitle', 'home.lessonsBtnTitle');
