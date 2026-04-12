@@ -17,6 +17,7 @@ import { openFlashcardScreen, flipFlashcard, rateFlashcard } from './grammar/fla
 import { openDeHetScreen, setDhLevel, startDeHetDrill, answerDeHet } from './grammar/dehet-ui.js';
 import { startLesson, startHomeworkLesson, restartLesson, buildCategoryCards, buildAlphabet, listenPhrase, listenSlowPhrase, listenTranslation, toggleSpeak as toggleLessonSpeak, nextPhrase, speakAlphabetLetter } from './lesson.js';
 import { readHomeworkFile, generateHomeworkPhrases } from './api/homework.js';
+import { openReviewScreen, startNewReview, getLearnedCount } from './review.js';
 
 // ── Speech speed ──────────────────────────────────────────────────────────────
 function setSpeechRate(rate) {
@@ -76,6 +77,9 @@ function applyStaticI18n() {
   setText('startBtnLabel', 'home.start');
   setText('lessonsBtnTitle', 'home.lessonsBtnTitle');
   setText('lessonsBtnSub', 'home.lessonsBtnSub');
+  setText('reviewBtnTitle', 'home.reviewTitle');
+  setText('reviewBtnSub', 'home.reviewSub');
+  updateReviewCount();
   setText('hwTitle', 'home.hwTitle');
   setText('hwSub', 'home.hwSub');
   setText('hwBtn', 'home.hwBtn');
@@ -122,6 +126,16 @@ function applyStaticI18n() {
   // Words screen
   setText('wordsScreenTitle', 'words.title');
   setText('wordsScreenSubtitle', 'words.subtitle');
+}
+
+// ── Review count badge ────────────────────────────────────────────────────────
+function updateReviewCount() {
+  const count = getLearnedCount();
+  const badge = document.getElementById('reviewBtnCount');
+  if (badge) {
+    badge.textContent = count > 0 ? count : '';
+    badge.style.display = count > 0 ? '' : 'none';
+  }
 }
 
 // ── Homework upload ───────────────────────────────────────────────────────────
@@ -253,6 +267,9 @@ function switchLanguage(lang) {
   state.conversationHistory = [];
   const chatArea = document.getElementById('chatArea');
   if (chatArea) chatArea.innerHTML = '';
+
+  // Update review badge for the new target language
+  updateReviewCount();
 }
 
 function updateHeaderAndChat() {
@@ -358,3 +375,5 @@ window.toggleLessonSpeak   = toggleLessonSpeak;
 window.nextPhrase          = nextPhrase;
 window.speakAlphabetLetter = speakAlphabetLetter;
 window.handleHomeworkUpload = handleHomeworkUpload;
+window.openReviewScreen    = openReviewScreen;
+window.startNewReview      = startNewReview;

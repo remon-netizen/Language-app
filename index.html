@@ -132,6 +132,17 @@
         <span class="lessons-btn-arrow">→</span>
       </button>
 
+      <!-- Review learned phrases -->
+      <button class="review-btn" id="reviewBtn" onclick="openReviewScreen()">
+        <span class="review-btn-icon">🔄</span>
+        <span class="review-btn-text">
+          <span class="review-btn-title" id="reviewBtnTitle">Review</span>
+          <span class="review-btn-sub" id="reviewBtnSub">Practise phrases from memory</span>
+        </span>
+        <span class="review-btn-count" id="reviewBtnCount"></span>
+        <span class="review-btn-arrow">→</span>
+      </button>
+
       <!-- Grammar Exercises card -->
       <div class="grammar-tools-card">
         <div class="settings-label" id="grammarLabel">Grammar Exercises</div>
@@ -238,6 +249,11 @@
       <button class="btn-restart" onclick="restartLesson()">🔄 Restart</button>
       <button class="next-btn" onclick="showScreen('lessonBrowseScreen'); openLessonBrowse()">← Back to lessons</button>
     </div>
+  </div>
+
+  <!-- ══════════ REVIEW SCREEN ══════════ -->
+  <div class="screen" id="reviewScreen">
+    <!-- Content populated dynamically by review.js -->
   </div>
 
   <!-- ══════════ CHAT SCREEN ══════════ -->

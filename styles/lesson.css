@@ -139,6 +139,64 @@
 }
 .btn-restart:hover { background: #003d80; }
 
+/* ── Review card ── */
+.review-card {
+  background: var(--card-bg);
+  border-radius: 20px;
+  padding: 32px 28px;
+  text-align: center;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+  margin-bottom: 20px;
+}
+.review-prompt {
+  font-size: 0.85rem;
+  color: var(--gray);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.review-translation {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+  margin-bottom: 10px;
+}
+.review-tip {
+  font-size: 0.82rem;
+  color: var(--gray);
+  background: var(--light-blue);
+  border-radius: 8px;
+  padding: 8px 12px;
+  text-align: left;
+  margin-bottom: 12px;
+}
+.review-answer {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 2px solid var(--border);
+}
+.review-answer-label {
+  font-size: 0.75rem;
+  color: var(--gray);
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.review-answer-target {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--blue);
+  line-height: 1.3;
+}
+.review-answer-phonetic {
+  font-size: 0.95rem;
+  color: var(--gray);
+  font-style: italic;
+  margin-top: 4px;
+}
+
 @media (max-width: 500px) {
   .phrase-card .ukrainian { font-size: 1.5rem; }
   .controls { flex-direction: column; }
