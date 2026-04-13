@@ -42,7 +42,7 @@ function updateCompactLabel() {
   const el = document.getElementById('langCompactText');
   if (!el) return;
   const nativeFlag = { nl: '🇳🇱', en: '🇬🇧' }[state.nativeLanguage] || '';
-  const targetFlag = { uk: '🇺🇦', nl: '🇳🇱', en: '🇬🇧' }[state.currentLanguage] || '';
+  const targetFlag = { uk: '🇺🇦', nl: '🇳🇱', en: '🇬🇧', fr: '🇫🇷' }[state.currentLanguage] || '';
   const targetName = languageName(state.currentLanguage);
   el.textContent = `${nativeFlag} → ${targetFlag} ${targetName}`;
 }

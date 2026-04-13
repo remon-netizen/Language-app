@@ -12,11 +12,13 @@
 import { LESSONS as UK_LESSONS } from './lessons.js';
 import { DUTCH_LESSONS as NL_LESSONS } from './dutch-lessons.js';
 import { ENGLISH_LESSONS as EN_LESSONS } from './english-lessons.js';
+import { FRENCH_LESSONS as FR_LESSONS } from './french-lessons.js';
 
 export function getLessonsForTarget(target) {
   switch (target) {
     case 'nl': return NL_LESSONS;
     case 'en': return EN_LESSONS;
+    case 'fr': return FR_LESSONS;
     case 'uk':
     default:   return UK_LESSONS;
   }

@@ -15,6 +15,7 @@ const TARGET_META = {
   uk: { prefix: 'uk', label: 'Ukrainian', listKey: 'availableUkVoices', selKey: 'selectedVoice',   savedKey: 'ukVoiceName' },
   nl: { prefix: 'nl', label: 'Dutch',     listKey: 'availableNlVoices', selKey: 'selectedNlVoice', savedKey: 'nlVoiceName' },
   en: { prefix: 'en', label: 'English',   listKey: 'availableEnVoices', selKey: 'selectedEnVoice', savedKey: 'enVoiceName' },
+  fr: { prefix: 'fr', label: 'French',    listKey: 'availableFrVoices', selKey: 'selectedFrVoice', savedKey: 'frVoiceName' },
 };
 
 function meta() {
@@ -88,6 +89,7 @@ export function testVoice() {
     uk: 'Привіт! Як справи? Мене звати Sasha.',
     nl: 'Hallo! Hoe gaat het? Mijn naam is Emma.',
     en: 'Hello! How are you? My name is Oliver.',
+    fr: 'Bonjour ! Comment allez-vous ? Je m\'appelle Pierre.',
   };
   speakText(samples[state.currentLanguage] || samples.uk, getTTSLang());
 }
@@ -97,6 +99,7 @@ function getSelectedVoice(lang) {
   if (code === 'nl') return state.selectedNlVoice;
   if (code === 'uk') return state.selectedVoice;
   if (code === 'en') return state.selectedEnVoice;
+  if (code === 'fr') return state.selectedFrVoice;
   return null;
 }
 

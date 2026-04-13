@@ -88,6 +88,33 @@ const TOPICS_EN = [
     subtitle: { en: 'subject, object, possessive, reflexive', nl: 'onderwerp, lijdend voorwerp, bezittelijk, wederkerend' } },
 ];
 
+const TOPICS_FR = [
+  { id: 'gender',       icon: '🔤',
+    title:    { en: 'Gender & Articles',     nl: 'Geslacht & lidwoorden' },
+    subtitle: { en: 'le / la / les, un / une / des',  nl: 'le / la / les, un / une / des' } },
+  { id: 'conjugation',  icon: '🔄',
+    title:    { en: 'Verb Conjugation',      nl: 'Werkwoordsvervoeging' },
+    subtitle: { en: '-er, -ir, -re groups + irregulars', nl: '-er, -ir, -re groepen + onregelmatig' } },
+  { id: 'past_tense',   icon: '⏮',
+    title:    { en: 'Past Tense',            nl: 'Verleden tijd' },
+    subtitle: { en: 'passé composé vs imparfait',    nl: 'passé composé vs imparfait' } },
+  { id: 'pronouns',     icon: '👤',
+    title:    { en: 'Pronouns',              nl: 'Voornaamwoorden' },
+    subtitle: { en: 'subject, object, reflexive',     nl: 'onderwerp, lijdend voorwerp, wederkerend' } },
+  { id: 'prepositions', icon: '📍',
+    title:    { en: 'Prepositions',          nl: 'Voorzetsels' },
+    subtitle: { en: 'à, de, en, dans, pour…',         nl: 'à, de, en, dans, pour…' } },
+  { id: 'adjectives',   icon: '🖊',
+    title:    { en: 'Adjectives',            nl: 'Bijvoeglijke naamwoorden' },
+    subtitle: { en: 'agreement + position (BANGS)',   nl: 'verbuiging + positie (BANGS)' } },
+  { id: 'negation',     icon: '🚫',
+    title:    { en: 'Negation',              nl: 'Ontkenning' },
+    subtitle: { en: 'ne...pas, ne...jamais, ne...rien', nl: 'ne...pas, ne...jamais, ne...rien' } },
+  { id: 'subjunctive',  icon: '💭',
+    title:    { en: 'Subjunctive',           nl: 'Aanvoegende wijs' },
+    subtitle: { en: 'il faut que, je veux que…',      nl: 'il faut que, je veux que…' } },
+];
+
 // Pick the localised string from a {en, nl} field, falling back to English.
 function loc(field) {
   if (!field) return '';
@@ -111,6 +138,7 @@ function getTopics() {
   switch (state.currentLanguage) {
     case 'nl': return TOPICS_NL;
     case 'en': return TOPICS_EN;
+    case 'fr': return TOPICS_FR;
     case 'uk':
     default:   return TOPICS_UK;
   }

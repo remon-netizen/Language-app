@@ -6,7 +6,7 @@ export async function lookupWord(word) {
   const apiKey = getApiKey();
   if (!apiKey) throw new Error('No API key — add your Gemini key in Settings (⚙️)');
 
-  const TARGET_NAMES = { uk: 'Ukrainian', nl: 'Dutch', en: 'English' };
+  const TARGET_NAMES = { uk: 'Ukrainian', nl: 'Dutch', en: 'English', fr: 'French' };
   const NATIVE_NAMES = { en: 'English', nl: 'Dutch' };
   const langName   = TARGET_NAMES[state.currentLanguage] || 'Ukrainian';
   const nativeName = NATIVE_NAMES[state.nativeLanguage] || 'English';

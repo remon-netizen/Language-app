@@ -3,7 +3,7 @@
 // Target = the language the learner is studying.
 // Invariant: native !== target.
 export const NATIVE_LANGUAGES = ['nl', 'en'];
-export const TARGET_LANGUAGES = ['uk', 'nl', 'en'];
+export const TARGET_LANGUAGES = ['uk', 'nl', 'en', 'fr'];
 
 const DEFAULT_NATIVE = 'nl';
 const DEFAULT_TARGET = 'uk';
@@ -51,9 +51,11 @@ export const state = {
   selectedVoice: null,      // selected Ukrainian voice
   selectedNlVoice: null,    // selected Dutch voice
   selectedEnVoice: null,    // selected English voice
+  selectedFrVoice: null,    // selected French voice
   availableUkVoices: [],
   availableNlVoices: [],
   availableEnVoices: [],
+  availableFrVoices: [],
 };
 
 // Possible target languages for a given native language (excludes the native).
@@ -67,6 +69,7 @@ export function getTTSLang() {
   switch (state.currentLanguage) {
     case 'nl': return 'nl-NL';
     case 'en': return 'en-GB';
+    case 'fr': return 'fr-FR';
     case 'uk':
     default:   return 'uk-UA';
   }
@@ -77,6 +80,7 @@ export function getLTLang() {
   switch (state.currentLanguage) {
     case 'nl': return 'nl';
     case 'en': return 'en-GB';
+    case 'fr': return 'fr';
     case 'uk':
     default:   return 'uk';
   }
@@ -86,15 +90,15 @@ export function getLTLang() {
 // native language. Used in UI labels like "Translate to Ukrainian".
 export function getTargetLanguageName(inLang = state.nativeLanguage) {
   const names = {
-    en: { uk: 'Ukrainian', nl: 'Dutch',     en: 'English' },
-    nl: { uk: 'Oekraïens', nl: 'Nederlands', en: 'Engels' },
+    en: { uk: 'Ukrainian', nl: 'Dutch',     en: 'English', fr: 'French' },
+    nl: { uk: 'Oekraïens', nl: 'Nederlands', en: 'Engels',  fr: 'Frans' },
   };
   return names[inLang]?.[state.currentLanguage] || state.currentLanguage;
 }
 
 // Flag emoji for the current target language.
 export function getTargetFlag() {
-  return { uk: '🇺🇦', nl: '🇳🇱', en: '🇬🇧' }[state.currentLanguage] || '🌐';
+  return { uk: '🇺🇦', nl: '🇳🇱', en: '🇬🇧', fr: '🇫🇷' }[state.currentLanguage] || '🌐';
 }
 
 // Extract the human first name from a TTS voice name.
@@ -109,17 +113,18 @@ function extractFirstName(voiceName) {
     .trim();
   const first = cleaned.split(/\s+/)[0];
   // Reject non-names (language labels like "Nederlands", "Ukrainian", etc.)
-  if (!first || /^(Nederlands|Ukrainian|English|German|French|Spanish|Dutch|Engels|Oekraïens)$/i.test(first)) return null;
+  if (!first || /^(Nederlands|Ukrainian|English|German|French|Spanish|Dutch|Engels|Oekraïens|Français|Frans)$/i.test(first)) return null;
   return first;
 }
 
 // Default tutor name when the TTS voice has no human name embedded.
-const DEFAULT_TUTOR = { uk: 'Sasha', nl: 'Emma', en: 'Oliver' };
+const DEFAULT_TUTOR = { uk: 'Sasha', nl: 'Emma', en: 'Oliver', fr: 'Pierre' };
 
 export function getTutorFirstName() {
   const voice =
     state.currentLanguage === 'nl' ? state.selectedNlVoice :
     state.currentLanguage === 'en' ? state.selectedEnVoice :
+    state.currentLanguage === 'fr' ? state.selectedFrVoice :
     null;
   if (voice) {
     const extracted = extractFirstName(voice.name);

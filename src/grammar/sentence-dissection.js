@@ -21,7 +21,7 @@ export function openDissectScreen() {
   document.getElementById('dissectResult').innerHTML = '';
   const sub = document.getElementById('dissectScreenSub');
   if (sub) {
-    const meta = { uk: '🇺🇦 Ukrainian', nl: '🇳🇱 Dutch', en: '🇬🇧 English' };
+    const meta = { uk: '🇺🇦 Ukrainian', nl: '🇳🇱 Dutch', en: '🇬🇧 English', fr: '🇫🇷 French' };
     sub.textContent = meta[state.currentLanguage] || meta.uk;
   }
 }

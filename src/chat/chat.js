@@ -55,6 +55,13 @@ function buildOpeners(target, native, n) {
         { uk: `Hello! I'm ${n}. How are you today? What would you like to learn?`, en: `Hallo! Ik ben ${n}. Hoe gaat het vandaag? Wat wil je leren?` },
       ],
     },
+    fr: {
+      en: [
+        { uk: `Bonjour ! Je suis ${n}, votre assistant pour le français. Comment vous appelez-vous ?`, en: `Hello! I'm ${n}, your French language helper. What's your name?` },
+        { uk: `Bienvenue ! Je suis ${n}. Pratiquons le français ensemble. D'où venez-vous ?`, en: `Welcome! I'm ${n}. Let's practise French together. Where are you from?` },
+        { uk: `Salut ! Je suis ${n}. Comment allez-vous aujourd'hui ? Qu'est-ce que vous voulez apprendre ?`, en: `Hi! I'm ${n}. How are you today? What would you like to learn?` },
+      ],
+    },
   };
   return data[target]?.[native] || data[target]?.en || data.uk.en;
 }
@@ -168,6 +175,34 @@ function buildStarterSuggestions(target, native) {
           { uk: 'Let\'s talk about culture', en: 'Laten we het over cultuur hebben' },
           { uk: 'What do you think about this?', en: 'Wat denk jij hierover?' },
           { uk: 'Could you explain this grammar structure?', en: 'Kun je deze grammaticale constructie uitleggen?' },
+        ],
+      },
+    },
+    fr: {
+      en: {
+        a1: [
+          { uk: 'Je m\'appelle [your name]', en: 'My name is [your name]' },
+          { uk: 'Je viens de...', en: 'I come from...' },
+          { uk: 'Ça va bien, merci !', en: 'I\'m fine, thank you!' },
+          { uk: 'Je ne comprends pas', en: 'I don\'t understand' },
+        ],
+        a2: [
+          { uk: 'Je m\'appelle [nom]. J\'apprends le français.', en: 'My name is [name]. I\'m learning French.' },
+          { uk: 'J\'habite à Amsterdam', en: 'I live in Amsterdam' },
+          { uk: 'Pouvez-vous répéter ?', en: 'Can you repeat that?' },
+          { uk: 'Qu\'est-ce que ça veut dire ?', en: 'What does that mean?' },
+        ],
+        b1: [
+          { uk: 'J\'apprends le français depuis un moment', en: 'I\'ve been learning French for a while' },
+          { uk: 'Depuis combien de temps apprenez-vous les langues ?', en: 'How long have you been learning languages?' },
+          { uk: 'J\'ai une question sur la grammaire', en: 'I have a question about grammar' },
+          { uk: 'Parlez-moi de la France', en: 'Tell me about France' },
+        ],
+        b2: [
+          { uk: 'Intéressant, que faites-vous dans la vie ?', en: 'Interesting, what do you do for a living?' },
+          { uk: 'Parlons de la culture française', en: 'Let\'s talk about French culture' },
+          { uk: 'Qu\'en pensez-vous ?', en: 'What do you think about this?' },
+          { uk: 'Pourriez-vous m\'expliquer cette construction grammaticale ?', en: 'Could you explain this grammar structure?' },
         ],
       },
     },
@@ -337,6 +372,35 @@ export function getFallbackResponse(userText) {
         { uk: 'Could you repeat that?', en: 'Kun je dat herhalen?' },
         { uk: 'Thank you very much!', en: 'Heel erg bedankt!' },
         { uk: 'That\'s really interesting', en: 'Dat is echt interessant' },
+      ]
+    };
+  }
+
+  // French fallback responses (target = French)
+  if (state.currentLanguage === 'fr') {
+    const frResponses = [
+      { keys: ['bonjour','salut','bonsoir','hello','hi','hey'], uk: 'Bonjour ! Comment allez-vous aujourd\'hui ?', en: 'Hello! How are you today?' },
+      { keys: ['bien','good','fine','great','ça va'], uk: 'Magnifique ! Moi aussi je vais bien, merci !', en: 'Wonderful! I\'m doing well too, thanks!' },
+      { keys: ['merci','thank'], uk: 'De rien ! Vous vous débrouillez très bien !', en: 'You\'re welcome! You\'re doing really well!' },
+      { keys: ['manger','food','eat','fromage','vin','wine','cheese'], uk: 'La cuisine française est extraordinaire ! Quel est votre plat préféré ?', en: 'French cuisine is extraordinary! What\'s your favourite dish?' },
+      { keys: ['bye','revoir','goodbye','salut'], uk: 'Au revoir ! Bonne continuation avec votre français !', en: 'Goodbye! Keep up the good work with your French!' },
+      { keys: ['learn','apprendre','étudier','study'], uk: 'Excellent ! La pratique est la clé du succès. Continuez !', en: 'Excellent! Practice is the key to success. Keep going!' },
+      { keys: ['france','french','paris','français'], uk: 'La France est un pays magnifique avec une culture riche !', en: 'France is a magnificent country with a rich culture!' },
+    ];
+    const matched = frResponses.find(r => r.keys.some(k => lower.includes(k)));
+    const frFallbacks = [
+      { uk: 'Intéressant ! Continuez, vous vous débrouillez bien !', en: 'Interesting! Keep going, you\'re doing well!' },
+      { uk: 'Formidable ! Votre français s\'améliore de jour en jour !', en: 'Wonderful! Your French is improving every day!' },
+      { uk: 'Je comprends. De quoi d\'autre voulez-vous parler ?', en: 'I understand. What else would you like to talk about?' },
+    ];
+    const resp = matched || frFallbacks[Math.floor(Math.random() * frFallbacks.length)];
+    return {
+      response_uk: resp.uk, response_en: resp.en, grammar_feedback: null,
+      suggestions: [
+        { uk: 'Comment dit-on "..." en français ?', en: 'How do you say "..." in French?' },
+        { uk: 'Pouvez-vous répéter ?', en: 'Can you repeat that?' },
+        { uk: 'Merci beaucoup !', en: 'Thank you very much!' },
+        { uk: 'C\'est très intéressant', en: 'That\'s very interesting' },
       ]
     };
   }

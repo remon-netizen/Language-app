@@ -34,7 +34,7 @@ async function callGrammarAPI(systemPrompt, userMessage) {
   return parsed;
 }
 
-const TARGET_LANG_NAME_GR = { uk: 'Ukrainian', nl: 'Dutch', en: 'English' };
+const TARGET_LANG_NAME_GR = { uk: 'Ukrainian', nl: 'Dutch', en: 'English', fr: 'French' };
 const NATIVE_LANG_NAME_GR = { en: 'English', nl: 'Dutch' };
 
 // ── Verb conjugation ──────────────────────────────────────────────────────────
@@ -179,7 +179,63 @@ export async function conjugateVerb(verb) {
   "notes": "..."
 }`;
 
-  const schemaByLang = { uk: ukSchema, nl: nlSchema, en: enSchema };
+  const frSchema = `{
+  "verb_infinitive": "...",
+  "verb_target": "...",
+  "tenses": [
+    {
+      "tense_name": "Present",
+      "tense_name_target": "Présent",
+      "forms": [
+        { "pronoun": "je",         "pronoun_en": "I",         "form": "..." },
+        { "pronoun": "tu",         "pronoun_en": "you",       "form": "..." },
+        { "pronoun": "il/elle/on", "pronoun_en": "he/she/one","form": "..." },
+        { "pronoun": "nous",       "pronoun_en": "we",        "form": "..." },
+        { "pronoun": "vous",       "pronoun_en": "you (pl./formal)", "form": "..." },
+        { "pronoun": "ils/elles",  "pronoun_en": "they",      "form": "..." }
+      ]
+    },
+    {
+      "tense_name": "Passé Composé",
+      "tense_name_target": "Passé composé",
+      "forms": [
+        { "pronoun": "je",         "pronoun_en": "I",         "form": "..." },
+        { "pronoun": "tu",         "pronoun_en": "you",       "form": "..." },
+        { "pronoun": "il/elle/on", "pronoun_en": "he/she/one","form": "..." },
+        { "pronoun": "nous",       "pronoun_en": "we",        "form": "..." },
+        { "pronoun": "vous",       "pronoun_en": "you (pl./formal)", "form": "..." },
+        { "pronoun": "ils/elles",  "pronoun_en": "they",      "form": "..." }
+      ]
+    },
+    {
+      "tense_name": "Imparfait",
+      "tense_name_target": "Imparfait",
+      "forms": [
+        { "pronoun": "je",         "pronoun_en": "I",         "form": "..." },
+        { "pronoun": "tu",         "pronoun_en": "you",       "form": "..." },
+        { "pronoun": "il/elle/on", "pronoun_en": "he/she/one","form": "..." },
+        { "pronoun": "nous",       "pronoun_en": "we",        "form": "..." },
+        { "pronoun": "vous",       "pronoun_en": "you (pl./formal)", "form": "..." },
+        { "pronoun": "ils/elles",  "pronoun_en": "they",      "form": "..." }
+      ]
+    },
+    {
+      "tense_name": "Future",
+      "tense_name_target": "Futur simple",
+      "forms": [
+        { "pronoun": "je",         "pronoun_en": "I",         "form": "..." },
+        { "pronoun": "tu",         "pronoun_en": "you",       "form": "..." },
+        { "pronoun": "il/elle/on", "pronoun_en": "he/she/one","form": "..." },
+        { "pronoun": "nous",       "pronoun_en": "we",        "form": "..." },
+        { "pronoun": "vous",       "pronoun_en": "you (pl./formal)", "form": "..." },
+        { "pronoun": "ils/elles",  "pronoun_en": "they",      "form": "..." }
+      ]
+    }
+  ],
+  "notes": "..."
+}`;
+
+  const schemaByLang = { uk: ukSchema, nl: nlSchema, en: enSchema, fr: frSchema };
   const schema = schemaByLang[targetCode] || ukSchema;
   const prompt = `You are a ${lang} grammar expert teaching a ${nativeName}-speaking learner. The user provides a verb. Return ONLY a valid JSON object matching this exact schema with real ${lang} conjugations filled in. Write any prose ("notes") in ${nativeName}. No markdown, no explanation outside the JSON.\n\nSchema:\n${schema}`;
   return callGrammarAPI(prompt, `Conjugate the ${lang} verb: "${verb}"`);
@@ -212,7 +268,8 @@ export async function dissectSentence(sentence) {
   const ukExtra = 'For Ukrainian: include case (nominative/accusative/genitive/dative/instrumental/locative), gender (masculine/feminine/neuter), number, tense and aspect for verbs in the "details" field.';
   const nlExtra = 'For Dutch: include tense for verbs, de/het for nouns, comparative degree for adjectives, and note any separable verb prefixes in the "details" field. Dutch has no grammatical case system — do not include case.';
   const enExtra = 'For English: include tense and form for verbs (base, -s, -ing, past, past participle), number for nouns, comparative/superlative for adjectives, and note phrasal-verb particles in the "details" field. English has no grammatical case beyond pronouns — only mark case on pronouns (nominative/accusative).';
-  const extras = { uk: ukExtra, nl: nlExtra, en: enExtra };
+  const frExtra = 'For French: include gender (masculin/féminin) and number (singulier/pluriel) for nouns and adjectives, tense and mood for verbs (présent, passé composé, imparfait, futur, subjonctif, conditionnel), verb group (-er/-ir/-re), and note any liaison or elision in the "details" field.';
+  const extras = { uk: ukExtra, nl: nlExtra, en: enExtra, fr: frExtra };
 
   const prompt = `You are a ${lang} grammar expert teaching a ${nativeName}-speaking learner. Analyse the provided sentence word by word. Return ONLY a valid JSON object matching this schema. ${extras[targetCode] || ukExtra} Write all "translation", "details" and "grammar_note" prose in ${nativeName}. No markdown.\n\nSchema:\n${schema}`;
   return callGrammarAPI(prompt, `Analyse this ${lang} sentence: "${sentence}"`);

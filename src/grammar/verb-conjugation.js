@@ -48,6 +48,28 @@ const COMMON_VERBS = {
     { verb: 'wonen',     en: 'to live' },
     { verb: 'begrijpen', en: 'to understand' },
   ],
+  fr: [
+    { verb: 'être',       en: 'to be' },
+    { verb: 'avoir',      en: 'to have' },
+    { verb: 'faire',      en: 'to do / make' },
+    { verb: 'aller',      en: 'to go' },
+    { verb: 'venir',      en: 'to come' },
+    { verb: 'dire',       en: 'to say' },
+    { verb: 'savoir',     en: 'to know' },
+    { verb: 'vouloir',    en: 'to want' },
+    { verb: 'pouvoir',    en: 'can' },
+    { verb: 'devoir',     en: 'must / to owe' },
+    { verb: 'penser',     en: 'to think' },
+    { verb: 'voir',       en: 'to see' },
+    { verb: 'donner',     en: 'to give' },
+    { verb: 'prendre',    en: 'to take' },
+    { verb: 'lire',       en: 'to read' },
+    { verb: 'écrire',     en: 'to write' },
+    { verb: 'manger',     en: 'to eat' },
+    { verb: 'boire',      en: 'to drink' },
+    { verb: 'vivre',      en: 'to live' },
+    { verb: 'comprendre', en: 'to understand' },
+  ],
   en: [
     { verb: 'to be',         en: 'zijn' },
     { verb: 'to have',       en: 'hebben' },
@@ -102,7 +124,7 @@ export function openVerbScreen() {
   document.getElementById('verbResult').innerHTML = '';
   const sub = document.getElementById('verbScreenSub');
   if (sub) {
-    const meta = { uk: '🇺🇦 Ukrainian', nl: '🇳🇱 Dutch', en: '🇬🇧 English' };
+    const meta = { uk: '🇺🇦 Ukrainian', nl: '🇳🇱 Dutch', en: '🇬🇧 English', fr: '🇫🇷 French' };
     sub.textContent = meta[state.currentLanguage] || meta.uk;
   }
   renderCommonVerbs();

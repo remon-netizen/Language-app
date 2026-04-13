@@ -42,8 +42,19 @@ const TOPIC_HINTS_EN = {
   pronouns:     'Focus on subject vs object pronouns (I/me, he/him), possessives (my/mine), reflexives (myself), and relative pronouns (who/which/that).',
 };
 
-const TOPIC_HINT_MAPS = { uk: TOPIC_HINTS_UK, nl: TOPIC_HINTS_NL, en: TOPIC_HINTS_EN };
-const TARGET_NAME     = { uk: 'Ukrainian', nl: 'Dutch', en: 'English' };
+const TOPIC_HINTS_FR = {
+  gender:       'Focus on noun gender (masculine le / feminine la) and correct article agreement. Include common exceptions and patterns (e.g. -tion endings are feminine, -ment endings are masculine).',
+  conjugation:  'Focus on present-tense verb conjugation: -er, -ir, -re groups, irregular verbs (être, avoir, aller, faire, venir, pouvoir, vouloir, devoir).',
+  past_tense:   'Focus on passé composé vs imparfait: when to use each, auxiliary choice (avoir vs être), past participle agreement.',
+  pronouns:     'Focus on subject pronouns (je, tu, il/elle/on, nous, vous, ils/elles), direct/indirect object pronouns (le, la, les, lui, leur), and pronoun placement before the verb.',
+  prepositions: 'Focus on prepositions of place (à, en, au, aux, de, du, des), time (depuis, pendant, en, dans), and common verb+preposition combos (penser à, parler de, s\'intéresser à).',
+  adjectives:   'Focus on adjective agreement (masculine/feminine, singular/plural) and position (most after the noun, but BANGS adjectives before: Beauty, Age, Number, Goodness, Size).',
+  negation:     'Focus on ne...pas, ne...plus, ne...jamais, ne...rien, ne...personne, ne...que. Position around the verb and in compound tenses.',
+  subjunctive:  'Focus on when to use the subjunctive mood: after expressions of doubt (douter que), emotion (être content que), necessity (il faut que), desire (vouloir que), and certain conjunctions (pour que, avant que, bien que).',
+};
+
+const TOPIC_HINT_MAPS = { uk: TOPIC_HINTS_UK, nl: TOPIC_HINTS_NL, en: TOPIC_HINTS_EN, fr: TOPIC_HINTS_FR };
+const TARGET_NAME     = { uk: 'Ukrainian', nl: 'Dutch', en: 'English', fr: 'French' };
 const NATIVE_NAME     = { en: 'English',  nl: 'Dutch' };
 
 export async function generateExercises(topicId, topicTitle, level = 'a1', includeOpen = false) {
@@ -91,6 +102,7 @@ export async function generateExercises(topicId, topicTitle, level = 'a1', inclu
     `- Dutch-specific guidance (if ${langName} is Dutch): use the terms "finite verb" (not "first verb"), "past participle", "middle field / middenveld", "verbal bracket / tangconstructie", "V2 word order". Short adverbs like "al", "nog", "niet", "wel" live in the middle field; with a DEFINITE object they follow the object ("Ik heb mijn huiswerk al gedaan"), with an INDEFINITE object they precede it ("Ik heb al een boek gelezen"). State this distinction when it applies.\n` +
     `- Ukrainian-specific guidance (if ${langName} is Ukrainian): name the case explicitly (nominative, genitive, dative, accusative, instrumental, locative, vocative), name the gender, and for verbs name the aspect (perfective/imperfective).\n` +
     `- English-specific guidance (if ${langName} is English): name tenses precisely (present simple, present continuous, present perfect, past simple, past perfect), name auxiliary verbs (do/does/did, have/has/had, be/is/are/was/were), and for prepositions/articles state the rule that fixes the choice rather than just labelling it as "idiomatic".\n` +
+    `- French-specific guidance (if ${langName} is French): name tenses precisely (présent, passé composé, imparfait, futur simple, conditionnel, subjonctif), specify gender (masculin/féminin) and number (singulier/pluriel) for nouns and adjectives, name the verb group (-er/-ir/-re), and for compound tenses state the auxiliary (avoir/être) and any past participle agreement rules.\n` +
     `- Multiple-choice: exactly 4 options, exactly one correct answer\n` +
     `- Open questions: provide one clear, concise correct_answer (not a list)\n` +
     `- Vary exercise style: fill-in-the-blank, choose correct form, spot the error, short translation\n` +

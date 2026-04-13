@@ -43,6 +43,7 @@ const dict = {
     'lang.uk':            'Ukrainian',
     'lang.nl':            'Dutch',
     'lang.en':            'English',
+    'lang.fr':            'French',
 
     // Lesson cards
     'lesson.phrases':         'phrases',
@@ -136,6 +137,7 @@ const dict = {
     'lang.uk':            'Oekraïens',
     'lang.nl':            'Nederlands',
     'lang.en':            'Engels',
+    'lang.fr':            'Frans',
 
     // Lesson cards
     'lesson.phrases':         'zinnen',

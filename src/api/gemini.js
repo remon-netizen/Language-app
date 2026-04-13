@@ -2,7 +2,7 @@ import { state, getTutorFirstName } from '../state.js';
 import { getApiKey } from '../storage.js';
 import { extractJSON } from '../utils.js';
 
-const TARGET_LANG_NAME = { uk: 'Ukrainian', nl: 'Dutch', en: 'English' };
+const TARGET_LANG_NAME = { uk: 'Ukrainian', nl: 'Dutch', en: 'English', fr: 'French' };
 const NATIVE_LANG_NAME = { en: 'English', nl: 'Dutch' };
 
 export function buildSystemPrompt(inTargetLang) {
