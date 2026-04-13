@@ -60,7 +60,7 @@ export async function generateNextLevelPhrases(lesson, currentLevelIndex) {
   const prompt =
     `You are an experienced ${langName} language teacher. A student has completed the "${topicName}" lesson at ${currentLevel} level.\n\n` +
     `Phrases they already know:\n${knownPhrases}\n\n` +
-    `Now generate 8 NEW practice phrases on the SAME topic but at ${nextLevel} level — harder vocabulary, longer sentences, more complex grammar.\n\n` +
+    `Now generate 12 NEW practice phrases on the SAME topic but at ${nextLevel} level — harder vocabulary, longer sentences, more complex grammar.\n\n` +
     `Return JSON:\n` +
     `{\n  "phrases": [\n    {\n` +
     `      "target": "${langName} phrase",\n` +
@@ -69,6 +69,7 @@ export async function generateNextLevelPhrases(lesson, currentLevelIndex) {
     `      "tip_native": "Helpful tip in ${nativeName}"\n` +
     `    }\n  ]\n}\n\n` +
     `Rules:\n` +
+    `- Generate exactly 12 phrases, not fewer\n` +
     `- Do NOT repeat any of the known phrases — build on them\n` +
     `- ${nextLevel} level: ${nextLevel === 'A2' ? 'longer sentences, basic connectors (і, але, тому що), past tense' : nextLevel === 'B1' ? 'complex sentences, varied tenses, conditionals, expressing opinions' : 'idiomatic expressions, nuanced vocabulary, complex grammar, near-native phrasing'}\n` +
     `- Stay on the "${topicName}" topic\n` +
@@ -81,7 +82,7 @@ export async function generateNextLevelPhrases(lesson, currentLevelIndex) {
     },
     contents: [{ role: 'user', parts: [{ text: prompt }] }],
     generationConfig: {
-      maxOutputTokens: 3000,
+      maxOutputTokens: 5000,
       temperature: 0.5,
       responseMimeType: 'application/json',
       thinkingConfig: { thinkingBudget: 0 },
@@ -105,7 +106,7 @@ export async function generateNextLevelPhrases(lesson, currentLevelIndex) {
   if (!parsed?.phrases?.length) throw new Error('Could not generate next-level phrases');
 
   const nativeKey = nativeCode;
-  return parsed.phrases.slice(0, 10).map(p => ({
+  return parsed.phrases.slice(0, 14).map(p => ({
     target: p.target,
     ph: p.ph || '',
     translations: { [nativeKey]: p.translation_native },
