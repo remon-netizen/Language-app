@@ -1,7 +1,7 @@
 // Language App — Service Worker
 // Cache the app shell so it works offline after first load.
 // Bump CACHE version whenever shell file list changes or content updates.
-const CACHE = 'language-app-v30';
+const CACHE = 'language-app-v31';
 const SHELL = [
   './index.html',
   './manifest.json',
