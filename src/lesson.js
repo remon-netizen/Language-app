@@ -360,11 +360,14 @@ export function showFeedback(score, heard, target) {
     compEl.innerHTML = `<div class="comparison-col"><label>${t('lesson.expected')}</label><div>${targetHtml}</div></div><div class="comparison-col"><label>${t('lesson.heard')}</label><div class="word">${heard}</div></div>`;
   } else { compEl.innerHTML = ''; }
 
+  // Remove any previous skip button before potentially adding a new one.
+  area.querySelectorAll('.btn-skip').forEach(el => el.remove());
+
   // When the score is low but something was heard, show a "I said it right"
   // skip button. Speech recognition for Ukrainian is imperfect — the user
   // shouldn't be stuck on a phrase they're pronouncing correctly just because
   // the recognition returns a different grammatical form.
-  if (heard && score < 70) {
+  if (heard && score < 60) {
     const native = state.nativeLanguage;
     const skipBtn = document.createElement('button');
     skipBtn.className = 'btn-skip';
