@@ -49,15 +49,34 @@ export function shuffleMCQOptions(q) {
 
 export function calcSimilarity(target, heard) {
   if (!heard) return 0;
-  const normalize = s => s.toLowerCase().replace(/[',\.\?!]/g, '').trim();
+  // Strip punctuation, lowercase, collapse whitespace.
+  const normalize = s => s.toLowerCase().replace(/[',.\?!;:\-—"«»""]/g, '').replace(/\s+/g, ' ').trim();
   const t = normalize(target), h = normalize(heard);
   if (t === h) return 100;
-  const tw = t.split(/\s+/), hw = h.split(/\s+/);
-  let matched = 0;
-  tw.forEach(w => { if (hw.includes(w)) matched++; });
-  const wordScore = tw.length ? (matched / tw.length) * 100 : 0;
+
+  // Character-level similarity (Levenshtein).
   const lev = levenshtein(t, h);
   const maxLen = Math.max(t.length, h.length);
   const charScore = maxLen ? ((maxLen - lev) / maxLen) * 100 : 0;
-  return Math.round(wordScore * 0.6 + charScore * 0.4);
+
+  const tw = t.split(/\s+/), hw = h.split(/\s+/);
+
+  // For single-word targets (e.g. "березень"), word-matching is all-or-nothing
+  // and unfairly harsh — "березні" shares the same root but scores 0% on words.
+  // Use character similarity as the primary metric for short phrases.
+  if (tw.length <= 2) {
+    // Also check if the heard text starts with the same root (first 3+ chars).
+    // If so, bump the score — the speaker clearly knew the word, just the
+    // recognition returned a different grammatical form.
+    const rootLen = Math.min(Math.floor(t.length * 0.6), t.length - 1);
+    const sameRoot = rootLen >= 3 && h.startsWith(t.slice(0, rootLen));
+    const rootBonus = sameRoot ? 15 : 0;
+    return Math.min(100, Math.round(charScore + rootBonus));
+  }
+
+  // Multi-word phrases: blend word-matching with character similarity.
+  let matched = 0;
+  tw.forEach(w => { if (hw.includes(w)) matched++; });
+  const wordScore = tw.length ? (matched / tw.length) * 100 : 0;
+  return Math.round(wordScore * 0.5 + charScore * 0.5);
 }

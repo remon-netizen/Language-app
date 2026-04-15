@@ -52,6 +52,25 @@
 .comparison { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
 .comparison-col { flex: 1; min-width: 120px; }
 .comparison-col label { font-size: 0.72rem; text-transform: uppercase; color: var(--gray); display: block; margin-bottom: 4px; font-weight: 600; }
+
+.btn-skip {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px 16px;
+  background: none;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--gray);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-skip:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+}
 .word.match { color: #16a34a; }
 .word.mismatch { color: #dc2626; text-decoration: underline dashed; }
 

@@ -359,6 +359,24 @@ export function showFeedback(score, heard, target) {
     const targetHtml = tw.map(w => `<span class="word ${hw.includes(w.toLowerCase()) ? 'match' : 'mismatch'}">${w}</span>`).join(' ');
     compEl.innerHTML = `<div class="comparison-col"><label>${t('lesson.expected')}</label><div>${targetHtml}</div></div><div class="comparison-col"><label>${t('lesson.heard')}</label><div class="word">${heard}</div></div>`;
   } else { compEl.innerHTML = ''; }
+
+  // When the score is low but something was heard, show a "I said it right"
+  // skip button. Speech recognition for Ukrainian is imperfect — the user
+  // shouldn't be stuck on a phrase they're pronouncing correctly just because
+  // the recognition returns a different grammatical form.
+  if (heard && score < 70) {
+    const native = state.nativeLanguage;
+    const skipBtn = document.createElement('button');
+    skipBtn.className = 'btn-skip';
+    skipBtn.textContent = native === 'nl' ? '✓ Ik zei het goed — ga door' : '✓ I said it right — continue';
+    skipBtn.addEventListener('click', () => {
+      // Override the score to 80 so this phrase doesn't drag down the average.
+      state.lessonScores[state.lessonScores.length - 1] = 80;
+      hideFeedback();
+      nextPhrase();
+    });
+    area.appendChild(skipBtn);
+  }
 }
 
 export function hideFeedback() { document.getElementById('feedbackArea').className = 'feedback-area'; }
