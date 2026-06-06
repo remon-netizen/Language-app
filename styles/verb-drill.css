@@ -326,6 +326,43 @@
   border-radius: 10px;
   margin-bottom: 10px;
 }
+/* Full conjugation table in feedback */
+.vd-full-table {
+  background: var(--card-bg);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+.vd-full-table-header {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #0891b2;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+.vd-full-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 8px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  transition: background 0.15s;
+}
+.vd-full-row.vd-highlight-row {
+  background: #dcfce7;
+  border: 2px solid #86efac;
+  font-weight: 700;
+}
+.vd-full-pronoun { color: var(--gray); }
+.vd-full-form    { font-weight: 600; color: var(--text); }
+.vd-highlight-row .vd-full-pronoun { color: #15803d; }
+.vd-highlight-row .vd-full-form    { color: #14532d; }
+
 .vd-listen-btn {
   display: inline-flex;
   align-items: center;

@@ -1,6 +1,6 @@
 import { state } from '../state.js';
 import { escHtml, levenshtein } from '../utils.js';
-import { CONJUGATIONS, buildDrillSet } from '../data/verb-conjugations.js';
+import { CONJUGATIONS, buildDrillSet, findVerb } from '../data/verb-conjugations.js';
 import { speakText } from '../voice.js';
 
 // ── State ────────────────────────────────────────────────────────────────────
@@ -314,8 +314,27 @@ function handleAnswer(q, answer) {
       </div>`;
   }
 
-  // Show full conjugation context
-  html += `<div class="vd-context">${escHtml(q.pronoun)} → <strong>${escHtml(q.correctForm)}</strong> (${escHtml(loc(q.tenseLabel))} ${nl ? 'van' : 'of'} ${escHtml(q.infinitive)})</div>`;
+  // Show full conjugation table for this tense, highlighting the correct row
+  const verb = findVerb(q.infinitive);
+  if (verb && verb[q.tense]) {
+    const tenseNames = {
+      present:    { en: 'Present', nl: 'Tegenwoordige tijd' },
+      past:       { en: 'Past', nl: 'Verleden tijd' },
+      future:     { en: 'Future', nl: 'Toekomst' },
+      imperative: { en: 'Imperative', nl: 'Gebiedende wijs' },
+    };
+    const tenseName = loc(tenseNames[q.tense]);
+    html += `<div class="vd-full-table">`;
+    html += `<div class="vd-full-table-header">${escHtml(q.infinitive)} — ${escHtml(tenseName)}</div>`;
+    for (const [pronoun, form] of Object.entries(verb[q.tense])) {
+      const isCorrectRow = pronoun === q.pronoun;
+      html += `<div class="vd-full-row ${isCorrectRow ? 'vd-highlight-row' : ''}">`;
+      html += `<span class="vd-full-pronoun">${escHtml(pronoun)}</span>`;
+      html += `<span class="vd-full-form">${escHtml(form)}</span>`;
+      html += `</div>`;
+    }
+    html += `</div>`;
+  }
 
   // Listen button
   html += `<button class="vd-listen-btn" id="vdListen">🔊 ${nl ? 'Luister' : 'Listen'}</button>`;
