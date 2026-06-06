@@ -1,0 +1,430 @@
+/* ── Verb Aspect Workshop ──────────────────────────────────────────────────── */
+
+#verbAspectScreen .lesson-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
+  border-radius: 16px;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 12px rgba(124,58,237,0.2);
+}
+#verbAspectScreen .lesson-header .back-btn {
+  background: rgba(255,255,255,0.18);
+  border: none; border-radius: 10px;
+  color: white; font-size: 1.2rem;
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: background 0.2s; flex-shrink: 0; padding: 0;
+}
+#verbAspectScreen .lesson-header .back-btn:hover { background: rgba(255,255,255,0.32); }
+#verbAspectScreen .lesson-header .lesson-title    { font-size: 1.05rem; font-weight: 700; color: white; }
+#verbAspectScreen .lesson-header .lesson-subtitle { font-size: 0.75rem; color: rgba(255,255,255,0.72); margin-top: 2px; }
+
+/* ── Tip card ── */
+.va-tip-card {
+  background: #f5f3ff;
+  border: 2px solid #ddd6fe;
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin-bottom: 16px;
+}
+.va-tip-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #6d28d9;
+  margin-bottom: 8px;
+}
+.va-tip-body {
+  font-size: 0.85rem;
+  color: #374151;
+  line-height: 1.6;
+}
+
+/* ── Menu grid ── */
+.va-menu-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.va-menu-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 14px;
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  background: var(--card-bg);
+  cursor: pointer;
+  transition: all 0.18s;
+  text-align: center;
+}
+.va-menu-card:hover {
+  border-color: #7c3aed;
+  background: #f5f3ff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(124,58,237,0.12);
+}
+.va-menu-primary {
+  border-color: #7c3aed;
+  background: #f5f3ff;
+}
+.va-menu-primary:hover { background: #ede9fe; }
+.va-menu-icon  { font-size: 2rem; line-height: 1; }
+.va-menu-title { font-size: 0.95rem; font-weight: 700; color: var(--text); }
+.va-menu-sub   { font-size: 0.75rem; color: var(--gray); }
+
+/* ── Reference cards ── */
+.va-ref-card {
+  background: var(--card-bg);
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+}
+.va-ref-pair-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.va-ref-pair-col {
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+}
+.va-imp-bg  { background: #dbeafe; }
+.va-perf-bg { background: #fce7f3; }
+.va-ref-pair-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+.va-imp-bg .va-ref-pair-label  { color: #1e40af; }
+.va-perf-bg .va-ref-pair-label { color: #9d174d; }
+.va-ref-pair-verb {
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+.va-imp-bg .va-ref-pair-verb  { color: #1d4ed8; }
+.va-perf-bg .va-ref-pair-verb { color: #be185d; }
+.va-ref-tip {
+  font-size: 0.82rem;
+  color: var(--gray);
+  line-height: 1.5;
+  font-style: italic;
+}
+
+.va-ref-examples-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+.va-ref-examples {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.va-ref-example {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+.va-ref-uk {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.va-ref-en {
+  font-size: 0.8rem;
+  color: var(--gray);
+  margin-bottom: 4px;
+}
+.va-ref-why {
+  font-size: 0.75rem;
+  color: #6d28d9;
+  font-style: italic;
+}
+
+/* Aspect tags */
+.va-aspect-tag {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 6px;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+.va-imp  { background: #dbeafe; color: #1e40af; }
+.va-perf { background: #fce7f3; color: #9d174d; }
+
+/* Nav buttons */
+.va-ref-nav {
+  display: flex;
+  gap: 10px;
+}
+.va-nav-btn {
+  flex: 1;
+  padding: 11px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: none;
+  color: var(--text);
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.va-nav-btn:hover:not(:disabled) { border-color: #7c3aed; color: #7c3aed; }
+.va-nav-btn:disabled { opacity: 0.35; cursor: default; }
+
+/* ── Exercise UI ── */
+.va-progress-wrap {
+  width: 100%;
+  height: 6px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+.va-progress-bar {
+  height: 100%;
+  background: #a78bfa;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+.va-progress-text {
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.7);
+}
+
+/* Verb hint bar */
+.va-verb-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #f5f3ff;
+  border: 1px solid #ddd6fe;
+  border-radius: 10px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.va-hint-imp  { font-weight: 700; color: #1d4ed8; font-size: 0.95rem; }
+.va-hint-sep  { color: var(--gray); }
+.va-hint-perf { font-weight: 700; color: #be185d; font-size: 0.95rem; }
+.va-hint-meaning { color: var(--gray); font-size: 0.8rem; margin-left: auto; }
+
+/* Question card */
+.va-q-card {
+  background: var(--card-bg);
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.07);
+}
+.va-q-translation {
+  font-size: 0.88rem;
+  color: var(--gray);
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+.va-q-prominent {
+  font-size: 1rem;
+  color: var(--text);
+  font-weight: 600;
+}
+.va-q-sentence {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.5;
+}
+.va-q-aspect-clue {
+  font-size: 0.8rem;
+  color: var(--gray);
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Options (aspect choice) */
+.va-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.va-option-btn {
+  width: 100%;
+  padding: 14px 18px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: var(--card-bg);
+  color: var(--text);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.va-option-btn:hover:not(:disabled) { border-color: #7c3aed; background: #f5f3ff; color: #7c3aed; }
+.va-option-btn.correct  { border-color: #16a34a; background: #dcfce7; color: #14532d; }
+.va-option-btn.wrong    { border-color: #dc2626; background: #fee2e2; color: #7f1d1d; }
+.va-option-btn:disabled { cursor: default; }
+
+/* Input area (fill verb + sentence write) */
+.va-input-area {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.va-text-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 2px solid var(--border);
+  border-radius: 11px;
+  font-size: 1rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+  background: var(--card-bg);
+  color: var(--text);
+  line-height: 1.5;
+}
+.va-text-input:focus { border-color: #7c3aed; }
+.va-text-input:disabled { opacity: 0.7; background: var(--bg); }
+.va-text-input.correct { border-color: #16a34a; background: #dcfce7; }
+.va-text-input.close   { border-color: #f59e0b; background: #fffbeb; }
+.va-text-input.wrong   { border-color: #dc2626; background: #fee2e2; }
+.va-textarea { resize: vertical; min-height: 60px; }
+
+.va-check-btn {
+  padding: 12px;
+  background: #7c3aed;
+  color: white;
+  border: none;
+  border-radius: 11px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+.va-check-btn:hover:not(:disabled) { background: #6d28d9; }
+.va-check-btn:disabled { opacity: 0.5; cursor: default; }
+
+/* Feedback */
+.va-full-sentence {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  padding: 10px 14px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+.va-answer-compare {
+  margin-bottom: 10px;
+}
+.va-your-answer {
+  font-size: 0.88rem;
+  padding: 8px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+.va-correct-answer {
+  font-size: 0.88rem;
+  padding: 8px 12px;
+  background: #dcfce7;
+  border: 1px solid #86efac;
+  border-radius: 8px;
+  color: #14532d;
+}
+.va-ans-label {
+  font-weight: 700;
+  margin-right: 6px;
+}
+.va-why {
+  font-size: 0.82rem;
+  color: #6d28d9;
+  padding: 10px 14px;
+  background: #f5f3ff;
+  border: 1px solid #ddd6fe;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+.va-listen-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 2px solid #ddd6fe;
+  border-radius: 10px;
+  background: #f5f3ff;
+  color: #7c3aed;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  margin-bottom: 10px;
+}
+.va-listen-btn:hover { background: #ede9fe; border-color: #7c3aed; }
+
+/* Next button */
+.va-next-btn {
+  width: 100%;
+  padding: 13px;
+  background: #7c3aed;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s;
+  margin-top: 6px;
+}
+.va-next-btn:hover { background: #6d28d9; }
+
+/* Score breakdown */
+.va-score-breakdown {
+  font-size: 0.78rem;
+  color: var(--gray);
+  margin-bottom: 20px;
+}
+
+/* ── Mobile ── */
+@media (max-width: 500px) {
+  .va-menu-grid   { gap: 8px; }
+  .va-menu-card   { padding: 16px 10px; }
+  .va-menu-icon   { font-size: 1.6rem; }
+  .va-menu-title  { font-size: 0.85rem; }
+  .va-q-sentence  { font-size: 1rem; }
+  .va-ref-pair-verb { font-size: 1.1rem; }
+}

@@ -56,6 +56,11 @@
   background: #fff7ed;
   color: #c2410c;
 }
+.ex-tool-aspect:hover {
+  border-color: #7c3aed;
+  background: #f5f3ff;
+  color: #6d28d9;
+}
 
 /* ── Controls bar (level + open toggle) ── */
 .ex-controls-bar {
