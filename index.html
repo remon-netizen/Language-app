@@ -34,7 +34,7 @@
 
 <header>
   <div class="header-info">
-    <h1 id="headerTitle"><span class="flag">🇺🇦</span> Ukrainian Practice</h1>
+    <h1 id="headerTitle"><span class="flag"><img src="https://flagcdn.com/ua.svg" alt="" class="flag-icon" width="20" height="13"></span> Ukrainian Practice</h1>
     <p id="headerTagline">Speak. Listen. Learn.</p>
   </div>
   <button class="settings-toggle" id="settingsToggleBtn" onclick="toggleSettingsDrawer()" title="Settings">⚙️</button>
@@ -112,15 +112,15 @@
       <div class="lang-picker-card" id="langPickerFull">
         <div class="settings-label" id="iSpeakLabel">I speak</div>
         <div class="lang-options" id="nativeLangOptions">
-          <button class="lang-choice-btn active" data-native="nl" onclick="switchNativeLanguage('nl')">🇳🇱 Nederlands</button>
-          <button class="lang-choice-btn"        data-native="en" onclick="switchNativeLanguage('en')">🇬🇧 English</button>
+          <button class="lang-choice-btn active" data-native="nl" onclick="switchNativeLanguage('nl')"><img src="https://flagcdn.com/nl.svg" alt="" class="flag-icon" width="20" height="13"> Nederlands</button>
+          <button class="lang-choice-btn"        data-native="en" onclick="switchNativeLanguage('en')"><img src="https://flagcdn.com/gb.svg" alt="" class="flag-icon" width="20" height="13"> English</button>
         </div>
         <div class="settings-label" id="iLearnLabel" style="margin-top:14px">I want to learn</div>
         <div class="lang-options" id="targetLangOptions">
-          <button class="lang-choice-btn active" data-lang="uk" onclick="switchLanguage('uk')">🇺🇦 <span data-langname="uk">Ukrainian</span></button>
-          <button class="lang-choice-btn"        data-lang="nl" onclick="switchLanguage('nl')">🇳🇱 <span data-langname="nl">Dutch</span></button>
-          <button class="lang-choice-btn"        data-lang="en" onclick="switchLanguage('en')">🇬🇧 <span data-langname="en">English</span></button>
-          <button class="lang-choice-btn"        data-lang="fr" onclick="switchLanguage('fr')">🇫🇷 <span data-langname="fr">French</span></button>
+          <button class="lang-choice-btn active" data-lang="uk" onclick="switchLanguage('uk')"><img src="https://flagcdn.com/ua.svg" alt="" class="flag-icon" width="20" height="13"> <span data-langname="uk">Ukrainian</span></button>
+          <button class="lang-choice-btn"        data-lang="nl" onclick="switchLanguage('nl')"><img src="https://flagcdn.com/nl.svg" alt="" class="flag-icon" width="20" height="13"> <span data-langname="nl">Dutch</span></button>
+          <button class="lang-choice-btn"        data-lang="en" onclick="switchLanguage('en')"><img src="https://flagcdn.com/gb.svg" alt="" class="flag-icon" width="20" height="13"> <span data-langname="en">English</span></button>
+          <button class="lang-choice-btn"        data-lang="fr" onclick="switchLanguage('fr')"><img src="https://flagcdn.com/fr.svg" alt="" class="flag-icon" width="20" height="13"> <span data-langname="fr">French</span></button>
         </div>
       </div>
 
@@ -133,7 +133,7 @@
 
       <!-- ═══ Primary actions ═══ -->
       <button class="start-btn" id="startBtn" onclick="openFreeChat()">
-        <span id="startBtnFlag">🇺🇦</span> <span id="startBtnLabel">Start Conversation</span>
+        <span id="startBtnFlag"><img src="https://flagcdn.com/ua.svg" alt="" class="flag-icon" width="20" height="13"></span> <span id="startBtnLabel">Start Conversation</span>
       </button>
 
       <!-- ═══ Learning tools (2-column grid) ═══ -->
@@ -164,7 +164,7 @@
 
       <!-- Inburgering — only shown when Dutch is the target AND native is not Dutch -->
       <button class="inburgering-btn nl-only" id="inburgeringBtn" onclick="openInburgeringScreen()">
-        <span class="ib-btn-icon">🇳🇱</span>
+        <span class="ib-btn-icon"><img src="https://flagcdn.com/nl.svg" alt="" class="flag-icon" width="24" height="16"></span>
         <span class="ib-btn-text">
           <span class="ib-btn-title" id="ibTitle">Inburgeringsexamen</span>
           <span class="ib-btn-sub" id="ibSub">Oefen KNS &amp; taalvaardigheid voor het examen</span>
@@ -356,7 +356,7 @@
       <button class="back-btn" onclick="showScreen('homeScreen')">←</button>
       <div>
         <div class="lesson-title">📋 Verb Conjugation</div>
-        <div class="lesson-subtitle" id="verbScreenSub">🇺🇦 Ukrainian</div>
+        <div class="lesson-subtitle" id="verbScreenSub"><img src="https://flagcdn.com/ua.svg" alt="" class="flag-icon" width="16" height="11"> Ukrainian</div>
       </div>
     </div>
     <div class="grammar-input-bar">
@@ -397,7 +397,7 @@
       <button class="back-btn" onclick="showScreen('homeScreen')">←</button>
       <div>
         <div class="lesson-title">🔍 Sentence Dissection</div>
-        <div class="lesson-subtitle" id="dissectScreenSub">🇺🇦 Ukrainian</div>
+        <div class="lesson-subtitle" id="dissectScreenSub"><img src="https://flagcdn.com/ua.svg" alt="" class="flag-icon" width="16" height="11"> Ukrainian</div>
       </div>
     </div>
     <div class="grammar-input-bar">

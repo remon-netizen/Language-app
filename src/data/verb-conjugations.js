@@ -1,4 +1,4 @@
-// Complete conjugation tables for 40 Ukrainian verbs (20 imperfective + 20 perfective pairs)
+// Complete conjugation tables for Ukrainian verbs (A1/A2/B1 levels)
 
 export const CONJUGATIONS = [
   // ============================================================
@@ -9,6 +9,12 @@ export const CONJUGATIONS = [
     aspect: 'imperfective',
     partner: 'піти',
     meaning: { en: 'to go (on foot)', nl: 'gaan (te voet)' },
+    level: 'A1',
+    sentences: [
+      { uk: 'Я ___ до школи щодня.', answer: 'іду', full: 'Я іду до школи щодня.', en: 'I go to school every day.', nl: 'Ik ga elke dag naar school.', tense: 'present', pronoun: 'я' },
+      { uk: 'Вони ___ додому повільно.', answer: 'ішли', full: 'Вони ішли додому повільно.', en: 'They were walking home slowly.', nl: 'Ze liepen langzaam naar huis.', tense: 'past', pronoun: 'вони' },
+      { uk: 'Куди ти ___?', answer: 'ідеш', full: 'Куди ти ідеш?', en: 'Where are you going?', nl: 'Waar ga je naartoe?', tense: 'present', pronoun: 'ти' },
+    ],
     present: {
       я: 'іду',
       ти: 'ідеш',
@@ -41,6 +47,7 @@ export const CONJUGATIONS = [
     aspect: 'perfective',
     partner: 'йти',
     meaning: { en: 'to go (on foot, completed)', nl: 'gaan (te voet, voltooid)' },
+    level: 'A1',
     present: null,
     past: {
       він: 'пішов',
@@ -70,6 +77,7 @@ export const CONJUGATIONS = [
     aspect: 'imperfective',
     partner: 'поїхати',
     meaning: { en: 'to go (by transport)', nl: 'gaan (met vervoer)' },
+    level: 'A1',
     present: {
       я: 'їду',
       ти: 'їдеш',
@@ -102,6 +110,7 @@ export const CONJUGATIONS = [
     aspect: 'perfective',
     partner: 'їхати',
     meaning: { en: 'to go (by transport, completed)', nl: 'gaan (met vervoer, voltooid)' },
+    level: 'A1',
     present: null,
     past: {
       він: 'поїхав',
@@ -131,6 +140,11 @@ export const CONJUGATIONS = [
     aspect: 'imperfective',
     partner: 'попрацювати',
     meaning: { en: 'to work', nl: 'werken' },
+    level: 'A1',
+    sentences: [
+      { uk: 'Він ___ в офісі кожного дня.', answer: 'працює', full: 'Він працює в офісі кожного дня.', en: 'He works in the office every day.', nl: 'Hij werkt elke dag op kantoor.', tense: 'present', pronoun: 'він/вона' },
+      { uk: 'Ми ___ над цим проектом.', answer: 'працюємо', full: 'Ми працюємо над цим проектом.', en: 'We are working on this project.', nl: 'We werken aan dit project.', tense: 'present', pronoun: 'ми' },
+    ],
     present: {
       я: 'працюю',
       ти: 'працюєш',
@@ -163,6 +177,7 @@ export const CONJUGATIONS = [
     aspect: 'perfective',
     partner: 'працювати',
     meaning: { en: 'to work (for a while, completed)', nl: 'werken (een tijdje, voltooid)' },
+    level: 'A1',
     present: null,
     past: {
       він: 'попрацював',
@@ -192,6 +207,7 @@ export const CONJUGATIONS = [
     aspect: 'imperfective',
     partner: 'зустрітися',
     meaning: { en: 'to meet up', nl: 'afspreken / ontmoeten' },
+    level: 'A1',
     present: {
       я: 'зустрічаюся',
       ти: 'зустрічаєшся',
@@ -224,6 +240,7 @@ export const CONJUGATIONS = [
     aspect: 'perfective',
     partner: 'зустрічатися',
     meaning: { en: 'to meet up (completed)', nl: 'afspreken / ontmoeten (voltooid)' },
+    level: 'A1',
     present: null,
     past: {
       він: 'зустрівся',
@@ -253,6 +270,7 @@ export const CONJUGATIONS = [
     aspect: 'imperfective',
     partner: 'приготувати',
     meaning: { en: 'to cook / to prepare', nl: 'koken / bereiden' },
+    level: 'A1',
     present: {
       я: 'готую',
       ти: 'готуєш',
@@ -285,6 +303,7 @@ export const CONJUGATIONS = [
     aspect: 'perfective',
     partner: 'готувати',
     meaning: { en: 'to cook / to prepare (completed)', nl: 'koken / bereiden (voltooid)' },
+    level: 'A1',
     present: null,
     past: {
       він: 'приготував',
@@ -314,6 +333,7 @@ export const CONJUGATIONS = [
     aspect: 'imperfective',
     partner: 'потренуватися',
     meaning: { en: 'to train / to exercise', nl: 'trainen / oefenen' },
+    level: 'A1',
     present: {
       я: 'тренуюся',
       ти: 'тренуєшся',
@@ -346,6 +366,7 @@ export const CONJUGATIONS = [
     aspect: 'perfective',
     partner: 'тренуватися',
     meaning: { en: 'to train (for a while, completed)', nl: 'trainen (een tijdje, voltooid)' },
+    level: 'A1',
     present: null,
     past: {
       він: 'потренувався',
@@ -375,6 +396,7 @@ export const CONJUGATIONS = [
     aspect: 'imperfective',
     partner: 'погуляти',
     meaning: { en: 'to walk / to stroll', nl: 'wandelen' },
+    level: 'A1',
     present: {
       я: 'гуляю',
       ти: 'гуляєш',
@@ -407,6 +429,7 @@ export const CONJUGATIONS = [
     aspect: 'perfective',
     partner: 'гуляти',
     meaning: { en: 'to take a walk (completed)', nl: 'wandelen (voltooid)' },
+    level: 'A1',
     present: null,
     past: {
       він: 'погуляв',
@@ -436,6 +459,7 @@ export const CONJUGATIONS = [
     aspect: 'imperfective',
     partner: 'подивитися',
     meaning: { en: 'to watch / to look', nl: 'kijken' },
+    level: 'A1',
     present: {
       я: 'дивлюся',
       ти: 'дивишся',
@@ -468,6 +492,7 @@ export const CONJUGATIONS = [
     aspect: 'perfective',
     partner: 'дивитися',
     meaning: { en: 'to watch / to look (completed)', nl: 'kijken (voltooid)' },
+    level: 'A1',
     present: null,
     past: {
       він: 'подивився',
@@ -497,6 +522,7 @@ export const CONJUGATIONS = [
     aspect: 'imperfective',
     partner: 'відпочити',
     meaning: { en: 'to rest / to relax', nl: 'rusten / uitrusten' },
+    level: 'A1',
     present: {
       я: 'відпочиваю',
       ти: 'відпочиваєш',
@@ -529,6 +555,7 @@ export const CONJUGATIONS = [
     aspect: 'perfective',
     partner: 'відпочивати',
     meaning: { en: 'to rest (completed)', nl: 'uitrusten (voltooid)' },
+    level: 'A1',
     present: null,
     past: {
       він: 'відпочив',
@@ -558,6 +585,11 @@ export const CONJUGATIONS = [
     aspect: 'imperfective',
     partner: 'купити',
     meaning: { en: 'to buy', nl: 'kopen' },
+    level: 'A1',
+    sentences: [
+      { uk: 'Ми ___ продукти в супермаркеті.', answer: 'купуємо', full: 'Ми купуємо продукти в супермаркеті.', en: 'We buy groceries at the supermarket.', nl: 'We kopen boodschappen in de supermarkt.', tense: 'present', pronoun: 'ми' },
+      { uk: 'Вона ___ нове плаття вчора.', answer: 'купувала', full: 'Вона купувала нове плаття вчора.', en: 'She was buying a new dress yesterday.', nl: 'Ze kocht gisteren een nieuwe jurk.', tense: 'past', pronoun: 'вона' },
+    ],
     present: {
       я: 'купую',
       ти: 'купуєш',
@@ -590,6 +622,7 @@ export const CONJUGATIONS = [
     aspect: 'perfective',
     partner: 'купувати',
     meaning: { en: 'to buy (completed)', nl: 'kopen (voltooid)' },
+    level: 'A1',
     present: null,
     past: {
       він: 'купив',
@@ -619,6 +652,7 @@ export const CONJUGATIONS = [
     aspect: 'imperfective',
     partner: 'обрати',
     meaning: { en: 'to choose', nl: 'kiezen' },
+    level: 'A1',
     present: {
       я: 'обираю',
       ти: 'обираєш',
@@ -651,6 +685,7 @@ export const CONJUGATIONS = [
     aspect: 'perfective',
     partner: 'обирати',
     meaning: { en: 'to choose (completed)', nl: 'kiezen (voltooid)' },
+    level: 'A1',
     present: null,
     past: {
       він: 'обрав',
@@ -680,6 +715,7 @@ export const CONJUGATIONS = [
     aspect: 'imperfective',
     partner: "з'їздити",
     meaning: { en: 'to travel', nl: 'reizen' },
+    level: 'A1',
     present: {
       я: 'подорожую',
       ти: 'подорожуєш',
@@ -712,6 +748,7 @@ export const CONJUGATIONS = [
     aspect: 'perfective',
     partner: 'подорожувати',
     meaning: { en: 'to make a trip (completed)', nl: 'een reis maken (voltooid)' },
+    level: 'A1',
     present: null,
     past: {
       він: "з'їздив",
@@ -741,6 +778,7 @@ export const CONJUGATIONS = [
     aspect: 'imperfective',
     partner: 'почекати',
     meaning: { en: 'to wait', nl: 'wachten' },
+    level: 'A1',
     present: {
       я: 'чекаю',
       ти: 'чекаєш',
@@ -773,6 +811,7 @@ export const CONJUGATIONS = [
     aspect: 'perfective',
     partner: 'чекати',
     meaning: { en: 'to wait (for a bit, completed)', nl: 'wachten (even, voltooid)' },
+    level: 'A1',
     present: null,
     past: {
       він: 'почекав',
@@ -802,6 +841,7 @@ export const CONJUGATIONS = [
     aspect: 'imperfective',
     partner: 'повернутися',
     meaning: { en: 'to return', nl: 'terugkeren' },
+    level: 'A1',
     present: {
       я: 'повертаюся',
       ти: 'повертаєшся',
@@ -834,6 +874,7 @@ export const CONJUGATIONS = [
     aspect: 'perfective',
     partner: 'повертатися',
     meaning: { en: 'to return (completed)', nl: 'terugkeren (voltooid)' },
+    level: 'A1',
     present: null,
     past: {
       він: 'повернувся',
@@ -863,6 +904,7 @@ export const CONJUGATIONS = [
     aspect: 'imperfective',
     partner: 'навчитися',
     meaning: { en: 'to study / to learn', nl: 'studeren / leren' },
+    level: 'A1',
     present: {
       я: 'навчаюся',
       ти: 'навчаєшся',
@@ -895,6 +937,7 @@ export const CONJUGATIONS = [
     aspect: 'perfective',
     partner: 'навчатися',
     meaning: { en: 'to learn (completed)', nl: 'leren (voltooid)' },
+    level: 'A1',
     present: null,
     past: {
       він: 'навчився',
@@ -924,6 +967,7 @@ export const CONJUGATIONS = [
     aspect: 'imperfective',
     partner: 'відвідати',
     meaning: { en: 'to visit', nl: 'bezoeken' },
+    level: 'A1',
     present: {
       я: 'відвідую',
       ти: 'відвідуєш',
@@ -956,6 +1000,7 @@ export const CONJUGATIONS = [
     aspect: 'perfective',
     partner: 'відвідувати',
     meaning: { en: 'to visit (completed)', nl: 'bezoeken (voltooid)' },
+    level: 'A1',
     present: null,
     past: {
       він: 'відвідав',
@@ -985,6 +1030,7 @@ export const CONJUGATIONS = [
     aspect: 'imperfective',
     partner: 'випити',
     meaning: { en: 'to drink', nl: 'drinken' },
+    level: 'A1',
     present: {
       я: "п'ю",
       ти: "п'єш",
@@ -1017,6 +1063,7 @@ export const CONJUGATIONS = [
     aspect: 'perfective',
     partner: 'пити',
     meaning: { en: 'to drink (completed)', nl: 'drinken (voltooid)' },
+    level: 'A1',
     present: null,
     past: {
       він: 'випив',
@@ -1046,6 +1093,12 @@ export const CONJUGATIONS = [
     aspect: 'imperfective',
     partner: "з'їсти",
     meaning: { en: 'to eat', nl: 'eten' },
+    level: 'A1',
+    sentences: [
+      { uk: 'Я ___ сніданок о восьмій.', answer: 'їм', full: 'Я їм сніданок о восьмій.', en: 'I eat breakfast at eight.', nl: 'Ik eet ontbijt om acht uur.', tense: 'present', pronoun: 'я' },
+      { uk: 'Що ви ___?', answer: 'їсте', full: 'Що ви їсте?', en: 'What are you eating?', nl: 'Wat eet u?', tense: 'present', pronoun: 'ви' },
+      { uk: 'Вона ___ суп на обід.', answer: 'їла', full: 'Вона їла суп на обід.', en: 'She was eating soup for lunch.', nl: 'Ze at soep als lunch.', tense: 'past', pronoun: 'вона' },
+    ],
     present: {
       я: 'їм',
       ти: 'їси',
@@ -1078,6 +1131,7 @@ export const CONJUGATIONS = [
     aspect: 'perfective',
     partner: 'їсти',
     meaning: { en: 'to eat (completed)', nl: 'eten (voltooid)' },
+    level: 'A1',
     present: null,
     past: {
       він: "з'їв",
@@ -1107,6 +1161,7 @@ export const CONJUGATIONS = [
     aspect: 'imperfective',
     partner: 'почати',
     meaning: { en: 'to begin', nl: 'beginnen' },
+    level: 'A1',
     present: {
       я: 'починаю',
       ти: 'починаєш',
@@ -1139,6 +1194,7 @@ export const CONJUGATIONS = [
     aspect: 'perfective',
     partner: 'починати',
     meaning: { en: 'to begin (completed)', nl: 'beginnen (voltooid)' },
+    level: 'A1',
     present: null,
     past: {
       він: 'почав',
@@ -1168,6 +1224,7 @@ export const CONJUGATIONS = [
     aspect: 'imperfective',
     partner: 'закінчити',
     meaning: { en: 'to finish', nl: 'afronden / voltooien' },
+    level: 'A1',
     present: {
       я: 'закінчую',
       ти: 'закінчуєш',
@@ -1200,6 +1257,7 @@ export const CONJUGATIONS = [
     aspect: 'perfective',
     partner: 'закінчувати',
     meaning: { en: 'to finish (completed)', nl: 'afronden / voltooien (voltooid)' },
+    level: 'A1',
     present: null,
     past: {
       він: 'закінчив',
@@ -1219,6 +1277,455 @@ export const CONJUGATIONS = [
       ти: 'закінчи',
       ви: 'закінчіть',
     },
+  },
+
+  // ============================================================
+  //  A2 VERBS
+  // ============================================================
+
+  // 21. знати / дізнатися — know / find out
+  {
+    infinitive: 'знати',
+    aspect: 'imperfective',
+    partner: 'дізнатися',
+    meaning: { en: 'to know', nl: 'weten / kennen' },
+    level: 'A2',
+    present: { я: 'знаю', ти: 'знаєш', 'він/вона': 'знає', ми: 'знаємо', ви: 'знаєте', вони: 'знають' },
+    past: { він: 'знав', вона: 'знала', воно: 'знало', вони: 'знали' },
+    future: { я: 'буду знати', ти: 'будеш знати', 'він/вона': 'буде знати', ми: 'будемо знати', ви: 'будете знати', вони: 'будуть знати' },
+    imperative: { ти: 'знай', ви: 'знайте' },
+    sentences: [
+      { uk: 'Я ___ цю людину.', answer: 'знаю', full: 'Я знаю цю людину.', en: 'I know this person.', nl: 'Ik ken deze persoon.', tense: 'present', pronoun: 'я' },
+      { uk: 'Вони ___ правду.', answer: 'знали', full: 'Вони знали правду.', en: 'They knew the truth.', nl: 'Zij wisten de waarheid.', tense: 'past', pronoun: 'вони' },
+      { uk: 'Ти ___ відповідь?', answer: 'знаєш', full: 'Ти знаєш відповідь?', en: 'Do you know the answer?', nl: 'Weet jij het antwoord?', tense: 'present', pronoun: 'ти' },
+    ],
+  },
+  {
+    infinitive: 'дізнатися',
+    aspect: 'perfective',
+    partner: 'знати',
+    meaning: { en: 'to find out', nl: 'te weten komen' },
+    level: 'A2',
+    present: null,
+    past: { він: 'дізнався', вона: 'дізналася', воно: 'дізналося', вони: 'дізналися' },
+    future: { я: 'дізнаюся', ти: 'дізнаєшся', 'він/вона': 'дізнається', ми: 'дізнаємося', ви: 'дізнаєтеся', вони: 'дізнаються' },
+    imperative: { ти: 'дізнайся', ви: 'дізнайтеся' },
+    sentences: [
+      { uk: 'Вона ___ про це вчора.', answer: 'дізналася', full: 'Вона дізналася про це вчора.', en: 'She found out about it yesterday.', nl: 'Ze kwam er gisteren achter.', tense: 'past', pronoun: 'вона' },
+    ],
+  },
+
+  // 22. бачити / побачити — see
+  {
+    infinitive: 'бачити',
+    aspect: 'imperfective',
+    partner: 'побачити',
+    meaning: { en: 'to see', nl: 'zien' },
+    level: 'A2',
+    present: { я: 'бачу', ти: 'бачиш', 'він/вона': 'бачить', ми: 'бачимо', ви: 'бачите', вони: 'бачать' },
+    past: { він: 'бачив', вона: 'бачила', воно: 'бачило', вони: 'бачили' },
+    future: { я: 'буду бачити', ти: 'будеш бачити', 'він/вона': 'буде бачити', ми: 'будемо бачити', ви: 'будете бачити', вони: 'будуть бачити' },
+    imperative: { ти: 'бач', ви: 'бачте' },
+    sentences: [
+      { uk: 'Я ___ море з вікна.', answer: 'бачу', full: 'Я бачу море з вікна.', en: 'I see the sea from the window.', nl: 'Ik zie de zee vanuit het raam.', tense: 'present', pronoun: 'я' },
+      { uk: 'Ми ___ цей фільм багато разів.', answer: 'бачили', full: 'Ми бачили цей фільм багато разів.', en: 'We have seen this movie many times.', nl: 'We hebben deze film vaak gezien.', tense: 'past', pronoun: 'вони' },
+    ],
+  },
+  {
+    infinitive: 'побачити',
+    aspect: 'perfective',
+    partner: 'бачити',
+    meaning: { en: 'to see (completed)', nl: 'zien (voltooid)' },
+    level: 'A2',
+    present: null,
+    past: { він: 'побачив', вона: 'побачила', воно: 'побачило', вони: 'побачили' },
+    future: { я: 'побачу', ти: 'побачиш', 'він/вона': 'побачить', ми: 'побачимо', ви: 'побачите', вони: 'побачать' },
+    imperative: { ти: 'побач', ви: 'побачте' },
+    sentences: [
+      { uk: 'Завтра ти ___ результат.', answer: 'побачиш', full: 'Завтра ти побачиш результат.', en: 'Tomorrow you will see the result.', nl: 'Morgen zie je het resultaat.', tense: 'future', pronoun: 'ти' },
+    ],
+  },
+
+  // 23. робити / зробити — do/make
+  {
+    infinitive: 'робити',
+    aspect: 'imperfective',
+    partner: 'зробити',
+    meaning: { en: 'to do / to make', nl: 'doen / maken' },
+    level: 'A2',
+    present: { я: 'роблю', ти: 'робиш', 'він/вона': 'робить', ми: 'робимо', ви: 'робите', вони: 'роблять' },
+    past: { він: 'робив', вона: 'робила', воно: 'робило', вони: 'робили' },
+    future: { я: 'буду робити', ти: 'будеш робити', 'він/вона': 'буде робити', ми: 'будемо робити', ви: 'будете робити', вони: 'будуть робити' },
+    imperative: { ти: 'роби', ви: 'робіть' },
+    sentences: [
+      { uk: 'Що ти ___?', answer: 'робиш', full: 'Що ти робиш?', en: 'What are you doing?', nl: 'Wat doe je?', tense: 'present', pronoun: 'ти' },
+      { uk: 'Вони ___ домашнє завдання щодня.', answer: 'роблять', full: 'Вони роблять домашнє завдання щодня.', en: 'They do homework every day.', nl: 'Ze maken elke dag huiswerk.', tense: 'present', pronoun: 'вони' },
+      { uk: 'Вона ___ це добре.', answer: 'робила', full: 'Вона робила це добре.', en: 'She was doing it well.', nl: 'Ze deed het goed.', tense: 'past', pronoun: 'вона' },
+    ],
+  },
+  {
+    infinitive: 'зробити',
+    aspect: 'perfective',
+    partner: 'робити',
+    meaning: { en: 'to do / to make (completed)', nl: 'doen / maken (voltooid)' },
+    level: 'A2',
+    present: null,
+    past: { він: 'зробив', вона: 'зробила', воно: 'зробило', вони: 'зробили' },
+    future: { я: 'зроблю', ти: 'зробиш', 'він/вона': 'зробить', ми: 'зробимо', ви: 'зробите', вони: 'зроблять' },
+    imperative: { ти: 'зроби', ви: 'зробіть' },
+    sentences: [
+      { uk: 'Я ___ це завтра.', answer: 'зроблю', full: 'Я зроблю це завтра.', en: 'I will do it tomorrow.', nl: 'Ik doe het morgen.', tense: 'future', pronoun: 'я' },
+    ],
+  },
+
+  // 24. думати / подумати — think
+  {
+    infinitive: 'думати',
+    aspect: 'imperfective',
+    partner: 'подумати',
+    meaning: { en: 'to think', nl: 'denken' },
+    level: 'A2',
+    present: { я: 'думаю', ти: 'думаєш', 'він/вона': 'думає', ми: 'думаємо', ви: 'думаєте', вони: 'думають' },
+    past: { він: 'думав', вона: 'думала', воно: 'думало', вони: 'думали' },
+    future: { я: 'буду думати', ти: 'будеш думати', 'він/вона': 'буде думати', ми: 'будемо думати', ви: 'будете думати', вони: 'будуть думати' },
+    imperative: { ти: 'думай', ви: 'думайте' },
+    sentences: [
+      { uk: 'Я ___ про тебе.', answer: 'думаю', full: 'Я думаю про тебе.', en: 'I am thinking about you.', nl: 'Ik denk aan jou.', tense: 'present', pronoun: 'я' },
+    ],
+  },
+  {
+    infinitive: 'подумати',
+    aspect: 'perfective',
+    partner: 'думати',
+    meaning: { en: 'to think (completed)', nl: 'denken (voltooid)' },
+    level: 'A2',
+    present: null,
+    past: { він: 'подумав', вона: 'подумала', воно: 'подумало', вони: 'подумали' },
+    future: { я: 'подумаю', ти: 'подумаєш', 'він/вона': 'подумає', ми: 'подумаємо', ви: 'подумаєте', вони: 'подумають' },
+    imperative: { ти: 'подумай', ви: 'подумайте' },
+  },
+
+  // 25. говорити / сказати — speak / say
+  {
+    infinitive: 'говорити',
+    aspect: 'imperfective',
+    partner: 'сказати',
+    meaning: { en: 'to speak / to talk', nl: 'spreken / praten' },
+    level: 'A2',
+    present: { я: 'говорю', ти: 'говориш', 'він/вона': 'говорить', ми: 'говоримо', ви: 'говорите', вони: 'говорять' },
+    past: { він: 'говорив', вона: 'говорила', воно: 'говорило', вони: 'говорили' },
+    future: { я: 'буду говорити', ти: 'будеш говорити', 'він/вона': 'буде говорити', ми: 'будемо говорити', ви: 'будете говорити', вони: 'будуть говорити' },
+    imperative: { ти: 'говори', ви: 'говоріть' },
+    sentences: [
+      { uk: 'Він ___ українською.', answer: 'говорить', full: 'Він говорить українською.', en: 'He speaks Ukrainian.', nl: 'Hij spreekt Oekraïens.', tense: 'present', pronoun: 'він/вона' },
+      { uk: 'Ми ___ про це вчора.', answer: 'говорили', full: 'Ми говорили про це вчора.', en: 'We talked about it yesterday.', nl: 'We spraken er gisteren over.', tense: 'past', pronoun: 'вони' },
+    ],
+  },
+  {
+    infinitive: 'сказати',
+    aspect: 'perfective',
+    partner: 'говорити',
+    meaning: { en: 'to say / to tell', nl: 'zeggen' },
+    level: 'A2',
+    present: null,
+    past: { він: 'сказав', вона: 'сказала', воно: 'сказало', вони: 'сказали' },
+    future: { я: 'скажу', ти: 'скажеш', 'він/вона': 'скаже', ми: 'скажемо', ви: 'скажете', вони: 'скажуть' },
+    imperative: { ти: 'скажи', ви: 'скажіть' },
+    sentences: [
+      { uk: 'Вона ___ мені правду.', answer: 'сказала', full: 'Вона сказала мені правду.', en: 'She told me the truth.', nl: 'Ze vertelde me de waarheid.', tense: 'past', pronoun: 'вона' },
+      { uk: 'Що ти ___?', answer: 'скажеш', full: 'Що ти скажеш?', en: 'What will you say?', nl: 'Wat zeg je?', tense: 'future', pronoun: 'ти' },
+    ],
+  },
+
+  // 26. допомагати / допомогти — help
+  {
+    infinitive: 'допомагати',
+    aspect: 'imperfective',
+    partner: 'допомогти',
+    meaning: { en: 'to help', nl: 'helpen' },
+    level: 'A2',
+    present: { я: 'допомагаю', ти: 'допомагаєш', 'він/вона': 'допомагає', ми: 'допомагаємо', ви: 'допомагаєте', вони: 'допомагають' },
+    past: { він: 'допомагав', вона: 'допомагала', воно: 'допомагало', вони: 'допомагали' },
+    future: { я: 'буду допомагати', ти: 'будеш допомагати', 'він/вона': 'буде допомагати', ми: 'будемо допомагати', ви: 'будете допомагати', вони: 'будуть допомагати' },
+    imperative: { ти: 'допомагай', ви: 'допомагайте' },
+    sentences: [
+      { uk: 'Вони завжди ___ нам.', answer: 'допомагають', full: 'Вони завжди допомагають нам.', en: 'They always help us.', nl: 'Ze helpen ons altijd.', tense: 'present', pronoun: 'вони' },
+    ],
+  },
+  {
+    infinitive: 'допомогти',
+    aspect: 'perfective',
+    partner: 'допомагати',
+    meaning: { en: 'to help (completed)', nl: 'helpen (voltooid)' },
+    level: 'A2',
+    present: null,
+    past: { він: 'допоміг', вона: 'допомогла', воно: 'допомогло', вони: 'допомогли' },
+    future: { я: 'допоможу', ти: 'допоможеш', 'він/вона': 'допоможе', ми: 'допоможемо', ви: 'допоможете', вони: 'допоможуть' },
+    imperative: { ти: 'допоможи', ви: 'допоможіть' },
+    sentences: [
+      { uk: 'Я ___ тобі завтра.', answer: 'допоможу', full: 'Я допоможу тобі завтра.', en: 'I will help you tomorrow.', nl: 'Ik help je morgen.', tense: 'future', pronoun: 'я' },
+    ],
+  },
+
+  // 27. писати / написати — write
+  {
+    infinitive: 'писати',
+    aspect: 'imperfective',
+    partner: 'написати',
+    meaning: { en: 'to write', nl: 'schrijven' },
+    level: 'A2',
+    present: { я: 'пишу', ти: 'пишеш', 'він/вона': 'пише', ми: 'пишемо', ви: 'пишете', вони: 'пишуть' },
+    past: { він: 'писав', вона: 'писала', воно: 'писало', вони: 'писали' },
+    future: { я: 'буду писати', ти: 'будеш писати', 'він/вона': 'буде писати', ми: 'будемо писати', ви: 'будете писати', вони: 'будуть писати' },
+    imperative: { ти: 'пиши', ви: 'пишіть' },
+    sentences: [
+      { uk: 'Я ___ листа другові.', answer: 'пишу', full: 'Я пишу листа другові.', en: 'I am writing a letter to a friend.', nl: 'Ik schrijf een brief aan een vriend.', tense: 'present', pronoun: 'я' },
+    ],
+  },
+  {
+    infinitive: 'написати',
+    aspect: 'perfective',
+    partner: 'писати',
+    meaning: { en: 'to write (completed)', nl: 'schrijven (voltooid)' },
+    level: 'A2',
+    present: null,
+    past: { він: 'написав', вона: 'написала', воно: 'написало', вони: 'написали' },
+    future: { я: 'напишу', ти: 'напишеш', 'він/вона': 'напише', ми: 'напишемо', ви: 'напишете', вони: 'напишуть' },
+    imperative: { ти: 'напиши', ви: 'напишіть' },
+    sentences: [
+      { uk: 'Вона ___ есе за годину.', answer: 'написала', full: 'Вона написала есе за годину.', en: 'She wrote the essay in an hour.', nl: 'Ze schreef het essay in een uur.', tense: 'past', pronoun: 'вона' },
+    ],
+  },
+
+  // 28. читати / прочитати — read
+  {
+    infinitive: 'читати',
+    aspect: 'imperfective',
+    partner: 'прочитати',
+    meaning: { en: 'to read', nl: 'lezen' },
+    level: 'A2',
+    present: { я: 'читаю', ти: 'читаєш', 'він/вона': 'читає', ми: 'читаємо', ви: 'читаєте', вони: 'читають' },
+    past: { він: 'читав', вона: 'читала', воно: 'читало', вони: 'читали' },
+    future: { я: 'буду читати', ти: 'будеш читати', 'він/вона': 'буде читати', ми: 'будемо читати', ви: 'будете читати', вони: 'будуть читати' },
+    imperative: { ти: 'читай', ви: 'читайте' },
+    sentences: [
+      { uk: 'Я ___ книгу кожного вечора.', answer: 'читаю', full: 'Я читаю книгу кожного вечора.', en: 'I read a book every evening.', nl: 'Ik lees elke avond een boek.', tense: 'present', pronoun: 'я' },
+      { uk: 'Вони ___ газету вранці.', answer: 'читають', full: 'Вони читають газету вранці.', en: 'They read the newspaper in the morning.', nl: 'Ze lezen de krant in de ochtend.', tense: 'present', pronoun: 'вони' },
+    ],
+  },
+  {
+    infinitive: 'прочитати',
+    aspect: 'perfective',
+    partner: 'читати',
+    meaning: { en: 'to read (completed)', nl: 'lezen (voltooid)' },
+    level: 'A2',
+    present: null,
+    past: { він: 'прочитав', вона: 'прочитала', воно: 'прочитало', вони: 'прочитали' },
+    future: { я: 'прочитаю', ти: 'прочитаєш', 'він/вона': 'прочитає', ми: 'прочитаємо', ви: 'прочитаєте', вони: 'прочитають' },
+    imperative: { ти: 'прочитай', ви: 'прочитайте' },
+    sentences: [
+      { uk: 'Він ___ цю книгу за тиждень.', answer: 'прочитав', full: 'Він прочитав цю книгу за тиждень.', en: 'He read this book in a week.', nl: 'Hij las dit boek in een week.', tense: 'past', pronoun: 'він' },
+    ],
+  },
+
+  // 29. розуміти / зрозуміти — understand
+  {
+    infinitive: 'розуміти',
+    aspect: 'imperfective',
+    partner: 'зрозуміти',
+    meaning: { en: 'to understand', nl: 'begrijpen' },
+    level: 'A2',
+    present: { я: 'розумію', ти: 'розумієш', 'він/вона': 'розуміє', ми: 'розуміємо', ви: 'розумієте', вони: 'розуміють' },
+    past: { він: 'розумів', вона: 'розуміла', воно: 'розуміло', вони: 'розуміли' },
+    future: { я: 'буду розуміти', ти: 'будеш розуміти', 'він/вона': 'буде розуміти', ми: 'будемо розуміти', ви: 'будете розуміти', вони: 'будуть розуміти' },
+    imperative: { ти: 'розумій', ви: 'розумійте' },
+    sentences: [
+      { uk: 'Ви ___ українську мову?', answer: 'розумієте', full: 'Ви розумієте українську мову?', en: 'Do you understand Ukrainian?', nl: 'Begrijpt u Oekraïens?', tense: 'present', pronoun: 'ви' },
+      { uk: 'Я не ___ це слово.', answer: 'розумію', full: 'Я не розумію це слово.', en: 'I do not understand this word.', nl: 'Ik begrijp dit woord niet.', tense: 'present', pronoun: 'я' },
+    ],
+  },
+  {
+    infinitive: 'зрозуміти',
+    aspect: 'perfective',
+    partner: 'розуміти',
+    meaning: { en: 'to understand (completed)', nl: 'begrijpen (voltooid)' },
+    level: 'A2',
+    present: null,
+    past: { він: 'зрозумів', вона: 'зрозуміла', воно: 'зрозуміло', вони: 'зрозуміли' },
+    future: { я: 'зрозумію', ти: 'зрозумієш', 'він/вона': 'зрозуміє', ми: 'зрозуміємо', ви: 'зрозумієте', вони: 'зрозуміють' },
+    imperative: { ти: 'зрозумій', ви: 'зрозумійте' },
+    sentences: [
+      { uk: 'Вона нарешті ___ задачу.', answer: 'зрозуміла', full: 'Вона нарешті зрозуміла задачу.', en: 'She finally understood the problem.', nl: 'Ze begreep eindelijk het probleem.', tense: 'past', pronoun: 'вона' },
+    ],
+  },
+
+  // 30. платити / заплатити — pay
+  {
+    infinitive: 'платити',
+    aspect: 'imperfective',
+    partner: 'заплатити',
+    meaning: { en: 'to pay', nl: 'betalen' },
+    level: 'A2',
+    present: { я: 'плачу', ти: 'платиш', 'він/вона': 'платить', ми: 'платимо', ви: 'платите', вони: 'платять' },
+    past: { він: 'платив', вона: 'платила', воно: 'платило', вони: 'платили' },
+    future: { я: 'буду платити', ти: 'будеш платити', 'він/вона': 'буде платити', ми: 'будемо платити', ви: 'будете платити', вони: 'будуть платити' },
+    imperative: { ти: 'плати', ви: 'платіть' },
+    sentences: [
+      { uk: 'Хто ___ за обід?', answer: 'платить', full: 'Хто платить за обід?', en: 'Who pays for lunch?', nl: 'Wie betaalt de lunch?', tense: 'present', pronoun: 'він/вона' },
+    ],
+  },
+  {
+    infinitive: 'заплатити',
+    aspect: 'perfective',
+    partner: 'платити',
+    meaning: { en: 'to pay (completed)', nl: 'betalen (voltooid)' },
+    level: 'A2',
+    present: null,
+    past: { він: 'заплатив', вона: 'заплатила', воно: 'заплатило', вони: 'заплатили' },
+    future: { я: 'заплачу', ти: 'заплатиш', 'він/вона': 'заплатить', ми: 'заплатимо', ви: 'заплатите', вони: 'заплатять' },
+    imperative: { ти: 'заплати', ви: 'заплатіть' },
+    sentences: [
+      { uk: 'Я вже ___ за квитки.', answer: 'заплатив', full: 'Я вже заплатив за квитки.', en: 'I already paid for the tickets.', nl: 'Ik heb al betaald voor de kaartjes.', tense: 'past', pronoun: 'він' },
+    ],
+  },
+
+  // ============================================================
+  //  B1 VERBS
+  // ============================================================
+
+  // 31. пояснювати / пояснити — explain
+  {
+    infinitive: 'пояснювати',
+    aspect: 'imperfective',
+    partner: 'пояснити',
+    meaning: { en: 'to explain', nl: 'uitleggen' },
+    level: 'B1',
+    present: { я: 'пояснюю', ти: 'пояснюєш', 'він/вона': 'пояснює', ми: 'пояснюємо', ви: 'пояснюєте', вони: 'пояснюють' },
+    past: { він: 'пояснював', вона: 'пояснювала', воно: 'пояснювало', вони: 'пояснювали' },
+    future: { я: 'буду пояснювати', ти: 'будеш пояснювати', 'він/вона': 'буде пояснювати', ми: 'будемо пояснювати', ви: 'будете пояснювати', вони: 'будуть пояснювати' },
+    imperative: { ти: 'пояснюй', ви: 'пояснюйте' },
+    sentences: [
+      { uk: 'Вчитель ___ нове правило.', answer: 'пояснює', full: 'Вчитель пояснює нове правило.', en: 'The teacher explains the new rule.', nl: 'De leraar legt de nieuwe regel uit.', tense: 'present', pronoun: 'він/вона' },
+    ],
+  },
+  {
+    infinitive: 'пояснити',
+    aspect: 'perfective',
+    partner: 'пояснювати',
+    meaning: { en: 'to explain (completed)', nl: 'uitleggen (voltooid)' },
+    level: 'B1',
+    present: null,
+    past: { він: 'пояснив', вона: 'пояснила', воно: 'пояснило', вони: 'пояснили' },
+    future: { я: 'поясню', ти: 'поясниш', 'він/вона': 'пояснить', ми: 'пояснимо', ви: 'поясните', вони: 'пояснять' },
+    imperative: { ти: 'поясни', ви: 'поясніть' },
+  },
+
+  // 32. вирішувати / вирішити — decide/solve
+  {
+    infinitive: 'вирішувати',
+    aspect: 'imperfective',
+    partner: 'вирішити',
+    meaning: { en: 'to decide / to solve', nl: 'beslissen / oplossen' },
+    level: 'B1',
+    present: { я: 'вирішую', ти: 'вирішуєш', 'він/вона': 'вирішує', ми: 'вирішуємо', ви: 'вирішуєте', вони: 'вирішують' },
+    past: { він: 'вирішував', вона: 'вирішувала', воно: 'вирішувало', вони: 'вирішували' },
+    future: { я: 'буду вирішувати', ти: 'будеш вирішувати', 'він/вона': 'буде вирішувати', ми: 'будемо вирішувати', ви: 'будете вирішувати', вони: 'будуть вирішувати' },
+    imperative: { ти: 'вирішуй', ви: 'вирішуйте' },
+    sentences: [
+      { uk: 'Ми ___ цю проблему разом.', answer: 'вирішуємо', full: 'Ми вирішуємо цю проблему разом.', en: 'We are solving this problem together.', nl: 'We lossen dit probleem samen op.', tense: 'present', pronoun: 'ми' },
+    ],
+  },
+  {
+    infinitive: 'вирішити',
+    aspect: 'perfective',
+    partner: 'вирішувати',
+    meaning: { en: 'to decide / to solve (completed)', nl: 'beslissen / oplossen (voltooid)' },
+    level: 'B1',
+    present: null,
+    past: { він: 'вирішив', вона: 'вирішила', воно: 'вирішило', вони: 'вирішили' },
+    future: { я: 'вирішу', ти: 'вирішиш', 'він/вона': 'вирішить', ми: 'вирішимо', ви: 'вирішите', вони: 'вирішать' },
+    imperative: { ти: 'виріши', ви: 'вирішіть' },
+  },
+
+  // 33. забувати / забути — forget
+  {
+    infinitive: 'забувати',
+    aspect: 'imperfective',
+    partner: 'забути',
+    meaning: { en: 'to forget', nl: 'vergeten' },
+    level: 'B1',
+    present: { я: 'забуваю', ти: 'забуваєш', 'він/вона': 'забуває', ми: 'забуваємо', ви: 'забуваєте', вони: 'забувають' },
+    past: { він: 'забував', вона: 'забувала', воно: 'забувало', вони: 'забували' },
+    future: { я: 'буду забувати', ти: 'будеш забувати', 'він/вона': 'буде забувати', ми: 'будемо забувати', ви: 'будете забувати', вони: 'будуть забувати' },
+    imperative: { ти: 'забувай', ви: 'забувайте' },
+    sentences: [
+      { uk: 'Я завжди ___ ключі.', answer: 'забуваю', full: 'Я завжди забуваю ключі.', en: 'I always forget my keys.', nl: 'Ik vergeet altijd mijn sleutels.', tense: 'present', pronoun: 'я' },
+    ],
+  },
+  {
+    infinitive: 'забути',
+    aspect: 'perfective',
+    partner: 'забувати',
+    meaning: { en: 'to forget (completed)', nl: 'vergeten (voltooid)' },
+    level: 'B1',
+    present: null,
+    past: { він: 'забув', вона: 'забула', воно: 'забуло', вони: 'забули' },
+    future: { я: 'забуду', ти: 'забудеш', 'він/вона': 'забуде', ми: 'забудемо', ви: 'забудете', вони: 'забудуть' },
+    imperative: { ти: 'забудь', ви: 'забудьте' },
+    sentences: [
+      { uk: 'Він ___ пароль.', answer: 'забув', full: 'Він забув пароль.', en: 'He forgot the password.', nl: 'Hij vergat het wachtwoord.', tense: 'past', pronoun: 'він' },
+    ],
+  },
+
+  // 34. змінювати / змінити — change
+  {
+    infinitive: 'змінювати',
+    aspect: 'imperfective',
+    partner: 'змінити',
+    meaning: { en: 'to change', nl: 'veranderen' },
+    level: 'B1',
+    present: { я: 'змінюю', ти: 'змінюєш', 'він/вона': 'змінює', ми: 'змінюємо', ви: 'змінюєте', вони: 'змінюють' },
+    past: { він: 'змінював', вона: 'змінювала', воно: 'змінювало', вони: 'змінювали' },
+    future: { я: 'буду змінювати', ти: 'будеш змінювати', 'він/вона': 'буде змінювати', ми: 'будемо змінювати', ви: 'будете змінювати', вони: 'будуть змінювати' },
+    imperative: { ти: 'змінюй', ви: 'змінюйте' },
+  },
+  {
+    infinitive: 'змінити',
+    aspect: 'perfective',
+    partner: 'змінювати',
+    meaning: { en: 'to change (completed)', nl: 'veranderen (voltooid)' },
+    level: 'B1',
+    present: null,
+    past: { він: 'змінив', вона: 'змінила', воно: 'змінило', вони: 'змінили' },
+    future: { я: 'зміню', ти: 'зміниш', 'він/вона': 'змінить', ми: 'змінимо', ви: 'зміните', вони: 'змінять' },
+    imperative: { ти: 'зміни', ви: 'змініть' },
+  },
+
+  // 35. перевіряти / перевірити — check/verify
+  {
+    infinitive: 'перевіряти',
+    aspect: 'imperfective',
+    partner: 'перевірити',
+    meaning: { en: 'to check / to verify', nl: 'controleren' },
+    level: 'B1',
+    present: { я: 'перевіряю', ти: 'перевіряєш', 'він/вона': 'перевіряє', ми: 'перевіряємо', ви: 'перевіряєте', вони: 'перевіряють' },
+    past: { він: 'перевіряв', вона: 'перевіряла', воно: 'перевіряло', вони: 'перевіряли' },
+    future: { я: 'буду перевіряти', ти: 'будеш перевіряти', 'він/вона': 'буде перевіряти', ми: 'будемо перевіряти', ви: 'будете перевіряти', вони: 'будуть перевіряти' },
+    imperative: { ти: 'перевіряй', ви: 'перевіряйте' },
+    sentences: [
+      { uk: 'Я завжди ___ пошту вранці.', answer: 'перевіряю', full: 'Я завжди перевіряю пошту вранці.', en: 'I always check my email in the morning.', nl: 'Ik controleer altijd mijn e-mail in de ochtend.', tense: 'present', pronoun: 'я' },
+    ],
+  },
+  {
+    infinitive: 'перевірити',
+    aspect: 'perfective',
+    partner: 'перевіряти',
+    meaning: { en: 'to check (completed)', nl: 'controleren (voltooid)' },
+    level: 'B1',
+    present: null,
+    past: { він: 'перевірив', вона: 'перевірила', воно: 'перевірило', вони: 'перевірили' },
+    future: { я: 'перевірю', ти: 'перевіриш', 'він/вона': 'перевірить', ми: 'перевіримо', ви: 'перевірите', вони: 'перевірять' },
+    imperative: { ти: 'перевір', ви: 'перевірте' },
   },
 ];
 

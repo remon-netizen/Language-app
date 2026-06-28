@@ -1,4 +1,4 @@
-import { state } from '../state.js';
+import { state, flagImg } from '../state.js';
 import { escHtml } from '../utils.js';
 import { generateExercises } from '../api/exercises.js';
 import { languageName } from '../i18n.js';
@@ -171,7 +171,7 @@ function showTopicPicker() {
   const topics  = getTopics();
   const s       = getScreen();
   const native  = state.nativeLanguage;
-  const flag    = { uk: '🇺🇦', nl: '🇳🇱', en: '🇬🇧' }[state.currentLanguage] || '🌐';
+  const flag    = flagImg(state.currentLanguage);
   const lblTitle    = native === 'nl' ? '🎯 Grammatica-oefeningen' : '🎯 Grammar Exercises';
   const lblPick     = native === 'nl' ? 'kies een onderwerp' : 'pick a topic';
   const lblPracVerb = native === 'nl' ? 'Werkwoorden oefenen' : 'Practice Verbs';

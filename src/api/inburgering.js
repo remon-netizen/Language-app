@@ -58,7 +58,7 @@ export const INBURGERING_TOPICS = [
   },
   {
     id:       'kns_geschiedenis',
-    icon:     '🇳🇱',
+    icon:     '<img src="https://flagcdn.com/nl.svg" alt="" class="flag-icon" width="20" height="13">',
     title:    'Geschiedenis & Cultuur',
     subtitle: 'WO2, VOC, Nederlandse tradities',
     category: 'kns',

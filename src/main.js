@@ -1,5 +1,5 @@
 // ── Imports ───────────────────────────────────────────────────────────────────
-import { state, validTargetsFor, getTargetFlag, getTutorFirstName } from './state.js';
+import { state, validTargetsFor, getTargetFlag, getTutorFirstName, flagImg } from './state.js';
 import { t, languageName } from './i18n.js';
 import { loadProgress, loadApiKey, saveApiKey, switchProvider } from './storage.js';
 import { loadVoices, showBrowserBanner, dismissBanner, changeVoice, testVoice, speakText } from './voice.js';
@@ -43,10 +43,10 @@ function collapseLangPicker() {
 function updateCompactLabel() {
   const el = document.getElementById('langCompactText');
   if (!el) return;
-  const nativeFlag = { nl: '🇳🇱', en: '🇬🇧' }[state.nativeLanguage] || '';
-  const targetFlag = { uk: '🇺🇦', nl: '🇳🇱', en: '🇬🇧', fr: '🇫🇷' }[state.currentLanguage] || '';
+  const nativeFlag = flagImg(state.nativeLanguage, 16);
+  const targetFlag = flagImg(state.currentLanguage, 16);
   const targetName = languageName(state.currentLanguage);
-  el.textContent = `${nativeFlag} → ${targetFlag} ${targetName}`;
+  el.innerHTML = `${nativeFlag} → ${targetFlag} ${targetName}`;
 }
 
 function expandLangPicker() {
@@ -359,7 +359,7 @@ function updateHeaderAndChat() {
 
   // Start button flag
   const startFlag = document.getElementById('startBtnFlag');
-  if (startFlag) startFlag.textContent = flag;
+  if (startFlag) startFlag.innerHTML = flag;
 
   // Chat title
   const chatTitle = document.getElementById('chatTitle');
@@ -367,9 +367,9 @@ function updateHeaderAndChat() {
 
   // Verb / dissect screen subtitles include the target language name + flag
   const verbSub = document.getElementById('verbScreenSub');
-  if (verbSub) verbSub.textContent = `${flag} ${targetName}`;
+  if (verbSub) verbSub.innerHTML = `${flag} ${targetName}`;
   const dissectSub = document.getElementById('dissectScreenSub');
-  if (dissectSub) dissectSub.textContent = `${flag} ${targetName}`;
+  if (dissectSub) dissectSub.innerHTML = `${flag} ${targetName}`;
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────

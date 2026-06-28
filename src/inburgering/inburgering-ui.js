@@ -1,3 +1,4 @@
+import { flagImg } from '../state.js';
 import { escHtml } from '../utils.js';
 import {
   generateInburgeringQuestions,
@@ -53,7 +54,7 @@ function showTopicPicker() {
     <div class="ib-header">
       <button class="back-btn" id="ibHomeBack">←</button>
       <div>
-        <div class="lesson-title">🇳🇱 Inburgeringsexamen</div>
+        <div class="lesson-title">${flagImg('nl')} Inburgeringsexamen</div>
         <div class="lesson-subtitle" id="ibPickerSub">Voorbereiding — kies een onderwerp</div>
       </div>
     </div>

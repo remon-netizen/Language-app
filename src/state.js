@@ -96,9 +96,18 @@ export function getTargetLanguageName(inLang = state.nativeLanguage) {
   return names[inLang]?.[state.currentLanguage] || state.currentLanguage;
 }
 
-// Flag emoji for the current target language.
+// SVG flag image for a language code. Returns an <img> HTML string.
+const FLAG_CC = { uk: 'ua', nl: 'nl', en: 'gb', fr: 'fr' };
+export function flagImg(langCode, size = 20) {
+  const cc = FLAG_CC[langCode] || 'ua';
+  const w = size;
+  const h = Math.round(size * 0.67);
+  return `<img src="https://flagcdn.com/${cc}.svg" alt="" class="flag-icon" width="${w}" height="${h}">`;
+}
+
+// Flag HTML for the current target language.
 export function getTargetFlag() {
-  return { uk: '🇺🇦', nl: '🇳🇱', en: '🇬🇧', fr: '🇫🇷' }[state.currentLanguage] || '🌐';
+  return flagImg(state.currentLanguage);
 }
 
 // Extract the human first name from a TTS voice name.

@@ -57,9 +57,10 @@
   overflow: hidden;
 }
 .welcome-card::after {
-  content: '🇺🇦';
+  content: '';
   position: absolute; right: 24px; top: 50%; transform: translateY(-50%);
-  font-size: 64px; opacity: 0.3;
+  width: 64px; height: 43px; opacity: 0.3;
+  background: url('https://flagcdn.com/ua.svg') no-repeat center / contain;
 }
 .welcome-card h2 { font-size: 1.5rem; margin-bottom: 8px; }
 .welcome-card p { opacity: 0.85; font-size: 0.95rem; }

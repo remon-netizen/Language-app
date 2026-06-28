@@ -1,4 +1,4 @@
-import { state } from '../state.js';
+import { state, flagImg } from '../state.js';
 import { showScreen } from '../router.js';
 import { dissectSentence } from '../api/grammar.js';
 import { escHtml } from '../utils.js';
@@ -21,8 +21,8 @@ export function openDissectScreen() {
   document.getElementById('dissectResult').innerHTML = '';
   const sub = document.getElementById('dissectScreenSub');
   if (sub) {
-    const meta = { uk: '🇺🇦 Ukrainian', nl: '🇳🇱 Dutch', en: '🇬🇧 English', fr: '🇫🇷 French' };
-    sub.textContent = meta[state.currentLanguage] || meta.uk;
+    const meta = { uk: 'Ukrainian', nl: 'Dutch', en: 'English', fr: 'French' };
+    sub.innerHTML = `${flagImg(state.currentLanguage, 16)} ${meta[state.currentLanguage] || meta.uk}`;
   }
 }
 
@@ -75,7 +75,7 @@ function renderDissection(data, container) {
 
   // Translation + note
   const translationHtml = data.sentence_translation
-    ? `<div class="dissect-translation">🇬🇧 ${escHtml(data.sentence_translation)}</div>` : '';
+    ? `<div class="dissect-translation">${flagImg('en', 16)} ${escHtml(data.sentence_translation)}</div>` : '';
   const noteHtml = data.grammar_note
     ? `<div class="grammar-note-box">📝 ${escHtml(data.grammar_note)}</div>` : '';
 

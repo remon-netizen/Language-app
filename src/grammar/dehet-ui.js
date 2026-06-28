@@ -1,3 +1,4 @@
+import { flagImg } from '../state.js';
 import { showScreen } from '../router.js';
 import { generateDeHetNouns } from '../api/dehet.js';
 import { escHtml } from '../utils.js';
@@ -26,7 +27,7 @@ function renderDeHetHome() {
     <div class="lesson-header">
       <button class="back-btn" onclick="showScreen('homeScreen')">←</button>
       <div>
-        <div class="lesson-title">🇳🇱 De of Het?</div>
+        <div class="lesson-title">${flagImg('nl')} De of Het?</div>
         <div class="lesson-subtitle">Dutch article drill</div>
       </div>
     </div>
@@ -77,7 +78,7 @@ export async function startDeHetDrill() {
   screen.innerHTML = `
     <div class="lesson-header">
       <button class="back-btn" onclick="openDeHetScreen()">←</button>
-      <div><div class="lesson-title">🇳🇱 De of Het?</div></div>
+      <div><div class="lesson-title">${flagImg('nl')} De of Het?</div></div>
     </div>
     <div class="screen-inner">
       <div class="dh-loading">
@@ -111,7 +112,7 @@ function renderDeHetQuestion() {
     <div class="lesson-header">
       <button class="back-btn" onclick="openDeHetScreen()">←</button>
       <div>
-        <div class="lesson-title">🇳🇱 De of Het?</div>
+        <div class="lesson-title">${flagImg('nl')} De of Het?</div>
         <div class="lesson-subtitle">${progress}</div>
       </div>
     </div>
@@ -187,7 +188,7 @@ function renderDeHetScore() {
   screen.innerHTML = `
     <div class="lesson-header">
       <button class="back-btn" onclick="openDeHetScreen()">←</button>
-      <div><div class="lesson-title">🇳🇱 De of Het? — Results</div></div>
+      <div><div class="lesson-title">${flagImg('nl')} De of Het? — Results</div></div>
     </div>
     <div class="screen-inner">
 

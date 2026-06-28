@@ -1,4 +1,4 @@
-import { state } from '../state.js';
+import { state, flagImg } from '../state.js';
 import { showScreen } from '../router.js';
 import { conjugateVerb } from '../api/grammar.js';
 import { escHtml } from '../utils.js';
@@ -124,8 +124,8 @@ export function openVerbScreen() {
   document.getElementById('verbResult').innerHTML = '';
   const sub = document.getElementById('verbScreenSub');
   if (sub) {
-    const meta = { uk: '🇺🇦 Ukrainian', nl: '🇳🇱 Dutch', en: '🇬🇧 English', fr: '🇫🇷 French' };
-    sub.textContent = meta[state.currentLanguage] || meta.uk;
+    const meta = { uk: 'Ukrainian', nl: 'Dutch', en: 'English', fr: 'French' };
+    sub.innerHTML = `${flagImg(state.currentLanguage, 16)} ${meta[state.currentLanguage] || meta.uk}`;
   }
   renderCommonVerbs();
 }
