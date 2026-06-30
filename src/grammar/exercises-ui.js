@@ -179,6 +179,8 @@ function showTopicPicker() {
   const lblDeHet    = native === 'nl' ? 'De of Het?' : 'De or Het?';
   const lblAspect   = native === 'nl' ? 'Werkwoordsaspect' : 'Verb Aspect';
   const lblDrill    = native === 'nl' ? 'Werkwoord Drill' : 'Verb Drill';
+  const lblCases    = native === 'nl' ? 'Naamvallen Drill' : 'Case Drill';
+  const lblPrefix   = native === 'nl' ? 'Voorvoegsel Drill' : 'Prefix Drill';
   const isUK        = state.currentLanguage === 'uk';
   const lblLevel    = native === 'nl' ? 'Niveau:' : 'Level:';
   const lblOpen     = native === 'nl' ? '✏️ Open vragen:' : '✏️ Open questions:';
@@ -216,6 +218,14 @@ function showTopicPicker() {
         <span class="ex-tool-icon">✍️</span>
         <span>${lblDrill}</span>
       </button>
+      <button class="ex-tool-btn ex-tool-cases" id="exCaseDrillBtn" style="${isUK ? '' : 'display:none'}">
+        <span class="ex-tool-icon">📌</span>
+        <span>${lblCases}</span>
+      </button>
+      <button class="ex-tool-btn ex-tool-prefix" id="exPrefixDrillBtn" style="${isUK ? '' : 'display:none'}">
+        <span class="ex-tool-icon">🔗</span>
+        <span>${lblPrefix}</span>
+      </button>
     </div>
 
     <div class="ex-controls-bar">
@@ -241,6 +251,10 @@ function showTopicPicker() {
   if (aspectBtn) aspectBtn.addEventListener('click', () => window.openVerbAspectScreen());
   const drillBtn = s.querySelector('#exDrillBtn');
   if (drillBtn) drillBtn.addEventListener('click', () => window.openVerbDrillScreen());
+  const caseDrillBtn = s.querySelector('#exCaseDrillBtn');
+  if (caseDrillBtn) caseDrillBtn.addEventListener('click', () => window.openCaseDrillScreen());
+  const prefixDrillBtn = s.querySelector('#exPrefixDrillBtn');
+  if (prefixDrillBtn) prefixDrillBtn.addEventListener('click', () => window.openPrefixDrillScreen());
 
   s.querySelectorAll('.ex-level-btn').forEach(btn => {
     btn.addEventListener('click', () => setExLevel(btn.dataset.level));

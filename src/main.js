@@ -17,6 +17,8 @@ import { openFlashcardScreen, flipFlashcard, rateFlashcard } from './grammar/fla
 import { openDeHetScreen, setDhLevel, startDeHetDrill, answerDeHet } from './grammar/dehet-ui.js';
 import { openVerbAspectScreen } from './grammar/verb-aspect-ui.js';
 import { openVerbDrillScreen } from './grammar/verb-drill-ui.js';
+import { openCaseDrillScreen } from './grammar/case-drill-ui.js';
+import { openPrefixDrillScreen } from './grammar/prefix-drill-ui.js';
 import { startLesson, startHomeworkLesson, restartLesson, buildCategoryCards, buildAlphabet, listenPhrase, listenSlowPhrase, listenTranslation, toggleSpeak as toggleLessonSpeak, nextPhrase, speakAlphabetLetter } from './lesson.js';
 import { readHomeworkFile, generateHomeworkPhrases } from './api/homework.js';
 import { openReviewScreen, startNewReview, getLearnedCount } from './review.js';
@@ -460,4 +462,6 @@ window.toggleAutoPlay      = toggleAutoPlay;
 window.openReviewScreen    = openReviewScreen;
 window.startNewReview      = startNewReview;
 window.openVerbAspectScreen = openVerbAspectScreen;
-window.openVerbDrillScreen  = openVerbDrillScreen;
+window.openVerbDrillScreen    = openVerbDrillScreen;
+window.openCaseDrillScreen    = openCaseDrillScreen;
+window.openPrefixDrillScreen  = openPrefixDrillScreen;
