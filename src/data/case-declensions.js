@@ -4,13 +4,13 @@
 export const CASES = ['nominative','accusative','genitive','dative','instrumental','locative','vocative'];
 
 export const CASE_LABELS = {
-  nominative:   { en: 'Nominative', nl: 'Nominatief', uk: 'Називний' },
-  accusative:   { en: 'Accusative', nl: 'Accusatief', uk: 'Знахідний' },
-  genitive:     { en: 'Genitive', nl: 'Genitief', uk: 'Родовий' },
-  dative:       { en: 'Dative', nl: 'Datief', uk: 'Давальний' },
-  instrumental: { en: 'Instrumental', nl: 'Instrumentalis', uk: 'Орудний' },
-  locative:     { en: 'Locative', nl: 'Locatief', uk: 'Місцевий' },
-  vocative:     { en: 'Vocative', nl: 'Vocatief', uk: 'Кличний' },
+  nominative:   { en: 'Subject (хто? що?)', nl: 'Onderwerp (хто? що?)', uk: 'Називний' },
+  accusative:   { en: 'Direct object (кого? що?)', nl: 'Lijdend voorwerp (кого? що?)', uk: 'Знахідний' },
+  genitive:     { en: 'Possession / of (кого? чого?)', nl: 'Bezit / van (кого? чого?)', uk: 'Родовий' },
+  dative:       { en: 'To whom (кому? чому?)', nl: 'Aan wie (кому? чому?)', uk: 'Давальний' },
+  instrumental: { en: 'With / by means of (ким? чим?)', nl: 'Met / waarmee (ким? чим?)', uk: 'Орудний' },
+  locative:     { en: 'Location (на/в + кому? чому?)', nl: 'Locatie (на/в + кому? чому?)', uk: 'Місцевий' },
+  vocative:     { en: 'Addressing someone (hey!)', nl: 'Aanspreken (hé!)', uk: 'Кличний' },
 };
 
 export const NOUNS = [
