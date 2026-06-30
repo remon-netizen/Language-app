@@ -78,7 +78,7 @@ export const BASE_VERBS = [
         sentence: { uk: 'Я ___ документи в офіс.', answer: 'відніс', full: 'Я відніс документи в офіс.', en: 'I took the documents to the office.', nl: 'Ik bracht de documenten naar kantoor.' } },
       { prefix: 'пере-', verb: 'перенести', meaning: { en: 'to move, to reschedule, to endure', nl: 'verplaatsen, verzetten, verdragen' },
         sentence: { uk: 'Ми ___ зустріч на п\'ятницю.', answer: 'перенесли', full: 'Ми перенесли зустріч на п\'ятницю.', en: 'We rescheduled the meeting to Friday.', nl: 'We hebben de vergadering naar vrijdag verplaatst.' } },
-      { prefix: 'з-', verb: 'знести', meaning: { en: 'to carry down, to demolish', nl: 'naar beneden dragen, slopen' },
+      { prefix: 'з-/с-', verb: 'знести', meaning: { en: 'to carry down, to demolish', nl: 'naar beneden dragen, slopen' },
         sentence: { uk: 'Старий будинок ___ .', answer: 'знесли', full: 'Старий будинок знесли.', en: 'The old building was demolished.', nl: 'Het oude gebouw werd gesloopt.' } },
     ],
   },
@@ -93,7 +93,7 @@ export const BASE_VERBS = [
         sentence: { uk: 'Я ___ дитину зі школи.', answer: 'забрав', full: 'Я забрав дитину зі школи.', en: 'I picked up the child from school.', nl: 'Ik haalde het kind op van school.' } },
       { prefix: 'ви-', verb: 'вибрати', meaning: { en: 'to choose, to select', nl: 'kiezen, selecteren' },
         sentence: { uk: 'Вона ___ червону сукню.', answer: 'вибрала', full: 'Вона вибрала червону сукню.', en: 'She chose the red dress.', nl: 'Ze koos de rode jurk.' } },
-      { prefix: 'з-', verb: 'зібрати', meaning: { en: 'to collect, to gather', nl: 'verzamelen, bijeenbrengen' },
+      { prefix: 'з-/с-', verb: 'зібрати', meaning: { en: 'to collect, to gather', nl: 'verzamelen, bijeenbrengen' },
         sentence: { uk: 'Діти ___ гриби в лісі.', answer: 'зібрали', full: 'Діти зібрали гриби в лісі.', en: 'The children gathered mushrooms in the forest.', nl: 'De kinderen verzamelden paddenstoelen in het bos.' } },
       { prefix: 'під-', verb: 'підібрати', meaning: { en: 'to pick up, to match', nl: 'oprapen, bij elkaar zoeken' },
         sentence: { uk: 'Він ___ ключі з підлоги.', answer: 'підібрав', full: 'Він підібрав ключі з підлоги.', en: 'He picked up the keys from the floor.', nl: 'Hij raapte de sleutels van de vloer op.' } },
@@ -161,7 +161,7 @@ export const BASE_VERBS = [
     meaning: { en: 'to eat', nl: 'eten' },
     level: 'A1',
     prefixed: [
-      { prefix: 'з-', verb: "з'їсти", meaning: { en: 'to eat up', nl: 'opeten' },
+      { prefix: 'з-/с-', verb: "з'їсти", meaning: { en: 'to eat up', nl: 'opeten' },
         sentence: { uk: "Він ___ весь торт.", answer: "з'їв", full: "Він з'їв весь торт.", en: 'He ate up the whole cake.', nl: 'Hij at de hele taart op.' } },
       { prefix: 'пере-', verb: "переїсти", meaning: { en: 'to overeat', nl: 'te veel eten' },
         sentence: { uk: "Я ___ на вечері.", answer: "переїв", full: "Я переїв на вечері.", en: 'I overate at dinner.', nl: 'Ik heb te veel gegeten bij het diner.' } },
@@ -180,7 +180,7 @@ export const BASE_VERBS = [
         sentence: { uk: 'Він ___ книгу бібліотеці.', answer: 'віддав', full: 'Він віддав книгу бібліотеці.', en: 'He returned the book to the library.', nl: 'Hij gaf het boek terug aan de bibliotheek.' } },
       { prefix: 'пере-', verb: 'передати', meaning: { en: 'to pass, to hand over', nl: 'doorgeven, overhandigen' },
         sentence: { uk: '___ мені сіль, будь ласка.', answer: 'Передай', full: 'Передай мені сіль, будь ласка.', en: 'Pass me the salt, please.', nl: 'Geef me het zout door, alsjeblieft.' } },
-      { prefix: 'з-', verb: 'здати', meaning: { en: 'to hand in, to pass (exam)', nl: 'inleveren, slagen (examen)' },
+      { prefix: 'з-/с-', verb: 'здати', meaning: { en: 'to hand in, to pass (exam)', nl: 'inleveren, slagen (examen)' },
         sentence: { uk: 'Вона ___ іспит на відмінно.', answer: 'здала', full: 'Вона здала іспит на відмінно.', en: 'She passed the exam with top marks.', nl: 'Ze slaagde met uitstekende cijfers voor het examen.' } },
       { prefix: 'до-', verb: 'додати', meaning: { en: 'to add', nl: 'toevoegen' },
         sentence: { uk: '___ трохи солі.', answer: 'Додай', full: 'Додай трохи солі.', en: 'Add a little salt.', nl: 'Voeg een beetje zout toe.' } },
@@ -208,7 +208,7 @@ export const BASE_VERBS = [
     meaning: { en: 'to do, to make', nl: 'doen, maken' },
     level: 'A1',
     prefixed: [
-      { prefix: 'з-', verb: 'зробити', meaning: { en: 'to do/make (completed)', nl: 'doen/maken (voltooid)' },
+      { prefix: 'з-/с-', verb: 'зробити', meaning: { en: 'to do/make (completed)', nl: 'doen/maken (voltooid)' },
         sentence: { uk: 'Вона ___ домашнє завдання.', answer: 'зробила', full: 'Вона зробила домашнє завдання.', en: 'She did the homework.', nl: 'Ze maakte het huiswerk.' } },
       { prefix: 'пере-', verb: 'переробити', meaning: { en: 'to redo, to remake', nl: 'opnieuw doen, hermaken' },
         sentence: { uk: 'Мені потрібно ___ цей звіт.', answer: 'переробити', full: 'Мені потрібно переробити цей звіт.', en: 'I need to redo this report.', nl: 'Ik moet dit rapport opnieuw maken.' } },
@@ -274,6 +274,206 @@ export const BASE_VERBS = [
         sentence: { uk: 'Не ___ до мене!', answer: 'приставай', full: 'Не приставай до мене!', en: "Don't bother me!", nl: 'Val me niet lastig!' } },
       { prefix: 'пере-', verb: 'переставати', meaning: { en: 'to stop, to cease', nl: 'stoppen, ophouden' },
         sentence: { uk: 'Дощ ___ .', answer: 'перестав', full: 'Дощ перестав.', en: 'The rain stopped.', nl: 'De regen stopte.' } },
+    ],
+  },
+
+  // ── 16. бачити (see) ── fills по-, об-
+  {
+    base: 'бачити',
+    meaning: { en: 'to see', nl: 'zien' },
+    level: 'A1',
+    prefixed: [
+      { prefix: 'по-', verb: 'побачити', meaning: { en: 'to see (completed), to notice', nl: 'zien (voltooid), opmerken' },
+        sentence: { uk: 'Я ___ її на вулиці.', answer: 'побачив', full: 'Я побачив її на вулиці.', en: 'I saw her on the street.', nl: 'Ik zag haar op straat.' } },
+      { prefix: 'об-', verb: 'оббачити', meaning: { en: 'to look around, to survey', nl: 'rondkijken, overzien' },
+        sentence: { uk: 'Він ___ кімнату.', answer: 'оббачив', full: 'Він оббачив кімнату.', en: 'He looked around the room.', nl: 'Hij keek de kamer rond.' } },
+    ],
+  },
+
+  // ── 17. чути (hear) ── fills по-
+  {
+    base: 'чути',
+    meaning: { en: 'to hear', nl: 'horen' },
+    level: 'A1',
+    prefixed: [
+      { prefix: 'по-', verb: 'почути', meaning: { en: 'to hear (completed)', nl: 'horen (voltooid)' },
+        sentence: { uk: 'Ви ___ цю новину?', answer: 'почули', full: 'Ви почули цю новину?', en: 'Did you hear this news?', nl: 'Hebben jullie dit nieuws gehoord?' } },
+      { prefix: 'під-', verb: 'підслухати', meaning: { en: 'to eavesdrop, to overhear', nl: 'afluisteren' },
+        sentence: { uk: 'Він випадково ___ розмову.', answer: 'підслухав', full: 'Він випадково підслухав розмову.', en: 'He accidentally overheard the conversation.', nl: 'Hij hoorde per ongeluk het gesprek.' } },
+    ],
+  },
+
+  // ── 18. класти (put, lay) ── fills по-, об-
+  {
+    base: 'класти',
+    meaning: { en: 'to put, to lay', nl: 'leggen, neerleggen' },
+    level: 'A2',
+    prefixed: [
+      { prefix: 'по-', verb: 'покласти', meaning: { en: 'to put, to lay down (completed)', nl: 'neerleggen (voltooid)' },
+        sentence: { uk: 'Вона ___ ключі на стіл.', answer: 'поклала', full: 'Вона поклала ключі на стіл.', en: 'She put the keys on the table.', nl: 'Ze legde de sleutels op de tafel.' } },
+      { prefix: 'з-/с-', verb: 'скласти', meaning: { en: 'to compose, to fold, to put together', nl: 'samenstellen, vouwen' },
+        sentence: { uk: 'Він ___ валізу.', answer: 'склав', full: 'Він склав валізу.', en: 'He packed the suitcase.', nl: 'Hij pakte de koffer in.' } },
+      { prefix: 'від-', verb: 'відкласти', meaning: { en: 'to put aside, to postpone', nl: 'opzij leggen, uitstellen' },
+        sentence: { uk: 'Я ___ цю книгу на потім.', answer: 'відклав', full: 'Я відклав цю книгу на потім.', en: 'I put this book aside for later.', nl: 'Ik legde dit boek opzij voor later.' } },
+      { prefix: 'на-', verb: 'накласти', meaning: { en: 'to pile on, to apply', nl: 'ophopen, aanbrengen' },
+        sentence: { uk: 'Лікар ___ пов\'язку.', answer: 'наклав', full: 'Лікар наклав пов\'язку.', en: 'The doctor applied a bandage.', nl: 'De arts bracht een verband aan.' } },
+    ],
+  },
+
+  // ── 19. мити (wash) ── fills по-, у-/в-
+  {
+    base: 'мити',
+    meaning: { en: 'to wash', nl: 'wassen' },
+    level: 'A1',
+    prefixed: [
+      { prefix: 'по-', verb: 'помити', meaning: { en: 'to wash (completed)', nl: 'wassen (voltooid)' },
+        sentence: { uk: 'Я ___ посуд.', answer: 'помив', full: 'Я помив посуд.', en: 'I washed the dishes.', nl: 'Ik waste de vaat.' } },
+      { prefix: 'ви-', verb: 'вимити', meaning: { en: 'to wash clean, to scrub', nl: 'schoonwassen, schrobben' },
+        sentence: { uk: 'Вона ___ підлогу.', answer: 'вимила', full: 'Вона вимила підлогу.', en: 'She scrubbed the floor.', nl: 'Ze schrobde de vloer.' } },
+      { prefix: 'з-/с-', verb: 'змити', meaning: { en: 'to wash off', nl: 'afwassen, wegspoelen' },
+        sentence: { uk: 'Дощ ___ бруд з вікон.', answer: 'змив', full: 'Дощ змив бруд з вікон.', en: 'The rain washed the dirt off the windows.', nl: 'De regen spoelde het vuil van de ramen.' } },
+    ],
+  },
+
+  // ── 20. дзвонити (call, ring) ── fills по-, за-
+  {
+    base: 'дзвонити',
+    meaning: { en: 'to call, to ring', nl: 'bellen, opbellen' },
+    level: 'A1',
+    prefixed: [
+      { prefix: 'по-', verb: 'подзвонити', meaning: { en: 'to call (completed)', nl: 'bellen (voltooid)' },
+        sentence: { uk: '___ мені ввечері.', answer: 'Подзвони', full: 'Подзвони мені ввечері.', en: 'Call me in the evening.', nl: 'Bel me vanavond.' } },
+      { prefix: 'за-', verb: 'задзвонити', meaning: { en: 'to start ringing', nl: 'beginnen te rinkelen' },
+        sentence: { uk: 'Телефон ___ о сьомій ранку.', answer: 'задзвонив', full: 'Телефон задзвонив о сьомій ранку.', en: 'The phone rang at seven in the morning.', nl: 'De telefoon ging om zeven uur in de ochtend.' } },
+      { prefix: 'пере-', verb: 'передзвонити', meaning: { en: 'to call back', nl: 'terugbellen' },
+        sentence: { uk: 'Я ___ тобі пізніше.', answer: 'передзвоню', full: 'Я передзвоню тобі пізніше.', en: 'I will call you back later.', nl: 'Ik bel je later terug.' } },
+    ],
+  },
+
+  // ── 21. говорити (speak) ── fills об-, по-
+  {
+    base: 'говорити',
+    meaning: { en: 'to speak, to talk', nl: 'spreken, praten' },
+    level: 'A1',
+    prefixed: [
+      { prefix: 'об-', verb: 'обговорити', meaning: { en: 'to discuss', nl: 'bespreken' },
+        sentence: { uk: 'Ми ___ цей план вчора.', answer: 'обговорили', full: 'Ми обговорили цей план вчора.', en: 'We discussed this plan yesterday.', nl: 'We bespraken dit plan gisteren.' } },
+      { prefix: 'по-', verb: 'поговорити', meaning: { en: 'to have a talk', nl: 'praten, een gesprek voeren' },
+        sentence: { uk: 'Нам потрібно ___.', answer: 'поговорити', full: 'Нам потрібно поговорити.', en: 'We need to talk.', nl: 'We moeten praten.' } },
+      { prefix: 'за-', verb: 'заговорити', meaning: { en: 'to start speaking', nl: 'beginnen te praten' },
+        sentence: { uk: 'Дитина ___ у два роки.', answer: 'заговорила', full: 'Дитина заговорила у два роки.', en: 'The child started speaking at two.', nl: 'Het kind begon op twee jaar te praten.' } },
+      { prefix: 'від-', verb: 'відговорити', meaning: { en: 'to talk out of, to dissuade', nl: 'afpraten, ontmoedigen' },
+        sentence: { uk: 'Я ___ його від цієї ідеї.', answer: 'відговорив', full: 'Я відговорив його від цієї ідеї.', en: 'I talked him out of this idea.', nl: 'Ik praatte hem dit idee uit het hoofd.' } },
+    ],
+  },
+
+  // ── 22. летіти (fly) ── fills по-, з-/с-, об-
+  {
+    base: 'летіти',
+    meaning: { en: 'to fly', nl: 'vliegen' },
+    level: 'A2',
+    prefixed: [
+      { prefix: 'по-', verb: 'полетіти', meaning: { en: 'to fly off, to start flying', nl: 'wegvliegen, gaan vliegen' },
+        sentence: { uk: 'Літак ___ о третій годині.', answer: 'полетів', full: 'Літак полетів о третій годині.', en: 'The plane flew off at three.', nl: 'Het vliegtuig vloog om drie uur weg.' } },
+      { prefix: 'при-', verb: 'прилетіти', meaning: { en: 'to arrive by air', nl: 'aankomen (per vliegtuig)' },
+        sentence: { uk: 'Вони ___ з Лондона.', answer: 'прилетіли', full: 'Вони прилетіли з Лондона.', en: 'They arrived from London by air.', nl: 'Ze kwamen per vliegtuig uit Londen aan.' } },
+      { prefix: 'з-/с-', verb: 'злетіти', meaning: { en: 'to take off, to fly up', nl: 'opstijgen' },
+        sentence: { uk: 'Птах ___ з дерева.', answer: 'злетів', full: 'Птах злетів з дерева.', en: 'The bird flew up from the tree.', nl: 'De vogel vloog op van de boom.' } },
+      { prefix: 'об-', verb: 'облетіти', meaning: { en: 'to fly around', nl: 'omheen vliegen' },
+        sentence: { uk: 'Літак ___ хмару.', answer: 'облетів', full: 'Літак облетів хмару.', en: 'The plane flew around the cloud.', nl: 'Het vliegtuig vloog om de wolk heen.' } },
+    ],
+  },
+
+  // ── 23. крити (cover) ── fills від-, з-/с-, по-
+  {
+    base: 'крити',
+    meaning: { en: 'to cover', nl: 'bedekken' },
+    level: 'A2',
+    prefixed: [
+      { prefix: 'від-', verb: 'відкрити', meaning: { en: 'to open, to discover', nl: 'openen, ontdekken' },
+        sentence: { uk: 'Він ___ двері.', answer: 'відкрив', full: 'Він відкрив двері.', en: 'He opened the door.', nl: 'Hij opende de deur.' } },
+      { prefix: 'за-', verb: 'закрити', meaning: { en: 'to close, to shut', nl: 'sluiten, dichtdoen' },
+        sentence: { uk: '___ вікно, будь ласка.', answer: 'Закрий', full: 'Закрий вікно, будь ласка.', en: 'Close the window, please.', nl: 'Sluit het raam, alsjeblieft.' } },
+      { prefix: 'по-', verb: 'покрити', meaning: { en: 'to cover (completed)', nl: 'bedekken (voltooid)' },
+        sentence: { uk: 'Сніг ___ дахи будинків.', answer: 'покрив', full: 'Сніг покрив дахи будинків.', en: 'Snow covered the rooftops.', nl: 'Sneeuw bedekte de daken.' } },
+      { prefix: 'з-/с-', verb: 'скрити', meaning: { en: 'to hide, to conceal', nl: 'verbergen, verhullen' },
+        sentence: { uk: 'Він не зміг ___ радості.', answer: 'скрити', full: 'Він не зміг скрити радості.', en: 'He could not hide his joy.', nl: 'Hij kon zijn vreugde niet verbergen.' } },
+      { prefix: 'роз-', verb: 'розкрити', meaning: { en: 'to reveal, to uncover', nl: 'onthullen, blootleggen' },
+        sentence: { uk: 'Поліція ___ злочин.', answer: 'розкрила', full: 'Поліція розкрила злочин.', en: 'The police solved the crime.', nl: 'De politie loste de misdaad op.' } },
+    ],
+  },
+
+  // ── 24. єднати (unite) ── fills об-
+  {
+    base: 'єднати',
+    meaning: { en: 'to unite', nl: 'verenigen' },
+    level: 'B1',
+    prefixed: [
+      { prefix: 'об-', verb: "об'єднати", meaning: { en: 'to unite, to combine', nl: 'verenigen, samenvoegen' },
+        sentence: { uk: 'Вони ___ зусилля.', answer: "об'єднали", full: "Вони об'єднали зусилля.", en: 'They united their efforts.', nl: 'Ze verenigden hun krachten.' } },
+      { prefix: 'з-/с-', verb: "з'єднати", meaning: { en: 'to connect, to join', nl: 'verbinden, aansluiten' },
+        sentence: { uk: 'Міст ___ два береги.', answer: "з'єднав", full: "Міст з'єднав два береги.", en: 'The bridge connected the two banks.', nl: 'De brug verbond de twee oevers.' } },
+    ],
+  },
+
+  // ── 25. варити (cook, boil) ── fills з-/с-, по-
+  {
+    base: 'варити',
+    meaning: { en: 'to cook, to boil', nl: 'koken' },
+    level: 'A1',
+    prefixed: [
+      { prefix: 'з-/с-', verb: 'зварити', meaning: { en: 'to cook (completed), to boil', nl: 'koken (voltooid)' },
+        sentence: { uk: 'Мама ___ борщ.', answer: 'зварила', full: 'Мама зварила борщ.', en: 'Mom cooked borscht.', nl: 'Mama kookte borsjtsj.' } },
+      { prefix: 'по-', verb: 'поварити', meaning: { en: 'to cook for a while', nl: 'een tijdje koken' },
+        sentence: { uk: '___ ще п\'ять хвилин.', answer: 'Повари', full: 'Повари ще п\'ять хвилин.', en: 'Cook for five more minutes.', nl: 'Kook nog vijf minuten.' } },
+      { prefix: 'пере-', verb: 'переварити', meaning: { en: 'to overcook, to digest', nl: 'te lang koken, verteren' },
+        sentence: { uk: 'Я ___ макарони.', answer: 'переварив', full: 'Я переварив макарони.', en: 'I overcooked the pasta.', nl: 'Ik kookte de pasta te lang.' } },
+    ],
+  },
+
+  // ── 26. міняти (change, exchange) ── fills об-
+  {
+    base: 'міняти',
+    meaning: { en: 'to change, to exchange', nl: 'wisselen, ruilen' },
+    level: 'A2',
+    prefixed: [
+      { prefix: 'об-', verb: 'обміняти', meaning: { en: 'to exchange', nl: 'ruilen, omwisselen' },
+        sentence: { uk: 'Я ___ долари на гривні.', answer: 'обміняв', full: 'Я обміняв долари на гривні.', en: 'I exchanged dollars for hryvnias.', nl: 'Ik wisselde dollars om naar hryvnia.' } },
+      { prefix: 'за-', verb: 'замінити', meaning: { en: 'to replace, to substitute', nl: 'vervangen' },
+        sentence: { uk: 'Вони ___ стару лампу.', answer: 'замінили', full: 'Вони замінили стару лампу.', en: 'They replaced the old lamp.', nl: 'Ze vervingen de oude lamp.' } },
+    ],
+  },
+
+  // ── 27. їхати extensions ── fill у-/в-
+  // (adding to existing їхати would require restructuring, so adding separate verb)
+
+  // ── 28. думати (think) ── fills об-, по-
+  {
+    base: 'думати',
+    meaning: { en: 'to think', nl: 'denken' },
+    level: 'A1',
+    prefixed: [
+      { prefix: 'по-', verb: 'подумати', meaning: { en: 'to think (for a moment)', nl: 'nadenken (even)' },
+        sentence: { uk: 'Дай мені ___.', answer: 'подумати', full: 'Дай мені подумати.', en: 'Let me think.', nl: 'Laat me nadenken.' } },
+      { prefix: 'об-', verb: 'обдумати', meaning: { en: 'to think over, to consider', nl: 'overwegen, bedenken' },
+        sentence: { uk: 'Я ___ твою пропозицію.', answer: 'обдумав', full: 'Я обдумав твою пропозицію.', en: 'I thought over your proposal.', nl: 'Ik heb je voorstel overwogen.' } },
+      { prefix: 'ви-', verb: 'видумати', meaning: { en: 'to invent, to make up', nl: 'verzinnen, bedenken' },
+        sentence: { uk: 'Хто ___ цю гру?', answer: 'видумав', full: 'Хто видумав цю гру?', en: 'Who invented this game?', nl: 'Wie heeft dit spel verzonnen?' } },
+    ],
+  },
+
+  // ── 29. дягати (dress) ── fills у-/в-
+  {
+    base: 'дягати',
+    meaning: { en: 'to dress, to put on', nl: 'aankleden' },
+    level: 'A2',
+    prefixed: [
+      { prefix: 'у-/в-', verb: 'вдягати', meaning: { en: 'to dress, to put on', nl: 'aankleden, aantrekken' },
+        sentence: { uk: 'Вона ___ пальто.', answer: 'вдягла', full: 'Вона вдягла пальто.', en: 'She put on a coat.', nl: 'Ze trok een jas aan.' } },
+      { prefix: 'роз-', verb: 'роздягати', meaning: { en: 'to undress', nl: 'uitkleden' },
+        sentence: { uk: 'Діти ___ після прогулянки.', answer: 'роздяглися', full: 'Діти роздяглися після прогулянки.', en: 'The children undressed after the walk.', nl: 'De kinderen kleedden zich uit na de wandeling.' } },
+      { prefix: 'пере-', verb: 'передягати', meaning: { en: 'to change clothes', nl: 'zich omkleden' },
+        sentence: { uk: 'Він ___ після роботи.', answer: 'передягнувся', full: 'Він передягнувся після роботи.', en: 'He changed clothes after work.', nl: 'Hij kleedde zich om na het werk.' } },
     ],
   },
 ];
