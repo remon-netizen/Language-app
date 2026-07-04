@@ -323,10 +323,13 @@
 }
 
 @media (max-width: 500px) {
-  .difficulty-selector { flex-wrap: wrap; }
-  /* Larger tap targets for mic/send on small phones */
+  .difficulty-selector { flex-wrap: wrap; gap: 4px; }
   .mic-btn, .send-btn { padding: 12px 12px; }
   .chat-msg { max-width: 95%; }
+  .chat-settings-left, .chat-settings-right { min-width: 100%; flex: 1 1 100%; }
+  .chat-settings { gap: 6px; }
+  .translate-input { min-height: 60px; }
+  .chat-input { font-size: 0.95rem; padding: 10px; }
 }
 
 /* ── Conversation Summary ─────────────────────────────────────────────────── */

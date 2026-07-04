@@ -364,3 +364,19 @@
   transform: scale(0.95);
 }
 
+/* ── Mobile ── */
+@media (max-width: 500px) {
+  .categories-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; padding: 12px; }
+  .category-card { padding: 14px 10px; }
+  .category-card .icon { font-size: 1.5rem; }
+  .category-card .name { font-size: 0.85rem; }
+  .alphabet-grid { gap: 6px; }
+  .letter-card { padding: 10px 6px; }
+  .home-tools-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .home-tool-card { padding: 14px 10px; }
+  .home-tool-icon { font-size: 1.5rem; }
+  .home-tool-title { font-size: 0.85rem; }
+  .start-btn { padding: 14px; font-size: 1rem; }
+  .lang-choice-btn { padding: 8px 12px; font-size: 0.82rem; }
+}
+

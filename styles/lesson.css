@@ -225,6 +225,9 @@
 }
 
 @media (max-width: 500px) {
-  .phrase-card .ukrainian { font-size: 1.5rem; }
-  .controls { flex-direction: column; }
+  .phrase-card { padding: 20px 14px; }
+  .phrase-card .ukrainian { font-size: 1.4rem; }
+  .phrase-card .english { font-size: 1rem; }
+  .controls { flex-direction: column; gap: 8px; }
+  .btn { padding: 12px; font-size: 0.9rem; }
 }

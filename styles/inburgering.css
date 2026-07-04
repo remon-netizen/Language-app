@@ -548,15 +548,17 @@
 
 /* ── Mobile ── */
 @media (max-width: 500px) {
-  .ib-topic-grid  { gap: 7px; }
-  .ib-topic-card  { padding: 11px 10px; }
+  .ib-topic-grid  { grid-template-columns: 1fr; gap: 7px; }
+  .ib-topic-card  { padding: 11px 10px; flex-direction: row; gap: 10px; }
   .ib-topic-icon  { font-size: 1.4rem; }
-  .ib-topic-title { font-size: 0.8rem; }
-  .ib-topic-sub   { font-size: 0.63rem; }
+  .ib-topic-title { font-size: 0.82rem; }
+  .ib-topic-sub   { font-size: 0.68rem; }
   .ib-question    { font-size: 0.92rem; padding: 13px 13px; }
   .ib-option      { font-size: 0.88rem; padding: 11px 12px; }
   .ib-score-emoji    { font-size: 2.8rem; }
   .ib-score-fraction { font-size: 1.8rem; }
   .inburgering-btn { padding: 12px 14px; }
   .ib-btn-icon  { font-size: 1.7rem; }
+  .ib-writing-input { min-height: 50px; }
+  .ib-level-bar  { flex-wrap: wrap; gap: 4px; }
 }

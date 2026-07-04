@@ -211,3 +211,12 @@
 }
 .dh-back-btn:hover { border-color: var(--primary); }
 
+/* ── Mobile ── */
+@media (max-width: 500px) {
+  .dh-choice-row { gap: 8px; }
+  .dh-choice-btn { max-width: 100%; min-width: 0; padding: 14px; font-size: 1.1rem; }
+  .dh-level-row { flex-wrap: wrap; gap: 4px; }
+  .dh-noun-card { padding: 16px; }
+  .dh-noun-word { font-size: 1.3rem; }
+}
+

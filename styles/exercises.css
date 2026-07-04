@@ -463,13 +463,18 @@
 
 /* ── Mobile ── */
 @media (max-width: 500px) {
-  .ex-topic-grid  { gap: 8px; }
-  .ex-topic-card  { padding: 12px 10px; }
+  .ex-topic-grid  { grid-template-columns: 1fr; gap: 8px; }
+  .ex-topic-card  { padding: 12px 10px; flex-direction: row; gap: 10px; align-items: center; }
   .ex-topic-icon  { font-size: 1.5rem; }
-  .ex-topic-title { font-size: 0.82rem; }
-  .ex-topic-sub   { font-size: 0.65rem; }
+  .ex-topic-title { font-size: 0.85rem; }
+  .ex-topic-sub   { font-size: 0.7rem; }
+  .ex-tools-row   { flex-wrap: wrap; gap: 6px; }
+  .ex-tool-btn    { padding: 8px 10px; font-size: 0.78rem; }
   .ex-question    { font-size: 0.95rem; padding: 13px 14px; }
   .ex-option      { font-size: 0.88rem; padding: 11px 13px; }
   .ex-score-emoji { font-size: 2.8rem; }
   .ex-score-fraction { font-size: 1.8rem; }
+  .ex-open-input  { min-height: 50px; }
+  .ex-level-bar   { flex-wrap: wrap; gap: 4px; }
+  .ex-level-btn   { padding: 5px 10px; font-size: 0.78rem; }
 }

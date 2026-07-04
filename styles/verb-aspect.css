@@ -421,10 +421,14 @@
 
 /* ── Mobile ── */
 @media (max-width: 500px) {
-  .va-menu-grid   { gap: 8px; }
-  .va-menu-card   { padding: 16px 10px; }
-  .va-menu-icon   { font-size: 1.6rem; }
+  .va-menu-grid   { grid-template-columns: 1fr; gap: 8px; }
+  .va-menu-card   { padding: 14px 12px; flex-direction: row; gap: 10px; }
+  .va-menu-icon   { font-size: 1.5rem; }
   .va-menu-title  { font-size: 0.85rem; }
   .va-q-sentence  { font-size: 1rem; }
+  .va-q-card      { padding: 14px; }
+  .va-ref-pair-row { flex-direction: column; }
   .va-ref-pair-verb { font-size: 1.1rem; }
+  .va-text-input  { padding: 12px; font-size: 1rem; }
+  .va-options     { grid-template-columns: 1fr; }
 }

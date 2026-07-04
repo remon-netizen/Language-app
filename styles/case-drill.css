@@ -266,8 +266,16 @@
 /* Mobile */
 @media (max-width: 500px) {
   .cd-menu-grid { grid-template-columns: 1fr; gap: 8px; }
-  .cd-menu-card { padding: 16px 10px; }
+  .cd-menu-card { padding: 14px 12px; flex-direction: row; gap: 10px; }
+  .cd-menu-icon { font-size: 1.5rem; }
   .cd-learn-actions { flex-direction: column; }
   .cd-level-row { flex-wrap: wrap; }
-  .cd-decl-row { font-size: 0.78rem; }
+  .cd-filter-btn { padding: 5px 8px; font-size: 0.7rem; }
+  .cd-filter-row { gap: 4px; }
+  .cd-decl-row { font-size: 0.75rem; gap: 4px; padding: 4px 4px; }
+  .cd-decl-case { min-width: 60px; font-size: 0.7rem; }
+  .cd-q-card { padding: 14px; }
+  .cd-text-input { padding: 12px; font-size: 1rem; }
+  .cd-sentence-card { padding: 14px; }
+  .cd-q-case { font-size: 0.9rem; }
 }

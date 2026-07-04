@@ -687,12 +687,19 @@
 /* ── Mobile ── */
 @media (max-width: 500px) {
   .vd-ref-tables { grid-template-columns: 1fr; }
-  .vd-menu-grid  { gap: 8px; }
+  .vd-menu-grid  { grid-template-columns: 1fr; gap: 8px; }
   .vd-menu-grid-3 { grid-template-columns: 1fr; gap: 8px; }
-  .vd-menu-card  { padding: 16px 10px; }
+  .vd-menu-card  { padding: 14px 12px; flex-direction: row; gap: 10px; }
+  .vd-menu-icon  { font-size: 1.5rem; }
   .vd-q-pronoun  { font-size: 1.1rem; }
-  .vd-conj-row   { font-size: 0.78rem; }
+  .vd-conj-row   { font-size: 0.75rem; gap: 4px; }
   .vd-stats-bar  { flex-wrap: wrap; gap: 6px; }
   .vd-level-row  { flex-wrap: wrap; }
   .vd-learn-actions { flex-direction: column; }
+  .vd-filter-btn { padding: 5px 10px; font-size: 0.75rem; }
+  .vd-filter-row { gap: 4px; }
+  .vd-ref-col    { padding: 10px; }
+  .vd-q-card     { padding: 14px; }
+  .vd-text-input { padding: 12px; font-size: 1rem; }
+  .vd-sentence-card { padding: 14px; }
 }

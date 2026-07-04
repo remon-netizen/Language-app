@@ -200,7 +200,14 @@
 /* Mobile */
 @media (max-width: 500px) {
   .pd-menu-grid { grid-template-columns: 1fr; gap: 8px; }
+  .pd-menu-card { padding: 14px 12px; flex-direction: row; gap: 10px; }
+  .pd-menu-icon { font-size: 1.5rem; }
   .pd-options { grid-template-columns: 1fr; }
-  .pd-menu-card { padding: 16px 10px; }
   .pd-stats-bar { flex-wrap: wrap; gap: 6px; }
+  .pd-filter-btn { padding: 5px 8px; font-size: 0.7rem; }
+  .pd-filter-row { gap: 4px; }
+  .pd-q-card { padding: 14px; }
+  .pd-text-input { padding: 12px; font-size: 1rem; }
+  .pd-sentence-card { padding: 14px; }
+  .pd-option-btn { padding: 12px; font-size: 0.88rem; }
 }
