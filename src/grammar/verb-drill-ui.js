@@ -698,6 +698,7 @@ function handleAnswer(q, answer) {
   const isLast = vd.current + 1 >= vd.questions.length;
   const nextBtn = document.createElement('button');
   nextBtn.className = 'vd-next-btn';
+  nextBtn.type = 'button'; // not 'submit': Enter activates this button by design
   nextBtn.textContent = isLast
     ? (nl ? '🏁 Resultaten' : '🏁 See results')
     : (nl ? 'Volgende →' : 'Next →');
@@ -711,6 +712,10 @@ function handleAnswer(q, answer) {
     }
   });
   fb.appendChild(nextBtn);
+  // Hand focus to Next so a second Enter advances: the answer input is disabled
+  // once checked, so it can no longer receive the keypress itself. preventScroll
+  // keeps focus from fighting the smooth scroll below.
+  nextBtn.focus({ preventScroll: true });
   fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
@@ -1049,6 +1054,11 @@ function renderLearnForm(imp, perf) {
     return;
   }
 
+  // Reset here, as renderDrillQuestion and renderLearnSentence do. Relying on the
+  // Next handler alone left the first question dead when arriving from a drill
+  // question that had been answered but not advanced past.
+  vd.answered = false;
+
   const q = vd.learnForms[vd.learnFormIdx];
   const s = getScreen();
   const nl = state.nativeLanguage === 'nl';
@@ -1196,14 +1206,18 @@ function handleLearnAnswer(q, answer, imp, perf) {
 
   const nextBtn = document.createElement('button');
   nextBtn.className = 'vd-next-btn';
+  nextBtn.type = 'button'; // not 'submit': Enter activates this button by design
   nextBtn.textContent = nl ? 'Volgende →' : 'Next →';
   nextBtn.addEventListener('click', () => {
     vd.learnFormIdx++;
-    vd.answered = false;
     renderLearnForm(imp, perf);
     getScreen().scrollTo({ top: 0, behavior: 'smooth' });
   });
   fb.appendChild(nextBtn);
+  // Hand focus to Next so a second Enter advances: the answer input is disabled
+  // once checked, so it can no longer receive the keypress itself. preventScroll
+  // keeps focus from fighting the smooth scroll below.
+  nextBtn.focus({ preventScroll: true });
   fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
@@ -1344,6 +1358,7 @@ function handleLearnSentenceAnswer(sent, answer, imp, perf) {
 
   const nextBtn = document.createElement('button');
   nextBtn.className = 'vd-next-btn';
+  nextBtn.type = 'button'; // not 'submit': Enter activates this button by design
   const isLast = vd.learnSentIdx + 1 >= vd.learnSentences.length;
   nextBtn.textContent = isLast
     ? (nl ? '🏁 Resultaten' : '🏁 See results')
@@ -1354,6 +1369,10 @@ function handleLearnSentenceAnswer(sent, answer, imp, perf) {
     getScreen().scrollTo({ top: 0, behavior: 'smooth' });
   });
   fb.appendChild(nextBtn);
+  // Hand focus to Next so a second Enter advances: the answer input is disabled
+  // once checked, so it can no longer receive the keypress itself. preventScroll
+  // keeps focus from fighting the smooth scroll below.
+  nextBtn.focus({ preventScroll: true });
   fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
