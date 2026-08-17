@@ -13,12 +13,15 @@ let vd = {
   score:     0,
   answered:  false,
   total:     25,
-  mode:      'menu',      // 'menu' | 'reference' | 'drill' | 'learnPicker' | 'learnVerb'
+  mode:      'menu',      // 'menu' | 'reference' | 'drill' | 'learnPicker' | 'selectPicker' | 'learnVerb'
   refIdx:    0,
   filter:    'all',        // 'all' | 'imperfective' | 'perfective'
   tenseFilter: 'all',     // 'all' | 'present' | 'past' | 'future' | 'imperative'
   level:     localStorage.getItem('verbDrillLevel') || 'A1',
   focusWeak: false,
+  // My list: hand-picked verb pairs to drill (e.g. this week's class list)
+  selection:    loadSelection(),
+  useSelection: localStorage.getItem('verbDrillUseSelection') === '1',
   // Learn one verb state
   learnPairIdx: 0,
   learnStep:    'study',   // 'study' | 'practice' | 'sentences' | 'summary'
@@ -45,15 +48,53 @@ function getVerbsForLevel(level) {
   return CONJUGATIONS.filter(v => allowed.includes(v.level || 'A1'));
 }
 
-function countFormsForLevel(level) {
-  const verbs = getVerbsForLevel(level);
+const ALL_TENSES = ['present', 'past', 'future', 'imperative'];
+
+/** My list is stored as imperfective infinitives; the partner is looked up on use. */
+function loadSelection() {
+  try {
+    const raw = JSON.parse(localStorage.getItem('verbDrillSelection') || '[]');
+    if (!Array.isArray(raw)) return new Set();
+    return new Set(raw.filter(inf => CONJUGATIONS.some(v => v.infinitive === inf)));
+  } catch {
+    return new Set();
+  }
+}
+
+function saveSelection() {
+  localStorage.setItem('verbDrillSelection', JSON.stringify([...vd.selection]));
+}
+
+/** Expand each selected pair into both aspects, so a pick drills imperfective + perfective. */
+function getSelectedVerbs() {
+  const verbs = [];
+  for (const inf of vd.selection) {
+    const imp = findVerb(inf);
+    if (!imp) continue;
+    verbs.push(imp);
+    const perf = imp.partner ? findVerb(imp.partner) : null;
+    if (perf) verbs.push(perf);
+  }
+  return verbs;
+}
+
+/** True when the drill should be restricted to My list. */
+function selectionActive() {
+  return vd.useSelection && vd.selection.size > 0;
+}
+
+function countFormsForVerbs(verbs) {
   let count = 0;
   for (const v of verbs) {
-    for (const t of ['present', 'past', 'future', 'imperative']) {
+    for (const t of ALL_TENSES) {
       if (v[t]) count += Object.keys(v[t]).length;
     }
   }
   return count;
+}
+
+function countFormsForLevel(level) {
+  return countFormsForVerbs(getVerbsForLevel(level));
 }
 
 function getAllowedTenses(level) {
@@ -96,9 +137,11 @@ function showMenu() {
   vd.mode = 'menu';
   const s = getScreen();
   const nl = state.nativeLanguage === 'nl';
-  const verbCount = getVerbsForLevel(vd.level).length;
-  const formCount = countFormsForLevel(vd.level);
-  const allowedTenses = getAllowedTenses(vd.level);
+  const selOn = selectionActive();
+  const selVerbs = selOn ? getSelectedVerbs() : [];
+  const verbCount = selOn ? selVerbs.length : getVerbsForLevel(vd.level).length;
+  const formCount = selOn ? countFormsForVerbs(selVerbs) : countFormsForLevel(vd.level);
+  const allowedTenses = selOn ? ALL_TENSES : getAllowedTenses(vd.level);
   const weakCount = getWeakVerbCount();
   const hasWeak = hasWeaknessData();
 
@@ -114,12 +157,22 @@ function showMenu() {
     <div class="vd-stats-bar">
       <span class="vd-stat">📊 ${verbCount} ${nl ? 'werkwoorden' : 'verbs'}</span>
       <span class="vd-stat">🎯 ${formCount} ${nl ? 'vormen' : 'forms'}</span>
-      <span class="vd-stat">🔀 ${nl ? 'Willekeurig' : 'Randomised'}</span>
+      <span class="vd-stat">${selOn ? `📝 ${nl ? 'Mijn lijst' : 'My list'}` : `🔀 ${nl ? 'Willekeurig' : 'Randomised'}`}</span>
     </div>
 
     <div class="vd-filter-section">
-      <div class="vd-filter-label">${nl ? 'Niveau:' : 'Level:'}</div>
-      <div class="vd-level-row">
+      ${vd.selection.size ? `
+        <div class="vd-weak-toggle vd-list-toggle ${vd.useSelection ? 'active' : ''}" id="vdSelToggle">
+          <span class="vd-weak-check">${vd.useSelection ? '✓' : ''}</span>
+          <span>📝 ${nl
+            ? `Alleen mijn lijst (${vd.selection.size} werkwoorden)`
+            : `Only my list (${vd.selection.size} verbs)`}</span>
+        </div>` : ''}
+
+      <div class="vd-filter-label">${nl ? 'Niveau:' : 'Level:'}${selOn
+        ? ` <span class="vd-label-hint">${nl ? '— niet gebruikt bij mijn lijst' : '— not used with my list'}</span>`
+        : ''}</div>
+      <div class="vd-level-row${selOn ? ' vd-dim' : ''}">
         <button class="vd-level-btn ${vd.level === 'A1' ? 'active' : ''}" data-level="A1">A1</button>
         <button class="vd-level-btn ${vd.level === 'A2' ? 'active' : ''}" data-level="A2">A1 + A2</button>
         <button class="vd-level-btn ${vd.level === 'B1' ? 'active' : ''}" data-level="B1">A1 + A2 + B1</button>
@@ -147,7 +200,7 @@ function showMenu() {
         </div>` : ''}
     </div>
 
-    <div class="vd-menu-grid-3">
+    <div class="vd-menu-grid-4">
       <button class="vd-menu-card" id="vdRefBtn">
         <span class="vd-menu-icon">📖</span>
         <span class="vd-menu-title">${nl ? 'Tabel' : 'Tables'}</span>
@@ -157,6 +210,13 @@ function showMenu() {
         <span class="vd-menu-icon">🎓</span>
         <span class="vd-menu-title">${nl ? 'Leer één' : 'Learn One'}</span>
         <span class="vd-menu-sub">${nl ? 'Eén werkwoord' : 'One verb'}</span>
+      </button>
+      <button class="vd-menu-card" id="vdPickBtn">
+        <span class="vd-menu-icon">📝</span>
+        <span class="vd-menu-title">${nl ? 'Mijn lijst' : 'My List'}</span>
+        <span class="vd-menu-sub">${vd.selection.size
+          ? `${vd.selection.size} ${nl ? 'gekozen' : 'selected'}`
+          : (nl ? 'Kies zelf' : 'Pick your own')}</span>
       </button>
       <button class="vd-menu-card vd-menu-primary" id="vdStartBtn">
         <span class="vd-menu-icon">✍️</span>
@@ -168,7 +228,18 @@ function showMenu() {
   s.querySelector('#vdBack').addEventListener('click', () => window.showScreen('homeScreen'));
   s.querySelector('#vdRefBtn').addEventListener('click', () => showReference(0));
   s.querySelector('#vdLearnBtn').addEventListener('click', () => showVerbPicker());
+  s.querySelector('#vdPickBtn').addEventListener('click', () => showSelectionPicker());
   s.querySelector('#vdStartBtn').addEventListener('click', startDrill);
+
+  // "Only my list" toggle — re-renders so the stats bar and tense row follow it
+  const selToggle = s.querySelector('#vdSelToggle');
+  if (selToggle) {
+    selToggle.addEventListener('click', () => {
+      vd.useSelection = !vd.useSelection;
+      localStorage.setItem('verbDrillUseSelection', vd.useSelection ? '1' : '0');
+      showMenu();
+    });
+  }
 
   // Level filter
   s.querySelectorAll('[data-level]').forEach(btn => {
@@ -279,8 +350,10 @@ function showReference(index) {
 
 function startDrill() {
   vd.mode = 'drill';
-  const allowedTenses = getAllowedTenses(vd.level);
-  const levelVerbs = getVerbsForLevel(vd.level);
+  // My list ignores the level filter — a class list often spans levels — and opens up all tenses.
+  const useSel = selectionActive();
+  const allowedTenses = useSel ? ALL_TENSES : getAllowedTenses(vd.level);
+  const levelVerbs = useSel ? getSelectedVerbs() : getVerbsForLevel(vd.level);
   const levelInfinitives = new Set(levelVerbs.map(v => v.infinitive));
 
   let questions;
@@ -765,6 +838,117 @@ function showVerbPicker() {
         showLearnVerb(impVerb, perfVerb);
       }
     });
+  });
+}
+
+// ── My list: multi-select picker ──────────────────────────────────────────────
+
+function showSelectionPicker() {
+  vd.mode = 'selectPicker';
+  const s = getScreen();
+  const nl = state.nativeLanguage === 'nl';
+
+  const allVerbs = getVerbsForLevel('B1'); // My list may span every level
+  const groups = {};
+  for (let i = 0; i < allVerbs.length; i += 2) {
+    const imp = allVerbs[i];
+    const perf = allVerbs[i + 1];
+    if (!imp || !perf) continue;
+    const level = imp.level || 'A1';
+    (groups[level] = groups[level] || []).push({ imp, perf });
+  }
+
+  let listHtml = '';
+  for (const [level, pairs] of Object.entries(groups)) {
+    if (pairs.length === 0) continue;
+    listHtml += `<div class="vd-level-group">
+      <div class="vd-level-group-title">${level} — ${pairs.length} ${nl ? 'paren' : 'pairs'}</div>`;
+    for (const p of pairs) {
+      const on = vd.selection.has(p.imp.infinitive);
+      const color = getMasteryColor(p.imp.infinitive, p.perf.infinitive);
+      listHtml += `
+        <div class="vd-verb-row vd-pick-row ${on ? 'picked' : ''}" data-inf="${escHtml(p.imp.infinitive)}">
+          <span class="vd-pick-box">${on ? '✓' : ''}</span>
+          <div class="vd-verb-pair-text">
+            <div class="vd-verb-pair-inf">${escHtml(p.imp.infinitive)} / ${escHtml(p.perf.infinitive)}</div>
+            <div class="vd-verb-pair-meaning">${escHtml(loc(p.imp.meaning))}</div>
+          </div>
+          <div class="vd-mastery-dot ${color}"></div>
+        </div>`;
+    }
+    listHtml += '</div>';
+  }
+
+  s.innerHTML = `
+    <div class="lesson-header">
+      <button class="back-btn" id="vdPickBack">←</button>
+      <div>
+        <div class="lesson-title">📝 ${nl ? 'Mijn lijst' : 'My List'}</div>
+        <div class="lesson-subtitle">${nl
+          ? 'Tik werkwoorden aan en oefen alleen die'
+          : 'Tap verbs to practise just those'}</div>
+      </div>
+    </div>
+
+    <input type="text" class="vd-search-input" id="vdPickSearch"
+      placeholder="${nl ? 'Zoek werkwoord...' : 'Search verb...'}" autocomplete="off" />
+
+    <div class="vd-pick-list">${listHtml}</div>
+
+    <div class="vd-pick-bar">
+      <span class="vd-pick-count" id="vdPickCount"></span>
+      <button class="vd-pick-clear" id="vdPickClear">${nl ? 'Wissen' : 'Clear'}</button>
+      <button class="vd-pick-start" id="vdPickStart"></button>
+    </div>`;
+
+  const countEl = s.querySelector('#vdPickCount');
+  const startBtn = s.querySelector('#vdPickStart');
+
+  const refreshBar = () => {
+    const n = vd.selection.size;
+    countEl.textContent = nl ? `${n} gekozen` : `${n} selected`;
+    startBtn.disabled = n === 0;
+    startBtn.textContent = n === 0
+      ? `✍️ ${nl ? 'Oefen' : 'Practise'}`
+      : `✍️ ${nl ? `Oefen ${n}` : `Practise ${n}`}`;
+  };
+  refreshBar();
+
+  s.querySelector('#vdPickBack').addEventListener('click', showMenu);
+
+  // Toggle a pair in/out of the list, updating in place to keep scroll and search intact
+  s.querySelectorAll('.vd-pick-row').forEach(row => {
+    row.addEventListener('click', () => {
+      const inf = row.dataset.inf;
+      if (vd.selection.has(inf)) vd.selection.delete(inf);
+      else vd.selection.add(inf);
+      const on = vd.selection.has(inf);
+      row.classList.toggle('picked', on);
+      row.querySelector('.vd-pick-box').textContent = on ? '✓' : '';
+      saveSelection();
+      refreshBar();
+    });
+  });
+
+  const search = s.querySelector('#vdPickSearch');
+  search.addEventListener('input', () => {
+    const q = search.value.toLowerCase().trim();
+    s.querySelectorAll('.vd-pick-row').forEach(row => {
+      row.style.display = q && !row.textContent.toLowerCase().includes(q) ? 'none' : '';
+    });
+  });
+
+  s.querySelector('#vdPickClear').addEventListener('click', () => {
+    vd.selection.clear();
+    saveSelection();
+    showSelectionPicker();
+  });
+
+  startBtn.addEventListener('click', () => {
+    if (vd.selection.size === 0) return;
+    vd.useSelection = true;
+    localStorage.setItem('verbDrillUseSelection', '1');
+    startDrill();
   });
 }
 

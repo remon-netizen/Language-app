@@ -403,9 +403,19 @@ function init() {
 
 init();
 
-// Register service worker for PWA / offline support
+// Register service worker for PWA / offline support.
+// Skipped on localhost: the cache-first strategy would keep serving stale files
+// during development. Any SW left over from an earlier visit is torn down too.
+const isLocalhost = ['localhost', '127.0.0.1', '[::1]', '::1'].includes(location.hostname);
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js').catch(() => {});
+  if (isLocalhost) {
+    navigator.serviceWorker.getRegistrations()
+      .then(regs => Promise.all(regs.map(r => r.unregister())))
+      .then(() => caches?.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))))
+      .catch(() => {});
+  } else {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  }
 }
 
 // ── Expose functions to HTML onclick/onchange attributes ──────────────────────
