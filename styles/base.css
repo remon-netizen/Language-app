@@ -6,6 +6,12 @@
   vertical-align: middle;
   object-fit: contain;
   border-radius: 2px;
+  /* Keep every flag legible on any background without tinting the background to
+     suit it: a light hairline separates pale stripes from light surfaces (the
+     Ukrainian yellow on the yellow CTA) while the soft dark shadow does the same
+     for dark stripes on dark surfaces (the Ukrainian blue on the blue header).
+     box-shadow rather than border, so the 20x13 intrinsic size never shifts. */
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.75), 0 1px 3px rgba(0, 0, 0, 0.35);
 }
 
 body {
