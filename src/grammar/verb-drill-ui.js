@@ -4,6 +4,7 @@ import { CONJUGATIONS, buildDrillSet, findVerb } from '../data/verb-conjugations
 import { VERB_PAIRS } from '../data/verb-aspects.js';
 import { speakText } from '../voice.js';
 import { recordAnswer, getVerbMastery, getAllMastery, getWeakItems, hasWeaknessData, getWeakVerbCount } from '../data/verb-weakness.js';
+import { englishGloss } from './english-gloss.js';
 
 // ── State ────────────────────────────────────────────────────────────────────
 
@@ -302,7 +303,14 @@ function renderTable(verb, label) {
     if (!verb[t.key]) continue;
     html += `<div class="vd-tense-label">${t.name}</div><div class="vd-conj-table">`;
     for (const [pronoun, form] of Object.entries(verb[t.key])) {
-      html += `<div class="vd-conj-row"><span class="vd-pronoun">${escHtml(pronoun)}</span><span class="vd-form">${escHtml(form)}</span></div>`;
+      // The gloss wraps onto its own line: the two aspect tables sit side by side,
+      // so there is no room for a third inline column.
+      const gloss = englishGloss(verb.meaning.en, verb.aspect, t.key, pronoun);
+      html += `<div class="vd-conj-row">`
+        + `<span class="vd-pronoun">${escHtml(pronoun)}</span>`
+        + `<span class="vd-form">${escHtml(form)}</span>`
+        + (gloss ? `<span class="vd-conj-gloss">${escHtml(gloss)}</span>` : '')
+        + `</div>`;
     }
     html += '</div>';
   }
@@ -965,6 +973,38 @@ function showLearnVerb(imp, perf) {
   renderLearnStudy(imp, perf);
 }
 
+/**
+ * Example sentences for both aspects, with the drilled form highlighted in place
+ * of the blank. The data already carries these; they were only ever shown inside
+ * a drill, so the study view never let you see the forms in context.
+ */
+function renderExamples(imp, perf) {
+  const nl = state.nativeLanguage === 'nl';
+  const groups = [imp, perf].filter(v => v && v.sentences && v.sentences.length);
+  if (!groups.length) return '';
+
+  let html = `<div class="vd-examples">
+    <div class="vd-examples-title">${nl ? 'In zinnen' : 'In sentences'}</div>`;
+
+  for (const verb of groups) {
+    const tag = verb.aspect === 'imperfective'
+      ? `<span class="vd-aspect-tag vd-imp">IMP</span>`
+      : `<span class="vd-aspect-tag vd-perf">PERF</span>`;
+    html += `<div class="vd-example-group">
+      <div class="vd-example-verb">${tag} ${escHtml(verb.infinitive)}</div>`;
+    for (const sent of verb.sentences) {
+      const filled = escHtml(sent.uk)
+        .replace('___', `<strong class="vd-example-form">${escHtml(sent.answer)}</strong>`);
+      html += `<div class="vd-example">
+        <div class="vd-example-uk">${filled}</div>
+        <div class="vd-example-en">${escHtml(sent.en)}</div>
+      </div>`;
+    }
+    html += `</div>`;
+  }
+  return html + `</div>`;
+}
+
 function renderLearnStudy(imp, perf) {
   const s = getScreen();
   const nl = state.nativeLanguage === 'nl';
@@ -995,6 +1035,8 @@ function renderLearnStudy(imp, perf) {
       <div class="vd-ref-col vd-imp-col">${renderTable(imp, nl ? 'Onvoltooid' : 'Imperfective')}</div>
       <div class="vd-ref-col vd-perf-col">${renderTable(perf, nl ? 'Voltooid' : 'Perfective')}</div>
     </div>
+
+    ${renderExamples(imp, perf)}
 
     <div class="vd-learn-actions">
       <button id="vdLearnBackBtn">← ${nl ? 'Terug' : 'Back'}</button>

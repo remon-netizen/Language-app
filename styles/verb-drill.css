@@ -145,13 +145,75 @@
 .vd-conj-table { margin-bottom: 4px; }
 .vd-conj-row {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
-  padding: 3px 0;
+  padding: 3px 0 5px;
   font-size: 0.85rem;
-  gap: 8px;
+  gap: 0 8px;
 }
 .vd-pronoun { color: var(--gray); font-weight: 500; white-space: nowrap; }
 .vd-form    { font-weight: 700; color: var(--text); text-align: right; }
+/* English gloss: flex-basis 100% drops it onto its own line under the form,
+   since the two aspect tables share the row width. */
+.vd-conj-gloss {
+  flex-basis: 100%;
+  text-align: right;
+  font-size: 0.7rem;
+  font-style: italic;
+  color: var(--gray);
+  line-height: 1.25;
+}
+
+/* ── Example sentences under the study tables ── */
+.vd-examples {
+  background: var(--card-bg);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 16px;
+}
+.vd-examples-title {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #0891b2;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 10px;
+}
+.vd-example-group + .vd-example-group {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.vd-example-verb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.vd-example { padding: 5px 0; }
+.vd-example + .vd-example { border-top: 1px dashed var(--border); }
+.vd-example-uk {
+  font-size: 0.9rem;
+  color: var(--text);
+  line-height: 1.4;
+}
+.vd-example-form {
+  color: #0e7490;
+  background: #ecfeff;
+  border-radius: 4px;
+  padding: 0 3px;
+}
+.vd-example-en {
+  font-size: 0.78rem;
+  font-style: italic;
+  color: var(--gray);
+  line-height: 1.35;
+  margin-top: 1px;
+}
 
 .vd-ref-nav {
   display: flex;
@@ -794,7 +856,7 @@
   .vd-menu-card  { padding: 14px 12px; flex-direction: row; gap: 10px; }
   .vd-menu-icon  { font-size: 1.5rem; }
   .vd-q-pronoun  { font-size: 1.1rem; }
-  .vd-conj-row   { font-size: 0.75rem; gap: 4px; }
+  .vd-conj-row   { font-size: 0.75rem; gap: 0 4px; }
   .vd-stats-bar  { flex-wrap: wrap; gap: 6px; }
   .vd-level-row  { flex-wrap: wrap; }
   .vd-learn-actions { flex-direction: column; }
