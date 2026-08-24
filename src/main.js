@@ -414,7 +414,23 @@ if ('serviceWorker' in navigator) {
       .then(() => caches?.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))))
       .catch(() => {});
   } else {
-    navigator.serviceWorker.register('./sw.js').catch(() => {});
+    // A new worker installs and claims the page, but the page is already rendered
+    // from the old cache and nothing reloads it -- so the app kept showing an old
+    // build. Reload once on handover, and re-check on foreground, because a PWA
+    // resumed from memory never navigates and so never checks on its own.
+    const hadController = !!navigator.serviceWorker.controller;
+    let reloading = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!hadController || reloading) return; // first install: page is already current
+      reloading = true;
+      location.reload();
+    });
+    navigator.serviceWorker.register('./sw.js').then(reg => {
+      reg.update().catch(() => {});
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') reg.update().catch(() => {});
+      });
+    }).catch(() => {});
   }
 }
 
