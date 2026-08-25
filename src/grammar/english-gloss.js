@@ -47,6 +47,19 @@ export function englishLemma(meaningEn) {
     .trim();
 }
 
+/**
+ * A delimitative perfective ("по-" + verb) means "do it for a while", not "do it
+ * to completion". The data records that as "(for a while, completed)", so pull the
+ * phrase out and keep it: dropping it turns попрацював into a flat "he worked",
+ * which is actually the commonest reading of the *imperfective* попрацював pairs with.
+ */
+function qualifierOf(meaningEn) {
+  const paren = /\(([^)]*)\)/.exec(String(meaningEn || ''));
+  if (!paren) return '';
+  const d = /for a (while|bit)/.exec(paren[1]);
+  return d ? `for a ${d[1]}` : '';
+}
+
 function pastOf(w) {
   if (IRREGULAR_PAST[w]) return IRREGULAR_PAST[w];
   if (w.endsWith('e')) return w + 'd';
@@ -74,26 +87,31 @@ function beForm(pronoun) {
 }
 
 /**
- * @param {string} meaningEn  the verb's meaning.en, e.g. 'to go (on foot)'
- * @param {string} aspect     'imperfective' | 'perfective'
- * @param {string} tense      'present' | 'past' | 'future' | 'imperative'
- * @param {string} pronoun    the table row key, e.g. 'я' or 'він/вона'
+ * @param {object} verb     a CONJUGATIONS entry
+ * @param {string} tense    'present' | 'past' | 'future' | 'imperative'
+ * @param {string} pronoun  the table row key, e.g. 'я' or 'він/вона'
  * @returns {string} the gloss, or '' if it cannot be built
  */
-export function englishGloss(meaningEn, aspect, tense, pronoun) {
+export function englishGloss(verb, tense, pronoun) {
+  const meaningEn = verb && verb.meaning ? verb.meaning.en : '';
   const lemma = englishLemma(meaningEn);
   if (!lemma) return '';
 
   const [head, ...particle] = lemma.split(' ');
   const tail = particle.length ? ' ' + particle.join(' ') : '';
+  const perfective = verb.aspect === 'perfective';
+  // Only a perfective is bounded, so only it can carry the "for a while". The
+  // phrase comes from meaning.en rather than the delimitative flag because some
+  // delimitatives (погуляти -> "take a walk") already read as bounded in English,
+  // where appending it again would be redundant.
+  const q = perfective && qualifierOf(meaningEn) ? ' ' + qualifierOf(meaningEn) : '';
 
   // Imperative has no subject in English: "go!", "find out!"
-  if (tense === 'imperative') return head + tail + '!';
+  if (tense === 'imperative') return `${head}${tail}${q}!`;
 
   const subject = SUBJECT[pronoun];
   if (!subject) return '';
 
-  const perfective = aspect === 'perfective';
   const simple = perfective || STATIVE.has(head);
 
   if (tense === 'present') {
@@ -103,14 +121,66 @@ export function englishGloss(meaningEn, aspect, tense, pronoun) {
 
   if (tense === 'past') {
     if (head === 'be') return `${subject} ${PLURAL.has(pronoun) ? 'were' : 'was'}`;
-    if (simple) return `${subject} ${pastOf(head)}${tail}`;
+    if (simple) return `${subject} ${pastOf(head)}${tail}${q}`;
     return `${subject} ${PLURAL.has(pronoun) ? 'were' : 'was'} ${ingOf(head)}${tail}`;
   }
 
   if (tense === 'future') {
-    if (simple) return `${subject} will ${head}${tail}`;
+    if (simple) return `${subject} will ${head}${tail}${q}`;
     return `${subject} will be ${ingOf(head)}${tail}`;
   }
 
+  return '';
+}
+
+/**
+ * One line of usage guidance per tense block.
+ *
+ * The per-row gloss can only ever show one English reading, but a Ukrainian
+ * imperfective past covers three (progressive, habitual, plain factual). Showing
+ * only "he was working" teaches a false equivalence -- yet replacing it with
+ * "he worked" would read identically to the perfective and erase the contrast the
+ * side-by-side tables exist to show. So the row keeps the contrastive reading and
+ * this line states the full range underneath.
+ *
+ * English only, matching the glosses it sits with.
+ *
+ * @param {object} verb   a CONJUGATIONS entry
+ * @param {string} tense  'present' | 'past' | 'future' | 'imperative'
+ * @returns {string} the note, or '' when a tense needs none
+ */
+export function aspectNote(verb, tense) {
+  const meaningEn = verb && verb.meaning ? verb.meaning.en : '';
+  const lemma = englishLemma(meaningEn);
+  if (!lemma) return '';
+
+  const [head, ...particle] = lemma.split(' ');
+  const tail = particle.length ? ' ' + particle.join(' ') : '';
+  const v = head + tail;
+
+  if (verb.aspect === 'imperfective') {
+    if (tense === 'present')  return 'happening now, or regularly';
+    if (tense === 'past') {
+      if (head === 'be') return 'a state that held over time';
+      if (STATIVE.has(head)) return `a state that held over time: ${pastOf(head)}${tail} · used to ${v}`;
+      return `ongoing, repeated, or simply factual: was ${ingOf(head)}${tail} · used to ${v} · ${pastOf(head)}${tail}`;
+    }
+    // Statives have no continuous, so there is no progressive to contrast against;
+    // offering one would print the very "will be knowing" this module avoids.
+    if (tense === 'future') {
+      return STATIVE.has(head)
+        ? `a state that will hold — “will ${v}”`
+        : `usually just “will ${v}” — not only “will be ${ingOf(head)}${tail}”`;
+    }
+    if (tense === 'imperative') return 'general or repeated — and the normal choice after “не”';
+    return '';
+  }
+
+  // Read the flag rather than the prose: погуляти is delimitative but its
+  // meaning.en says "(completed)", so wording alone misclassified it.
+  const bounded = !!verb.delimitative;
+  if (tense === 'past')   return bounded ? 'one bounded stretch — done for a while, not finished off' : 'one action, seen as completed';
+  if (tense === 'future') return bounded ? 'one bounded stretch, not carried through to a result' : 'one action, completed in the future';
+  if (tense === 'imperative') return 'one specific action, right now';
   return '';
 }

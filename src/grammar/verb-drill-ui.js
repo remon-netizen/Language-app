@@ -4,7 +4,7 @@ import { CONJUGATIONS, buildDrillSet, findVerb } from '../data/verb-conjugations
 import { VERB_PAIRS } from '../data/verb-aspects.js';
 import { speakText } from '../voice.js';
 import { recordAnswer, getVerbMastery, getAllMastery, getWeakItems, hasWeaknessData, getWeakVerbCount } from '../data/verb-weakness.js';
-import { englishGloss } from './english-gloss.js';
+import { englishGloss, aspectNote } from './english-gloss.js';
 
 // ── State ────────────────────────────────────────────────────────────────────
 
@@ -289,6 +289,30 @@ function showMenu() {
 
 // ── Reference tables ─────────────────────────────────────────────────────────
 
+/**
+ * The conjugation table shown after an answer. Separate from renderTable because
+ * it highlights the drilled row and uses the feedback styling, but it carries the
+ * same gloss and usage note -- the moment right after answering is exactly when
+ * that explanation is wanted. Shared by both answer handlers, which previously
+ * held byte-identical copies and so missed the glosses when renderTable gained them.
+ */
+function renderAnswerTable(verb, tense, highlightPronoun) {
+  if (!verb || !verb[tense]) return '';
+  const note = aspectNote(verb, tense);
+  let html = `<div class="vd-full-table">`;
+  html += `<div class="vd-full-table-header">${escHtml(verb.infinitive)} — ${escHtml(loc(getTenseLabel(tense)))}</div>`;
+  if (note) html += `<div class="vd-full-note">${escHtml(note)}</div>`;
+  for (const [pronoun, form] of Object.entries(verb[tense])) {
+    const gloss = englishGloss(verb, tense, pronoun);
+    html += `<div class="vd-full-row ${pronoun === highlightPronoun ? 'vd-highlight-row' : ''}">`
+      + `<span class="vd-full-pronoun">${escHtml(pronoun)}</span>`
+      + `<span class="vd-full-form">${escHtml(form)}</span>`
+      + (gloss ? `<span class="vd-full-gloss">${escHtml(gloss)}</span>` : '')
+      + `</div>`;
+  }
+  return html + `</div>`;
+}
+
 function renderTable(verb, label) {
   if (!verb) return '';
   const nl = state.nativeLanguage === 'nl';
@@ -301,11 +325,16 @@ function renderTable(verb, label) {
   let html = `<div class="vd-table-header">${label}: <strong>${escHtml(verb.infinitive)}</strong></div>`;
   for (const t of tenses) {
     if (!verb[t.key]) continue;
-    html += `<div class="vd-tense-label">${t.name}</div><div class="vd-conj-table">`;
+    // One usage line per tense: a single per-row gloss cannot carry the fact that
+    // an imperfective past spans progressive, habitual and plain factual readings.
+    const note = aspectNote(verb, t.key);
+    html += `<div class="vd-tense-label">${t.name}</div>`
+      + (note ? `<div class="vd-tense-note">${escHtml(note)}</div>` : '')
+      + `<div class="vd-conj-table">`;
     for (const [pronoun, form] of Object.entries(verb[t.key])) {
       // The gloss wraps onto its own line: the two aspect tables sit side by side,
       // so there is no room for a third inline column.
-      const gloss = englishGloss(verb.meaning.en, verb.aspect, t.key, pronoun);
+      const gloss = englishGloss(verb, t.key, pronoun);
       html += `<div class="vd-conj-row">`
         + `<span class="vd-pronoun">${escHtml(pronoun)}</span>`
         + `<span class="vd-form">${escHtml(form)}</span>`
@@ -676,19 +705,7 @@ function handleAnswer(q, answer) {
 
   // Show full conjugation table for this tense
   const verb = findVerb(q.infinitive);
-  if (verb && verb[q.tense]) {
-    const tenseName = loc(getTenseLabel(q.tense));
-    html += `<div class="vd-full-table">`;
-    html += `<div class="vd-full-table-header">${escHtml(q.infinitive)} — ${escHtml(tenseName)}</div>`;
-    for (const [pronoun, form] of Object.entries(verb[q.tense])) {
-      const isCorrectRow = pronoun === q.pronoun;
-      html += `<div class="vd-full-row ${isCorrectRow ? 'vd-highlight-row' : ''}">`;
-      html += `<span class="vd-full-pronoun">${escHtml(pronoun)}</span>`;
-      html += `<span class="vd-full-form">${escHtml(form)}</span>`;
-      html += `</div>`;
-    }
-    html += `</div>`;
-  }
+  html += renderAnswerTable(verb, q.tense, q.pronoun);
 
   // Listen button
   html += `<button class="vd-listen-btn" id="vdListen">🔊 ${nl ? 'Luister' : 'Listen'}</button>`;
@@ -1223,19 +1240,7 @@ function handleLearnAnswer(q, answer, imp, perf) {
 
   // Show full conjugation table
   const verb = findVerb(q.infinitive);
-  if (verb && verb[q.tense]) {
-    const tenseName = loc(getTenseLabel(q.tense));
-    html += `<div class="vd-full-table">`;
-    html += `<div class="vd-full-table-header">${escHtml(q.infinitive)} — ${escHtml(tenseName)}</div>`;
-    for (const [pronoun, form] of Object.entries(verb[q.tense])) {
-      const isCorrectRow = pronoun === q.pronoun;
-      html += `<div class="vd-full-row ${isCorrectRow ? 'vd-highlight-row' : ''}">`;
-      html += `<span class="vd-full-pronoun">${escHtml(pronoun)}</span>`;
-      html += `<span class="vd-full-form">${escHtml(form)}</span>`;
-      html += `</div>`;
-    }
-    html += `</div>`;
-  }
+  html += renderAnswerTable(verb, q.tense, q.pronoun);
 
   html += `<button class="vd-listen-btn" id="vdListen">🔊 ${nl ? 'Luister' : 'Listen'}</button>`;
 

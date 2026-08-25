@@ -92,7 +92,7 @@ export const CONJUGATIONS = [
   },
   {
     infinitive: 'попрацювати',
-    aspect: 'perfective',
+    aspect: 'perfective', delimitative: true,
     partner: 'працювати',
     meaning: { en: 'to work (for a while, completed)', nl: 'werken (een tijdje, voltooid)' },
     level: 'A1',
@@ -178,7 +178,7 @@ export const CONJUGATIONS = [
     ],
   },
   {
-    infinitive: 'потренуватися', aspect: 'perfective', partner: 'тренуватися',
+    infinitive: 'потренуватися', aspect: 'perfective', delimitative: true, partner: 'тренуватися',
     meaning: { en: 'to train (for a while, completed)', nl: 'trainen (een tijdje, voltooid)' }, level: 'A1',
     present: null,
     past: { він: 'потренувався', вона: 'потренувалася', воно: 'потренувалося', вони: 'потренувалися' },
@@ -206,7 +206,7 @@ export const CONJUGATIONS = [
     ],
   },
   {
-    infinitive: 'погуляти', aspect: 'perfective', partner: 'гуляти',
+    infinitive: 'погуляти', aspect: 'perfective', delimitative: true, partner: 'гуляти',
     meaning: { en: 'to take a walk (completed)', nl: 'wandelen (voltooid)' }, level: 'A1',
     present: null,
     past: { він: 'погуляв', вона: 'погуляла', воно: 'погуляло', вони: 'погуляли' },
@@ -374,7 +374,7 @@ export const CONJUGATIONS = [
     ],
   },
   {
-    infinitive: 'почекати', aspect: 'perfective', partner: 'чекати',
+    infinitive: 'почекати', aspect: 'perfective', delimitative: true, partner: 'чекати',
     meaning: { en: 'to wait (for a bit, completed)', nl: 'wachten (even, voltooid)' }, level: 'A1',
     present: null,
     past: { він: 'почекав', вона: 'почекала', воно: 'почекало', вони: 'почекали' },
@@ -600,7 +600,7 @@ export const CONJUGATIONS = [
     ],
   },
   {
-    infinitive: 'побути', aspect: 'perfective', partner: 'бути',
+    infinitive: 'побути', aspect: 'perfective', delimitative: true, partner: 'бути',
     meaning: { en: 'to stay (for a while)', nl: 'even blijven' }, level: 'A1',
     present: null,
     past: { він: 'побув', вона: 'побула', воно: 'побуло', вони: 'побули' },
@@ -628,7 +628,7 @@ export const CONJUGATIONS = [
     ],
   },
   {
-    infinitive: 'походити', aspect: 'perfective', partner: 'ходити',
+    infinitive: 'походити', aspect: 'perfective', delimitative: true, partner: 'ходити',
     meaning: { en: 'to walk around (for a while)', nl: 'even rondlopen' }, level: 'A1',
     present: null,
     past: { він: 'походив', вона: 'походила', воно: 'походило', вони: 'походили' },
@@ -656,7 +656,7 @@ export const CONJUGATIONS = [
     ],
   },
   {
-    infinitive: 'пограти', aspect: 'perfective', partner: 'грати',
+    infinitive: 'пограти', aspect: 'perfective', delimitative: true, partner: 'грати',
     meaning: { en: 'to play (for a while)', nl: 'even spelen' }, level: 'A1',
     present: null,
     past: { він: 'пограв', вона: 'пограла', воно: 'пограло', вони: 'пограли' },

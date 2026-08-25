@@ -424,6 +424,26 @@
 .vd-full-form    { font-weight: 600; color: var(--text); }
 .vd-highlight-row .vd-full-pronoun { color: #15803d; }
 .vd-highlight-row .vd-full-form    { color: #14532d; }
+/* Gloss wraps onto its own line, as in the study tables. */
+.vd-full-row { flex-wrap: wrap; }
+.vd-full-gloss {
+  flex-basis: 100%;
+  text-align: right;
+  font-size: 0.7rem;
+  font-style: italic;
+  color: var(--gray);
+  line-height: 1.25;
+}
+.vd-highlight-row .vd-full-gloss { color: #15803d; }
+/* Usage note under the feedback table header. */
+.vd-full-note {
+  font-size: 0.68rem;
+  line-height: 1.35;
+  color: var(--gray);
+  margin: -4px 0 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px dotted var(--border);
+}
 
 .vd-listen-btn {
   display: inline-flex;
@@ -866,4 +886,15 @@
   .vd-q-card     { padding: 14px; }
   .vd-text-input { padding: 12px; font-size: 1rem; }
   .vd-sentence-card { padding: 14px; }
+}
+
+/* Usage note under each tense label: the per-row gloss shows one English
+   reading, this states the range the Ukrainian form actually covers. */
+.vd-tense-note {
+  font-size: 0.68rem;
+  line-height: 1.35;
+  color: var(--gray);
+  margin: -2px 0 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px dotted var(--border);
 }
