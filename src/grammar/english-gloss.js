@@ -159,7 +159,9 @@ export function aspectNote(verb, tense) {
   const v = head + tail;
 
   if (verb.aspect === 'imperfective') {
-    if (tense === 'present')  return 'happening now, or regularly';
+    // Present needs no note: "I work" already says it, and the pair tip carries
+    // the aspect contrast. Only tenses with a quirk of their own get a line.
+    if (tense === 'present') return '';
     if (tense === 'past') {
       if (head === 'be') return 'a state that held over time';
       if (STATIVE.has(head)) return `a state that held over time: ${pastOf(head)}${tail} · used to ${v}`;
@@ -176,11 +178,17 @@ export function aspectNote(verb, tense) {
     return '';
   }
 
+  // Only the past gets a note. Future and imperative repeated the same "one
+  // completed action" line three times over; the pair tip now says it once, and
+  // says it better. The past keeps its line because it sits directly opposite the
+  // imperfective past, where the contrast is the point of the two columns.
+  //
   // Read the flag rather than the prose: погуляти is delimitative but its
   // meaning.en says "(completed)", so wording alone misclassified it.
-  const bounded = !!verb.delimitative;
-  if (tense === 'past')   return bounded ? 'one bounded stretch — done for a while, not finished off' : 'one action, seen as completed';
-  if (tense === 'future') return bounded ? 'one bounded stretch, not carried through to a result' : 'one action, completed in the future';
-  if (tense === 'imperative') return 'one specific action, right now';
+  if (tense === 'past') {
+    return verb.delimitative
+      ? 'one bounded stretch — done for a while, not finished off'
+      : 'one action, seen as completed';
+  }
   return '';
 }

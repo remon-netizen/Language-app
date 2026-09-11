@@ -2,6 +2,7 @@ import { state } from '../state.js';
 import { escHtml, levenshtein } from '../utils.js';
 import { CONJUGATIONS, buildDrillSet, findVerb } from '../data/verb-conjugations.js';
 import { VERB_PAIRS } from '../data/verb-aspects.js';
+import { ASPECT_TIPS } from '../data/aspect-tips.js';
 import { speakText } from '../voice.js';
 import { recordAnswer, getVerbMastery, getAllMastery, getWeakItems, hasWeaknessData, getWeakVerbCount } from '../data/verb-weakness.js';
 import { englishGloss, aspectNote } from './english-gloss.js';
@@ -296,9 +297,26 @@ function showMenu() {
  * that explanation is wanted. Shared by both answer handlers, which previously
  * held byte-identical copies and so missed the glosses when renderTable gained them.
  */
+/**
+ * The one-line aspect tip for a pair. VERB_PAIRS covers the 20 pairs in the
+ * aspect drill; ASPECT_TIPS covers the other 34. Keyed by the imperfective, so a
+ * perfective looks up through its partner.
+ *
+ * This is where the aspect nuance belongs: what "по-" does to a verb is a fact
+ * about the pair, not about any one tense, and repeating it under every tense is
+ * what made the tables heavy.
+ */
+function pairTip(verb) {
+  if (!verb) return '';
+  const impInf = verb.aspect === 'imperfective' ? verb.infinitive : verb.partner;
+  const fromPairs = VERB_PAIRS.find(p => p.imperfective === impInf);
+  if (fromPairs && fromPairs.tip) return loc(fromPairs.tip);
+  return ASPECT_TIPS[impInf] ? loc(ASPECT_TIPS[impInf]) : '';
+}
+
 function renderAnswerTable(verb, tense, highlightPronoun) {
   if (!verb || !verb[tense]) return '';
-  const note = aspectNote(verb, tense);
+  const note = aspectNote(verb, tense) || pairTip(verb);
   let html = `<div class="vd-full-table">`;
   html += `<div class="vd-full-table-header">${escHtml(verb.infinitive)} — ${escHtml(loc(getTenseLabel(tense)))}</div>`;
   if (note) html += `<div class="vd-full-note">${escHtml(note)}</div>`;
@@ -313,7 +331,11 @@ function renderAnswerTable(verb, tense, highlightPronoun) {
   return html + `</div>`;
 }
 
-function renderTable(verb, label) {
+/**
+ * @param {boolean} showNotes  usage lines are for the study view; the reference
+ *   view is a lookup table you page through, where prose only slows you down.
+ */
+function renderTable(verb, label, showNotes) {
   if (!verb) return '';
   const nl = state.nativeLanguage === 'nl';
   const tenses = [
@@ -327,7 +349,7 @@ function renderTable(verb, label) {
     if (!verb[t.key]) continue;
     // One usage line per tense: a single per-row gloss cannot carry the fact that
     // an imperfective past spans progressive, habitual and plain factual readings.
-    const note = aspectNote(verb, t.key);
+    const note = showNotes ? aspectNote(verb, t.key) : '';
     html += `<div class="vd-tense-label">${t.name}</div>`
       + (note ? `<div class="vd-tense-note">${escHtml(note)}</div>` : '')
       + `<div class="vd-conj-table">`;
@@ -369,8 +391,8 @@ function showReference(index) {
     </div>
 
     <div class="vd-ref-tables">
-      <div class="vd-ref-col vd-imp-col">${renderTable(imp, nl ? 'Onvoltooid' : 'Imperfective')}</div>
-      <div class="vd-ref-col vd-perf-col">${renderTable(perf, nl ? 'Voltooid' : 'Perfective')}</div>
+      <div class="vd-ref-col vd-imp-col">${renderTable(imp, nl ? 'Onvoltooid' : 'Imperfective', false)}</div>
+      <div class="vd-ref-col vd-perf-col">${renderTable(perf, nl ? 'Voltooid' : 'Perfective', false)}</div>
     </div>
 
     <div class="vd-ref-nav">
@@ -1027,10 +1049,7 @@ function renderLearnStudy(imp, perf) {
   const nl = state.nativeLanguage === 'nl';
 
   // Find aspect tip from verb-aspects data if available
-  const aspectPair = VERB_PAIRS.find(p =>
-    p.imperfective === imp.infinitive || p.perfective === perf.infinitive
-  );
-  const tip = aspectPair ? loc(aspectPair.tip) : '';
+  const tip = pairTip(imp);
 
   s.innerHTML = `
     <div class="lesson-header">
@@ -1049,8 +1068,8 @@ function renderLearnStudy(imp, perf) {
     ${tip ? `<div class="vd-learn-tip">💡 ${escHtml(tip)}</div>` : ''}
 
     <div class="vd-ref-tables">
-      <div class="vd-ref-col vd-imp-col">${renderTable(imp, nl ? 'Onvoltooid' : 'Imperfective')}</div>
-      <div class="vd-ref-col vd-perf-col">${renderTable(perf, nl ? 'Voltooid' : 'Perfective')}</div>
+      <div class="vd-ref-col vd-imp-col">${renderTable(imp, nl ? 'Onvoltooid' : 'Imperfective', true)}</div>
+      <div class="vd-ref-col vd-perf-col">${renderTable(perf, nl ? 'Voltooid' : 'Perfective', true)}</div>
     </div>
 
     ${renderExamples(imp, perf)}
