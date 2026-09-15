@@ -1,21 +1,36 @@
 import { lookupWord } from './api/word-lookup.js';
 import { escHtml } from './utils.js';
+import { state } from './state.js';
 
 const STORAGE_KEY = 'savedWords';
 let _currentLookup = null;
 
+const L = (en, nl) => (state.nativeLanguage === 'nl' ? nl : en);
+
 // ── Storage helpers ───────────────────────────────────────────────────────────
 
-export function loadSavedWords() {
+// Every saved word, in every language (for writes).
+function loadAllWords() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
   catch { return []; }
 }
 
+// Words for the current target language. Words saved before languages were
+// tagged are assigned by script: Cyrillic → Ukrainian, anything else → the
+// non-Ukrainian target being studied.
+function wordLang(w) {
+  if (w.lang) return w.lang;
+  return /[\u0400-\u04FF]/.test(w.word) ? 'uk' : (state.currentLanguage === 'uk' ? 'other' : state.currentLanguage);
+}
+export function loadSavedWords() {
+  return loadAllWords().filter(w => wordLang(w) === state.currentLanguage);
+}
+
 export function saveWord(wordData) {
-  const words = loadSavedWords();
-  const already = words.some(w => w.word === wordData.word);
+  const words = loadAllWords();
+  const already = words.some(w => w.word === wordData.word && wordLang(w) === state.currentLanguage);
   if (!already) {
-    words.unshift({ ...wordData, savedAt: Date.now() });
+    words.unshift({ ...wordData, lang: state.currentLanguage, savedAt: Date.now() });
     localStorage.setItem(STORAGE_KEY, JSON.stringify(words));
     updateWordsCount();
     return true;
@@ -24,7 +39,7 @@ export function saveWord(wordData) {
 }
 
 export function deleteWord(word) {
-  const words = loadSavedWords().filter(w => w.word !== word);
+  const words = loadAllWords().filter(w => !(w.word === word && wordLang(w) === state.currentLanguage));
   localStorage.setItem(STORAGE_KEY, JSON.stringify(words));
   updateWordsCount();
 }
@@ -43,7 +58,7 @@ export function updateWordsCount() {
   const badge = document.getElementById('wordsBadge');
   if (!badge) return;
   if (count > 0) {
-    badge.textContent = due > 0 ? `${count} · ${due} due` : count;
+    badge.textContent = due > 0 ? `${count} · ${due} ${L('due', 'nu')}` : count;
     badge.style.display = 'inline';
   } else {
     badge.style.display = 'none';
@@ -70,7 +85,7 @@ export function scheduleWord(wordObj, quality) {
 }
 
 export function updateWordAfterReview(updatedWord) {
-  const words = loadSavedWords().map(w => w.word === updatedWord.word ? updatedWord : w);
+  const words = loadAllWords().map(w => (w.word === updatedWord.word && wordLang(w) === wordLang(updatedWord)) ? updatedWord : w);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(words));
   updateWordsCount();
 }
@@ -98,7 +113,7 @@ export async function openWordLookup(rawWord) {
 
   _currentLookup = null;
   wordEl.textContent = word;
-  content.innerHTML = '<div class="wl-loading">Looking up…</div>';
+  content.innerHTML = `<div class="wl-loading">${L('Looking up…', 'Opzoeken…')}</div>`;
   overlay.classList.add('open');
 
   try {
@@ -113,19 +128,19 @@ export async function openWordLookup(rawWord) {
         <span class="wl-pos-en">${escHtml(data.part_of_speech)}</span>
       </div>
       ${data.details ? `<div class="wl-details">${escHtml(data.details)}</div>` : ''}
-      <div class="wl-base">Base form: <strong>${escHtml(data.word)}</strong></div>
+      <div class="wl-base">${L('Base form', 'Basisvorm')}: <strong>${escHtml(data.word)}</strong></div>
       <button class="wl-save-btn ${saved ? 'saved' : ''}" id="wlSaveBtn">
-        ${saved ? '✓ Saved' : '+ Save word'}
+        ${saved ? '✓ ' + L('Saved', 'Opgeslagen') : '+ ' + L('Save word', 'Woord opslaan')}
       </button>`;
 
     document.getElementById('wlSaveBtn').addEventListener('click', function() {
       if (!_currentLookup || isWordSaved(_currentLookup.word)) return;
       saveWord(_currentLookup);
-      this.textContent = '✓ Saved';
+      this.textContent = '✓ ' + L('Saved', 'Opgeslagen');
       this.classList.add('saved');
     });
   } catch (err) {
-    content.innerHTML = `<div class="wl-error">Could not look up word: ${escHtml(err.message)}</div>`;
+    content.innerHTML = `<div class="wl-error">${L('Could not look up word', 'Kon het woord niet opzoeken')}: ${escHtml(err.message)}</div>`;
   }
 }
 
@@ -149,8 +164,8 @@ export function renderWordsScreen() {
   if (words.length === 0) {
     container.innerHTML = `
       <div class="words-empty">
-        No saved words yet.<br>
-        Tap any word in a conversation to look it up and save it.
+        ${L('No saved words yet.', 'Nog geen opgeslagen woorden.')}<br>
+        ${L('Tap any word in a conversation to look it up and save it.', 'Tik op een woord in een gesprek om het op te zoeken en op te slaan.')}
       </div>`;
     return;
   }
@@ -160,8 +175,8 @@ export function renderWordsScreen() {
     <button class="fc-review-btn" onclick="openFlashcardScreen()">
       <span class="fc-review-icon">📇</span>
       <span class="fc-review-text">
-        <span class="fc-review-title">Review ${due} word${due === 1 ? '' : 's'} due</span>
-        <span class="fc-review-sub">Spaced repetition flashcards</span>
+        <span class="fc-review-title">${L(`Review ${due} word${due === 1 ? '' : 's'} due`, `${due} ${due === 1 ? 'woord' : 'woorden'} herhalen`)}</span>
+        <span class="fc-review-sub">${L('Flashcards: type it or flip it', 'Flashcards: typen of omdraaien')}</span>
       </span>
       <span>→</span>
     </button>` : '';
@@ -176,7 +191,7 @@ export function renderWordsScreen() {
           ${w.details ? `<div class="wc-details">${escHtml(w.details)}</div>` : ''}
         </div>
       </div>
-      <button class="wc-delete" data-word="${escHtml(w.word)}" title="Remove">🗑</button>
+      <button class="wc-delete" data-word="${escHtml(w.word)}" title="${L('Remove', 'Verwijderen')}">🗑</button>
     </div>`).join('');
 
   // Attach delete listeners

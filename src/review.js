@@ -14,6 +14,7 @@ import { setupRecognition } from './speech.js';
 import { speakText, speakSlow } from './voice.js';
 import { getTargetText, getTranslation, getTip } from './data/lesson-helpers.js';
 import { t } from './i18n.js';
+import { getDueWords, getWordsCount } from './words.js';
 
 // ── Storage ──────────────────────────────────────────────────────────────────
 
@@ -61,6 +62,23 @@ export function getLearnedCount() {
   return loadLearned().filter(p => p.lang === state.currentLanguage).length;
 }
 
+// Strong phrases wait longer before they count as due. This is the same
+// cooldown curve the session ordering uses: score 0 → now, 50 → ~6h,
+// 80 → ~24h, 95 → ~72h. Never-reviewed phrases are always due.
+function cooldownHours(score) { return Math.pow(score / 100, 2) * 72; }
+export function getDuePhrases() {
+  const now = Date.now(), HOUR = 3600_000;
+  return loadLearned().filter(p => {
+    if (p.lang !== state.currentLanguage) return false;
+    if (!p.lastReviewed) return true;
+    return (now - p.lastReviewed) / HOUR >= cooldownHours(p.reviewScore || 0);
+  });
+}
+// Phrases + words waiting, for the home badge and the Today card.
+export function getDueTotal() {
+  return getDuePhrases().length + getDueWords().length;
+}
+
 // ── Review session state ─────────────────────────────────────────────────────
 
 let review = {
@@ -74,14 +92,56 @@ let review = {
 
 // ── Public entry ─────────────────────────────────────────────────────────────
 
+// The review hub: one place for everything that is due, whichever system
+// scheduled it. Phrases (from lessons) are spoken from memory; words (saved
+// from conversations) are typed or flipped as flashcards.
 export function openReviewScreen() {
+  showScreen('reviewScreen');
+  const nl = state.nativeLanguage === 'nl';
+  const learned = getLearnedCount();
+  const duePhrases = getDuePhrases().length;
+  const words = getWordsCount();
+  const dueWords = getDueWords().length;
+  const s = getScreen();
+
+  const row = (icon, title, sub, count, total, onclick, disabled) => `
+    <button class="rv-row ${disabled ? 'rv-row-disabled' : ''}" ${disabled ? 'disabled' : `onclick="${onclick}"`}>
+      <span class="rv-row-icon">${icon}</span>
+      <span class="rv-row-text">
+        <span class="rv-row-title">${title}</span>
+        <span class="rv-row-sub">${sub}</span>
+      </span>
+      <span class="rv-row-count ${count ? 'rv-row-due' : ''}">${count ? count : total}</span>
+    </button>`;
+
+  s.innerHTML = `
+    <div class="lesson-header">
+      <button class="back-btn" onclick="showScreen('homeScreen')">←</button>
+      <div>
+        <div class="lesson-title">${nl ? '🔄 Herhalen' : '🔄 Review'}</div>
+        <div class="lesson-subtitle">${nl ? 'Wat vandaag aan de beurt is' : 'What is due today'}</div>
+      </div>
+    </div>
+    <div class="rv-hub">
+      ${row('🗣️', nl ? 'Zinnen uit lessen' : 'Phrases from lessons',
+            learned ? (nl ? `${duePhrases} van ${learned} aan de beurt · uit je hoofd zeggen` : `${duePhrases} of ${learned} due · say them from memory`)
+                    : (nl ? 'Nog niets geleerd — doe eerst een les' : 'Nothing learned yet — do a lesson first'),
+            duePhrases, learned, 'startPhraseReview()', learned === 0)}
+      ${row('📇', nl ? 'Woorden uit gesprekken' : 'Words from conversations',
+            words ? (nl ? `${dueWords} van ${words} aan de beurt · typen of omdraaien` : `${dueWords} of ${words} due · type or flip`)
+                  : (nl ? 'Nog geen woorden — tik op een woord in een gesprek' : 'No words yet — tap a word in a conversation'),
+            dueWords, words, 'openFlashcardScreen()', words === 0)}
+      ${learned === 0 && words === 0 ? `
+        <div class="rv-empty">
+          <button class="rv-empty-btn" onclick="openLessonBrowse()">📖 ${nl ? 'Naar de lessen' : 'Go to lessons'}</button>
+          <button class="rv-empty-btn" onclick="openFreeChat()">💬 ${nl ? 'Start een gesprek' : 'Start a conversation'}</button>
+        </div>` : ''}
+    </div>`;
+}
+
+export function startPhraseReview() {
   const all = loadLearned().filter(p => p.lang === state.currentLanguage);
-  if (all.length === 0) {
-    alert(state.nativeLanguage === 'nl'
-      ? 'Nog geen zinnen geleerd. Voltooi eerst een les!'
-      : 'No phrases learned yet. Complete a lesson first!');
-    return;
-  }
+  if (all.length === 0) { openReviewScreen(); return; }
 
   // ── Smart spaced repetition ──────────────────────────────────────────────
   // Each phrase gets an urgency score. Higher urgency = reviewed sooner.
@@ -197,7 +257,7 @@ function renderReviewCard() {
     }</button>
   `;
 
-  s.querySelector('#reviewBack').addEventListener('click', () => showScreen('homeScreen'));
+  s.querySelector('#reviewBack').addEventListener('click', () => openReviewScreen());
 
   // Hear the translation in native language
   s.querySelector('#reviewHearBtn').addEventListener('click', () => {
@@ -326,7 +386,7 @@ function showReviewComplete() {
   const s = getScreen();
   s.innerHTML = `
     <div class="lesson-header">
-      <button class="back-btn" onclick="showScreen('homeScreen')">←</button>
+      <button class="back-btn" onclick="openReviewScreen()">←</button>
       <div>
         <div class="lesson-title">${native === 'nl' ? '🔄 Herhaling klaar!' : '🔄 Review complete!'}</div>
       </div>
@@ -345,12 +405,12 @@ function showReviewComplete() {
         <div class="stat-box"><div class="num">${avg}%</div><div class="label">${native === 'nl' ? 'Gem. score' : 'Avg score'}</div></div>
       </div>
       <button class="btn-level-up" onclick="startNewReview()">${native === 'nl' ? '🔄 Nog een ronde' : '🔄 Another round'}</button>
-      <button class="next-btn" onclick="showScreen('homeScreen')">${native === 'nl' ? '← Naar huis' : '← Home'}</button>
+      <button class="next-btn" onclick="openReviewScreen()">${native === 'nl' ? '← Terug naar herhalen' : '← Back to review'}</button>
     </div>
   `;
 }
 
-// Alias for the onclick — calls openReviewScreen again.
+// Alias for the onclick — starts another phrase round.
 export function startNewReview() {
-  openReviewScreen();
+  startPhraseReview();
 }

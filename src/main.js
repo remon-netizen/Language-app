@@ -1,6 +1,7 @@
 // ── Imports ───────────────────────────────────────────────────────────────────
 import { state, validTargetsFor, getTargetFlag, getTutorFirstName, flagImg } from './state.js';
 import { t, languageName } from './i18n.js';
+import { escHtml } from './utils.js';
 import { loadProgress, loadApiKey, saveApiKey, switchProvider } from './storage.js';
 import { loadVoices, showBrowserBanner, dismissBanner, changeVoice, testVoice, speakText } from './voice.js';
 import { showScreen } from './router.js';
@@ -22,7 +23,13 @@ import { openPrefixDrillScreen } from './grammar/prefix-drill-ui.js';
 import { openNumbersDrillScreen } from './grammar/numbers-drill-ui.js';
 import { startLesson, startHomeworkLesson, restartLesson, buildCategoryCards, buildAlphabet, listenPhrase, listenSlowPhrase, listenTranslation, toggleSpeak as toggleLessonSpeak, nextPhrase, speakAlphabetLetter } from './lesson.js';
 import { readHomeworkFile, generateHomeworkPhrases } from './api/homework.js';
-import { openReviewScreen, startNewReview, getLearnedCount } from './review.js';
+import { openReviewScreen, startPhraseReview, startNewReview, getLearnedCount, getDuePhrases, getDueTotal } from './review.js';
+import { getDueWords } from './words.js';
+import { getLessonsForTarget, getLessonName } from './data/lesson-helpers.js';
+import { getWeakVerbCount as weakVerbs } from './data/verb-weakness.js';
+import { getWeakNounCount as weakNouns } from './data/case-weakness.js';
+import { getWeakVerbCount as weakPrefixVerbs } from './data/prefix-weakness.js';
+import { weakKeys as weakNumberKeys } from './data/numbers-weakness.js';
 
 // ── Collapsible language picker ────────────────────────────────────────────────
 function collapseLangPicker() {
@@ -196,15 +203,80 @@ function applyStaticI18n() {
   setText('wordsScreenSubtitle', 'words.subtitle');
 }
 
-// ── Review count badge ────────────────────────────────────────────────────────
+// ── Review count badge + Today card ──────────────────────────────────────────
+// The badge shows what is DUE (phrases + words), not how much has ever been
+// learned; that is the number a learner acts on.
 function updateReviewCount() {
-  const count = getLearnedCount();
+  const due = getDueTotal();
   const badge = document.getElementById('reviewBtnCount');
   if (badge) {
-    badge.textContent = count > 0 ? count : '';
-    badge.style.display = count > 0 ? '' : 'none';
+    badge.textContent = due > 0 ? due : '';
+    badge.style.display = due > 0 ? '' : 'none';
   }
+  renderTodayCard();
 }
+
+// How many weak items the offline drills are tracking for the current target.
+function weakSpotCount() {
+  if (state.currentLanguage !== 'uk') return 0;
+  try { return weakVerbs() + weakNouns() + weakPrefixVerbs() + weakNumberKeys().length; }
+  catch { return 0; }
+}
+
+// The first lesson that is not finished yet, for "continue where you left off".
+function nextLesson() {
+  const lessons = getLessonsForTarget(state.currentLanguage) || [];
+  let started = null;
+  for (const l of lessons) {
+    const done = (state.categoryProgress[l.id] || []).length;
+    if (done > 0 && done < l.phrases.length) return { lesson: l, done };
+    if (done === 0 && !started) started = { lesson: l, done: 0 };
+  }
+  return started;
+}
+
+// One card at the top of Home that answers "what should I do now?".
+function renderTodayCard() {
+  const card = document.getElementById('todayCard');
+  if (!card) return;
+  const nl = state.nativeLanguage === 'nl';
+  const duePhrases = getDuePhrases().length;
+  const dueWords = getDueWords().length;
+  const weak = weakSpotCount();
+  const next = nextLesson();
+  const anyProgress = getLearnedCount() > 0 || Object.keys(state.categoryProgress).length > 0;
+
+  const rows = [];
+  if (duePhrases + dueWords > 0) {
+    const parts = [];
+    if (duePhrases) parts.push(nl ? `${duePhrases} ${duePhrases === 1 ? 'zin' : 'zinnen'}` : `${duePhrases} phrase${duePhrases === 1 ? '' : 's'}`);
+    if (dueWords) parts.push(nl ? `${dueWords} ${dueWords === 1 ? 'woord' : 'woorden'}` : `${dueWords} word${dueWords === 1 ? '' : 's'}`);
+    rows.push({ icon: '🔄', title: nl ? 'Herhalen' : 'Review', sub: parts.join(' + ') + (nl ? ' aan de beurt' : ' due'), onclick: 'openReviewScreen()', hot: true });
+  }
+  if (weak > 0) {
+    rows.push({ icon: '🎯', title: nl ? 'Zwakke plekken' : 'Weak spots', sub: nl ? `${weak} ${weak === 1 ? 'vorm' : 'vormen'} die je eerder fout had` : `${weak} form${weak === 1 ? '' : 's'} you got wrong before`, onclick: 'openExercisesScreen()' });
+  }
+  if (next) {
+    const name = getLessonName(next.lesson, state.nativeLanguage);
+    rows.push({ icon: next.lesson.icon || '📖', title: next.done ? (nl ? 'Ga verder' : 'Continue') : (nl ? 'Volgende les' : 'Next lesson'),
+      sub: `${name} · ${next.done}/${next.lesson.phrases.length}`, onclick: `startLesson('${next.lesson.id}')` });
+  }
+  if (!rows.length && !anyProgress) {
+    rows.push({ icon: '👋', title: nl ? 'Begin met een les' : 'Start with a lesson', sub: nl ? 'Luister, spreek na, en de zinnen komen terug om te herhalen' : 'Listen, repeat, and the phrases come back for review', onclick: 'openLessonBrowse()', hot: true });
+  }
+  if (!rows.length) { card.style.display = 'none'; return; }
+
+  card.style.display = '';
+  card.innerHTML = `
+    <div class="today-title">${nl ? '📅 Vandaag' : '📅 Today'}</div>
+    ${rows.slice(0, 3).map(r => `
+      <button class="today-row ${r.hot ? 'today-row-hot' : ''}" onclick="${r.onclick}">
+        <span class="today-icon">${r.icon}</span>
+        <span class="today-text"><span class="today-row-title">${escHtml(r.title)}</span><span class="today-row-sub">${escHtml(r.sub)}</span></span>
+        <span class="today-arrow">→</span>
+      </button>`).join('')}`;
+}
+document.addEventListener('screenShown', e => { if (e.detail.id === 'homeScreen') updateReviewCount(); });
 
 // ── Homework upload ───────────────────────────────────────────────────────────
 async function handleHomeworkUpload(file) {
@@ -488,6 +560,7 @@ window.handleHomeworkUpload = handleHomeworkUpload;
 window.expandLangPicker    = expandLangPicker;
 window.toggleAutoPlay      = toggleAutoPlay;
 window.openReviewScreen    = openReviewScreen;
+window.startPhraseReview   = startPhraseReview;
 window.startNewReview      = startNewReview;
 window.openVerbAspectScreen = openVerbAspectScreen;
 window.openVerbDrillScreen    = openVerbDrillScreen;

@@ -134,10 +134,8 @@
         <button class="api-notice-btn" onclick="toggleSettingsDrawer()">Settings →</button>
       </div>
 
-      <!-- ═══ Primary actions ═══ -->
-      <button class="start-btn" id="startBtn" onclick="openFreeChat()">
-        <span id="startBtnFlag"><img src="https://flagcdn.com/ua.svg" alt="" class="flag-icon" width="20" height="13"></span> <span id="startBtnLabel">Start Conversation</span>
-      </button>
+      <!-- ═══ Today: what is due, weak spots, next lesson (filled by main.js) ═══ -->
+      <div class="today-card" id="todayCard" style="display:none"></div>
 
       <!-- ═══ Learning tools (2-column grid) ═══ -->
       <div class="home-tools-grid">
@@ -149,13 +147,13 @@
         <button class="home-tool-card" id="reviewBtn" onclick="openReviewScreen()">
           <span class="home-tool-icon">🔄</span>
           <span class="home-tool-title" id="reviewBtnTitle">Review</span>
-          <span class="home-tool-sub" id="reviewBtnSub">From memory</span>
+          <span class="home-tool-sub" id="reviewBtnSub">Due today</span>
           <span class="review-btn-count" id="reviewBtnCount" style="display:none"></span>
         </button>
         <button class="home-tool-card" id="grammarBtn" onclick="openExercisesScreen()">
           <span class="home-tool-icon">🎯</span>
           <span class="home-tool-title" id="grammarLabel">Grammar</span>
-          <span class="home-tool-sub">Exercises</span>
+          <span class="home-tool-sub" id="grammarSub">Drills &amp; exercises</span>
         </button>
         <button class="home-tool-card" onclick="openWordsScreen()">
           <span class="home-tool-icon">📚</span>
@@ -164,6 +162,12 @@
           <span class="words-count-badge" id="wordsBadge" style="display:none"></span>
         </button>
       </div>
+
+      <!-- ═══ AI conversation ═══ -->
+      <button class="start-btn" id="startBtn" onclick="openFreeChat()">
+        <span id="startBtnFlag"><img src="https://flagcdn.com/ua.svg" alt="" class="flag-icon" width="20" height="13"></span> <span id="startBtnLabel">Start Conversation</span>
+        <span class="start-btn-ai" id="startBtnAi">🔑 AI</span>
+      </button>
 
       <!-- Inburgering — only shown when Dutch is the target AND native is not Dutch -->
       <button class="inburgering-btn nl-only" id="inburgeringBtn" onclick="openInburgeringScreen()">

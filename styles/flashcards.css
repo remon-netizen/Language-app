@@ -133,3 +133,22 @@
 .fc-review-text { flex: 1; }
 .fc-review-title { display: block; font-size: 1rem; }
 .fc-review-sub { display: block; font-size: 0.8rem; opacity: 0.85; font-weight: 400; }
+
+/* Type-it front */
+.fc-prompt { font-size: 0.78rem; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.04em; }
+.fc-translation-front { font-size: 1.6rem; font-weight: 700; color: var(--text); }
+.fc-type-row { display: flex; gap: 8px; width: 100%; max-width: 360px; margin-top: 6px; }
+.fc-type-input {
+  flex: 1; padding: 12px 14px; border: 2px solid var(--border); border-radius: 11px;
+  font-size: 1.1rem; font-family: inherit; outline: none; text-align: center; min-width: 0;
+}
+.fc-type-input:focus { border-color: #6366f1; }
+.fc-check-btn {
+  width: 48px; border: none; border-radius: 11px; background: #6366f1; color: white;
+  font-size: 1.1rem; font-weight: 800; cursor: pointer;
+}
+.fc-check-btn:hover { background: #4f46e5; }
+.fc-compare { font-size: 0.85rem; color: var(--gray); margin-bottom: 8px; }
+.fc-say { background: none; border: none; font-size: 1.1rem; cursor: pointer; vertical-align: middle; }
+.fc-rate-btn.fc-suggested { outline: 3px solid #6366f1; outline-offset: 2px; }
+#fcResult .ex-feedback-result { margin-bottom: 8px; }
