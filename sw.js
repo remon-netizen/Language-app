@@ -78,6 +78,10 @@ const SHELL = [
   './styles/numbers-drill.css',
   './src/api/model.js',
   './src/grammar/drill-core.js',
+  './src/data/vocab-uk.js',
+  './src/data/vocab-progress.js',
+  './src/grammar/vocab-drill-ui.js',
+  './styles/vocab-drill.css',
 ];
 
 // Install: pre-cache the app shell

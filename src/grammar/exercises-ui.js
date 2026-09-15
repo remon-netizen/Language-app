@@ -181,6 +181,7 @@ function showTopicPicker() {
   const lblCases    = native === 'nl' ? 'Naamvallen Drill' : 'Case Drill';
   const lblPrefix   = native === 'nl' ? 'Voorvoegsel Drill' : 'Prefix Drill';
   const lblNumbers  = native === 'nl' ? 'Getallen & Tijd' : 'Numbers & Time';
+  const lblVocab    = native === 'nl' ? 'Woordenschat' : 'Vocabulary';
   const isUK        = state.currentLanguage === 'uk';
   const lblLevel    = native === 'nl' ? 'Niveau (AI-onderwerpen):' : 'Level (AI topics):';
   const keyOk       = hasApiKey();
@@ -202,6 +203,10 @@ function showTopicPicker() {
 
     <div class="ex-section-label">${native === 'nl' ? '📴 Drills — werken offline, onthouden je fouten' : '📴 Drills — work offline, remember your mistakes'}</div>
     <div class="ex-tools-row">
+      <button class="ex-tool-btn ex-tool-vocab" id="exVocabBtn" style="${isUK ? '' : 'display:none'}">
+        <span class="ex-tool-icon">🧠</span>
+        <span>${lblVocab}</span>
+      </button>
       <button class="ex-tool-btn ex-tool-drill" id="exDrillBtn" style="${isUK ? '' : 'display:none'}">
         <span class="ex-tool-icon">✍️</span>
         <span>${lblDrill}</span>
@@ -271,6 +276,8 @@ function showTopicPicker() {
   if (caseDrillBtn) caseDrillBtn.addEventListener('click', () => window.openCaseDrillScreen());
   const prefixDrillBtn = s.querySelector('#exPrefixDrillBtn');
   if (prefixDrillBtn) prefixDrillBtn.addEventListener('click', () => window.openPrefixDrillScreen());
+  const vocabBtn = s.querySelector('#exVocabBtn');
+  if (vocabBtn) vocabBtn.addEventListener('click', () => window.openVocabDrillScreen());
   const numbersDrillBtn = s.querySelector('#exNumbersDrillBtn');
   if (numbersDrillBtn) numbersDrillBtn.addEventListener('click', () => window.openNumbersDrillScreen());
 

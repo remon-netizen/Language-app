@@ -21,6 +21,8 @@ import { openVerbDrillScreen } from './grammar/verb-drill-ui.js';
 import { openCaseDrillScreen } from './grammar/case-drill-ui.js';
 import { openPrefixDrillScreen } from './grammar/prefix-drill-ui.js';
 import { openNumbersDrillScreen } from './grammar/numbers-drill-ui.js';
+import { openVocabDrillScreen, startVocabReview } from './grammar/vocab-drill-ui.js';
+import { dueVocab, weakVocab } from './data/vocab-progress.js';
 import { startLesson, startHomeworkLesson, restartLesson, buildCategoryCards, buildAlphabet, listenPhrase, listenSlowPhrase, listenTranslation, toggleSpeak as toggleLessonSpeak, nextPhrase, speakAlphabetLetter } from './lesson.js';
 import { readHomeworkFile, generateHomeworkPhrases } from './api/homework.js';
 import { openReviewScreen, startPhraseReview, startNewReview, getLearnedCount, getDuePhrases, getDueTotal } from './review.js';
@@ -245,7 +247,7 @@ function updateReviewCount() {
 // How many weak items the offline drills are tracking for the current target.
 function weakSpotCount() {
   if (state.currentLanguage !== 'uk') return 0;
-  try { return weakVerbs() + weakNouns() + weakPrefixVerbs() + weakNumberKeys().length; }
+  try { return weakVerbs() + weakNouns() + weakPrefixVerbs() + weakNumberKeys().length + weakVocab().length; }
   catch { return 0; }
 }
 
@@ -267,7 +269,7 @@ function renderTodayCard() {
   if (!card) return;
   const nl = state.nativeLanguage === 'nl';
   const duePhrases = getDuePhrases().length;
-  const dueWords = getDueWords().length;
+  const dueWords = getDueWords().length + (state.currentLanguage === 'uk' ? dueVocab().length : 0);
   const weak = weakSpotCount();
   const next = nextLesson();
   const anyProgress = getLearnedCount() > 0 || Object.keys(state.categoryProgress).length > 0;
@@ -599,3 +601,5 @@ window.openVerbDrillScreen    = openVerbDrillScreen;
 window.openCaseDrillScreen    = openCaseDrillScreen;
 window.openPrefixDrillScreen  = openPrefixDrillScreen;
 window.openNumbersDrillScreen = openNumbersDrillScreen;
+window.openVocabDrillScreen   = openVocabDrillScreen;
+window.startVocabReview       = startVocabReview;

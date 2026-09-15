@@ -15,6 +15,7 @@ import { speakText, speakSlow } from './voice.js';
 import { getTargetText, getTranslation, getTip } from './data/lesson-helpers.js';
 import { t } from './i18n.js';
 import { getDueWords, getWordsCount } from './words.js';
+import { vocabStats } from './data/vocab-progress.js';
 import { levenshtein } from './utils.js';
 
 // ── Storage ──────────────────────────────────────────────────────────────────
@@ -77,7 +78,8 @@ export function getDuePhrases() {
 }
 // Phrases + words waiting, for the home badge and the Today card.
 export function getDueTotal() {
-  return getDuePhrases().length + getDueWords().length;
+  const vocabDue = state.currentLanguage === 'uk' ? vocabStats().due : 0;
+  return getDuePhrases().length + getDueWords().length + vocabDue;
 }
 
 // ── Review session state ─────────────────────────────────────────────────────
@@ -103,6 +105,7 @@ export function openReviewScreen() {
   const duePhrases = getDuePhrases().length;
   const words = getWordsCount();
   const dueWords = getDueWords().length;
+  const vs = state.currentLanguage === 'uk' ? vocabStats() : null;
   const s = getScreen();
 
   const row = (icon, title, sub, count, total, onclick, disabled) => `
@@ -132,6 +135,10 @@ export function openReviewScreen() {
             words ? (nl ? `${dueWords} van ${words} aan de beurt · typen of omdraaien` : `${dueWords} of ${words} due · type or flip`)
                   : (nl ? 'Nog geen woorden — tik op een woord in een gesprek' : 'No words yet — tap a word in a conversation'),
             dueWords, words, 'openFlashcardScreen()', words === 0)}
+      ${vs ? row('🧠', nl ? 'Woordenschat (kernwoorden)' : 'Vocabulary deck (core words)',
+            vs.seen ? (nl ? `${vs.due} aan de beurt · ${vs.seen} gezien, ${vs.learned} geleerd van ${vs.total}` : `${vs.due} due · ${vs.seen} seen, ${vs.learned} learned of ${vs.total}`)
+                    : (nl ? 'Nog niet gestart — leer 10 nieuwe woorden' : 'Not started — learn 10 new words'),
+            vs.due, vs.seen ? vs.learned : '→', vs.due ? 'startVocabReview()' : 'openVocabDrillScreen()', false) : ''}
       ${learned === 0 && words === 0 ? `
         <div class="rv-empty">
           <button class="rv-empty-btn" onclick="openLessonBrowse()">📖 ${nl ? 'Naar de lessen' : 'Go to lessons'}</button>
