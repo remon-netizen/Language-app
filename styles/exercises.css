@@ -66,6 +66,11 @@
   background: #ecfeff;
   color: #0e7490;
 }
+.ex-tool-numbers:hover {
+  border-color: #ea580c;
+  background: #fff7ed;
+  color: #c2410c;
+}
 
 /* ── Controls bar (level + open toggle) ── */
 .ex-controls-bar {
