@@ -22,6 +22,7 @@ let vd = {
   tenseFilter: 'all',     // 'all' | 'present' | 'past' | 'future' | 'imperative'
   level:     localStorage.getItem('verbDrillLevel') || 'A1',
   focusWeak: false,
+  dictation: localStorage.getItem('verbDrillDictation') === '1', // hear the form, type it
   // My list: hand-picked verb pairs to drill (e.g. this week's class list)
   selection:    loadSelection(),
   useSelection: localStorage.getItem('verbDrillUseSelection') === '1',
@@ -196,6 +197,10 @@ function showMenu() {
         <button class="vd-filter-btn ${vd.tenseFilter === 'imperative' ? 'active' : ''} ${!allowedTenses.includes('imperative') ? 'disabled' : ''}" data-tense="imperative">${nl ? 'Gebiedend' : 'Imperative'}</button>
       </div>
 
+      <div class="vd-weak-toggle vd-dictation-toggle ${vd.dictation ? 'active' : ''}" id="vdDictToggle">
+        <span class="vd-weak-check">${vd.dictation ? '✓' : ''}</span>
+        <span>👂 ${nl ? 'Dictee: hoor de vorm, typ wat je hoort' : 'Dictation: hear the form, type what you hear'}</span>
+      </div>
       ${hasWeak ? `
         <div class="vd-weak-toggle ${vd.focusWeak ? 'active' : ''}" id="vdWeakToggle">
           <span class="vd-weak-check">${vd.focusWeak ? '✓' : ''}</span>
@@ -284,6 +289,14 @@ function showMenu() {
     });
   });
 
+  // Dictation toggle
+  const dictToggle = s.querySelector('#vdDictToggle');
+  dictToggle.addEventListener('click', () => {
+    vd.dictation = !vd.dictation;
+    localStorage.setItem('verbDrillDictation', vd.dictation ? '1' : '0');
+    dictToggle.classList.toggle('active', vd.dictation);
+    dictToggle.querySelector('.vd-weak-check').textContent = vd.dictation ? '✓' : '';
+  });
   // Weakness toggle
   const weakToggle = s.querySelector('#vdWeakToggle');
   if (weakToggle) {
@@ -647,6 +660,7 @@ function renderConjugationQuestion(q) {
       <div class="vd-q-prompt">
         <span class="vd-q-pronoun">${escHtml(q.pronoun)}</span>
         <span class="vd-q-tense">${escHtml(tenseLabel)}</span>
+        ${vd.dictation ? `<button class="vd-dict-play" id="vdDictPlay" type="button" title="${nl ? 'Nog eens' : 'Play again'}">🔊</button>` : ''}
       </div>
     </div>
 
@@ -660,6 +674,11 @@ function renderConjugationQuestion(q) {
     <div id="vdFeedback"></div>`;
 
   s.querySelector('#vdDrillBack').addEventListener('click', showMenu);
+  if (vd.dictation) {
+    const say = () => speakText(q.tense === 'imperative' ? q.correctForm : `${q.pronoun} ${q.correctForm}`, state.currentLanguage);
+    s.querySelector('#vdDictPlay').addEventListener('click', say);
+    setTimeout(say, 250);
+  }
   setupInputHandlers(q);
 }
 

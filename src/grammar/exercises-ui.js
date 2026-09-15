@@ -130,7 +130,8 @@ let ex = {
   score:       0,
   answered:    false,
   level:       localStorage.getItem('exLevel')      || 'a1',
-  includeOpen: localStorage.getItem('exIncludeOpen') === 'true',
+  // Open (typed) questions are on unless the learner switched them off: production beats recognition.
+  includeOpen: localStorage.getItem('exIncludeOpen') !== 'false',
 };
 
 function getTopics() {

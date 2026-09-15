@@ -26,7 +26,7 @@ function loadPrefs() {
     const p = JSON.parse(localStorage.getItem(PREFS_KEY));
     if (!p) return;
     if (Array.isArray(p.cats) && p.cats.length) nd.cats = p.cats.filter(id => getCategory(id));
-    if (['type', 'choose', 'listen'].includes(p.qMode)) nd.qMode = p.qMode;
+    if (['type', 'choose', 'listen', 'dictate'].includes(p.qMode)) nd.qMode = p.qMode;
     if ([10, 25, 50].includes(p.total)) nd.total = p.total;
   } catch { /* ignore */ }
   if (!nd.cats.length) nd.cats = ['small'];
@@ -177,6 +177,7 @@ function showMenu() {
       ${modeBtn('type',   '✍️', nl ? 'Typen' : 'Type',   nl ? 'cijfer → woord' : 'digits → word')}
       ${modeBtn('choose', '👆', nl ? 'Kiezen' : 'Choose', nl ? 'woord → cijfer' : 'word → digits')}
       ${modeBtn('listen', '👂', nl ? 'Luisteren' : 'Listen', nl ? 'geluid → cijfer' : 'audio → digits')}
+      ${modeBtn('dictate', '👂✍️', nl ? 'Dictee' : 'Dictation', nl ? 'geluid → woord' : 'audio → word')}
     </div>
 
     <div class="nd-length-row">
@@ -356,6 +357,7 @@ function renderQuestion() {
   const q = nd.questions[nd.current];
   if (nd.qMode === 'choose') renderChoose(q);
   else if (nd.qMode === 'listen') renderListen(q);
+  else if (nd.qMode === 'dictate') renderType(q, { dictation: true });
   else renderType(q);
 }
 
@@ -375,12 +377,19 @@ function promptCard(item, { hideClock = false } = {}) {
 }
 
 // Mode 1: see the digits, type the Ukrainian word.
-function renderType(q) {
+// With dictation on, the word is spoken and the digits are hidden: type what you hear.
+function renderType(q, { dictation = false } = {}) {
   const s = getScreen();
   const nl = state.nativeLanguage === 'nl';
+  const word = q.item.answers[0];
   s.innerHTML = `
     ${headerHtml()}
-    ${promptCard(q.item)}
+    ${dictation ? `
+    <div class="nd-q-card nd-q-card-listen">
+      <div class="nd-q-question">${escHtml(questionWord(q.item))}</div>
+      <button class="nd-big-listen" id="ndSay">🔊</button>
+      <div class="nd-q-hint">${nl ? 'Typ wat je hoort' : 'Type what you hear'}</div>
+    </div>` : promptCard(q.item)}
     <div class="nd-input-area">
       <input type="text" class="nd-text-input" id="ndInput" lang="uk"
         placeholder="${nl ? 'Typ het in het Oekraïens…' : 'Type it in Ukrainian…'}"
@@ -390,6 +399,11 @@ function renderType(q) {
     <div id="ndFeedback"></div>`;
 
   s.querySelector('#ndDrillBack').addEventListener('click', showMenu);
+  if (dictation) {
+    const say = () => speakText(word, state.currentLanguage);
+    s.querySelector('#ndSay').addEventListener('click', say);
+    say();
+  }
   const input = s.querySelector('#ndInput');
   const check = s.querySelector('#ndCheck');
 

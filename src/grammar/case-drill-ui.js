@@ -21,6 +21,7 @@ let cd = {
   level:     localStorage.getItem('caseDrillLevel') || 'A1',
   focusWeak: false,
   adjMode:   false,   // drill adjective + noun pairs instead of bare nouns
+  dictation: localStorage.getItem('caseDrillDictation') === '1', // hear the form, type it
   missed:    [],
   // Learn one noun
   learnNoun:    null,
@@ -134,6 +135,10 @@ function showMenu() {
         <button class="cd-filter-btn ${cd.genderFilter === 'n' ? 'active' : ''}" data-gen="n">${nl ? 'Onz.' : 'Neut'}</button>
       </div>
 
+      <div class="cd-weak-toggle cd-adj-toggle ${cd.dictation ? 'active' : ''}" id="cdDictToggle">
+        <span class="cd-weak-check">${cd.dictation ? '✓' : ''}</span>
+        <span>👂 ${nl ? 'Dictee: hoor de vorm, typ wat je hoort' : 'Dictation: hear the form, type what you hear'}</span>
+      </div>
       <div class="cd-weak-toggle cd-adj-toggle ${cd.adjMode ? 'active' : ''}" id="cdAdjToggle">
         <span class="cd-weak-check">${cd.adjMode ? '✓' : ''}</span>
         <span>📐 ${nl ? `Bijvoeglijk naamwoord + zelfstandig naamwoord (${ADJECTIVE_NOUNS.length} paren)` : `Adjective + noun agreement (${ADJECTIVE_NOUNS.length} pairs)`}</span>
@@ -183,6 +188,9 @@ function showMenu() {
   s.querySelectorAll('[data-gen]').forEach(btn => {
     btn.addEventListener('click', () => { cd.genderFilter = btn.dataset.gen; s.querySelectorAll('[data-gen]').forEach(b => b.classList.toggle('active', b.dataset.gen === cd.genderFilter)); });
   });
+  // Dictation toggle
+  const dt = s.querySelector('#cdDictToggle');
+  dt.addEventListener('click', () => { cd.dictation = !cd.dictation; localStorage.setItem('caseDrillDictation', cd.dictation ? '1' : '0'); dt.classList.toggle('active', cd.dictation); dt.querySelector('.cd-weak-check').textContent = cd.dictation ? '✓' : ''; });
   // Adjective mode toggle
   const at = s.querySelector('#cdAdjToggle');
   at.addEventListener('click', () => { cd.adjMode = !cd.adjMode; at.classList.toggle('active', cd.adjMode); at.querySelector('.cd-weak-check').textContent = cd.adjMode ? '✓' : ''; });
@@ -362,6 +370,7 @@ function renderFormQuestion(q) {
       <div class="cd-q-prompt">
         <span class="cd-q-case">${escHtml(caseLabel)}</span>
         <span class="cd-q-number">${escHtml(numLabel)}</span>
+        ${cd.dictation ? `<button class="cd-dict-play" id="cdDictPlay" type="button" title="${nl ? 'Nog eens' : 'Play again'}">🔊</button>` : ''}
       </div>
     </div>
 
@@ -374,6 +383,11 @@ function renderFormQuestion(q) {
     <div id="cdFeedback"></div>`;
 
   s.querySelector('#cdDrillBack').addEventListener('click', showMenu);
+  if (cd.dictation) {
+    const say = () => speakText(q.correctForm, state.currentLanguage);
+    s.querySelector('#cdDictPlay').addEventListener('click', say);
+    setTimeout(say, 250);
+  }
   setupInput(q);
 }
 

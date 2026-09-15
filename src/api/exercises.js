@@ -67,7 +67,7 @@ export async function generateExercises(topicId, topicTitle, level = 'a1', inclu
   const hint       = hintMap[topicId] || `Focus on the grammar topic: ${topicTitle}.`;
 
   const mixLine = includeOpen
-    ? 'Include a mix: 6 multiple-choice questions AND 4 open-ended questions (student writes the answer). Spread them naturally — do not group all open questions at the end.'
+    ? 'Include a mix: 4 multiple-choice questions AND 6 open-ended questions (student writes the answer). Spread them naturally — do not group all open questions at the end.'
     : 'All 10 questions must be multiple-choice.';
 
   const schemaLines = includeOpen

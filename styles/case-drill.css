@@ -284,3 +284,10 @@
 .cd-gender-adj { background: #ede9fe; color: #6d28d9; }
 .cd-adj-toggle { margin-top: 10px; }
 .cd-hl-cell { text-decoration: underline; text-decoration-color: #059669; text-underline-offset: 3px; }
+
+/* Dictation */
+.cd-dict-play {
+  margin-left: auto; background: #059669; color: white; border: none; border-radius: 10px;
+  width: 40px; height: 36px; font-size: 1rem; cursor: pointer;
+}
+.cd-dict-play:hover { background: #047857; }

@@ -903,3 +903,11 @@
 .vd-menu-grid-5 { grid-template-columns: repeat(5, 1fr); }
 @media (max-width: 700px) { .vd-menu-grid-5 { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 500px) { .vd-menu-grid-5 { grid-template-columns: 1fr 1fr; } }
+
+/* Dictation */
+.vd-dict-play {
+  margin-left: auto; background: #0891b2; color: white; border: none; border-radius: 10px;
+  width: 40px; height: 36px; font-size: 1rem; cursor: pointer;
+}
+.vd-dict-play:hover { background: #0e7490; }
+.vd-dictation-toggle { margin-bottom: 8px; }

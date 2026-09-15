@@ -256,3 +256,7 @@
   .nd-ref-nav { flex-wrap: wrap; }
   .nd-nav-primary { flex-basis: 100%; order: -1; }
 }
+
+/* Four mode buttons */
+.nd-mode-row { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 500px) { .nd-mode-row { grid-template-columns: 1fr 1fr; } }

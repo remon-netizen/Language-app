@@ -15,6 +15,7 @@ import { speakText, speakSlow } from './voice.js';
 import { getTargetText, getTranslation, getTip } from './data/lesson-helpers.js';
 import { t } from './i18n.js';
 import { getDueWords, getWordsCount } from './words.js';
+import { levenshtein } from './utils.js';
 
 // ── Storage ──────────────────────────────────────────────────────────────────
 
@@ -241,12 +242,17 @@ function renderReviewCard() {
       </div>
     </div>
 
-    <div class="controls">
-      <button class="btn btn-translation" id="reviewHearBtn">${lblHear}</button>
-      <button class="btn btn-listen-slow" id="reviewHintBtn">${lblHint}</button>
+    <div class="review-type-row">
+      <input type="text" class="review-type-input" id="reviewInput" lang="${state.currentLanguage}"
+        placeholder="${native === 'nl' ? 'Typ het in het Oekraïens…' : 'Type it in the target language…'}"
+        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+      <button class="review-type-check" id="reviewCheckBtn" type="button">${native === 'nl' ? 'Controleer' : 'Check'} ✓</button>
     </div>
+    <div class="review-or">${native === 'nl' ? 'of zeg het hardop' : 'or say it out loud'}</div>
     <div class="controls" style="margin-top:0">
       <button class="btn btn-speak" id="reviewSpeakBtn">${lblSpeak}</button>
+      <button class="btn btn-translation" id="reviewHearBtn">${lblHear}</button>
+      <button class="btn btn-listen-slow" id="reviewHintBtn">${lblHint}</button>
     </div>
 
     <div class="feedback-area" id="reviewFeedback"></div>
@@ -279,6 +285,33 @@ function renderReviewCard() {
   speakBtn.addEventListener('click', () => toggleReviewSpeak(speakBtn));
 
   s.querySelector('#reviewNextBtn').addEventListener('click', nextReviewCard);
+
+  // Typed recall: same scoring path as speech, so the spaced queue treats both alike.
+  const input = s.querySelector('#reviewInput');
+  const check = () => {
+    const typed = input.value.trim();
+    if (!typed || review.revealed) { input.focus(); return; }
+    input.disabled = true;
+    s.querySelector('#reviewCheckBtn').disabled = true;
+    const score = typedScore(typed, p.target);
+    input.classList.add(score >= 85 ? 'correct' : score >= 60 ? 'close' : 'wrong');
+    processReviewResult([typed], score);
+  };
+  s.querySelector('#reviewCheckBtn').addEventListener('click', check);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); check(); } });
+  input.focus({ preventScroll: true });
+}
+
+// 0–100 similarity of a typed phrase to the target, ignoring case, punctuation
+// and apostrophe variants. Exact → 100; a slip or two in a long phrase still
+// scores high, a different phrase scores low.
+function typedScore(typed, target) {
+  const norm = s => s.toLowerCase().replace(/[’ʼ`´‘]/g, "'").replace(/[.,!?;:"«»—\-]/g, '').replace(/\s+/g, ' ').trim();
+  const a = norm(typed), b = norm(target);
+  if (a === b) return 100;
+  const lev = levenshtein(a, b);
+  const maxLen = Math.max(a.length, b.length) || 1;
+  return Math.max(0, Math.round((1 - lev / maxLen) * 100));
 }
 
 // ── Speech recognition ───────────────────────────────────────────────────────
@@ -304,12 +337,15 @@ function toggleReviewSpeak(btn) {
   if (review.recognition) review.recognition.start();
 }
 
-function processReviewResult(recognizedList) {
+function processReviewResult(recognizedList, presetScore) {
   const p = review.phrases[review.current];
   const target = p.target.toLowerCase().trim();
   const heard = recognizedList[0] || '';
-  const score = calcSimilarity(target, heard);
+  const score = presetScore !== undefined ? presetScore : calcSimilarity(target, heard);
   review.scores.push(score);
+  review.revealed = true;
+  const ri = document.getElementById('reviewInput');
+  if (ri) { ri.disabled = true; const cb = document.getElementById('reviewCheckBtn'); if (cb) cb.disabled = true; }
 
   // Update the stored phrase's review data
   const learned = loadLearned();
@@ -348,7 +384,7 @@ function showReviewFeedback(score, heard, phrase) {
   fb.innerHTML = `
     <div class="feedback-score ${cls}">${heard ? `${emoji} ${score}%` : emoji}</div>
     <div class="feedback-text">${msg}</div>
-    ${heard ? `<div class="feedback-heard">${native === 'nl' ? 'Ik hoorde:' : 'I heard:'} <span>"${escHtml(heard)}"</span></div>` : ''}
+    ${heard ? `<div class="feedback-heard">${document.getElementById('reviewInput')?.value.trim() === heard ? (native === 'nl' ? 'Jij typte:' : 'You typed:') : (native === 'nl' ? 'Ik hoorde:' : 'I heard:')} <span>"${escHtml(heard)}"</span></div>` : ''}
   `;
 
   // Reveal the correct answer
@@ -360,8 +396,10 @@ function showReviewFeedback(score, heard, phrase) {
   // Play the correct pronunciation so they hear how it should sound
   setTimeout(() => speakText(phrase.target, getTTSLang()), 500);
 
-  // Show the next button
-  document.getElementById('reviewNextBtn').style.display = '';
+  // Show the next button and hand it focus so Enter advances
+  const nb = document.getElementById('reviewNextBtn');
+  nb.style.display = '';
+  nb.focus({ preventScroll: true });
 }
 
 function nextReviewCard() {
