@@ -6,6 +6,8 @@
 import { VOCAB } from './vocab-uk.js';
 import { scheduleWord } from '../words.js';
 
+import { markActivity } from './activity.js';
+
 const STORAGE_KEY = 'vocabProgress';
 let data = null;
 
@@ -28,6 +30,7 @@ export function recordVocab(key, quality) {
   next.t = Date.now();
   d[key] = next;
   save();
+  markActivity();
 }
 
 export function dueVocab() {

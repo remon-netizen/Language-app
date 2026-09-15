@@ -1,6 +1,8 @@
 // ── Case drill weakness tracker ───────────────────────────────────────────────
 // Structure: { [nom_s]: { [case|number]: { a: attempts, c: correct, t: timestamp } } }
 
+import { markActivity } from './activity.js';
+
 const STORAGE_KEY = 'caseWeakness';
 let data = null;
 
@@ -19,6 +21,7 @@ export function recordAnswer(noun, caseName, number, isCorrect) {
   const e = d[noun][key];
   e.a++; if (isCorrect) e.c++; e.t = Date.now();
   save();
+  markActivity();
 }
 
 export function getNounMastery(noun) {

@@ -23,6 +23,8 @@ import { openPrefixDrillScreen } from './grammar/prefix-drill-ui.js';
 import { openNumbersDrillScreen } from './grammar/numbers-drill-ui.js';
 import { openVocabDrillScreen, startVocabReview } from './grammar/vocab-drill-ui.js';
 import { openSentenceBuildScreen, tracker as sentenceTracker } from './grammar/sentence-build-ui.js';
+import { openDialogueScreen, tracker as dialogueTracker } from './grammar/dialogue-ui.js';
+import { openProgressScreen } from './progress-ui.js';
 import { dueVocab, weakVocab } from './data/vocab-progress.js';
 import { startLesson, startHomeworkLesson, restartLesson, buildCategoryCards, buildAlphabet, listenPhrase, listenSlowPhrase, listenTranslation, toggleSpeak as toggleLessonSpeak, nextPhrase, speakAlphabetLetter } from './lesson.js';
 import { readHomeworkFile, generateHomeworkPhrases } from './api/homework.js';
@@ -148,6 +150,7 @@ function applyStaticI18n() {
   setText('apiSaveBtn', 'settings.save');
 
   // Home screen
+  setText('progressLinkLabel', 'home.progress');
   setText('apiNoticeText', 'home.apiNotice');
   setText('apiNoticeBtn', 'home.apiNoticeBtn');
   setText('grammarSub', 'home.grammarSub');
@@ -248,7 +251,7 @@ function updateReviewCount() {
 // How many weak items the offline drills are tracking for the current target.
 function weakSpotCount() {
   if (state.currentLanguage !== 'uk') return 0;
-  try { return weakVerbs() + weakNouns() + weakPrefixVerbs() + weakNumberKeys().length + weakVocab().length + sentenceTracker.weakKeys().length; }
+  try { return weakVerbs() + weakNouns() + weakPrefixVerbs() + weakNumberKeys().length + weakVocab().length + sentenceTracker.weakKeys().length + dialogueTracker.weakKeys().length; }
   catch { return 0; }
 }
 
@@ -604,4 +607,6 @@ window.openPrefixDrillScreen  = openPrefixDrillScreen;
 window.openNumbersDrillScreen = openNumbersDrillScreen;
 window.openVocabDrillScreen   = openVocabDrillScreen;
 window.openSentenceBuildScreen = openSentenceBuildScreen;
+window.openDialogueScreen     = openDialogueScreen;
+window.openProgressScreen     = openProgressScreen;
 window.startVocabReview       = startVocabReview;

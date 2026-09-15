@@ -3,6 +3,7 @@ import { getDueWords, scheduleWord, updateWordAfterReview } from '../words.js';
 import { escHtml } from '../utils.js';
 import { speakText } from '../voice.js';
 import { grade, resultLine, L } from './drill-core.js';
+import { markActivity } from '../data/activity.js';
 
 // ── State ─────────────────────────────────────────────────────────────────────
 
@@ -171,6 +172,7 @@ export function rateFlashcard(quality) {
   updateWordAfterReview(updated);
 
   if (quality >= 3) fc.score++;
+  markActivity();
   fc.current++;
   renderFlashcard();
 }

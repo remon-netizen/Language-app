@@ -1,3 +1,4 @@
+import { markActivity } from './activity.js';
 // ── Verb weakness tracker ─────────────────────────────────────────────────────
 // Tracks which conjugation forms the learner gets wrong, persisted in localStorage.
 // Structure: { [infinitive]: { [tense|pronoun]: { a: attempts, c: correct, t: timestamp } } }
@@ -30,6 +31,7 @@ export function recordAnswer(infinitive, tense, pronoun, isCorrect) {
   if (isCorrect) entry.c++;
   entry.t = Date.now();
   save();
+  markActivity();
 }
 
 export function getVerbMastery(infinitive) {

@@ -9,6 +9,7 @@ import { speakText, speakSlow } from './voice.js';
 import { t } from './i18n.js';
 import { getLessonLevel, saveLessonLevel, getLevelLabel, getNextLevelLabel, hasNextLevel, generateNextLevelPhrases } from './api/level-up.js';
 import { markPhraseAsLearned } from './review.js';
+import { markActivity } from './data/activity.js';
 
 // BCP-47 tag for the user's native language TTS (used to speak translations).
 function getNativeTTSLang() {
@@ -328,6 +329,7 @@ export function processLessonResult(recognizedList) {
   const heard = recognizedList[0] || '';
   const score = calcSimilarity(target, heard);
   state.lessonScores.push(score);
+  markActivity();
 
   // Save this phrase to the learned-phrases store for later review.
   markPhraseAsLearned(phrase);

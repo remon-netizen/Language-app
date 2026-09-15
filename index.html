@@ -34,6 +34,8 @@
   <link rel="stylesheet" href="styles/numbers-drill.css" />
   <link rel="stylesheet" href="styles/vocab-drill.css" />
   <link rel="stylesheet" href="styles/sentence-build.css" />
+  <link rel="stylesheet" href="styles/dialogue.css" />
+  <link rel="stylesheet" href="styles/progress.css" />
 </head>
 <body>
 
@@ -170,6 +172,8 @@
           <span class="words-count-badge" id="wordsBadge" style="display:none"></span>
         </button>
       </div>
+
+      <button class="home-progress-link" id="progressLink" onclick="openProgressScreen()">📊 <span id="progressLinkLabel">Progress</span></button>
 
       <!-- ═══ AI conversation ═══ -->
       <button class="start-btn" id="startBtn" onclick="openFreeChat()">
@@ -467,6 +471,16 @@
   <!-- ══════════ SENTENCE BUILDER SCREEN ══════════ -->
   <div class="screen" id="sentenceBuildScreen">
     <!-- Content populated dynamically by sentence-build-ui.js -->
+  </div>
+
+  <!-- ══════════ DIALOGUES SCREEN ══════════ -->
+  <div class="screen" id="dialogueScreen">
+    <!-- Content populated dynamically by dialogue-ui.js -->
+  </div>
+
+  <!-- ══════════ PROGRESS SCREEN ══════════ -->
+  <div class="screen" id="progressScreen">
+    <!-- Content populated dynamically by progress-ui.js -->
   </div>
 
 </div><!-- /app -->

@@ -2,6 +2,8 @@
 // Structure: { [itemKey]: { a: attempts, c: correct, t: lastTimestamp } }
 // itemKey examples: "card:17", "ord:3:f", "time:7:30", "at:11:00"
 
+import { markActivity } from './activity.js';
+
 const STORAGE_KEY = 'numbersWeakness';
 let data = null;
 
@@ -18,6 +20,7 @@ export function recordAnswer(key, isCorrect) {
   const e = d[key];
   e.a++; if (isCorrect) e.c++; e.t = Date.now();
   save();
+  markActivity();
 }
 
 // 0 = never wrong (or never seen), 1 = always wrong.

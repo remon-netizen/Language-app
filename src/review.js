@@ -17,6 +17,7 @@ import { t } from './i18n.js';
 import { getDueWords, getWordsCount } from './words.js';
 import { vocabStats } from './data/vocab-progress.js';
 import { levenshtein } from './utils.js';
+import { markActivity } from './data/activity.js';
 
 // ── Storage ──────────────────────────────────────────────────────────────────
 
@@ -351,6 +352,7 @@ function processReviewResult(recognizedList, presetScore) {
   const score = presetScore !== undefined ? presetScore : calcSimilarity(target, heard);
   review.scores.push(score);
   review.revealed = true;
+  markActivity();
   const ri = document.getElementById('reviewInput');
   if (ri) { ri.disabled = true; const cb = document.getElementById('reviewCheckBtn'); if (cb) cb.disabled = true; }
 

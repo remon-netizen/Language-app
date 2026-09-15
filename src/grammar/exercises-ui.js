@@ -183,6 +183,7 @@ function showTopicPicker() {
   const lblNumbers  = native === 'nl' ? 'Getallen & Tijd' : 'Numbers & Time';
   const lblVocab    = native === 'nl' ? 'Woordenschat' : 'Vocabulary';
   const lblSentence = native === 'nl' ? 'Zinnen bouwen' : 'Sentence Builder';
+  const lblDialog   = native === 'nl' ? 'Dialogen' : 'Dialogues';
   const isUK        = state.currentLanguage === 'uk';
   const lblLevel    = native === 'nl' ? 'Niveau (AI-onderwerpen):' : 'Level (AI topics):';
   const keyOk       = hasApiKey();
@@ -227,6 +228,10 @@ function showTopicPicker() {
       <button class="ex-tool-btn ex-tool-sentence" id="exSentenceBtn" style="${isUK ? '' : 'display:none'}">
         <span class="ex-tool-icon">🧩</span>
         <span>${lblSentence}</span>
+      </button>
+      <button class="ex-tool-btn ex-tool-dialog" id="exDialogBtn" style="${isUK ? '' : 'display:none'}">
+        <span class="ex-tool-icon">🎧</span>
+        <span>${lblDialog}</span>
       </button>
       ${!isUK ? `<div class="ex-tools-empty">${native === 'nl' ? 'Nog geen offline drills voor deze taal.' : 'No offline drills for this language yet.'}</div>` : ''}
     </div>
@@ -281,6 +286,8 @@ function showTopicPicker() {
   if (caseDrillBtn) caseDrillBtn.addEventListener('click', () => window.openCaseDrillScreen());
   const prefixDrillBtn = s.querySelector('#exPrefixDrillBtn');
   if (prefixDrillBtn) prefixDrillBtn.addEventListener('click', () => window.openPrefixDrillScreen());
+  const dialogBtn = s.querySelector('#exDialogBtn');
+  if (dialogBtn) dialogBtn.addEventListener('click', () => window.openDialogueScreen());
   const sentenceBtn = s.querySelector('#exSentenceBtn');
   if (sentenceBtn) sentenceBtn.addEventListener('click', () => window.openSentenceBuildScreen());
   const vocabBtn = s.querySelector('#exVocabBtn');

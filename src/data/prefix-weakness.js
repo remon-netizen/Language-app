@@ -1,6 +1,8 @@
 // ── Prefix drill weakness tracker ─────────────────────────────────────────────
 // Structure: { [prefixedVerb]: { [exerciseType]: { a: attempts, c: correct, t: timestamp } } }
 
+import { markActivity } from './activity.js';
+
 const STORAGE_KEY = 'prefixWeakness';
 let data = null;
 
@@ -18,6 +20,7 @@ export function recordAnswer(verb, type, isCorrect) {
   const e = d[verb][type];
   e.a++; if (isCorrect) e.c++; e.t = Date.now();
   save();
+  markActivity();
 }
 
 export function getVerbMastery(verb) {

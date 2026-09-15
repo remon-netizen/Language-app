@@ -3,6 +3,8 @@
 // Used by the sentence builder and dialogues; numbers-weakness.js has the same
 // shape and will move onto this factory when it is next touched.
 
+import { markActivity } from './activity.js';
+
 export function makeTracker(storageKey) {
   let data = null;
   const load = () => {
@@ -18,6 +20,7 @@ export function makeTracker(storageKey) {
       if (!d[key]) d[key] = { a: 0, c: 0, t: 0 };
       d[key].a++; if (isCorrect) d[key].c++; d[key].t = Date.now();
       save();
+      markActivity();
     },
     attempts(key) { return load()[key]?.a || 0; },
     errorRate(key) { const e = load()[key]; return e && e.a ? 1 - e.c / e.a : 0; },

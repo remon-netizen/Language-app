@@ -300,3 +300,8 @@ The home screen category grid and lesson flow are fully data-driven — no other
 - Offline drills (Ukrainian): Verb Drill (with Aspect practice inside it), Case Drill (nouns and adjective + noun), Prefix Drill, Numbers & Time (cardinals, ordinals, dates, clock time). Each records mistakes in its own `*Weakness` localStorage store and feeds them back into later rounds.
 - `src/review.js` is the review hub: lesson phrases (spoken from memory) and saved words (typed or flipped flashcards) with one due count, which also drives the Today card on Home (`renderTodayCard` in `src/main.js`).
 - `src/router.js` mirrors screen changes into browser history, so the phone's back gesture moves between screens instead of leaving the PWA.
+- **Vocabulary deck** (`src/data/vocab-uk.js`, `vocab-progress.js`, `grammar/vocab-drill-ui.js`): ~350 core words in 12 themes, learned by typing from the meaning, scheduled with the same SM-2 code as saved words.
+- **Sentence Builder** (`src/data/sentences-uk.js`, `grammar/sentence-build-ui.js`): 61 everyday sentences plus the 200 aspect sentences; dictionary forms in, a typed sentence out, graded by similarity with a word-by-word view.
+- **Dialogues** (`src/data/dialogues-uk.js`, `grammar/dialogue-ui.js`): 8 short dialogues played with the transcript hidden, then two gap-fills and one comprehension question.
+- **Pronouns** (`src/data/pronouns-uk.js`) are a third mode of the Case Drill next to nouns and adjective + noun.
+- **Progress** (`src/progress-ui.js`, `src/data/activity.js`): one screen with the streak, the last 14 days, lesson completion, every review queue and every drill's accuracy. Every recorder calls `markActivity()`.
