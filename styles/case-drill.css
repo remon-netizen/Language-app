@@ -291,3 +291,7 @@
   width: 40px; height: 36px; font-size: 1rem; cursor: pointer;
 }
 .cd-dict-play:hover { background: #047857; }
+
+/* Pronoun table: four gender columns */
+.cd-pron-row { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr; gap: 6px; }
+.cd-pron-row span { font-size: 0.85rem; }

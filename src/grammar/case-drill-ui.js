@@ -1,6 +1,7 @@
 import { state } from '../state.js';
 import { escHtml, levenshtein } from '../utils.js';
 import { CASES, CASE_LABELS, NOUNS, CASE_SENTENCES, ADJECTIVE_NOUNS, buildCaseDrillSet, findNoun } from '../data/case-declensions.js';
+import { PERSONAL, POSSESSIVE, PRON_CASES, GENDER_LABELS, INDECLINABLE_NOTE } from '../data/pronouns-uk.js';
 import { speakText } from '../voice.js';
 import { recordAnswer, getNounMastery, getAllMastery, getWeakItems, hasWeaknessData, getWeakNounCount } from '../data/case-weakness.js';
 import { appendNext, missedListHtml, wireSpeakButtons, scoreMessage, scoreEmoji, resultLine } from './drill-core.js';
@@ -21,6 +22,7 @@ let cd = {
   level:     localStorage.getItem('caseDrillLevel') || 'A1',
   focusWeak: false,
   adjMode:   false,   // drill adjective + noun pairs instead of bare nouns
+  pronMode:  false,   // drill personal and possessive pronouns
   dictation: localStorage.getItem('caseDrillDictation') === '1', // hear the form, type it
   missed:    [],
   // Learn one noun
@@ -139,9 +141,18 @@ function showMenu() {
         <span class="cd-weak-check">${cd.dictation ? '✓' : ''}</span>
         <span>👂 ${nl ? 'Dictee: hoor de vorm, typ wat je hoort' : 'Dictation: hear the form, type what you hear'}</span>
       </div>
+      <div class="cd-filter-label" style="margin-top:12px">${nl ? 'Wat:' : 'What:'}</div>
+      <div class="cd-weak-toggle cd-adj-toggle ${!cd.adjMode && !cd.pronMode ? 'active' : ''}" id="cdNounToggle">
+        <span class="cd-weak-check">${!cd.adjMode && !cd.pronMode ? '✓' : ''}</span>
+        <span>📌 ${nl ? `Zelfstandige naamwoorden (${nouns.length})` : `Nouns (${nouns.length})`}</span>
+      </div>
       <div class="cd-weak-toggle cd-adj-toggle ${cd.adjMode ? 'active' : ''}" id="cdAdjToggle">
         <span class="cd-weak-check">${cd.adjMode ? '✓' : ''}</span>
         <span>📐 ${nl ? `Bijvoeglijk naamwoord + zelfstandig naamwoord (${ADJECTIVE_NOUNS.length} paren)` : `Adjective + noun agreement (${ADJECTIVE_NOUNS.length} pairs)`}</span>
+      </div>
+      <div class="cd-weak-toggle cd-adj-toggle ${cd.pronMode ? 'active' : ''}" id="cdPronToggle">
+        <span class="cd-weak-check">${cd.pronMode ? '✓' : ''}</span>
+        <span>👤 ${nl ? `Voornaamwoorden: я, ти, він… + мій, наш… (${PERSONAL.length + POSSESSIVE.length})` : `Pronouns: я, ти, він… + мій, наш… (${PERSONAL.length + POSSESSIVE.length})`}</span>
       </div>
       ${hasWeak ? `<div class="cd-weak-toggle ${cd.focusWeak ? 'active' : ''}" id="cdWeakToggle">
         <span class="cd-weak-check">${cd.focusWeak ? '✓' : ''}</span>
@@ -191,9 +202,11 @@ function showMenu() {
   // Dictation toggle
   const dt = s.querySelector('#cdDictToggle');
   dt.addEventListener('click', () => { cd.dictation = !cd.dictation; localStorage.setItem('caseDrillDictation', cd.dictation ? '1' : '0'); dt.classList.toggle('active', cd.dictation); dt.querySelector('.cd-weak-check').textContent = cd.dictation ? '✓' : ''; });
-  // Adjective mode toggle
-  const at = s.querySelector('#cdAdjToggle');
-  at.addEventListener('click', () => { cd.adjMode = !cd.adjMode; at.classList.toggle('active', cd.adjMode); at.querySelector('.cd-weak-check').textContent = cd.adjMode ? '✓' : ''; });
+  // What to drill: nouns / adjective+noun / pronouns (one at a time)
+  const setWhat = what => { cd.adjMode = what === 'adj'; cd.pronMode = what === 'pron'; showMenu(); };
+  s.querySelector('#cdNounToggle').addEventListener('click', () => setWhat('noun'));
+  s.querySelector('#cdAdjToggle').addEventListener('click', () => setWhat('adj'));
+  s.querySelector('#cdPronToggle').addEventListener('click', () => setWhat('pron'));
   // Weak toggle
   const wt = s.querySelector('#cdWeakToggle');
   if (wt) wt.addEventListener('click', () => { cd.focusWeak = !cd.focusWeak; wt.classList.toggle('active', cd.focusWeak); wt.querySelector('.cd-weak-check').textContent = cd.focusWeak ? '✓' : ''; });
@@ -271,8 +284,42 @@ function buildAdjectiveQuestions() {
   return out;
 }
 
+// Personal pronouns: one form per case (nominative skipped, it is the word itself).
+// Possessives: case × gender, like adjectives. Alternatives (нього, мого) are accepted.
+function buildPronounQuestions() {
+  const out = [];
+  const cases = PRON_CASES.filter(c => c !== 'nominative' && (cd.caseFilter === 'all' || c === cd.caseFilter));
+  for (const entry of PERSONAL) {
+    for (const caseName of cases) {
+      out.push({ type: 'pron', entry, caseName, number: 'singular', nom_s: entry.word, meaning: entry.meaning,
+        gender: null, tag: 'PRON', correctForm: entry.forms[caseName], alts: entry.alts[caseName] || [] });
+    }
+  }
+  for (const entry of POSSESSIVE) {
+    for (const caseName of cases) {
+      for (const g of ['m', 'f', 'n', 'p']) {
+        if (cd.numberFilter === 'singular' && g === 'p') continue;
+        if (cd.numberFilter === 'plural' && g !== 'p') continue;
+        if (cd.genderFilter !== 'all' && g !== 'p' && g !== cd.genderFilter) continue;
+        const forms = entry.forms[caseName][g];
+        out.push({ type: 'pron', entry, caseName, number: g === 'p' ? 'plural' : 'singular', gender: g === 'p' ? null : g,
+          tag: g === 'p' ? 'PL' : null, nom_s: entry.word, meaning: entry.meaning, pronGender: g,
+          correctForm: forms[0], alts: forms.slice(1) });
+      }
+    }
+  }
+  return out;
+}
+
 function startDrill() {
   cd.mode = 'drill';
+  if (cd.pronMode) {
+    const qs = shuffle(buildPronounQuestions()).slice(0, cd.total);
+    if (qs.length === 0) { showEmptyState(); return; }
+    cd.questions = qs; cd.current = 0; cd.score = 0; cd.missed = []; cd.answered = false;
+    renderDrillQuestion();
+    return;
+  }
   if (cd.adjMode) {
     const qs = shuffle(buildAdjectiveQuestions()).slice(0, cd.total);
     if (qs.length === 0) { showEmptyState(); return; }
@@ -347,7 +394,9 @@ function renderFormQuestion(q) {
   const nl = state.nativeLanguage === 'nl';
   const pct = Math.round((cd.current / cd.questions.length) * 100);
   const caseLabel = loc(CASE_LABELS[q.caseName]);
-  const numLabel = q.number === 'singular' ? (nl ? 'enkelvoud' : 'singular') : (nl ? 'meervoud' : 'plural');
+  const numLabel = q.type === 'pron'
+    ? (q.pronGender ? loc(GENDER_LABELS[q.pronGender]) : '')
+    : q.number === 'singular' ? (nl ? 'enkelvoud' : 'singular') : (nl ? 'meervoud' : 'plural');
 
   s.innerHTML = `
     <div class="lesson-header">
@@ -363,7 +412,7 @@ function renderFormQuestion(q) {
 
     <div class="cd-q-card">
       <div class="cd-q-noun">
-        ${q.gender ? `<span class="cd-gender-tag ${genderClass(q.gender)}">${genderLabel(q.gender)}</span>` : `<span class="cd-gender-tag cd-gender-adj">ADJ + N</span>`}
+        ${q.gender ? `<span class="cd-gender-tag ${genderClass(q.gender)}">${genderLabel(q.gender)}</span>` : `<span class="cd-gender-tag cd-gender-adj">${escHtml(q.tag || 'ADJ + N')}</span>`}
         ${escHtml(q.nom_s)}
       </div>
       <div class="cd-q-meaning">${escHtml(loc(q.meaning))}</div>
@@ -452,15 +501,16 @@ function handleAnswer(q, answer) {
 
   const normAnswer = normalise(answer);
   const normCorrect = normalise(q.correctForm);
-  const isExact = normAnswer === normCorrect;
+  const accepted = [q.correctForm, ...(q.alts || [])].map(normalise);
+  const isExact = accepted.includes(normAnswer);
   const lev = levenshtein(normAnswer, normCorrect);
-  const isClose = !isExact && lev <= 1;
+  const isClose = !isExact && normCorrect.length >= 4 && lev <= 1;
   const isCorrect = isExact || isClose;
 
   if (isCorrect) { cd.score++; input.classList.add(isExact ? 'correct' : 'close'); }
   else { input.classList.add('wrong'); }
 
-  recordAnswer(q.nom_s || q.noun, q.caseName || q.targetCase, q.number, isCorrect);
+  recordAnswer(q.type === 'pron' ? `${q.nom_s}${q.pronGender ? ' (' + q.pronGender + ')' : ''}` : (q.nom_s || q.noun), q.caseName || q.targetCase, q.number, isCorrect);
   if (!isCorrect) {
     cd.missed.push({
       left: q.nom_s || q.noun, right: q.correctForm,
@@ -491,6 +541,10 @@ function handleAnswer(q, answer) {
     html += renderDeclTable(noun, q.caseName || q.targetCase, q.number);
   } else if (q.type === 'adj') {
     html += renderAdjTable(q.entry, q.caseName, q.number);
+  } else if (q.type === 'pron') {
+    html += renderPronTable(q.entry, q.caseName, q.pronGender);
+    if (q.alts && q.alts.length) html += `<div class="cd-context">${nl ? 'Ook goed' : 'Also fine'}: ${q.alts.map(escHtml).join(' · ')}</div>`;
+    if (q.entry.kind === 'possessive') html += `<div class="cd-context">💡 ${escHtml(loc(INDECLINABLE_NOTE))}</div>`;
   }
 
   html += `<button class="cd-listen-btn" id="cdListen">🔊 ${nl ? 'Luister' : 'Listen'}</button>`;
@@ -517,6 +571,33 @@ function renderDeclTable(noun, highlightCase, highlightNumber) {
       <span class="cd-decl-case">${escHtml(loc(CASE_LABELS[c]))}</span>
       <span class="cd-decl-sg">${escHtml(sg)}</span>
       <span class="cd-decl-pl">${escHtml(pl)}</span>
+    </div>`;
+  }
+  return html + '</div>';
+}
+
+function renderPronTable(entry, highlightCase, gender) {
+  const nl = state.nativeLanguage === 'nl';
+  if (entry.kind === 'personal') {
+    let html = `<div class="cd-decl-table"><div class="cd-decl-header"><span>${escHtml(entry.word)} — ${escHtml(loc(entry.meaning))}</span><span></span></div>`;
+    for (const c of PRON_CASES) {
+      const isHL = c === highlightCase;
+      const alt = (entry.alts[c] || []).join(' / ');
+      html += `<div class="cd-decl-row ${isHL ? 'cd-highlight-row' : ''}">
+        <span class="cd-decl-case">${escHtml(loc(CASE_LABELS[c]))}</span>
+        <span class="cd-decl-sg">${escHtml(entry.forms[c])}</span>
+        <span class="cd-decl-pl">${alt ? escHtml(alt) : ''}</span>
+      </div>`;
+    }
+    return html + '</div>';
+  }
+  let html = `<div class="cd-decl-table cd-pron-table"><div class="cd-decl-header"><span>${escHtml(entry.word)} — ${escHtml(loc(entry.meaning))}</span><span>m · f · n · pl</span></div>`;
+  for (const c of PRON_CASES) {
+    const isHL = c === highlightCase;
+    const cell = g => `<span class="${isHL && g === gender ? 'cd-hl-cell' : ''}">${escHtml(entry.forms[c][g][0])}</span>`;
+    html += `<div class="cd-decl-row cd-pron-row ${isHL ? 'cd-highlight-row' : ''}">
+      <span class="cd-decl-case">${escHtml(loc(CASE_LABELS[c]).split(' — ')[0])}</span>
+      ${cell('m')} ${cell('f')} ${cell('n')} ${cell('p')}
     </div>`;
   }
   return html + '</div>';
