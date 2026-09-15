@@ -11,4 +11,7 @@
   --danger: #ef4444;
   --card-bg: #ffffff;
   --bg: #f8f9ff;
+  /* Aliases some screens use (flashcards, exercises) */
+  --surface: #ffffff;
+  --primary: #005BBB;
 }

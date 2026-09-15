@@ -85,6 +85,7 @@
 .browser-banner .bb-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 3px; }
 .browser-banner .bb-sub { font-size: 0.8rem; opacity: 0.85; }
 .browser-banner .bb-close {
+  min-height: 36px;
   background: rgba(255,255,255,0.2); border: none; color: white;
   border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 0.8rem; flex-shrink: 0;
 }
@@ -149,6 +150,7 @@
   border-radius: 6px; padding: 5px 10px; font-size: 0.78rem;
   font-weight: 600; cursor: pointer; white-space: nowrap; flex-shrink: 0;
 }
+.api-notice-btn { min-height: 36px; }
 .api-notice-btn:hover { background: #d97706; }
 
 /* ── Home tools grid (2-column) ── */

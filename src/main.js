@@ -145,6 +145,32 @@ function applyStaticI18n() {
   setText('apiSaveBtn', 'settings.save');
 
   // Home screen
+  setText('apiNoticeText', 'home.apiNotice');
+  setText('apiNoticeBtn', 'home.apiNoticeBtn');
+  setText('grammarSub', 'home.grammarSub');
+  setText('autoPlayLabel', 'settings.autoPlay');
+  setText('geminiFreeLabel', 'settings.geminiFree');
+  setText('updateToastText', 'app.updateReady');
+  setText('updateToastBtn', 'app.reload');
+  // Lesson screen (static buttons; lesson.js re-labels them during recording)
+  setText('listenBtn', 'lesson.listen'); const lb = document.getElementById('listenBtn'); if (lb) lb.textContent = '🔊 ' + t('lesson.listen');
+  const lsb = document.getElementById('listenSlowBtn'); if (lsb) lsb.textContent = '🐢 ' + t('lesson.listenSlow');
+  const ltb = document.getElementById('listenTranslationBtn'); if (ltb) ltb.textContent = '💬 ' + t('lesson.hearMeaning');
+  const spk = document.getElementById('speakBtn'); if (spk) { spk.textContent = '🎙️ ' + t('lesson.speak'); spk.dataset.idleLabel = '🎙️ ' + t('lesson.speak'); }
+  setText('nextBtn', 'lesson.next');
+  setText('completeTitle', 'lesson.completeTitle');
+  setText('restartBtn', 'lesson.restart');
+  setText('backToLessonsBtn', 'lesson.backToLessons');
+  setText('micNotice', 'lesson.micNotice');
+  setText('alphabetTitle', 'lesson.alphabet');
+  // Verb lookup / dissection screens
+  setText('verbScreenTitle', 'grammar.verbTitle');
+  setText('verbSubmitBtn', 'grammar.verbBtn');
+  const vi = document.getElementById('verbInput'); if (vi) vi.placeholder = t('grammar.verbPlaceholder');
+  setText('dissectScreenTitle', 'grammar.dissectTitle');
+  setText('dissectSubmitBtn', 'grammar.dissectBtn');
+  const di = document.getElementById('dissectInput'); if (di) di.placeholder = t('grammar.dissectPlaceholder');
+  setText('summaryTitle', 'chat.summaryTitle');
   setText('iSpeakLabel', 'home.iSpeak');
   setText('iLearnLabel', 'home.iLearn');
   setText('grammarLabel', 'home.grammarTitle');
@@ -492,12 +518,18 @@ if ('serviceWorker' in navigator) {
     // from the old cache and nothing reloads it -- so the app kept showing an old
     // build. Reload once on handover, and re-check on foreground, because a PWA
     // resumed from memory never navigates and so never checks on its own.
+    // Rather than reloading under the learner's feet (mid-drill state lives in
+    // memory), show a toast and let them reload when they are ready. On Home,
+    // where nothing is in progress, reload straight away.
     const hadController = !!navigator.serviceWorker.controller;
-    let reloading = false;
+    let handled = false;
     navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (!hadController || reloading) return; // first install: page is already current
-      reloading = true;
-      location.reload();
+      if (!hadController || handled) return; // first install: page is already current
+      handled = true;
+      const onHome = document.getElementById('homeScreen')?.classList.contains('active');
+      if (onHome) { location.reload(); return; }
+      const toast = document.getElementById('updateToast');
+      if (toast) toast.style.display = '';
     });
     navigator.serviceWorker.register('./sw.js').then(reg => {
       reg.update().catch(() => {});

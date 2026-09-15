@@ -375,7 +375,7 @@ function handleSentenceAnswer(q, answer) {
   // Compare normalised versions
   const normalise = s => s.toLowerCase().replace(/[.,!?;:'"«»""—\-]/g, '').replace(/\s+/g, ' ').trim();
   const normAnswer = normalise(answer);
-  const normCorrect = normalise(q.correctSentence);
+  const normCorrect = normalise(q.translation.uk);
 
   const isExact = normAnswer === normCorrect;
   const lev = levenshtein(normAnswer, normCorrect);
@@ -391,7 +391,7 @@ function handleSentenceAnswer(q, answer) {
     input.classList.add(isExact ? 'correct' : 'close');
   } else {
     input.classList.add('wrong');
-    va.missed.push({ left: loc(q.translation), right: q.correctSentence, extra: q.translation.aspect === 'imperfective' ? 'IMP' : 'PERF' });
+    va.missed.push({ left: loc(q.translation), right: q.translation.uk, extra: q.translation.aspect === 'imperfective' ? 'IMP' : 'PERF' });
   }
 
   const yourLabel = native === 'nl' ? 'Jouw antwoord:' : 'Your answer:';
@@ -409,13 +409,13 @@ function handleSentenceAnswer(q, answer) {
     <div class="ex-feedback-result ${resultClass}">${resultText}</div>
     <div class="va-answer-compare">
       <div class="va-your-answer"><span class="va-ans-label">${yourLabel}</span> ${escHtml(answer)}</div>
-      <div class="va-correct-answer"><span class="va-ans-label">${correctLabel}</span> ${escHtml(q.correctSentence)}</div>
+      <div class="va-correct-answer"><span class="va-ans-label">${correctLabel}</span> ${escHtml(q.translation.uk)}</div>
     </div>
     <div class="va-why"><span class="va-ans-label">${whyLabel}</span> ${escHtml(loc(q.translation.why))}</div>
     <button class="va-listen-btn" id="vaListenCorrect">🔊 ${native === 'nl' ? 'Luister' : 'Listen'}</button>`;
 
   fb.querySelector('#vaListenCorrect').addEventListener('click', () => {
-    speakText(q.correctSentence, state.currentLanguage);
+    speakText(q.translation.uk, state.currentLanguage);
   });
 
   showNextButton(fb);

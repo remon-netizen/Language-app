@@ -43,6 +43,12 @@
   <button class="settings-toggle" id="settingsToggleBtn" onclick="toggleSettingsDrawer()" title="Settings">⚙️</button>
 </header>
 
+<!-- Update toast: shown when a new service worker has taken over -->
+<div class="update-toast" id="updateToast" style="display:none">
+  <span id="updateToastText">A new version is ready</span>
+  <button id="updateToastBtn" onclick="location.reload()">Reload</button>
+</div>
+
 <!-- Settings drawer overlay -->
 <div class="drawer-overlay" id="drawerOverlay" onclick="toggleSettingsDrawer()"></div>
 
@@ -87,7 +93,7 @@
   <div class="drawer-section">
     <div class="settings-label" id="aiLabel">AI Provider &amp; API Key</div>
     <div class="api-provider-row">
-      <label><input type="radio" name="aiProvider" value="gemini" onchange="switchProvider('gemini')"> Gemini (free)</label>
+      <label><input type="radio" name="aiProvider" value="gemini" onchange="switchProvider('gemini')"> <span id="geminiFreeLabel">Gemini (free)</span></label>
       <label><input type="radio" name="aiProvider" value="anthropic" onchange="switchProvider('anthropic')"> Anthropic</label>
     </div>
     <div class="api-key-row">
@@ -131,7 +137,7 @@
       <div class="api-notice" id="apiNotice" style="display:none">
         <span class="api-notice-icon">🔑</span>
         <span class="api-notice-text" id="apiNoticeText">Add an API key in Settings for AI conversations and exercises</span>
-        <button class="api-notice-btn" onclick="toggleSettingsDrawer()">Settings →</button>
+        <button class="api-notice-btn" id="apiNoticeBtn" onclick="toggleSettingsDrawer()">Settings →</button>
       </div>
 
       <!-- ═══ Today: what is due, weak spots, next lesson (filled by main.js) ═══ -->
@@ -232,7 +238,7 @@
   <!-- ══════════ LESSON PRACTICE SCREEN ══════════ -->
   <div class="screen" id="lessonScreen">
     <div class="lesson-header">
-      <button class="back-btn" onclick="showScreen('lessonBrowseScreen'); openLessonBrowse()">←</button>
+      <button class="back-btn" onclick="openLessonBrowse()">←</button>
       <div>
         <div class="lesson-title" id="lessonTitle"></div>
         <div class="lesson-subtitle" id="lessonSubtitle"></div>
@@ -272,12 +278,12 @@
 
     <div class="lesson-complete" id="lessonComplete">
       <div class="complete-icon">🎉</div>
-      <div class="complete-title">Lesson Complete!</div>
+      <div class="complete-title" id="completeTitle">Lesson Complete!</div>
       <div class="complete-subtitle" id="completeSubtitle"></div>
       <div class="complete-stats" id="completeStats"></div>
       <!-- Level-up button injected dynamically by showLessonComplete() -->
-      <button class="btn-restart" onclick="restartLesson()">🔄 Restart</button>
-      <button class="next-btn" onclick="showScreen('lessonBrowseScreen'); openLessonBrowse()">← Back to lessons</button>
+      <button class="btn-restart" id="restartBtn" onclick="restartLesson()">🔄 Restart</button>
+      <button class="next-btn" id="backToLessonsBtn" onclick="openLessonBrowse()">← Back to lessons</button>
     </div>
   </div>
 
@@ -347,7 +353,7 @@
             📊 Conversation Summary
           </button>
           <div class="sidebar-card sum-card" id="summaryCard" style="display:none">
-            <div class="sidebar-title">📊 Summary</div>
+            <div class="sidebar-title" id="summaryTitle">📊 Summary</div>
             <div id="summaryContent"></div>
           </div>
 
@@ -362,7 +368,7 @@
     <div class="lesson-header">
       <button class="back-btn" onclick="openExercisesScreen()">←</button>
       <div>
-        <div class="lesson-title">📋 Verb Conjugation</div>
+        <div class="lesson-title" id="verbScreenTitle">📋 Verb Lookup</div>
         <div class="lesson-subtitle" id="verbScreenSub"><img src="https://flagcdn.com/ua.svg" alt="" class="flag-icon" width="16" height="11"> Ukrainian</div>
       </div>
     </div>
@@ -403,7 +409,7 @@
     <div class="lesson-header">
       <button class="back-btn" onclick="openExercisesScreen()">←</button>
       <div>
-        <div class="lesson-title">🔍 Sentence Dissection</div>
+        <div class="lesson-title" id="dissectScreenTitle">🔍 Sentence Dissection</div>
         <div class="lesson-subtitle" id="dissectScreenSub"><img src="https://flagcdn.com/ua.svg" alt="" class="flag-icon" width="16" height="11"> Ukrainian</div>
       </div>
     </div>
