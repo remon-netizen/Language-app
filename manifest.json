@@ -1,13 +1,13 @@
 {
-  "name": "Ukrainian Language Practice",
-  "short_name": "Ukrainian",
-  "description": "Learn Ukrainian with speech interaction, grammar feedback and AI conversation",
+  "name": "Taal-chat — Language Practice",
+  "short_name": "Taal-chat",
+  "description": "Learn Ukrainian, Dutch, English or French with speech, drills, grammar feedback and AI conversation",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#005BBB",
   "orientation": "portrait-primary",
-  "lang": "uk",
+  "lang": "nl",
   "icons": [
     {
       "src": "icon.svg",
@@ -16,5 +16,8 @@
       "purpose": "any maskable"
     }
   ],
-  "categories": ["education", "lifestyle"]
+  "categories": [
+    "education",
+    "lifestyle"
+  ]
 }

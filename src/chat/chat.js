@@ -61,6 +61,11 @@ function buildOpeners(target, native, n) {
         { uk: `Bienvenue ! Je suis ${n}. Pratiquons le français ensemble. D'où venez-vous ?`, en: `Welcome! I'm ${n}. Let's practise French together. Where are you from?` },
         { uk: `Salut ! Je suis ${n}. Comment allez-vous aujourd'hui ? Qu'est-ce que vous voulez apprendre ?`, en: `Hi! I'm ${n}. How are you today? What would you like to learn?` },
       ],
+      nl: [
+        { uk: `Bonjour ! Je suis ${n}, votre assistant pour le français. Comment vous appelez-vous ?`, en: `Hallo! Ik ben ${n}, jouw hulp bij het Frans. Hoe heet jij?` },
+        { uk: `Bienvenue ! Je suis ${n}. Pratiquons le français ensemble. D'où venez-vous ?`, en: `Welkom! Ik ben ${n}. Laten we samen Frans oefenen. Waar kom jij vandaan?` },
+        { uk: `Salut ! Je suis ${n}. Comment allez-vous aujourd'hui ? Qu'est-ce que vous voulez apprendre ?`, en: `Hoi! Ik ben ${n}. Hoe gaat het vandaag? Wat wil je leren?` },
+      ],
     },
   };
   return data[target]?.[native] || data[target]?.en || data.uk.en;
@@ -203,6 +208,32 @@ function buildStarterSuggestions(target, native) {
           { uk: 'Parlons de la culture française', en: 'Let\'s talk about French culture' },
           { uk: 'Qu\'en pensez-vous ?', en: 'What do you think about this?' },
           { uk: 'Pourriez-vous m\'expliquer cette construction grammaticale ?', en: 'Could you explain this grammar structure?' },
+        ],
+      },
+      nl: {
+        a1: [
+          { uk: 'Je m\'appelle [jouw naam]', en: 'Ik heet [jouw naam]' },
+          { uk: 'Je viens de...', en: 'Ik kom uit...' },
+          { uk: 'Ça va bien, merci !', en: 'Het gaat goed, dank je!' },
+          { uk: 'Je ne comprends pas', en: 'Ik begrijp het niet' },
+        ],
+        a2: [
+          { uk: 'Je m\'appelle [naam]. J\'apprends le français.', en: 'Ik heet [naam]. Ik leer Frans.' },
+          { uk: 'J\'habite à Amsterdam', en: 'Ik woon in Amsterdam' },
+          { uk: 'Pouvez-vous répéter ?', en: 'Kun je dat herhalen?' },
+          { uk: 'Qu\'est-ce que ça veut dire ?', en: 'Wat betekent dat?' },
+        ],
+        b1: [
+          { uk: 'J\'apprends le français depuis un moment', en: 'Ik leer al een tijdje Frans' },
+          { uk: 'Depuis combien de temps apprenez-vous les langues ?', en: 'Hoe lang leer je al talen?' },
+          { uk: 'J\'ai une question sur la grammaire', en: 'Ik heb een vraag over grammatica' },
+          { uk: 'Parlez-moi de la France', en: 'Vertel me over Frankrijk' },
+        ],
+        b2: [
+          { uk: 'Intéressant, que faites-vous dans la vie ?', en: 'Interessant, wat doe je voor werk?' },
+          { uk: 'Parlons de la culture française', en: 'Laten we het over de Franse cultuur hebben' },
+          { uk: 'Qu\'en pensez-vous ?', en: 'Wat vind jij ervan?' },
+          { uk: 'Pourriez-vous m\'expliquer cette construction grammaticale ?', en: 'Kun je deze grammaticale constructie uitleggen?' },
         ],
       },
     },

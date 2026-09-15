@@ -217,11 +217,7 @@ function showTopicPicker() {
         <span class="ex-tool-icon">🔢</span>
         <span>${lblNumbers}</span>
       </button>
-      <button class="ex-tool-btn ex-tool-dehet ${aiCls}" id="exDehetBtn" style="${isNL ? '' : 'display:none'}">
-        <span class="ex-tool-icon">🏷️</span>
-        <span>${lblDeHet}</span>${aiTag}
-      </button>
-      ${!isUK && !isNL ? `<div class="ex-tools-empty">${native === 'nl' ? 'Nog geen offline drills voor deze taal.' : 'No offline drills for this language yet.'}</div>` : ''}
+      ${!isUK ? `<div class="ex-tools-empty">${native === 'nl' ? 'Nog geen offline drills voor deze taal.' : 'No offline drills for this language yet.'}</div>` : ''}
     </div>
 
     <div class="ex-section-label">${native === 'nl' ? '🤖 AI-oefeningen — gegenereerd met je API-sleutel' : '🤖 AI exercises — generated with your API key'}</div>
@@ -231,6 +227,10 @@ function showTopicPicker() {
         <button class="ex-nokey-btn" id="exNoKeyBtn">${native === 'nl' ? 'Sleutel toevoegen →' : 'Add key →'}</button>
       </div>`}
     <div class="ex-tools-row ex-tools-row-ai">
+      <button class="ex-tool-btn ex-tool-dehet ${aiCls}" id="exDehetBtn" style="${isNL ? '' : 'display:none'}">
+        <span class="ex-tool-icon">🏷️</span>
+        <span>${lblDeHet}</span>${aiTag}
+      </button>
       <button class="ex-tool-btn ${aiCls}" id="exVerbBtn">
         <span class="ex-tool-icon">📋</span>
         <span>${lblPracVerb}</span>${aiTag}

@@ -290,3 +290,13 @@ The home screen category grid and lesson flow are fully data-driven — no other
 - **LanguageTool rate limits**: The free API tier has request rate limits. Grammar checks may silently fail under heavy use — the app continues without them.
 - **Direct browser API calls**: Calling Anthropic's API directly from the browser requires the `anthropic-dangerous-direct-browser-access` header, which means the API key is visible in browser DevTools network requests. For production use, proxy calls through a server-side function.
 - **Gemini JSON mode**: The `responseMimeType: 'application/json'` config enforces JSON output in Gemini 2.0 Flash. Older model versions do not support this parameter.
+
+---
+
+## Drills, review and the shared modules (2026-09)
+
+- `src/api/model.js` — the one place that calls the AI provider. Every generated feature (exercises, De/Het nouns, homework, level-up, word lookup, verb lookup, dissection, Inburgering, summary) goes through `generateJSON()`, which routes to Gemini or Anthropic by the provider chosen in Settings and throws one localised "no key" error.
+- `src/grammar/drill-core.js` — shared pieces of every typed drill: answer grading with typo tolerance, the result line, a focused Next button (Enter advances), score wording, and the "missed this round" list.
+- Offline drills (Ukrainian): Verb Drill (with Aspect practice inside it), Case Drill (nouns and adjective + noun), Prefix Drill, Numbers & Time (cardinals, ordinals, dates, clock time). Each records mistakes in its own `*Weakness` localStorage store and feeds them back into later rounds.
+- `src/review.js` is the review hub: lesson phrases (spoken from memory) and saved words (typed or flipped flashcards) with one due count, which also drives the Today card on Home (`renderTodayCard` in `src/main.js`).
+- `src/router.js` mirrors screen changes into browser history, so the phone's back gesture moves between screens instead of leaving the PWA.
