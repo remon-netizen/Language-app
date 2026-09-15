@@ -4,6 +4,7 @@ import { CONJUGATIONS, buildDrillSet, findVerb } from '../data/verb-conjugations
 import { VERB_PAIRS } from '../data/verb-aspects.js';
 import { ASPECT_TIPS } from '../data/aspect-tips.js';
 import { speakText } from '../voice.js';
+import { missedListHtml, wireSpeakButtons } from './drill-core.js';
 import { recordAnswer, getVerbMastery, getAllMastery, getWeakItems, hasWeaknessData, getWeakVerbCount } from '../data/verb-weakness.js';
 import { englishGloss, aspectNote } from './english-gloss.js';
 
@@ -485,6 +486,7 @@ function startDrill() {
   vd.questions = mixed.slice(0, vd.total);
   if (vd.questions.length === 0) { showEmptyState(); return; }
   vd.current = 0;
+  vd.missed = [];
   vd.score = 0;
   vd.answered = false;
   renderDrillQuestion();
@@ -705,6 +707,13 @@ function handleAnswer(q, answer) {
 
   // Record for weakness tracking
   recordAnswer(q.infinitive, q.tense, q.pronoun, isCorrect);
+  if (!isCorrect) {
+    vd.missed.push({
+      left: q.infinitive, right: q.correctForm,
+      extra: `${q.tense === 'imperative' ? '' : q.pronoun + ' · '}${loc(q.tenseLabel)}`,
+      say: q.type === 'sentence' && q.fullSentence ? q.fullSentence : q.correctForm,
+    });
+  }
 
   const fb = document.getElementById('vdFeedback');
   const nl = state.nativeLanguage === 'nl';
@@ -785,13 +794,6 @@ function showDrillScore() {
             : pct >= 60 ? (nl ? 'Goed bezig!' : 'Good effort!')
             : (nl ? 'Blijf oefenen!' : 'Keep practising!');
 
-  // Collect wrong answers
-  const wrongQs = vd.questions.filter((q, i) => {
-    // We don't track per-question correctness directly, so reconstruct from weakness data
-    // Instead, just show the questions and let the score speak for itself
-    return false; // simplified — the weakness tracker already recorded everything
-  });
-
   const s = getScreen();
   s.innerHTML = `
     <div class="lesson-header">
@@ -814,8 +816,10 @@ function showDrillScore() {
         <button class="ex-next-btn" id="vdRetry">🔄 ${nl ? 'Opnieuw (nieuwe vragen)' : 'Try again (new questions)'}</button>
         <button class="ex-back-btn" id="vdBackMenu">← Menu</button>
       </div>
-    </div>`;
+    </div>
+    ${missedListHtml(vd.missed || [], { cls: 'verb' })}`;
 
+  wireSpeakButtons(s);
   s.querySelector('#vdScoreBack').addEventListener('click', showMenu);
   s.querySelector('#vdRetry').addEventListener('click', startDrill);
   s.querySelector('#vdBackMenu').addEventListener('click', showMenu);

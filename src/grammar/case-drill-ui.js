@@ -1,8 +1,9 @@
 import { state } from '../state.js';
 import { escHtml, levenshtein } from '../utils.js';
-import { CASES, CASE_LABELS, NOUNS, CASE_SENTENCES, buildCaseDrillSet, findNoun } from '../data/case-declensions.js';
+import { CASES, CASE_LABELS, NOUNS, CASE_SENTENCES, ADJECTIVE_NOUNS, buildCaseDrillSet, findNoun } from '../data/case-declensions.js';
 import { speakText } from '../voice.js';
 import { recordAnswer, getNounMastery, getAllMastery, getWeakItems, hasWeaknessData, getWeakNounCount } from '../data/case-weakness.js';
+import { appendNext, missedListHtml, wireSpeakButtons, scoreMessage, scoreEmoji, resultLine } from './drill-core.js';
 
 // ── State ────────────────────────────────────────────────────────────────────
 
@@ -19,6 +20,8 @@ let cd = {
   genderFilter: 'all',
   level:     localStorage.getItem('caseDrillLevel') || 'A1',
   focusWeak: false,
+  adjMode:   false,   // drill adjective + noun pairs instead of bare nouns
+  missed:    [],
   // Learn one noun
   learnNoun:    null,
   learnForms:   [],
@@ -131,6 +134,10 @@ function showMenu() {
         <button class="cd-filter-btn ${cd.genderFilter === 'n' ? 'active' : ''}" data-gen="n">${nl ? 'Onz.' : 'Neut'}</button>
       </div>
 
+      <div class="cd-weak-toggle cd-adj-toggle ${cd.adjMode ? 'active' : ''}" id="cdAdjToggle">
+        <span class="cd-weak-check">${cd.adjMode ? '✓' : ''}</span>
+        <span>📐 ${nl ? `Bijvoeglijk naamwoord + zelfstandig naamwoord (${ADJECTIVE_NOUNS.length} paren)` : `Adjective + noun agreement (${ADJECTIVE_NOUNS.length} pairs)`}</span>
+      </div>
       ${hasWeak ? `<div class="cd-weak-toggle ${cd.focusWeak ? 'active' : ''}" id="cdWeakToggle">
         <span class="cd-weak-check">${cd.focusWeak ? '✓' : ''}</span>
         <span>🎯 ${nl ? 'Focus op zwakke woorden' : 'Focus on weak nouns'} (${weakCount})</span>
@@ -176,6 +183,9 @@ function showMenu() {
   s.querySelectorAll('[data-gen]').forEach(btn => {
     btn.addEventListener('click', () => { cd.genderFilter = btn.dataset.gen; s.querySelectorAll('[data-gen]').forEach(b => b.classList.toggle('active', b.dataset.gen === cd.genderFilter)); });
   });
+  // Adjective mode toggle
+  const at = s.querySelector('#cdAdjToggle');
+  at.addEventListener('click', () => { cd.adjMode = !cd.adjMode; at.classList.toggle('active', cd.adjMode); at.querySelector('.cd-weak-check').textContent = cd.adjMode ? '✓' : ''; });
   // Weak toggle
   const wt = s.querySelector('#cdWeakToggle');
   if (wt) wt.addEventListener('click', () => { cd.focusWeak = !cd.focusWeak; wt.classList.toggle('active', cd.focusWeak); wt.querySelector('.cd-weak-check').textContent = cd.focusWeak ? '✓' : ''; });
@@ -230,8 +240,38 @@ function showReference(index) {
 
 // ── Drill ────────────────────────────────────────────────────────────────────
 
+function buildAdjectiveQuestions() {
+  const levels = { A1: ['A1'], A2: ['A1', 'A2'], B1: ['A1', 'A2', 'B1'] };
+  const allowed = levels[cd.level] || levels.A1;
+  const out = [];
+  for (const entry of ADJECTIVE_NOUNS) {
+    if (!allowed.includes(entry.level || 'A1')) continue;
+    for (const caseName of CASES) {
+      if (cd.caseFilter !== 'all' && caseName !== cd.caseFilter) continue;
+      for (const number of ['singular', 'plural']) {
+        if (cd.numberFilter !== 'all' && number !== cd.numberFilter) continue;
+        const form = entry.forms[caseName]?.[number === 'singular' ? 's' : 'p'];
+        if (!form) continue;
+        out.push({
+          type: 'adj', entry, caseName, number,
+          nom_s: `${entry.adjective} + ${entry.noun}`,
+          meaning: entry.meaning, gender: null, correctForm: form,
+        });
+      }
+    }
+  }
+  return out;
+}
+
 function startDrill() {
   cd.mode = 'drill';
+  if (cd.adjMode) {
+    const qs = shuffle(buildAdjectiveQuestions()).slice(0, cd.total);
+    if (qs.length === 0) { showEmptyState(); return; }
+    cd.questions = qs; cd.current = 0; cd.score = 0; cd.missed = []; cd.answered = false;
+    renderDrillQuestion();
+    return;
+  }
   let questions = buildCaseDrillSet(9999);
   const levelNouns = new Set(getNounsForLevel(cd.level).map(n => n.nom_s));
 
@@ -265,6 +305,7 @@ function startDrill() {
   cd.questions = mixed;
   cd.current = 0;
   cd.score = 0;
+  cd.missed = [];
   cd.answered = false;
   renderDrillQuestion();
 }
@@ -314,7 +355,7 @@ function renderFormQuestion(q) {
 
     <div class="cd-q-card">
       <div class="cd-q-noun">
-        <span class="cd-gender-tag ${genderClass(q.gender)}">${genderLabel(q.gender)}</span>
+        ${q.gender ? `<span class="cd-gender-tag ${genderClass(q.gender)}">${genderLabel(q.gender)}</span>` : `<span class="cd-gender-tag cd-gender-adj">ADJ + N</span>`}
         ${escHtml(q.nom_s)}
       </div>
       <div class="cd-q-meaning">${escHtml(loc(q.meaning))}</div>
@@ -406,13 +447,17 @@ function handleAnswer(q, answer) {
   else { input.classList.add('wrong'); }
 
   recordAnswer(q.nom_s || q.noun, q.caseName || q.targetCase, q.number, isCorrect);
+  if (!isCorrect) {
+    cd.missed.push({
+      left: q.nom_s || q.noun, right: q.correctForm,
+      extra: `${loc(CASE_LABELS[q.caseName || q.targetCase]).split(' — ')[0]} · ${q.number === 'singular' ? 'sg' : 'pl'}`,
+    });
+  }
 
   const fb = document.getElementById('cdFeedback');
   const nl = state.nativeLanguage === 'nl';
-  const resultClass = isCorrect ? 'correct' : 'wrong';
-  const resultText = isExact ? '✓ Correct!' : isClose ? '✓ Almost!' : '✗ Not quite';
 
-  let html = `<div class="ex-feedback-result ${resultClass}">${resultText}</div>`;
+  let html = resultLine({ isExact, isCorrect });
 
   if (!isExact) {
     html += `<div class="cd-answer-compare">
@@ -427,9 +472,11 @@ function handleAnswer(q, answer) {
   }
 
   // Show declension table
-  const noun = findNoun(q.nom_s || q.noun);
+  const noun = q.type === 'adj' ? null : findNoun(q.nom_s || q.noun);
   if (noun) {
     html += renderDeclTable(noun, q.caseName || q.targetCase, q.number);
+  } else if (q.type === 'adj') {
+    html += renderAdjTable(q.entry, q.caseName, q.number);
   }
 
   html += `<button class="cd-listen-btn" id="cdListen">🔊 ${nl ? 'Luister' : 'Listen'}</button>`;
@@ -440,15 +487,10 @@ function handleAnswer(q, answer) {
   });
 
   const isLast = cd.current + 1 >= cd.questions.length;
-  const nextBtn = document.createElement('button');
-  nextBtn.className = 'cd-next-btn';
-  nextBtn.textContent = isLast ? (nl ? '🏁 Resultaten' : '🏁 See results') : (nl ? 'Volgende →' : 'Next →');
-  nextBtn.addEventListener('click', () => {
+  appendNext(fb, { isLast, className: 'cd-next-btn', onNext: () => {
     if (isLast) showScore();
     else { cd.current++; renderDrillQuestion(); getScreen().scrollTo({ top: 0, behavior: 'smooth' }); }
-  });
-  fb.appendChild(nextBtn);
-  fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } });
 }
 
 function renderDeclTable(noun, highlightCase, highlightNumber) {
@@ -466,15 +508,29 @@ function renderDeclTable(noun, highlightCase, highlightNumber) {
   return html + '</div>';
 }
 
+function renderAdjTable(entry, highlightCase, highlightNumber) {
+  let html = `<div class="cd-decl-table"><div class="cd-decl-header"><span>${escHtml(entry.adjective)} + ${escHtml(entry.noun)}</span><span>sg / pl</span></div>`;
+  for (const c of CASES) {
+    const f = entry.forms[c] || {};
+    const isHL = c === highlightCase;
+    html += `<div class="cd-decl-row ${isHL ? 'cd-highlight-row' : ''}">
+      <span class="cd-decl-case">${escHtml(loc(CASE_LABELS[c]))}</span>
+      <span class="cd-decl-sg ${isHL && highlightNumber === 'singular' ? 'cd-hl-cell' : ''}">${escHtml(f.s || '—')}</span>
+      <span class="cd-decl-pl ${isHL && highlightNumber === 'plural' ? 'cd-hl-cell' : ''}">${escHtml(f.p || '—')}</span>
+    </div>`;
+  }
+  return html + '</div>';
+}
+
 // ── Score ─────────────────────────────────────────────────────────────────────
 
 function showScore() {
   const total = cd.questions.length;
   const score = cd.score;
   const pct = Math.round((score / total) * 100);
-  const emoji = pct === 100 ? '🏆' : pct >= 80 ? '🎉' : pct >= 60 ? '👍' : '💪';
+  const emoji = scoreEmoji(pct);
   const nl = state.nativeLanguage === 'nl';
-  const msg = pct === 100 ? 'Perfect!' : pct >= 80 ? (nl ? 'Geweldig!' : 'Great job!') : pct >= 60 ? (nl ? 'Goed bezig!' : 'Good effort!') : (nl ? 'Blijf oefenen!' : 'Keep practising!');
+  const msg = scoreMessage(pct);
 
   const s = getScreen();
   s.innerHTML = `
@@ -495,8 +551,10 @@ function showScore() {
         <button class="ex-next-btn" id="cdRetry">🔄 ${nl ? 'Opnieuw' : 'Try again'}</button>
         <button class="ex-back-btn" id="cdBackMenu">← Menu</button>
       </div>
-    </div>`;
+    </div>
+    ${missedListHtml(cd.missed, { cls: 'case' })}`;
 
+  wireSpeakButtons(s);
   s.querySelector('#cdScoreBack').addEventListener('click', showMenu);
   s.querySelector('#cdRetry').addEventListener('click', startDrill);
   s.querySelector('#cdBackMenu').addEventListener('click', showMenu);

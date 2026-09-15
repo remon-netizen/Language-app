@@ -1,7 +1,7 @@
 import { state } from '../state.js';
 import { escHtml, levenshtein } from '../utils.js';
 import { speakText } from '../voice.js';
-import { CATEGORIES, getCategory, referenceRows, TIME_PATTERNS, ordinalSuffix, GENDER_LABEL, timeGloss } from '../data/numbers-time.js';
+import { CATEGORIES, getCategory, referenceRows, TIME_PATTERNS, ordinalSuffix, GENDER_LABEL, timeGloss, MONTHS } from '../data/numbers-time.js';
 import { recordAnswer, weight, weakKeys, totalAttempts } from '../data/numbers-weakness.js';
 
 // ── State ────────────────────────────────────────────────────────────────────
@@ -63,6 +63,7 @@ function promptText(item) {
   switch (item.kind) {
     case 'ordinal': return ordinalSuffix(item.value, state.nativeLanguage);
     case 'attime':  return `${nl ? 'om' : 'at'} ${item.prompt}`;
+    case 'date':    return `${item.d} ${nl ? MONTHS[item.m - 1].nl : MONTHS[item.m - 1].en}`;
     default:        return item.prompt;
   }
 }
@@ -81,6 +82,7 @@ function questionWord(item) {
     case 'ordinal':  return item.gender === 'f' ? 'Яка?' : item.gender === 'n' ? 'Яке?' : 'Який?';
     case 'time':     return 'Котра година?';
     case 'attime':   return 'О котрій годині?';
+    case 'date':     return 'Яке сьогодні число?';
   }
   return '';
 }
@@ -467,9 +469,11 @@ function renderListen(q) {
   const nl = state.nativeLanguage === 'nl';
   const word = q.item.answers[0];
   const isTime = q.item.kind === 'time' || q.item.kind === 'attime';
-  const placeholder = isTime ? '7:30' : q.item.kind === 'ordinal' ? (nl ? '3 (rangtelwoord)' : '3 (ordinal)') : '17';
+  const isDate = q.item.kind === 'date';
+  const placeholder = isTime ? '7:30' : isDate ? (nl ? '15-9 (dag-maand)' : '15-9 (day-month)') : q.item.kind === 'ordinal' ? (nl ? '3 (rangtelwoord)' : '3 (ordinal)') : '17';
   const what = q.item.kind === 'ordinal' ? (nl ? 'Welk rangtelwoord hoor je?' : 'Which ordinal do you hear?')
     : isTime ? (nl ? 'Hoe laat hoor je?' : 'What time do you hear?')
+    : isDate ? (nl ? 'Welke datum hoor je?' : 'Which date do you hear?')
     : (nl ? 'Welk getal hoor je?' : 'Which number do you hear?');
 
   s.innerHTML = `
@@ -480,7 +484,7 @@ function renderListen(q) {
       <div class="nd-q-hint">${what}${q.item.kind === 'ordinal' ? ` · ${escHtml(loc(GENDER_LABEL[q.item.gender]))}` : ''}</div>
     </div>
     <div class="nd-input-area">
-      <input type="text" class="nd-text-input nd-digits-input" id="ndInput" inputmode="${isTime ? 'text' : 'numeric'}"
+      <input type="text" class="nd-text-input nd-digits-input" id="ndInput" inputmode="${isTime || isDate ? 'text' : 'numeric'}"
         placeholder="${placeholder}" autocomplete="off" autocorrect="off" spellcheck="false" />
       <button class="nd-check-btn" id="ndCheck">${nl ? 'Controleer ✓' : 'Check ✓'}</button>
     </div>
@@ -499,7 +503,9 @@ function renderListen(q) {
     if (!answer) { input.focus(); return; }
     nd.answered = true;
     input.disabled = true; check.disabled = true;
-    const isCorrect = isTime ? parseTime(answer) === q.item.value : parseNumber(answer) === q.item.value;
+    const isCorrect = isTime ? parseTime(answer) === q.item.value
+      : isDate ? parseDate(answer) === q.item.value
+      : parseNumber(answer) === q.item.value;
     if (isCorrect) nd.score++;
     input.classList.add(isCorrect ? 'correct' : 'wrong');
     recordAnswer(q.item.key, isCorrect);
@@ -527,6 +533,20 @@ function parseTime(s) {
   return `${h}:${String(m).padStart(2, '0')}`;
 }
 
+// "15-9", "15/9", "15.9", "15 9", "15 september" → "15-9"
+function parseDate(s) {
+  const nums = s.match(/\d+/g);
+  if (!nums) return null;
+  const d = Number(nums[0]);
+  let m = nums[1] ? Number(nums[1]) : NaN;
+  if (Number.isNaN(m)) {
+    const word = s.toLowerCase().replace(/[\d\s\-\/.]/g, '');
+    const idx = MONTHS.findIndex(mo => word && (mo.en.toLowerCase().startsWith(word.slice(0, 3)) || mo.nl.startsWith(word.slice(0, 3))));
+    if (idx !== -1) m = idx + 1;
+  }
+  return `${d}-${m}`;
+}
+
 // ── Distractors for choose mode ──────────────────────────────────────────────
 
 // Pairs that sound alike and are worth confusing on purpose.
@@ -546,6 +566,9 @@ function distractors(q) {
   } else if (item.kind === 'ordinal') {
     take(o => o.value === item.value && o.gender !== item.gender);   // same number, other gender
     take(o => o.value !== item.value && o.gender === item.gender);   // other number, same gender
+  } else if (item.kind === 'date') {
+    take(o => o.m === item.m && o.d !== item.d);                     // same month, other day
+    take(o => o.d === item.d && o.m !== item.m);                     // same day, other month
   } else {
     take(o => o.h === item.h && o.m !== item.m);                     // same hour, other minutes
     take(o => o.m === item.m && o.h !== item.h);                     // same minutes, other hour

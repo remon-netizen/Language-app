@@ -2,6 +2,7 @@ import { state } from '../state.js';
 import { escHtml, levenshtein } from '../utils.js';
 import { VERB_PAIRS, buildExerciseSet, shuffle } from '../data/verb-aspects.js';
 import { speakText } from '../voice.js';
+import { appendNext, missedListHtml, wireSpeakButtons, scoreMessage, scoreEmoji } from './drill-core.js';
 
 // ── State ────────────────────────────────────────────────────────────────────
 
@@ -13,6 +14,7 @@ let va = {
   total:     25,          // questions per session
   mode:      'exercises', // 'reference' | 'exercises'
   refPair:   0,           // current pair index in reference mode
+  missed:    [],
 };
 
 const loc = field => {
@@ -142,6 +144,7 @@ function startSession() {
   va.mode = 'exercises';
   va.exercises = buildExerciseSet(va.total);
   va.current = 0;
+  va.missed = [];
   va.score = 0;
   va.answered = false;
   renderExercise();
@@ -221,6 +224,7 @@ function handleAspectAnswer(q, chosen) {
   va.answered = true;
   const isRight = chosen === q.correctAspect;
   if (isRight) va.score++;
+  else va.missed.push({ left: loc(q.translation), right: q.translation.uk, extra: q.correctAspect === 'imperfective' ? 'IMP' : 'PERF' });
 
   document.querySelectorAll('.va-option-btn').forEach(btn => {
     btn.disabled = true;
@@ -300,6 +304,7 @@ function handleFillAnswer(q, answer) {
     else input.classList.add('correct');
   } else {
     input.classList.add('wrong');
+    va.missed.push({ left: loc(q.translation), right: q.correctVerb, extra: q.translation.uk, say: q.translation.uk });
   }
 
   showExFeedback(isRight || isClose, q.translation, q.correctVerb, answer, isClose);
@@ -386,6 +391,7 @@ function handleSentenceAnswer(q, answer) {
     input.classList.add(isExact ? 'correct' : 'close');
   } else {
     input.classList.add('wrong');
+    va.missed.push({ left: loc(q.translation), right: q.correctSentence, extra: q.translation.aspect === 'imperfective' ? 'IMP' : 'PERF' });
   }
 
   const yourLabel = native === 'nl' ? 'Jouw antwoord:' : 'Your answer:';
@@ -431,7 +437,7 @@ function showExFeedback(isRight, translation, correctVerb, userAnswer, isClose) 
       : (native === 'nl' ? '✗ Niet helemaal' : '✗ Not quite');
 
   let answerHtml = '';
-  if (userAnswer !== undefined && !isRight) {
+  if (userAnswer !== undefined && (!isRight || isClose)) {
     const yourLabel = native === 'nl' ? 'Jouw antwoord:' : 'Your answer:';
     const correctLabel = native === 'nl' ? 'Correct:' : 'Correct:';
     answerHtml = `
@@ -464,13 +470,7 @@ function showExFeedback(isRight, translation, correctVerb, userAnswer, isClose) 
 
 function showNextButton(container) {
   const isLast = va.current + 1 >= va.exercises.length;
-  const native = state.nativeLanguage;
-  const btn = document.createElement('button');
-  btn.className = 'va-next-btn';
-  btn.textContent = isLast
-    ? (native === 'nl' ? '🏁 Resultaten' : '🏁 See results')
-    : (native === 'nl' ? 'Volgende →' : 'Next →');
-  btn.addEventListener('click', () => {
+  appendNext(container, { isLast, className: 'va-next-btn', onNext: () => {
     if (isLast) {
       showScore();
     } else {
@@ -478,8 +478,7 @@ function showNextButton(container) {
       renderExercise();
       getScreen().scrollTo({ top: 0, behavior: 'smooth' });
     }
-  });
-  container.appendChild(btn);
+  } });
 }
 
 // ── Score screen ─────────────────────────────────────────────────────────────
@@ -488,12 +487,9 @@ function showScore() {
   const total = va.exercises.length;
   const score = va.score;
   const pct = Math.round((score / total) * 100);
-  const emoji = pct === 100 ? '🏆' : pct >= 80 ? '🎉' : pct >= 60 ? '👍' : '💪';
+  const emoji = scoreEmoji(pct);
   const native = state.nativeLanguage;
-  const msg = pct === 100 ? (native === 'nl' ? 'Perfecte score!' : 'Perfect score!')
-            : pct >= 80 ? (native === 'nl' ? 'Geweldig!' : 'Great job!')
-            : pct >= 60 ? (native === 'nl' ? 'Goed bezig!' : 'Good effort!')
-            : (native === 'nl' ? 'Blijf oefenen!' : 'Keep practising!');
+  const msg = scoreMessage(pct);
 
   const s = getScreen();
   s.innerHTML = `
@@ -518,10 +514,12 @@ function showScore() {
       </div>
       <div class="ex-score-actions">
         <button class="ex-next-btn" id="vaRetry">🔄 ${native === 'nl' ? 'Opnieuw (nieuwe vragen)' : 'Try again (new questions)'}</button>
-        <button class="ex-back-btn" id="vaBackMenu">← ${native === 'nl' ? 'Menu' : 'Menu'}</button>
+        <button class="ex-back-btn" id="vaBackMenu">← Menu</button>
       </div>
-    </div>`;
+    </div>
+    ${missedListHtml(va.missed, { cls: 'aspect' })}`;
 
+  wireSpeakButtons(s);
   s.querySelector('#vaScoreBack').addEventListener('click', showMenu);
   s.querySelector('#vaRetry').addEventListener('click', startSession);
   s.querySelector('#vaBackMenu').addEventListener('click', showMenu);

@@ -279,3 +279,8 @@
   .cd-sentence-card { padding: 14px; }
   .cd-q-case { font-size: 0.9rem; }
 }
+
+/* Adjective + noun mode */
+.cd-gender-adj { background: #ede9fe; color: #6d28d9; }
+.cd-adj-toggle { margin-top: 10px; }
+.cd-hl-cell { text-decoration: underline; text-decoration-color: #059669; text-underline-offset: 3px; }

@@ -3,6 +3,7 @@ import { escHtml, levenshtein } from '../utils.js';
 import { PREFIXES, BASE_VERBS, buildPrefixDrillSet, findBaseVerb, getDistractorPrefixes, getDistractorMeanings } from '../data/prefix-verbs.js';
 import { speakText } from '../voice.js';
 import { recordAnswer, hasWeaknessData, getWeakVerbCount, getWeakItems } from '../data/prefix-weakness.js';
+import { appendNext, missedListHtml, wireSpeakButtons, scoreMessage, scoreEmoji, resultLine } from './drill-core.js';
 
 // ── State ────────────────────────────────────────────────────────────────────
 
@@ -15,6 +16,7 @@ let pd = {
   mode:      'menu',        // 'menu' | 'refPrefix' | 'refVerb' | 'drill'
   refIdx:    0,
   prefixFilter: 'all',
+  missed:    [],
 };
 
 const loc = field => {
@@ -241,6 +243,7 @@ function startDrill() {
   if (pd.questions.length === 0) { showEmptyState(); return; }
   pd.current = 0;
   pd.score = 0;
+  pd.missed = [];
   pd.answered = false;
   renderQuestion();
 }
@@ -320,6 +323,7 @@ function renderChoosePrefix(q) {
       const chosen = btn.dataset.option;
       const isCorrect = chosen === q.correctPrefix;
       if (isCorrect) pd.score++;
+      else pd.missed.push({ left: `${q.base} → ${loc(q.meaning)}`, right: q.verb, extra: q.correctPrefix });
       recordAnswer(q.verb, 'choose_prefix', isCorrect);
 
       // Disable all buttons and highlight
@@ -377,6 +381,7 @@ function renderIdentifyMeaning(q) {
       const chosenEn = btn.dataset.meaning;
       const isCorrect = chosenEn === q.correctMeaning.en;
       if (isCorrect) pd.score++;
+      else pd.missed.push({ left: q.verb, right: loc(q.correctMeaning), extra: q.prefix, say: q.verb });
       recordAnswer(q.verb, 'identify_meaning', isCorrect);
 
       s.querySelectorAll('.pd-option-btn').forEach(b => {
@@ -451,11 +456,10 @@ function renderFillBlank(q) {
     else { input.classList.add('wrong'); }
 
     recordAnswer(q.verb, 'fill_blank', isCorrect);
+    if (!isCorrect) pd.missed.push({ left: loc(q.meaning), right: q.answer, extra: q.verb, say: q.fullSentence });
 
     const fb = document.getElementById('pdFeedback');
-    const resultClass = isCorrect ? 'correct' : 'wrong';
-    const resultText = isExact ? '✓ Correct!' : isClose ? '✓ Almost!' : '✗ Not quite';
-    let html = `<div class="ex-feedback-result ${resultClass}">${resultText}</div>`;
+    let html = resultLine({ isExact, isCorrect });
 
     if (!isExact) {
       html += `<div class="pd-answer-compare">
@@ -497,17 +501,11 @@ function showDrillFeedback(isCorrect, verb, prefix, meaning) {
 }
 
 function appendNextBtn(container) {
-  const nl = state.nativeLanguage === 'nl';
   const isLast = pd.current + 1 >= pd.questions.length;
-  const btn = document.createElement('button');
-  btn.className = 'pd-next-btn';
-  btn.textContent = isLast ? (nl ? '🏁 Resultaten' : '🏁 See results') : (nl ? 'Volgende →' : 'Next →');
-  btn.addEventListener('click', () => {
+  appendNext(container, { isLast, className: 'pd-next-btn', onNext: () => {
     if (isLast) { showScore(); }
     else { pd.current++; renderQuestion(); getScreen().scrollTo({ top: 0, behavior: 'smooth' }); }
-  });
-  container.appendChild(btn);
-  container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } });
 }
 
 // ── Score ─────────────────────────────────────────────────────────────────────
@@ -516,12 +514,9 @@ function showScore() {
   const total = pd.questions.length;
   const score = pd.score;
   const pct = Math.round((score / total) * 100);
-  const emoji = pct === 100 ? '🏆' : pct >= 80 ? '🎉' : pct >= 60 ? '👍' : '💪';
+  const emoji = scoreEmoji(pct);
   const nl = state.nativeLanguage === 'nl';
-  const msg = pct === 100 ? (nl ? 'Perfecte score!' : 'Perfect score!')
-            : pct >= 80 ? (nl ? 'Geweldig!' : 'Great job!')
-            : pct >= 60 ? (nl ? 'Goed bezig!' : 'Good effort!')
-            : (nl ? 'Blijf oefenen!' : 'Keep practising!');
+  const msg = scoreMessage(pct);
 
   const s = getScreen();
   s.innerHTML = `
@@ -545,8 +540,10 @@ function showScore() {
         <button class="ex-next-btn" id="pdRetry">🔄 ${nl ? 'Opnieuw' : 'Try again'}</button>
         <button class="ex-back-btn" id="pdBackMenu">← Menu</button>
       </div>
-    </div>`;
+    </div>
+    ${missedListHtml(pd.missed, { cls: 'prefix' })}`;
 
+  wireSpeakButtons(s);
   s.querySelector('#pdScoreBack').addEventListener('click', showMenu);
   s.querySelector('#pdRetry').addEventListener('click', startDrill);
   s.querySelector('#pdBackMenu').addEventListener('click', showMenu);

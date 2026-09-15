@@ -179,6 +179,50 @@ function ordinalItem(n, gender) {
   };
 }
 
+// ── Dates ─────────────────────────────────────────────────────────────────────
+
+// Month names in the genitive, which is the only form a date ever needs
+// ("п'ятнадцяте вересня" = the fifteenth OF September).
+export const MONTHS = [
+  { gen: 'січня',     nom: 'січень',   en: 'January',   nl: 'januari' },
+  { gen: 'лютого',    nom: 'лютий',    en: 'February',  nl: 'februari' },
+  { gen: 'березня',   nom: 'березень', en: 'March',     nl: 'maart' },
+  { gen: 'квітня',    nom: 'квітень',  en: 'April',     nl: 'april' },
+  { gen: 'травня',    nom: 'травень',  en: 'May',       nl: 'mei' },
+  { gen: 'червня',    nom: 'червень',  en: 'June',      nl: 'juni' },
+  { gen: 'липня',     nom: 'липень',   en: 'July',      nl: 'juli' },
+  { gen: 'серпня',    nom: 'серпень',  en: 'August',    nl: 'augustus' },
+  { gen: 'вересня',   nom: 'вересень', en: 'September', nl: 'september' },
+  { gen: 'жовтня',    nom: 'жовтень',  en: 'October',   nl: 'oktober' },
+  { gen: 'листопада', nom: 'листопад', en: 'November',  nl: 'november' },
+  { gen: 'грудня',    nom: 'грудень',  en: 'December',  nl: 'december' },
+];
+
+// Genitive of the (neuter) ordinal: перше → першого, третє → третього.
+// Only the last word of a compound ordinal changes: двадцять першого.
+export function ordinalGenitive(n) {
+  const masc = ordinal(n, 'm');
+  const words = masc.split(' ');
+  const last = words.pop();
+  const gen = last.endsWith('ій') ? last.slice(0, -2) + 'ього' : last.slice(0, -2) + 'ого';
+  return [...words, gen].join(' ');
+}
+
+function dateItem(d, m) {
+  const month = MONTHS[m - 1];
+  return {
+    key: `date:${d}-${m}`, kind: 'date', value: `${d}-${m}`, d, m,
+    prompt: `${d}-${m}`,
+    // "What's the date?" takes the nominative neuter (число is neuter);
+    // "on the …" takes the genitive. Both are accepted.
+    answers: [`${ordinal(d, 'n')} ${month.gen}`, `${ordinalGenitive(d)} ${month.gen}`],
+    note: {
+      en: `Яке сьогодні число? → ${ordinal(d, 'n')} ${month.gen} (neuter, because число is neuter). "On the ${ordinalSuffix(d, "en")}" → ${ordinalGenitive(d)} ${month.gen} (genitive). The month is always genitive: ${month.nom} → ${month.gen}.`,
+      nl: `Яке сьогодні число? → ${ordinal(d, 'n')} ${month.gen} (onzijdig, want число is onzijdig). "Op de ${d}e" → ${ordinalGenitive(d)} ${month.gen} (genitief). De maand staat altijd in de genitief: ${month.nom} → ${month.gen}.`,
+    },
+  };
+}
+
 // ── Clock time ────────────────────────────────────────────────────────────────
 
 // Hour as feminine ordinal in three cases:
@@ -359,6 +403,25 @@ export const CATEGORIES = [
     },
   },
   {
+    id: 'dates', icon: '📅',
+    title: { en: 'Dates', nl: 'Datums' },
+    sub:   { en: 'перше січня, п\'ятого травня …', nl: 'перше січня, п\'ятого травня …' },
+    items: () => {
+      const items = [];
+      // Every month with a low day, plus a random spread of other days.
+      for (let m = 1; m <= 12; m++) items.push(dateItem(((m * 7) % 28) + 1, m));
+      const seen = new Set(items.map(i => i.key));
+      while (items.length < 48) {
+        const d = rnd(1, 31), m = rnd(1, 12);
+        if (d > 28 && m === 2) continue;
+        if (d === 31 && [4, 6, 9, 11].includes(m)) continue;
+        const it = dateItem(d, m);
+        if (!seen.has(it.key)) { seen.add(it.key); items.push(it); }
+      }
+      return items;
+    },
+  },
+  {
     id: 'time', icon: '🕰️',
     title: { en: 'What time is it?', nl: 'Hoe laat is het?' },
     sub:   { en: 'Котра година? — пів на восьму', nl: 'Котра година? — пів на восьму' },
@@ -394,6 +457,8 @@ export function referenceRows(catId) {
       return Object.keys(ORDINAL_BASE).map(Number).map(n => ({
         left: String(n), right: ordinal(n, 'm'), extra: `${ordinal(n, 'f')} · ${ordinal(n, 'n')}`,
       })).concat([{ left: '21', right: ordinal(21, 'm'), extra: `${ordinal(21, 'f')} · ${ordinal(21, 'n')}` }]);
+    case 'dates':
+      return MONTHS.map((mo, i) => ({ left: `${i + 1}`, right: `${mo.nom} → ${mo.gen}`, extra: `${(i * 3) % 28 + 1} ${mo.en}: ${ordinal((i * 3) % 28 + 1, 'n')} ${mo.gen}` }));
     case 'time':
       return range(1, 12).map(h => ({ left: `${h}:00`, right: `${HOUR_FORMS[h].nom} година`, extra: `${h}:30 → пів на ${HOUR_FORMS[nextHour(h)].acc}` }));
     case 'attime':
