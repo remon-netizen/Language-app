@@ -8,7 +8,7 @@ import { state } from '../state.js';
 import { getApiKey } from '../storage.js';
 import { extractJSON } from '../utils.js';
 
-const TARGET_NAME = { uk: 'Ukrainian', nl: 'Dutch', en: 'English' };
+const TARGET_NAME = { uk: 'Ukrainian', nl: 'Dutch', en: 'English', fr: 'French' };
 const NATIVE_NAME = { en: 'English', nl: 'Dutch' };
 
 const LEVELS = ['A1', 'A2', 'B1', 'B2'];

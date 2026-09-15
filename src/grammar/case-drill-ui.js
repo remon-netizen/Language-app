@@ -246,7 +246,15 @@ function startDrill() {
   if (cd.numberFilter !== 'all') sentenceQs = sentenceQs.filter(sq => sq.number === cd.numberFilter);
   sentenceQs = shuffle(sentenceQs).slice(0, Math.ceil(cd.total / 4)).map(sq => ({ ...sq, type: 'sentence' }));
 
-  const formQs = shuffle(questions).slice(0, cd.total - sentenceQs.length);
+  // Focus on weak nouns: half the form questions come from forms answered wrong before.
+  let pool = shuffle(questions);
+  if (cd.focusWeak) {
+    const weak = new Set(getWeakItems(999).map(i => `${i.noun}|${i.caseName}|${i.number}`));
+    const weakQs = pool.filter(q => weak.has(`${q.nom_s}|${q.caseName}|${q.number}`));
+    const restQs = pool.filter(q => !weak.has(`${q.nom_s}|${q.caseName}|${q.number}`));
+    pool = [...weakQs.slice(0, Math.ceil(cd.total / 2)), ...restQs];
+  }
+  const formQs = pool.slice(0, cd.total - sentenceQs.length);
   const mixed = shuffle([...formQs, ...sentenceQs]).slice(0, cd.total);
 
   if (mixed.length === 0) {

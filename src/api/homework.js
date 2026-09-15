@@ -62,7 +62,7 @@ export async function readHomeworkFile(file) {
 
 // ── Generate speaking practice from homework text ────────────────────────────
 
-const TARGET_NAME = { uk: 'Ukrainian', nl: 'Dutch', en: 'English' };
+const TARGET_NAME = { uk: 'Ukrainian', nl: 'Dutch', en: 'English', fr: 'French' };
 const NATIVE_NAME = { en: 'English', nl: 'Dutch' };
 
 export async function generateHomeworkPhrases(homeworkText) {

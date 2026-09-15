@@ -29,15 +29,9 @@ const TOPICS_UK = [
   { id: 'negation',     icon: '🚫',
     title:    { en: 'Negation',             nl: 'Ontkenning' },
     subtitle: { en: 'не, ні, нічого, ніхто…',             nl: 'не, ні, нічого, ніхто…' } },
-  { id: 'numbers',      icon: '🔢',
-    title:    { en: 'Numbers',              nl: 'Telwoorden' },
-    subtitle: { en: 'numeral agreement with nouns',       nl: 'telwoorden bij zelfstandige naamwoorden' } },
 ];
 
 const TOPICS_NL = [
-  { id: 'de_het',       icon: '📰',
-    title:    { en: 'De / Het',              nl: 'De / Het' },
-    subtitle: { en: 'article gender — the hardest rule',  nl: 'het lidwoordgeslacht — de moeilijkste regel' } },
   { id: 'conjugation',  icon: '🔄',
     title:    { en: 'Verb Conjugation',      nl: 'Werkwoordsvervoeging' },
     subtitle: { en: 'present tense patterns + t-rules',   nl: 'tegenwoordige tijd + t-regels' } },

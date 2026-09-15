@@ -2,7 +2,7 @@ import { state } from '../state.js';
 import { escHtml, levenshtein } from '../utils.js';
 import { PREFIXES, BASE_VERBS, buildPrefixDrillSet, findBaseVerb, getDistractorPrefixes, getDistractorMeanings } from '../data/prefix-verbs.js';
 import { speakText } from '../voice.js';
-import { recordAnswer, hasWeaknessData, getWeakVerbCount } from '../data/prefix-weakness.js';
+import { recordAnswer, hasWeaknessData, getWeakVerbCount, getWeakItems } from '../data/prefix-weakness.js';
 
 // ── State ────────────────────────────────────────────────────────────────────
 
@@ -74,7 +74,7 @@ function showMenu() {
     <div class="pd-stats-bar">
       <span class="pd-stat">🔗 ${PREFIXES.length} ${nl ? 'voorvoegsels' : 'prefixes'}</span>
       <span class="pd-stat">📊 ${count} ${nl ? 'combinaties' : 'combinations'}</span>
-      <span class="pd-stat">🔀 ${nl ? 'Gemengd' : 'Mixed'}</span>
+      <span class="pd-stat">${hasWeaknessData() ? `🎯 ${getWeakVerbCount()} ${nl ? 'zwak' : 'weak'}` : `🔀 ${nl ? 'Gemengd' : 'Mixed'}`}</span>
     </div>
 
     <div class="pd-filter-section">
@@ -233,7 +233,11 @@ function startDrill() {
     }
   }
 
-  pd.questions = questions.slice(0, pd.total);
+  // Verbs answered wrong before fill up to half the round, so they keep coming back.
+  const weak = new Set(getWeakItems(999).map(i => i.verb));
+  const weakQs = questions.filter(q => weak.has(q.verb)).slice(0, Math.ceil(pd.total / 2));
+  const restQs = questions.filter(q => !weakQs.includes(q));
+  pd.questions = shuffle([...weakQs, ...restQs.slice(0, pd.total - weakQs.length)]);
   if (pd.questions.length === 0) { showEmptyState(); return; }
   pd.current = 0;
   pd.score = 0;

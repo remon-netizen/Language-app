@@ -94,12 +94,12 @@ export function practicePronunciation(btn) {
   btn.parentNode.insertBefore(panel, btn.nextSibling);
 
   // Speak the phrase — start recording when TTS finishes
-  speakTextCb(text, 'uk-UA', () => {
+  speakTextCb(text, getTTSLang(), () => {
     btn.disabled = false;
     btn.textContent = '⏹ Recording...';
     panel.innerHTML = '<div class="pronounce-status recording">🎙️ Say it now!</div>';
 
-    const rec = setupRecognition('uk-UA', (event) => {
+    const rec = setupRecognition(getTTSLang(), (event) => {
       const heard = event.results[0][0].transcript.trim();
       const score = calcSimilarity(text.toLowerCase().trim(), heard.toLowerCase());
 
