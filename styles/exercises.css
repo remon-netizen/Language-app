@@ -542,3 +542,4 @@
   .dc-missed-speak { grid-column: 2 / 3; grid-row: 1 / 4; }
 }
 .ex-tool-vocab:hover { border-color: #db2777; background: #fdf2f8; color: #9d174d; }
+.ex-tool-sentence:hover { border-color: #4f46e5; background: #eef2ff; color: #3730a3; }

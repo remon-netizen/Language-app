@@ -82,6 +82,10 @@ const SHELL = [
   './src/data/vocab-progress.js',
   './src/grammar/vocab-drill-ui.js',
   './styles/vocab-drill.css',
+  './src/data/flat-weakness.js',
+  './src/data/sentences-uk.js',
+  './src/grammar/sentence-build-ui.js',
+  './styles/sentence-build.css',
 ];
 
 // Install: pre-cache the app shell
