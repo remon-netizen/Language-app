@@ -1,6 +1,6 @@
 import { state } from '../state.js';
-import { getApiKey } from '../storage.js';
-import { extractJSON, shuffleMCQOptions } from '../utils.js';
+import { generateJSON } from './model.js';
+import { shuffleMCQOptions } from '../utils.js';
 
 const LEVEL_LABELS = {
   a1: 'A1 beginner',
@@ -58,9 +58,6 @@ const TARGET_NAME     = { uk: 'Ukrainian', nl: 'Dutch', en: 'English', fr: 'Fren
 const NATIVE_NAME     = { en: 'English',  nl: 'Dutch' };
 
 export async function generateExercises(topicId, topicTitle, level = 'a1', includeOpen = false) {
-  const apiKey = getApiKey();
-  if (!apiKey) throw new Error('No API key — add your Gemini key in Settings (⚙️)');
-
   const targetCode = state.currentLanguage;
   const nativeCode = state.nativeLanguage;
   const langName   = TARGET_NAME[targetCode] || 'Ukrainian';
@@ -110,33 +107,7 @@ export async function generateExercises(topicId, topicTitle, level = 'a1', inclu
     `- Wrong options should be plausible to someone who hasn't learned the rule yet\n` +
     `- Difficulty: ${lvlLabel}`;
 
-  const body = {
-    system_instruction: {
-      parts: [{ text: `You are an experienced ${langName} grammar teacher. Your students' native language is ${nativeName}; write all explanations in ${nativeName}. Return ONLY a valid JSON object, no markdown fences.` }],
-    },
-    contents: [{ role: 'user', parts: [{ text: prompt }] }],
-    generationConfig: {
-      // Deeper English explanations (3–5 sentences each) make each item longer, so budget more tokens.
-      maxOutputTokens: 6000,
-      temperature: 0.5,
-      responseMimeType: 'application/json',
-      thinkingConfig: { thinkingBudget: 0 },
-    },
-  };
-
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-    { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
-  );
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error?.message || `HTTP ${res.status}`);
-  }
-
-  const data   = await res.json();
-  const parts  = data.candidates?.[0]?.content?.parts || [];
-  const text   = parts.filter(p => !p.thought).map(p => p.text).join('').trim();
-  const parsed = extractJSON(text);
+  const parsed = await generateJSON({ system: `You are an experienced ${langName} grammar teacher. Your students' native language is ${nativeName}; write all explanations in ${nativeName}. Return ONLY a valid JSON object, no markdown fences.`, prompt: prompt, maxTokens: 6000, temperature: 0.5 });
 
   if (!parsed?.exercises?.length) throw new Error('Could not parse exercises from response');
 

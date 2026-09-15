@@ -39,6 +39,8 @@ export function saveApiKey() {
     localStorage.setItem(storageKey, key);
     updateApiStatus(key, state.currentProvider);
   }
+  // Home notice, hub buttons and anything else that depends on the key re-check.
+  document.dispatchEvent(new CustomEvent('apiKeyChanged'));
 }
 
 export function updateApiStatus(key, provider) {
@@ -47,14 +49,15 @@ export function updateApiStatus(key, provider) {
   const isGemini = provider === 'gemini';
   const validPrefix = isGemini ? 'AIza' : 'sk-ant-';
   const providerName = isGemini ? 'Gemini' : 'Anthropic';
+  const nl = state.nativeLanguage === 'nl';
   if (key && key.startsWith(validPrefix)) {
-    el.textContent = `✓ ${providerName} key saved — AI responses enabled`;
+    el.textContent = nl ? `✓ ${providerName}-sleutel opgeslagen — AI-functies staan aan` : `✓ ${providerName} key saved — AI features enabled`;
     el.className = 'api-status ok';
   } else if (key) {
-    el.textContent = `⚠ Key saved but may be invalid (should start with ${validPrefix})`;
+    el.textContent = nl ? `⚠ Sleutel opgeslagen, maar lijkt ongeldig (moet beginnen met ${validPrefix})` : `⚠ Key saved but may be invalid (should start with ${validPrefix})`;
     el.className = 'api-status missing';
   } else {
-    el.textContent = 'No key — conversations will use fallback responses';
+    el.textContent = nl ? 'Geen sleutel — chat gebruikt standaardantwoorden, AI-oefeningen staan uit' : 'No key — chat uses canned replies, AI exercises are off';
     el.className = 'api-status missing';
   }
 }

@@ -92,7 +92,7 @@ function showMenu() {
     <div class="lesson-header">
       <button class="back-btn" id="cdBack">←</button>
       <div>
-        <div class="lesson-title">📌 ${nl ? 'Naamvallen Drill' : 'Case Practice Drill'}</div>
+        <div class="lesson-title">📌 ${nl ? 'Naamvallen Drill' : 'Case Drill'}</div>
         <div class="lesson-subtitle">${nl ? 'Oefen Oekraïense naamvallen' : 'Practice Ukrainian noun cases'}</div>
       </div>
     </div>
@@ -155,7 +155,7 @@ function showMenu() {
       </button>
     </div>`;
 
-  s.querySelector('#cdBack').addEventListener('click', () => window.showScreen('homeScreen'));
+  s.querySelector('#cdBack').addEventListener('click', () => window.openExercisesScreen());
   s.querySelector('#cdRefBtn').addEventListener('click', () => showReference(0));
   s.querySelector('#cdLearnBtn').addEventListener('click', showNounPicker);
   s.querySelector('#cdStartBtn').addEventListener('click', startDrill);

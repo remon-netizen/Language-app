@@ -103,7 +103,7 @@ function showMenu() {
       </button>
     </div>`;
 
-  s.querySelector('#pdBack').addEventListener('click', () => window.showScreen('homeScreen'));
+  s.querySelector('#pdBack').addEventListener('click', () => window.openExercisesScreen());
   s.querySelector('#pdRefPrefixBtn').addEventListener('click', () => showRefByPrefix(0));
   s.querySelector('#pdRefVerbBtn').addEventListener('click', () => showRefByVerb(0));
   s.querySelector('#pdStartBtn').addEventListener('click', startDrill);

@@ -1,5 +1,5 @@
 import { state } from '../state.js';
-import { getApiKey } from '../storage.js';
+import { generateText } from './model.js';
 import { extractJSON, shuffleMCQOptions } from '../utils.js';
 
 const NATIVE_NAME_IB = { en: 'English', nl: 'Dutch' };
@@ -109,31 +109,7 @@ export const INBURGERING_TOPICS = [
 // ── Shared fetch helper ───────────────────────────────────────────────────────
 
 async function callGemini(prompt, systemPrompt, maxTokens = 6500) {
-  const apiKey = getApiKey();
-  if (!apiKey) throw new Error('No API key — add your Gemini key in Settings (⚙️)');
-
-  const body = {
-    system_instruction: { parts: [{ text: systemPrompt }] },
-    contents: [{ role: 'user', parts: [{ text: prompt }] }],
-    generationConfig: {
-      maxOutputTokens: maxTokens,
-      temperature: 0.4,
-      responseMimeType: 'application/json',
-      thinkingConfig: { thinkingBudget: 0 },
-    },
-  };
-
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-    { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
-  );
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error?.message || `HTTP ${res.status}`);
-  }
-  const data  = await res.json();
-  const parts = data.candidates?.[0]?.content?.parts || [];
-  return parts.filter(p => !p.thought).map(p => p.text).join('').trim();
+  return generateText({ system: systemPrompt, prompt: prompt, maxTokens: maxTokens, temperature: 0.4 });
 }
 
 // ── Standard questions (KNS + luisteren + spreken + praktisch) ────────────────

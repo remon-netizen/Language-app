@@ -1,11 +1,7 @@
 import { state } from '../state.js';
-import { getApiKey } from '../storage.js';
-import { extractJSON } from '../utils.js';
+import { generateJSON } from './model.js';
 
 export async function generateConversationSummary() {
-  const apiKey = getApiKey();
-  if (!apiKey) throw new Error('No API key set');
-
   const TARGET_NAMES = { uk: 'Ukrainian', nl: 'Dutch', en: 'English', fr: 'French' };
   const NATIVE_NAMES = { en: 'English', nl: 'Dutch' };
   const langName   = TARGET_NAMES[state.currentLanguage] || 'Ukrainian';
@@ -62,32 +58,7 @@ Guidelines:
 - "vocabulary_used": only ${langName} words/phrases the STUDENT used (not the tutor), max 8. Focus on notable or new words.
 - Be warm, specific, and constructive throughout.`;
 
-  const body = {
-    contents: [{ role: 'user', parts: [{ text: prompt }] }],
-    generationConfig: {
-      maxOutputTokens: 1500,
-      temperature: 0.3,
-      responseMimeType: 'application/json',
-      thinkingConfig: { thinkingBudget: 0 },
-    },
-  };
-
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-    { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
-  );
-
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error?.message || `HTTP ${res.status}`);
-  }
-
-  const data = await res.json();
-  const parts = data.candidates?.[0]?.content?.parts || [];
-  const text = parts.filter(p => !p.thought).map(p => p.text).join('').trim();
-  if (!text) throw new Error('Empty response from Gemini');
-
-  const parsed = extractJSON(text);
+  const parsed = await generateJSON({ prompt: prompt, maxTokens: 1500, temperature: 0.3 });
   if (!parsed || !parsed.overall_assessment) throw new Error('Could not parse summary');
   return parsed;
 }

@@ -483,3 +483,29 @@
   .ex-level-bar   { flex-wrap: wrap; gap: 4px; }
   .ex-level-btn   { padding: 5px 10px; font-size: 0.78rem; }
 }
+
+/* ── Hub sections: offline drills vs AI tools ── */
+.ex-section-label {
+  font-size: 0.74rem; font-weight: 700; color: var(--gray);
+  text-transform: uppercase; letter-spacing: 0.04em; margin: 0 0 8px 2px;
+}
+.ex-tools-row + .ex-section-label { margin-top: 18px; }
+.ex-tools-empty { font-size: 0.82rem; color: var(--gray); padding: 10px 4px; }
+.ex-tool-btn { position: relative; }
+.ex-ai-tag {
+  position: absolute; top: 6px; right: 8px; font-size: 0.7rem; line-height: 1;
+  opacity: 0.8;
+}
+.ex-tool-locked, .ex-topic-locked { opacity: 0.55; }
+.ex-tool-locked:hover, .ex-topic-locked:hover { opacity: 0.8; }
+.ex-nokey {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+  background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px;
+  padding: 10px 14px; margin-bottom: 10px; font-size: 0.82rem; color: #92400e;
+}
+.ex-nokey-btn {
+  background: #f59e0b; color: white; border: none; border-radius: 8px;
+  padding: 8px 12px; font-size: 0.8rem; font-weight: 700; cursor: pointer; font-family: inherit;
+  min-height: 36px;
+}
+.ex-nokey-btn:hover { background: #d97706; }

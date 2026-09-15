@@ -1,12 +1,11 @@
 // Homework document → speaking practice phrases generator.
+import { generateJSON } from './model.js';
 //
 // Accepts a .docx or .txt file, extracts the text, sends it to Gemini,
 // and returns an array of practice phrases in the standard lesson shape:
 //   { target, ph, translations: { en?, nl? }, tip: { en?, nl? } }
 
 import { state } from '../state.js';
-import { getApiKey } from '../storage.js';
-import { extractJSON } from '../utils.js';
 
 // ── .docx text extraction ────────────────────────────────────────────────────
 // A .docx is a ZIP containing word/document.xml. We load JSZip dynamically
@@ -66,9 +65,6 @@ const TARGET_NAME = { uk: 'Ukrainian', nl: 'Dutch', en: 'English', fr: 'French' 
 const NATIVE_NAME = { en: 'English', nl: 'Dutch' };
 
 export async function generateHomeworkPhrases(homeworkText) {
-  const apiKey = getApiKey();
-  if (!apiKey) throw new Error('No API key — add your Gemini key in Settings.');
-
   const targetCode = state.currentLanguage;
   const nativeCode = state.nativeLanguage;
   const langName   = TARGET_NAME[targetCode] || 'Ukrainian';
@@ -96,32 +92,7 @@ export async function generateHomeworkPhrases(homeworkText) {
     `- If the homework contains exercises or fill-in-the-blank, use the ANSWERS as the basis for phrases\n` +
     `- If the homework has a dialogue, extract the most useful lines as practice phrases`;
 
-  const body = {
-    system_instruction: {
-      parts: [{ text: `You are an expert ${langName} teacher. Return ONLY valid JSON, no markdown fences.` }],
-    },
-    contents: [{ role: 'user', parts: [{ text: prompt }] }],
-    generationConfig: {
-      maxOutputTokens: 4000,
-      temperature: 0.4,
-      responseMimeType: 'application/json',
-      thinkingConfig: { thinkingBudget: 0 },
-    },
-  };
-
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-    { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
-  );
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error?.message || `HTTP ${res.status}`);
-  }
-
-  const data  = await res.json();
-  const parts = data.candidates?.[0]?.content?.parts || [];
-  const text  = parts.filter(p => !p.thought).map(p => p.text).join('').trim();
-  const parsed = extractJSON(text);
+  const parsed = await generateJSON({ system: `You are an expert ${langName} teacher. Return ONLY valid JSON, no markdown fences.`, prompt: prompt, maxTokens: 4000, temperature: 0.4 });
 
   if (!parsed?.phrases?.length) throw new Error('Could not generate phrases from homework');
 

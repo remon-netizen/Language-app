@@ -1,6 +1,7 @@
 import { state } from '../state.js';
 import { getApiKey } from '../storage.js';
 import { buildSystemPrompt } from './gemini.js';
+import { ANTHROPIC_MODEL } from './model.js';
 
 export async function callClaudeAPI(userMessage, isUkrainian) {
   const apiKey = getApiKey();
@@ -9,7 +10,7 @@ export async function callClaudeAPI(userMessage, isUkrainian) {
   state.conversationHistory.push({ role: 'user', content: userMessage });
 
   const body = {
-    model: 'claude-haiku-4-5',
+    model: ANTHROPIC_MODEL,
     max_tokens: 1024,
     system: buildSystemPrompt(isUkrainian),
     messages: state.conversationHistory.slice(-12)

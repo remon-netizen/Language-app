@@ -40,7 +40,7 @@ function renderFlashcard() {
   const screen = document.getElementById('flashcardScreen');
   screen.innerHTML = `
     <div class="lesson-header">
-      <button class="back-btn" onclick="showScreen('wordsScreen')">←</button>
+      <button class="back-btn" onclick="openWordsScreen()">←</button>
       <div>
         <div class="lesson-title">📇 Flashcards</div>
         <div class="lesson-subtitle">${progress} due today</div>
@@ -83,7 +83,7 @@ function renderDoneScreen() {
   const screen = document.getElementById('flashcardScreen');
   screen.innerHTML = `
     <div class="lesson-header">
-      <button class="back-btn" onclick="showScreen('wordsScreen')">←</button>
+      <button class="back-btn" onclick="openWordsScreen()">←</button>
       <div>
         <div class="lesson-title">📇 Flashcards</div>
         <div class="lesson-subtitle">Session complete!</div>
@@ -96,7 +96,7 @@ function renderDoneScreen() {
         <div class="fc-done-text">${fc.score} / ${fc.cards.length} remembered</div>
         <div class="fc-done-msg">${msg}</div>
         <div class="fc-next-info">📅 Next review scheduled automatically ✓</div>
-        <button class="fc-flip-btn" onclick="showScreen('wordsScreen')" style="margin-top:20px">← Back to My Words</button>
+        <button class="fc-flip-btn" onclick="openWordsScreen()" style="margin-top:20px">← Back to My Words</button>
       </div>
     </div>`;
 }

@@ -25,7 +25,7 @@ function renderDeHetHome() {
   const screen = document.getElementById('dehetScreen');
   screen.innerHTML = `
     <div class="lesson-header">
-      <button class="back-btn" onclick="showScreen('homeScreen')">←</button>
+      <button class="back-btn" onclick="openExercisesScreen()">←</button>
       <div>
         <div class="lesson-title">${flagImg('nl')} De of Het?</div>
         <div class="lesson-subtitle">Dutch article drill</div>

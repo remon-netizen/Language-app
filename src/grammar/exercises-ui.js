@@ -2,6 +2,11 @@ import { state, flagImg } from '../state.js';
 import { escHtml } from '../utils.js';
 import { generateExercises } from '../api/exercises.js';
 import { languageName } from '../i18n.js';
+import { hasApiKey } from '../api/model.js';
+
+// A small helper so every string in this file is available in both native languages.
+const NL = () => state.nativeLanguage === 'nl';
+const L = (en, nl) => (NL() ? nl : en);
 
 // ── Topic definitions ─────────────────────────────────────────────────────────
 // Each topic carries language-specific titles/subtitles per native language.
@@ -168,16 +173,18 @@ function showTopicPicker() {
   const flag    = flagImg(state.currentLanguage);
   const lblTitle    = native === 'nl' ? '🎯 Grammatica-oefeningen' : '🎯 Grammar Exercises';
   const lblPick     = native === 'nl' ? 'kies een onderwerp' : 'pick a topic';
-  const lblPracVerb = native === 'nl' ? 'Werkwoorden oefenen' : 'Practice Verbs';
+  const lblPracVerb = native === 'nl' ? 'Werkwoord opzoeken' : 'Verb Lookup';
   const lblDissect  = native === 'nl' ? 'Zin ontleden' : 'Dissect a Sentence';
   const lblDeHet    = native === 'nl' ? 'De of Het?' : 'De or Het?';
-  const lblAspect   = native === 'nl' ? 'Werkwoordsaspect' : 'Verb Aspect';
   const lblDrill    = native === 'nl' ? 'Werkwoord Drill' : 'Verb Drill';
   const lblCases    = native === 'nl' ? 'Naamvallen Drill' : 'Case Drill';
   const lblPrefix   = native === 'nl' ? 'Voorvoegsel Drill' : 'Prefix Drill';
   const lblNumbers  = native === 'nl' ? 'Getallen & Tijd' : 'Numbers & Time';
   const isUK        = state.currentLanguage === 'uk';
-  const lblLevel    = native === 'nl' ? 'Niveau:' : 'Level:';
+  const lblLevel    = native === 'nl' ? 'Niveau (AI-onderwerpen):' : 'Level (AI topics):';
+  const keyOk       = hasApiKey();
+  const aiTag       = `<span class="ex-ai-tag" title="${native === 'nl' ? 'Gebruikt AI — API-sleutel nodig' : 'Uses AI — needs an API key'}">🔑</span>`;
+  const aiCls       = keyOk ? 'ex-tool-ai' : 'ex-tool-ai ex-tool-locked';
   const lblOpen     = native === 'nl' ? '✏️ Open vragen:' : '✏️ Open questions:';
   const lblOn       = native === 'nl' ? 'AAN' : 'ON';
   const lblOff      = native === 'nl' ? 'UIT' : 'OFF';
@@ -192,23 +199,8 @@ function showTopicPicker() {
       </div>
     </div>
 
+    <div class="ex-section-label">${native === 'nl' ? '📴 Drills — werken offline, onthouden je fouten' : '📴 Drills — work offline, remember your mistakes'}</div>
     <div class="ex-tools-row">
-      <button class="ex-tool-btn" id="exVerbBtn">
-        <span class="ex-tool-icon">📋</span>
-        <span>${lblPracVerb}</span>
-      </button>
-      <button class="ex-tool-btn" id="exDissectBtn">
-        <span class="ex-tool-icon">🔍</span>
-        <span>${lblDissect}</span>
-      </button>
-      <button class="ex-tool-btn ex-tool-dehet" id="exDehetBtn" style="${isNL ? '' : 'display:none'}">
-        <span class="ex-tool-icon">🏷️</span>
-        <span>${lblDeHet}</span>
-      </button>
-      <button class="ex-tool-btn ex-tool-aspect" id="exAspectBtn" style="${isUK ? '' : 'display:none'}">
-        <span class="ex-tool-icon">🔀</span>
-        <span>${lblAspect}</span>
-      </button>
       <button class="ex-tool-btn ex-tool-drill" id="exDrillBtn" style="${isUK ? '' : 'display:none'}">
         <span class="ex-tool-icon">✍️</span>
         <span>${lblDrill}</span>
@@ -224,6 +216,28 @@ function showTopicPicker() {
       <button class="ex-tool-btn ex-tool-numbers" id="exNumbersDrillBtn" style="${isUK ? '' : 'display:none'}">
         <span class="ex-tool-icon">🔢</span>
         <span>${lblNumbers}</span>
+      </button>
+      <button class="ex-tool-btn ex-tool-dehet ${aiCls}" id="exDehetBtn" style="${isNL ? '' : 'display:none'}">
+        <span class="ex-tool-icon">🏷️</span>
+        <span>${lblDeHet}</span>${aiTag}
+      </button>
+      ${!isUK && !isNL ? `<div class="ex-tools-empty">${native === 'nl' ? 'Nog geen offline drills voor deze taal.' : 'No offline drills for this language yet.'}</div>` : ''}
+    </div>
+
+    <div class="ex-section-label">${native === 'nl' ? '🤖 AI-oefeningen — gegenereerd met je API-sleutel' : '🤖 AI exercises — generated with your API key'}</div>
+    ${keyOk ? '' : `
+      <div class="ex-nokey">
+        <span>🔑 ${native === 'nl' ? 'Zonder API-sleutel staan de AI-onderdelen uit.' : 'Without an API key the AI parts are off.'}</span>
+        <button class="ex-nokey-btn" id="exNoKeyBtn">${native === 'nl' ? 'Sleutel toevoegen →' : 'Add key →'}</button>
+      </div>`}
+    <div class="ex-tools-row ex-tools-row-ai">
+      <button class="ex-tool-btn ${aiCls}" id="exVerbBtn">
+        <span class="ex-tool-icon">📋</span>
+        <span>${lblPracVerb}</span>${aiTag}
+      </button>
+      <button class="ex-tool-btn ${aiCls}" id="exDissectBtn">
+        <span class="ex-tool-icon">🔍</span>
+        <span>${lblDissect}</span>${aiTag}
       </button>
     </div>
 
@@ -242,12 +256,14 @@ function showTopicPicker() {
     <div class="ex-topic-grid" id="exTopicGrid"></div>`;
 
   s.querySelector('#exHomeBack').addEventListener('click', () => window.showScreen('homeScreen'));
-  s.querySelector('#exVerbBtn').addEventListener('click', () => window.openVerbScreen());
-  s.querySelector('#exDissectBtn').addEventListener('click', () => window.openDissectScreen());
+  // AI tools open Settings instead when there is no key yet.
+  const aiOrSettings = fn => () => (hasApiKey() ? fn() : window.toggleSettingsDrawer());
+  s.querySelector('#exVerbBtn').addEventListener('click', aiOrSettings(() => window.openVerbScreen()));
+  s.querySelector('#exDissectBtn').addEventListener('click', aiOrSettings(() => window.openDissectScreen()));
   const dehetBtn = s.querySelector('#exDehetBtn');
-  if (dehetBtn) dehetBtn.addEventListener('click', () => window.openDeHetScreen());
-  const aspectBtn = s.querySelector('#exAspectBtn');
-  if (aspectBtn) aspectBtn.addEventListener('click', () => window.openVerbAspectScreen());
+  if (dehetBtn) dehetBtn.addEventListener('click', aiOrSettings(() => window.openDeHetScreen()));
+  const noKeyBtn = s.querySelector('#exNoKeyBtn');
+  if (noKeyBtn) noKeyBtn.addEventListener('click', () => window.toggleSettingsDrawer());
   const drillBtn = s.querySelector('#exDrillBtn');
   if (drillBtn) drillBtn.addEventListener('click', () => window.openVerbDrillScreen());
   const caseDrillBtn = s.querySelector('#exCaseDrillBtn');
@@ -271,7 +287,7 @@ function showTopicPicker() {
   const grid = s.querySelector('#exTopicGrid');
   topics.forEach(topic => {
     const btn = document.createElement('button');
-    btn.className = 'ex-topic-card';
+    btn.className = 'ex-topic-card' + (keyOk ? '' : ' ex-topic-locked');
     // Pass an English title to the API hint lookup (topic.id is the canonical key).
     const titleStr    = loc(topic.title);
     const subtitleStr = loc(topic.subtitle);
@@ -279,7 +295,7 @@ function showTopicPicker() {
       <span class="ex-topic-icon">${topic.icon}</span>
       <span class="ex-topic-title">${escHtml(titleStr)}</span>
       <span class="ex-topic-sub">${escHtml(subtitleStr)}</span>`;
-    btn.addEventListener('click', () => startExercises({ ...topic, title: titleStr, subtitle: subtitleStr }));
+    btn.addEventListener('click', aiOrSettings(() => startExercises({ ...topic, title: titleStr, subtitle: subtitleStr })));
     grid.appendChild(btn);
   });
 }
@@ -295,12 +311,12 @@ async function startExercises(topic) {
       <button class="back-btn" id="exTopicBack">←</button>
       <div>
         <div class="lesson-title">${topic.icon} ${escHtml(topic.title)}</div>
-        <div class="lesson-subtitle" id="exSubtitle">Generating exercises…</div>
+        <div class="lesson-subtitle" id="exSubtitle">${L('Generating exercises…', 'Oefeningen maken…')}</div>
       </div>
     </div>
     <div id="exBody" class="ex-loading">
       <div class="ex-spinner"></div>
-      <div class="ex-loading-text">Creating your exercises…</div>
+      <div class="ex-loading-text">${L('Creating your exercises…', 'Je oefeningen worden gemaakt…')}</div>
     </div>`;
 
   s.querySelector('#exTopicBack').addEventListener('click', () => {
@@ -314,7 +330,7 @@ async function startExercises(topic) {
   } catch (err) {
     document.getElementById('exBody').innerHTML = `
       <div class="ex-error">⚠️ ${escHtml(err.message)}</div>
-      <button class="ex-action-btn" id="exErrBack">← Back to topics</button>`;
+      <button class="ex-action-btn" id="exErrBack">← ${L('Back to topics', 'Terug naar onderwerpen')}</button>`;
     document.getElementById('exErrBack').addEventListener('click', () => {
       window.showScreen('exercisesScreen');
       showTopicPicker();
@@ -337,7 +353,7 @@ function buildProgressDots() {
   return ex.list.map((q, i) => {
     const cls  = i < ex.current ? 'done' : i === ex.current ? 'current' : '';
     const type = q.type === 'open' ? ' open-dot' : '';
-    return `<span class="ex-dot ${cls}${type}" title="${q.type === 'open' ? 'Open question' : 'Multiple choice'}"></span>`;
+    return `<span class="ex-dot ${cls}${type}" title="${q.type === 'open' ? L('Open question', 'Open vraag') : L('Multiple choice', 'Meerkeuze')}"></span>`;
   }).join('');
 }
 
@@ -347,7 +363,7 @@ function renderMCQuestion() {
   const q     = ex.list[ex.current];
   const total = ex.list.length;
 
-  document.getElementById('exSubtitle').textContent = `Question ${ex.current + 1} of ${total}`;
+  document.getElementById('exSubtitle').textContent = L(`Question ${ex.current + 1} of ${total}`, `Vraag ${ex.current + 1} van ${total}`);
 
   const body = document.getElementById('exBody');
   body.className = 'ex-body';
@@ -390,18 +406,18 @@ function renderOpenQuestion() {
   const q     = ex.list[ex.current];
   const total = ex.list.length;
 
-  document.getElementById('exSubtitle').textContent = `Question ${ex.current + 1} of ${total}`;
+  document.getElementById('exSubtitle').textContent = L(`Question ${ex.current + 1} of ${total}`, `Vraag ${ex.current + 1} van ${total}`);
 
   const body = document.getElementById('exBody');
   body.className = 'ex-body';
   body.innerHTML = `
     <div class="ex-progress">${buildProgressDots()}</div>
-    <div class="ex-open-badge">✏️ Open question — write your answer</div>
+    <div class="ex-open-badge">✏️ ${L('Open question — write your answer', 'Open vraag — schrijf je antwoord')}</div>
     <div class="ex-question">${escHtml(q.question)}</div>
     <div class="ex-open-area">
       <textarea class="ex-open-input" id="exOpenInput"
-        placeholder="Type your answer here…" rows="3" autocomplete="off" autocorrect="off" spellcheck="false"></textarea>
-      <button class="ex-open-check-btn" id="exOpenCheck">Check ✓</button>
+        placeholder="${L('Type your answer here…', 'Typ hier je antwoord…')}" rows="3" autocomplete="off" autocorrect="off" spellcheck="false"></textarea>
+      <button class="ex-open-check-btn" id="exOpenCheck">${L('Check', 'Controleer')} ✓</button>
     </div>
     <div id="exFeedback"></div>`;
 
@@ -435,19 +451,19 @@ function handleOpenAnswer(userAnswer) {
   const fb = document.getElementById('exFeedback');
   fb.innerHTML = `
     <div class="ex-open-your-answer">
-      <span class="ex-open-your-label">Your answer:</span>
+      <span class="ex-open-your-label">${L('Your answer:', 'Jouw antwoord:')}</span>
       <span class="ex-open-your-text">${escHtml(userAnswer)}</span>
     </div>
     <div class="ex-open-correct-answer">
-      <span class="ex-open-correct-label">Correct answer:</span>
+      <span class="ex-open-correct-label">${L('Correct answer:', 'Juiste antwoord:')}</span>
       <span class="ex-open-correct-text">${escHtml(q.correct_answer)}</span>
     </div>
     <div class="ex-feedback-explanation">${escHtml(q.explanation)}</div>
     <div class="ex-self-assess">
-      <div class="ex-self-label">Did you get it right?</div>
+      <div class="ex-self-label">${L('Did you get it right?', 'Had je het goed?')}</div>
       <div class="ex-self-btns">
-        <button class="ex-self-yes" id="exSelfYes">✓ Yes</button>
-        <button class="ex-self-no"  id="exSelfNo">✗ Not quite</button>
+        <button class="ex-self-yes" id="exSelfYes">✓ ${L('Yes', 'Ja')}</button>
+        <button class="ex-self-no"  id="exSelfNo">✗ ${L('Not quite', 'Niet helemaal')}</button>
       </div>
     </div>`;
 
@@ -476,7 +492,7 @@ function showFeedback(isRight, explanation) {
 
   fb.innerHTML = `
     <div class="ex-feedback-result ${isRight ? 'correct' : 'wrong'}">
-      ${isRight ? '✓ Correct!' : '✗ Not quite'}
+      ${isRight ? '✓ Correct!' : '✗ ' + L('Not quite', 'Niet helemaal')}
     </div>
     <div class="ex-feedback-explanation">${escHtml(explanation)}</div>`;
 
@@ -488,7 +504,8 @@ function showNextButton(container, isLastOverride) {
   const isLast = isLastOverride !== undefined ? isLastOverride : ex.current + 1 >= ex.list.length;
   const btn = document.createElement('button');
   btn.className = 'ex-next-btn';
-  btn.textContent = isLast ? '🏁 See results' : 'Next →';
+  btn.textContent = isLast ? '🏁 ' + L('See results', 'Resultaten') : L('Next →', 'Volgende →');
+  btn.type = 'button';
   btn.addEventListener('click', () => {
     if (isLast) {
       showScore();
@@ -500,6 +517,7 @@ function showNextButton(container, isLastOverride) {
     }
   });
   container.appendChild(btn);
+  btn.focus({ preventScroll: true });
 }
 
 // ── Score screen ──────────────────────────────────────────────────────────────
@@ -509,13 +527,13 @@ function showScore() {
   const score = ex.score;
   const pct   = Math.round((score / total) * 100);
   const emoji = pct === 100 ? '🏆' : pct >= 80 ? '🎉' : pct >= 60 ? '👍' : '💪';
-  const msg   = pct === 100 ? 'Perfect score!' : pct >= 80 ? 'Great job!' : pct >= 60 ? 'Good effort!' : 'Keep practising!';
+  const msg   = pct === 100 ? L('Perfect score!', 'Perfecte score!') : pct >= 80 ? L('Great job!', 'Geweldig!') : pct >= 60 ? L('Good effort!', 'Goed bezig!') : L('Keep practising!', 'Blijf oefenen!');
   const topic = ex.topic;
 
   const openCount = ex.list.filter(q => q.type === 'open').length;
   const mcCount   = total - openCount;
 
-  document.getElementById('exSubtitle').textContent = 'Finished!';
+  document.getElementById('exSubtitle').textContent = L('Results', 'Resultaten');
 
   const body = document.getElementById('exBody');
   body.innerHTML = `
@@ -527,10 +545,10 @@ function showScore() {
         <div class="ex-score-bar-fill" style="width: ${pct}%"></div>
       </div>
       <div class="ex-score-pct">${pct}%</div>
-      ${openCount > 0 ? `<div class="ex-score-breakdown">${mcCount} multiple choice · ${openCount} open (self-assessed)</div>` : ''}
+      ${openCount > 0 ? `<div class="ex-score-breakdown">${mcCount} ${L('multiple choice', 'meerkeuze')} · ${openCount} ${L('open (self-assessed)', 'open (zelf beoordeeld)')}</div>` : ''}
       <div class="ex-score-actions">
-        <button class="ex-next-btn" id="exRetry">🔄 Try again</button>
-        <button class="ex-back-btn" id="exBackTopics">← Topics</button>
+        <button class="ex-next-btn" id="exRetry">🔄 ${L('Try again (new questions)', 'Opnieuw (nieuwe vragen)')}</button>
+        <button class="ex-back-btn" id="exBackTopics">← ${L('Topics', 'Onderwerpen')}</button>
       </div>
     </div>`;
 
@@ -540,3 +558,9 @@ function showScore() {
     showTopicPicker();
   });
 }
+
+// The hub shows AI tools as locked until a key exists; refresh it when one is saved.
+document.addEventListener('apiKeyChanged', () => {
+  const s = getScreen();
+  if (s && s.classList.contains('active') && s.querySelector('#exTopicGrid')) showTopicPicker();
+});

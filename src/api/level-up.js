@@ -1,12 +1,11 @@
 // Generate harder practice phrases for the next level of a lesson topic.
+import { generateJSON } from './model.js';
 //
 // Takes the current lesson's topic name + the phrases the student already
 // mastered, and asks Gemini to produce 8 harder phrases on the same theme
 // at the next CEFR level.
 
 import { state } from '../state.js';
-import { getApiKey } from '../storage.js';
-import { extractJSON } from '../utils.js';
 
 const TARGET_NAME = { uk: 'Ukrainian', nl: 'Dutch', en: 'English', fr: 'French' };
 const NATIVE_NAME = { en: 'English', nl: 'Dutch' };
@@ -37,9 +36,6 @@ export function hasNextLevel(levelIndex) {
 }
 
 export async function generateNextLevelPhrases(lesson, currentLevelIndex) {
-  const apiKey = getApiKey();
-  if (!apiKey) throw new Error('No API key — add your Gemini key in Settings.');
-
   const targetCode = state.currentLanguage;
   const nativeCode = state.nativeLanguage;
   const langName   = TARGET_NAME[targetCode] || 'Ukrainian';
@@ -76,32 +72,7 @@ export async function generateNextLevelPhrases(lesson, currentLevelIndex) {
     `- Order easiest → hardest\n` +
     `- Phonetic guides with stress marked in CAPS`;
 
-  const body = {
-    system_instruction: {
-      parts: [{ text: `You are an expert ${langName} teacher. Return ONLY valid JSON, no markdown.` }],
-    },
-    contents: [{ role: 'user', parts: [{ text: prompt }] }],
-    generationConfig: {
-      maxOutputTokens: 5000,
-      temperature: 0.5,
-      responseMimeType: 'application/json',
-      thinkingConfig: { thinkingBudget: 0 },
-    },
-  };
-
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-    { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
-  );
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error?.message || `HTTP ${res.status}`);
-  }
-
-  const data  = await res.json();
-  const parts = data.candidates?.[0]?.content?.parts || [];
-  const text  = parts.filter(p => !p.thought).map(p => p.text).join('').trim();
-  const parsed = extractJSON(text);
+  const parsed = await generateJSON({ system: `You are an expert ${langName} teacher. Return ONLY valid JSON, no markdown.`, prompt: prompt, maxTokens: 5000, temperature: 0.5 });
 
   if (!parsed?.phrases?.length) throw new Error('Could not generate next-level phrases');
 

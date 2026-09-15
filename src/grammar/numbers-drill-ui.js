@@ -184,7 +184,7 @@ function showMenu() {
 
     <button class="nd-start-btn" id="ndStart">▶ ${nl ? 'Start' : 'Start'}</button>`;
 
-  s.querySelector('#ndBack').addEventListener('click', () => window.showScreen('exercisesScreen'));
+  s.querySelector('#ndBack').addEventListener('click', () => window.openExercisesScreen());
   s.querySelector('#ndStart').addEventListener('click', startDrill);
 
   s.querySelectorAll('.nd-cat-card').forEach(card => {

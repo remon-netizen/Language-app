@@ -35,7 +35,7 @@ export function openVerbAspectScreen() {
 function showMenu() {
   const s = getScreen();
   const native = state.nativeLanguage;
-  const lblTitle    = native === 'nl' ? '🔀 Werkwoordsaspect' : '🔀 Verb Aspect Workshop';
+  const lblTitle    = native === 'nl' ? '🔀 Aspect oefenen' : '🔀 Aspect practice';
   const lblSub      = native === 'nl' ? 'Voltooid vs onvoltooid' : 'Perfective vs Imperfective';
   const lblRef      = native === 'nl' ? '📖 Werkwoord-overzicht' : '📖 Verb Reference Cards';
   const lblRefSub   = native === 'nl' ? 'Bekijk alle 20 werkwoordparen' : 'Browse all 20 verb pairs';
@@ -73,7 +73,7 @@ function showMenu() {
       </button>
     </div>`;
 
-  s.querySelector('#vaBack').addEventListener('click', () => window.showScreen('homeScreen'));
+  s.querySelector('#vaBack').addEventListener('click', () => window.openVerbDrillScreen());
   s.querySelector('#vaRefBtn').addEventListener('click', () => showReference(0));
   s.querySelector('#vaStartBtn').addEventListener('click', startSession);
 }
@@ -501,7 +501,7 @@ function showScore() {
       <button class="back-btn" id="vaScoreBack">←</button>
       <div>
         <div class="lesson-title">🔀 ${native === 'nl' ? 'Resultaten' : 'Results'}</div>
-        <div class="lesson-subtitle">${native === 'nl' ? 'Werkwoordsaspect' : 'Verb Aspect Workshop'}</div>
+        <div class="lesson-subtitle">${native === 'nl' ? 'Aspect oefenen' : 'Aspect practice'}</div>
       </div>
     </div>
 

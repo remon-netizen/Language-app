@@ -151,8 +151,8 @@ function showMenu() {
     <div class="lesson-header">
       <button class="back-btn" id="vdBack">←</button>
       <div>
-        <div class="lesson-title">✍️ ${nl ? 'Werkwoord Drill' : 'Verb Conjugation Drill'}</div>
-        <div class="lesson-subtitle">${nl ? 'Oefen werkwoordsvormen door te schrijven' : 'Practice verb forms by typing'}</div>
+        <div class="lesson-title">✍️ ${nl ? 'Werkwoord Drill' : 'Verb Drill'}</div>
+        <div class="lesson-subtitle">${nl ? 'Vormen, aspect en zinnen — door te typen' : 'Forms, aspect and sentences — by typing'}</div>
       </div>
     </div>
 
@@ -202,7 +202,12 @@ function showMenu() {
         </div>` : ''}
     </div>
 
-    <div class="vd-menu-grid-4">
+    <div class="vd-menu-grid-4 vd-menu-grid-5">
+      <button class="vd-menu-card" id="vdAspectBtn">
+        <span class="vd-menu-icon">🔀</span>
+        <span class="vd-menu-title">Aspect</span>
+        <span class="vd-menu-sub">${nl ? 'Voltooid / onvoltooid' : 'Perf. / imperf.'}</span>
+      </button>
       <button class="vd-menu-card" id="vdRefBtn">
         <span class="vd-menu-icon">📖</span>
         <span class="vd-menu-title">${nl ? 'Tabel' : 'Tables'}</span>
@@ -227,8 +232,9 @@ function showMenu() {
       </button>
     </div>`;
 
-  s.querySelector('#vdBack').addEventListener('click', () => window.showScreen('homeScreen'));
+  s.querySelector('#vdBack').addEventListener('click', () => window.openExercisesScreen());
   s.querySelector('#vdRefBtn').addEventListener('click', () => showReference(0));
+  s.querySelector('#vdAspectBtn').addEventListener('click', () => window.openVerbAspectScreen());
   s.querySelector('#vdLearnBtn').addEventListener('click', () => showVerbPicker());
   s.querySelector('#vdPickBtn').addEventListener('click', () => showSelectionPicker());
   s.querySelector('#vdStartBtn').addEventListener('click', startDrill);
@@ -792,7 +798,7 @@ function showDrillScore() {
       <button class="back-btn" id="vdScoreBack">←</button>
       <div>
         <div class="lesson-title">✍️ ${nl ? 'Resultaten' : 'Results'}</div>
-        <div class="lesson-subtitle">${nl ? 'Werkwoord Drill' : 'Verb Conjugation Drill'}</div>
+        <div class="lesson-subtitle">${nl ? 'Werkwoord Drill' : 'Verb Drill'}</div>
       </div>
     </div>
 

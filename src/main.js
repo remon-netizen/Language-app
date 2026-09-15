@@ -400,6 +400,7 @@ function init() {
   collapseLangPicker();
   updateApiNotice();
   initAutoPlay();
+  document.addEventListener('apiKeyChanged', updateApiNotice);
 }
 
 init();
