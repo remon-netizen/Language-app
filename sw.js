@@ -1,7 +1,7 @@
 // Language App — Service Worker
 // Cache the app shell so it works offline after first load.
 // Bump CACHE version whenever shell file list changes or content updates.
-const CACHE = 'language-app-v53';
+const CACHE = 'language-app-v54';
 const SHELL = [
   './index.html',
   './manifest.json',
@@ -75,6 +75,8 @@ const SHELL = [
   './src/grammar/numbers-drill-ui.js',
   './src/data/numbers-time.js',
   './src/data/numbers-weakness.js',
+  './src/data/numbers-course.js',
+  './src/data/numbers-progress.js',
   './styles/numbers-drill.css',
   './src/api/model.js',
   './src/grammar/drill-core.js',

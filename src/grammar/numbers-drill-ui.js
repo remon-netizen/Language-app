@@ -3,6 +3,8 @@ import { escHtml, levenshtein } from '../utils.js';
 import { speakText } from '../voice.js';
 import { CATEGORIES, getCategory, referenceRows, TIME_PATTERNS, ordinalSuffix, GENDER_LABEL, timeGloss, MONTHS } from '../data/numbers-time.js';
 import { recordAnswer, weight, weakKeys, totalAttempts } from '../data/numbers-weakness.js';
+import { STAGES } from '../data/numbers-course.js';
+import { recordNumber, dueNumbers, unseenNumbers, numbersStats } from '../data/numbers-progress.js';
 
 // ── State ────────────────────────────────────────────────────────────────────
 
@@ -10,7 +12,10 @@ const PREFS_KEY = 'numbersDrillPrefs';
 
 let nd = {
   cats:      ['small'],   // selected category ids
-  qMode:     'type',      // 'type' (digits → word) | 'choose' (word → digits) | 'listen' (audio → digits)
+  // 'type' (digits → word) | 'read' (word → digits, typed) | 'mixed' (those two)
+  // | 'listen' (audio → digits) | 'dictate' (audio → word) | 'choose' (word → digits, four options)
+  qMode:     'type',
+  session:   'drill',     // 'drill' (random, weighted) | 'new' (next course stage) | 'due' (scheduled review)
   total:     25,
   questions: [],
   current:   0,
@@ -26,7 +31,7 @@ function loadPrefs() {
     const p = JSON.parse(localStorage.getItem(PREFS_KEY));
     if (!p) return;
     if (Array.isArray(p.cats) && p.cats.length) nd.cats = p.cats.filter(id => getCategory(id));
-    if (['type', 'choose', 'listen', 'dictate'].includes(p.qMode)) nd.qMode = p.qMode;
+    if (['type', 'read', 'mixed', 'choose', 'listen', 'dictate'].includes(p.qMode)) nd.qMode = p.qMode;
     if ([10, 25, 50].includes(p.total)) nd.total = p.total;
   } catch { /* ignore */ }
   if (!nd.cats.length) nd.cats = ['small'];
@@ -129,6 +134,13 @@ export function openNumbersDrillScreen() {
   showMenu();
 }
 
+// Review-hub entry: only what the schedule says is due.
+export function startNumbersReview() {
+  loadPrefs();
+  window.showScreen('numbersDrillScreen');
+  startCourse('due');
+}
+
 // ── Menu ─────────────────────────────────────────────────────────────────────
 
 function showMenu() {
@@ -136,6 +148,8 @@ function showMenu() {
   const nl = state.nativeLanguage === 'nl';
   const weak = weakKeys().length;
   const done = totalAttempts();
+  const st = numbersStats();
+  const stage = nextStage();
 
   const catCards = CATEGORIES.map(c => `
     <div class="nd-cat-card ${nd.cats.includes(c.id) ? 'active' : ''}" data-cat="${c.id}">
@@ -169,16 +183,34 @@ function showMenu() {
       <span class="nd-stat ${weak ? 'nd-stat-weak' : ''}">🎯 ${weak} ${nl ? 'zwakke plekken' : 'weak spots'}</span>
     </div>
 
-    <div class="nd-section-label">${nl ? 'Wat wil je oefenen?' : 'What do you want to practise?'}</div>
-    <div class="nd-cat-grid">${catCards}</div>
-
     <div class="nd-section-label">${nl ? 'Hoe?' : 'How?'}</div>
     <div class="nd-mode-row">
-      ${modeBtn('type',   '✍️', nl ? 'Typen' : 'Type',   nl ? 'cijfer → woord' : 'digits → word')}
-      ${modeBtn('choose', '👆', nl ? 'Kiezen' : 'Choose', nl ? 'woord → cijfer' : 'word → digits')}
+      ${modeBtn('type',   '✍️', '12 → UK', nl ? 'typ het woord' : 'type the word')}
+      ${modeBtn('read',   '💡', 'UK → 12', nl ? 'typ het cijfer' : 'type the digits')}
+      ${modeBtn('mixed',  '🔀', nl ? 'Beide kanten' : 'Both ways', nl ? 'typen, door elkaar' : 'typed, mixed')}
       ${modeBtn('listen', '👂', nl ? 'Luisteren' : 'Listen', nl ? 'geluid → cijfer' : 'audio → digits')}
       ${modeBtn('dictate', '👂✍️', nl ? 'Dictee' : 'Dictation', nl ? 'geluid → woord' : 'audio → word')}
+      ${modeBtn('choose', '👆', nl ? 'Kiezen' : 'Choose', nl ? 'woord → cijfer' : 'word → digits')}
     </div>
+
+    <div class="nd-section-label">${nl ? 'Leren, stap voor stap' : 'Learn, step by step'}</div>
+    <div class="nd-course-stats">📚 ${st.seen} ${nl ? 'gezien' : 'seen'} · ${st.learned} ${nl ? 'geleerd' : 'learned'} / ${st.total}</div>
+    <div class="nd-course-grid">
+      <button class="nd-course-card nd-course-primary" id="ndLearn" ${stage ? '' : 'disabled'}>
+        <span class="nd-course-icon">${stage ? stage.icon : '🏁'}</span>
+        <span class="nd-course-title">${stage ? `${nl ? 'Leer' : 'Learn'}: ${escHtml(loc(stage.title))}` : (nl ? 'Alles gezien' : 'Everything seen')}</span>
+        <span class="nd-course-sub">${stage ? `${stage.fresh.length} ${nl ? 'nieuw' : 'new'} · ${nl ? 'stap' : 'step'} ${stage.index + 1}/${STAGES.length}` : (nl ? 'Blijf herhalen en drillen' : 'Keep reviewing and drilling')}</span>
+      </button>
+      <button class="nd-course-card" id="ndDue" ${st.due ? '' : 'disabled'}>
+        <span class="nd-course-icon">🔄</span>
+        <span class="nd-course-title">${nl ? 'Herhalen' : 'Review due'}</span>
+        <span class="nd-course-sub">${st.due} ${nl ? 'aan de beurt' : 'due'}</span>
+      </button>
+    </div>
+    <button class="nd-path-btn" id="ndPath">🗺️ ${nl ? 'Bekijk het leerpad' : 'See the learning path'}</button>
+
+    <div class="nd-section-label">${nl ? 'Vrij oefenen: willekeurige vragen' : 'Free practice: random questions'}</div>
+    <div class="nd-cat-grid">${catCards}</div>
 
     <div class="nd-length-row">
       <span class="nd-length-label">${nl ? 'Aantal:' : 'Questions:'}</span>
@@ -189,6 +221,9 @@ function showMenu() {
 
   s.querySelector('#ndBack').addEventListener('click', () => window.openExercisesScreen());
   s.querySelector('#ndStart').addEventListener('click', startDrill);
+  s.querySelector('#ndLearn').addEventListener('click', () => startCourse('new'));
+  s.querySelector('#ndDue').addEventListener('click', () => startCourse('due'));
+  s.querySelector('#ndPath').addEventListener('click', showPath);
 
   s.querySelectorAll('.nd-cat-card').forEach(card => {
     card.addEventListener('click', e => {
@@ -324,8 +359,90 @@ function buildQuestions() {
   return shuffle(questions).slice(0, nd.total);
 }
 
+// ── The course ───────────────────────────────────────────────────────────────
+
+const MAX_NEW = 12;
+
+// The first stage that still holds unseen items, and those items.
+function nextStage() {
+  const unseen = new Set(unseenNumbers().map(c => c.item.key));
+  const index = STAGES.findIndex(st => st.items.some(i => unseen.has(i.key)));
+  if (index === -1) return null;
+  return { ...STAGES[index], index, fresh: STAGES[index].items.filter(i => unseen.has(i.key)) };
+}
+
+// How a question is asked when the mode leaves a choice.
+function modeFor() {
+  return nd.qMode === 'mixed' ? (Math.random() < 0.5 ? 'read' : 'type') : nd.qMode;
+}
+
+// 'new': the next stage, at most 12 items. Each is shown with its word first
+//        (hear it, copy it), then asked from memory: once in the chosen mode, or
+//        word → digits followed by digits → word in 'mixed'.
+// 'due': whatever the schedule says is due, at most 30.
+function startCourse(kind) {
+  let questions;
+  if (kind === 'new') {
+    const stage = nextStage();
+    if (!stage) return showMenu();
+    const items = stage.fresh.slice(0, MAX_NEW);
+    const pool = stage.items;
+    const ask = mode => shuffle(items).map(item => ({ item, pool, catId: stage.id, mode }));
+    const passes = nd.qMode === 'mixed' ? ['read', 'type'] : [nd.qMode];
+    questions = nd.qMode === 'choose'
+      ? ask('choose')
+      : [...items.map(item => ({ item, pool, catId: stage.id, mode: 'type', intro: true })), ...passes.flatMap(ask)];
+  } else {
+    questions = shuffle(dueNumbers()).slice(0, 30).map(c => ({ item: c.item, pool: c.stage.items, catId: c.stage.id, mode: modeFor() }));
+  }
+  if (!questions.length) return showMenu();
+  nd.session = kind;
+  nd.questions = questions;
+  nd.current = 0; nd.score = 0; nd.missed = []; nd.answered = false;
+  renderQuestion();
+}
+
+// One place for both records: the weak-spot counter every drill feeds, and the
+// course schedule. Introduction cards are copying, so they count for neither.
+function record(q, isCorrect, quality) {
+  if (q.intro) return;
+  recordAnswer(q.item.key, isCorrect);
+  recordNumber(q.item.key, quality);
+}
+
+function showPath() {
+  const s = getScreen();
+  const nl = state.nativeLanguage === 'nl';
+  const unseen = new Set(unseenNumbers().map(c => c.item.key));
+  s.innerHTML = `
+    <div class="lesson-header">
+      <button class="back-btn" id="ndPathBack">←</button>
+      <div>
+        <div class="lesson-title">🗺️ ${nl ? 'Leerpad' : 'Learning path'}</div>
+        <div class="lesson-subtitle">${STAGES.length} ${nl ? 'stappen' : 'steps'} · ${nl ? 'van нуль tot двадцять п\'яте грудня' : 'from нуль to двадцять п\'яте грудня'}</div>
+      </div>
+    </div>
+    ${STAGES.map((st, i) => {
+      const seen = st.items.filter(it => !unseen.has(it.key)).length;
+      return `
+      <div class="nd-ref-section">
+        <div class="nd-ref-title">${st.icon} ${i + 1}. ${escHtml(loc(st.title))} <span class="nd-path-count">${seen}/${st.items.length}</span></div>
+        ${st.items.map(it => `
+          <div class="nd-ref-row ${unseen.has(it.key) ? '' : 'nd-path-seen'}">
+            <span class="nd-ref-left">${escHtml(optionLabel(it))}</span>
+            <span class="nd-ref-right">${escHtml(it.answers[0])}</span>
+            <span class="nd-ref-extra">${unseen.has(it.key) ? '' : '✓'}</span>
+            <button class="nd-ref-speak" data-say="${escHtml(it.answers[0])}">🔊</button>
+          </div>`).join('')}
+      </div>`; }).join('')}`;
+  s.querySelector('#ndPathBack').addEventListener('click', showMenu);
+  s.querySelectorAll('[data-say]').forEach(btn => btn.addEventListener('click', () => speakText(btn.dataset.say, state.currentLanguage)));
+  s.scrollTo({ top: 0 });
+}
+
 function startDrill() {
-  nd.questions = buildQuestions();
+  nd.session = 'drill';
+  nd.questions = buildQuestions().map(q => ({ ...q, mode: modeFor() }));
   if (!nd.questions.length) return showMenu();
   nd.current = 0;
   nd.score = 0;
@@ -355,24 +472,29 @@ function headerHtml() {
 function renderQuestion() {
   nd.answered = false;
   const q = nd.questions[nd.current];
-  if (nd.qMode === 'choose') renderChoose(q);
-  else if (nd.qMode === 'listen') renderListen(q);
-  else if (nd.qMode === 'dictate') renderType(q, { dictation: true });
+  if (q.mode === 'choose') renderChoose(q);
+  else if (q.mode === 'listen') renderListen(q);
+  else if (q.mode === 'read') renderListen(q, { read: true });
+  else if (q.mode === 'dictate') renderType(q, { dictation: true });
   else renderType(q);
 }
 
 // Prompt card: big digits / "3rd" / "7:30" with clock, plus the question word.
-function promptCard(item, { hideClock = false } = {}) {
+function promptCard(item, { hideClock = false, intro = false } = {}) {
   const isTime = item.kind === 'time' || item.kind === 'attime';
   const hint = promptHint(item);
+  const nl = state.nativeLanguage === 'nl';
   return `
-    <div class="nd-q-card">
+    <div class="nd-q-card ${intro ? 'nd-q-intro' : ''}">
+      ${intro ? `<div class="nd-q-badge">✨ ${nl ? 'Nieuw' : 'New'}</div>` : ''}
       <div class="nd-q-question">${escHtml(questionWord(item))}</div>
       <div class="nd-q-main">
         ${isTime && !hideClock ? clockSvg(item.h, item.m) : ''}
         <div class="nd-q-prompt ${item.kind === 'cardinal' && item.value >= 1000 ? 'nd-q-prompt-long' : ''}">${escHtml(promptText(item))}</div>
       </div>
       ${hint ? `<div class="nd-q-hint">${escHtml(hint)}</div>` : ''}
+      ${intro ? `<div class="nd-q-word">${escHtml(item.answers[0])} <button class="nd-say-inline" id="ndSayIntro" type="button">🔊</button></div>
+                 <div class="nd-q-hint">${nl ? 'Zeg het, typ het dan' : 'Say it, then type it'}</div>` : ''}
     </div>`;
 }
 
@@ -389,7 +511,7 @@ function renderType(q, { dictation = false } = {}) {
       <div class="nd-q-question">${escHtml(questionWord(q.item))}</div>
       <button class="nd-big-listen" id="ndSay">🔊</button>
       <div class="nd-q-hint">${nl ? 'Typ wat je hoort' : 'Type what you hear'}</div>
-    </div>` : promptCard(q.item)}
+    </div>` : promptCard(q.item, { intro: q.intro })}
     <div class="nd-input-area">
       <input type="text" class="nd-text-input" id="ndInput" lang="uk"
         placeholder="${nl ? 'Typ het in het Oekraïens…' : 'Type it in Ukrainian…'}"
@@ -403,6 +525,11 @@ function renderType(q, { dictation = false } = {}) {
     const say = () => speakText(word, state.currentLanguage);
     s.querySelector('#ndSay').addEventListener('click', say);
     say();
+  }
+  if (q.intro) {
+    const say = () => speakText(word, state.currentLanguage);
+    s.querySelector('#ndSayIntro').addEventListener('click', say);
+    setTimeout(say, 200);
   }
   const input = s.querySelector('#ndInput');
   const check = s.querySelector('#ndCheck');
@@ -421,7 +548,7 @@ function renderType(q, { dictation = false } = {}) {
     const isCorrect = isExact || isClose;
     if (isCorrect) nd.score++;
     input.classList.add(isExact ? 'correct' : isClose ? 'close' : 'wrong');
-    recordAnswer(q.item.key, isCorrect);
+    record(q, isCorrect, isExact ? 5 : isClose ? 3 : 1);
     showFeedback(q, { isCorrect, isExact, answer });
   };
   check.addEventListener('click', submit);
@@ -456,7 +583,7 @@ function renderChoose(q) {
     nd.answered = true;
     const isCorrect = btn.dataset.key === q.item.key;
     if (isCorrect) nd.score++;
-    recordAnswer(q.item.key, isCorrect);
+    record(q, isCorrect, isCorrect ? 3 : 1);
     s.querySelectorAll('.nd-option-btn').forEach(b => {
       b.disabled = true;
       if (b.dataset.key === q.item.key) b.classList.add('correct');
@@ -478,14 +605,16 @@ function renderChoose(q) {
 }
 
 // Mode 3: hear the Ukrainian, type the digits.
-function renderListen(q) {
+// With read on, the word is shown instead of spoken: word → digits, typed.
+function renderListen(q, { read = false } = {}) {
   const s = getScreen();
   const nl = state.nativeLanguage === 'nl';
   const word = q.item.answers[0];
   const isTime = q.item.kind === 'time' || q.item.kind === 'attime';
   const isDate = q.item.kind === 'date';
   const placeholder = isTime ? '7:30' : isDate ? (nl ? '15-9 (dag-maand)' : '15-9 (day-month)') : q.item.kind === 'ordinal' ? (nl ? '3 (rangtelwoord)' : '3 (ordinal)') : '17';
-  const what = q.item.kind === 'ordinal' ? (nl ? 'Welk rangtelwoord hoor je?' : 'Which ordinal do you hear?')
+  const what = read ? (nl ? 'Typ het in cijfers' : 'Type it in digits')
+    : q.item.kind === 'ordinal' ? (nl ? 'Welk rangtelwoord hoor je?' : 'Which ordinal do you hear?')
     : isTime ? (nl ? 'Hoe laat hoor je?' : 'What time do you hear?')
     : isDate ? (nl ? 'Welke datum hoor je?' : 'Which date do you hear?')
     : (nl ? 'Welk getal hoor je?' : 'Which number do you hear?');
@@ -494,7 +623,8 @@ function renderListen(q) {
     ${headerHtml()}
     <div class="nd-q-card nd-q-card-listen">
       <div class="nd-q-question">${escHtml(questionWord(q.item))}</div>
-      <button class="nd-big-listen" id="ndSay">🔊</button>
+      ${read ? `<div class="nd-q-word nd-q-word-read">${escHtml(word)} <button class="nd-say-inline" id="ndSay" type="button">🔊</button></div>`
+             : '<button class="nd-big-listen" id="ndSay">🔊</button>'}
       <div class="nd-q-hint">${what}${q.item.kind === 'ordinal' ? ` · ${escHtml(loc(GENDER_LABEL[q.item.gender]))}` : ''}</div>
     </div>
     <div class="nd-input-area">
@@ -507,7 +637,7 @@ function renderListen(q) {
   s.querySelector('#ndDrillBack').addEventListener('click', showMenu);
   const say = () => speakText(word, state.currentLanguage);
   s.querySelector('#ndSay').addEventListener('click', say);
-  say();
+  if (!read) say();
 
   const input = s.querySelector('#ndInput');
   const check = s.querySelector('#ndCheck');
@@ -522,7 +652,7 @@ function renderListen(q) {
       : parseNumber(answer) === q.item.value;
     if (isCorrect) nd.score++;
     input.classList.add(isCorrect ? 'correct' : 'wrong');
-    recordAnswer(q.item.key, isCorrect);
+    record(q, isCorrect, isCorrect ? 4 : 1);
     showFeedback(q, { isCorrect, isExact: isCorrect, answer, expectedDigits: promptText(q.item) });
   };
   check.addEventListener('click', submit);
@@ -597,7 +727,7 @@ function showFeedback(q, { isCorrect, isExact, answer, showWord = true, expected
   const fb = document.getElementById('ndFeedback');
   const nl = state.nativeLanguage === 'nl';
   const item = q.item;
-  if (!isCorrect) nd.missed.push(q);
+  if (!isCorrect && !q.intro) nd.missed.push(q);
   const resultText = isExact ? '✓ ' + (nl ? 'Correct!' : 'Correct!')
     : isCorrect ? '✓ ' + (nl ? 'Bijna! (kleine typfout)' : 'Almost! (minor typo)')
     : '✗ ' + (nl ? 'Niet helemaal' : 'Not quite');
@@ -660,6 +790,11 @@ function showScore() {
 
   // List what went wrong this round so it can be studied right away.
   const missed = nd.missed;
+  const stage = nextStage();
+  const again = nd.session === 'new'
+    ? (stage ? `📥 ${nl ? 'Volgende' : 'Next'}: ${escHtml(loc(stage.title))}` : '')
+    : nd.session === 'due' ? (dueNumbers().length ? `🔄 ${nl ? 'Verder herhalen' : 'More reviews'}` : '')
+    : `🔄 ${nl ? 'Nog een ronde' : 'Another round'}`;
   const s = getScreen();
   s.innerHTML = `
     <div class="lesson-header">
@@ -677,7 +812,7 @@ function showScore() {
       <div class="ex-score-bar-wrap"><div class="ex-score-bar-fill" style="width: ${pct}%"></div></div>
       <div class="ex-score-pct">${pct}%</div>
       <div class="ex-score-actions">
-        <button class="ex-next-btn" id="ndRetry">🔄 ${nl ? 'Nog een ronde' : 'Another round'}</button>
+        ${again ? `<button class="ex-next-btn" id="ndRetry">${again}</button>` : ''}
         <button class="ex-back-btn" id="ndBackMenu">← Menu</button>
       </div>
     </div>
@@ -694,7 +829,7 @@ function showScore() {
       </div>` : ''}`;
 
   s.querySelector('#ndScoreBack').addEventListener('click', showMenu);
-  s.querySelector('#ndRetry').addEventListener('click', startDrill);
+  s.querySelector('#ndRetry')?.addEventListener('click', () => (nd.session === 'drill' ? startDrill() : startCourse(nd.session)));
   s.querySelector('#ndBackMenu').addEventListener('click', showMenu);
   s.querySelectorAll('[data-say]').forEach(btn => {
     btn.addEventListener('click', () => speakText(btn.dataset.say, state.currentLanguage));

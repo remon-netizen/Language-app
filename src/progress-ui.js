@@ -4,6 +4,7 @@ import { getLessonsForTarget, getLessonName } from './data/lesson-helpers.js';
 import { getLearnedCount, getDuePhrases } from './review.js';
 import { getWordsCount, getDueWords } from './words.js';
 import { vocabStats } from './data/vocab-progress.js';
+import { numbersStats } from './data/numbers-progress.js';
 import { getAllMastery as verbMastery } from './data/verb-weakness.js';
 import { getAllMastery as caseMastery } from './data/case-weakness.js';
 import { getAllMastery as prefixMastery } from './data/prefix-weakness.js';
@@ -43,6 +44,7 @@ export function openProgressScreen() {
   const learned = getLearnedCount(), duePhrases = getDuePhrases().length;
   const words = getWordsCount(), dueWords = getDueWords().length;
   const vs = isUK ? vocabStats() : null;
+  const ns = isUK ? numbersStats() : null;
 
   // Drills
   const drills = isUK ? [
@@ -113,6 +115,15 @@ export function openProgressScreen() {
         <span class="pg-row-title">${vs.learned} / ${vs.total} ${L('core words learned', 'kernwoorden geleerd')} <span class="pg-due">${vs.due ? vs.due + ' ' + L('due', 'aan de beurt') : ''}</span></span>
         <span class="pg-row-sub">${vs.seen} ${L('seen', 'gezien')} · ${vs.weak} ${L('weak', 'zwak')}</span>
         ${bar(vs.learned / vs.total * 100, 'pg-fill-pink')}
+      </span>
+    </button>` : ''}
+    ${ns ? `
+    <button class="pg-card pg-row" onclick="openNumbersDrillScreen()">
+      <span class="pg-row-icon">🔢</span>
+      <span class="pg-row-text">
+        <span class="pg-row-title">${ns.learned} / ${ns.total} ${L('numbers & times learned', 'getallen & tijden geleerd')} <span class="pg-due">${ns.due ? ns.due + ' ' + L('due', 'aan de beurt') : ''}</span></span>
+        <span class="pg-row-sub">${ns.seen} ${L('seen', 'gezien')}</span>
+        ${bar(ns.learned / ns.total * 100, 'pg-fill-pink')}
       </span>
     </button>` : ''}
 

@@ -257,6 +257,31 @@
   .nd-nav-primary { flex-basis: 100%; order: -1; }
 }
 
-/* Four mode buttons */
-.nd-mode-row { grid-template-columns: repeat(4, 1fr); }
-@media (max-width: 500px) { .nd-mode-row { grid-template-columns: 1fr 1fr; } }
+/* Six mode buttons: three typed directions, then listening and choosing */
+.nd-mode-row { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 500px) { .nd-mode-sub { display: none; } }
+
+/* The course: learn the next stage, review what is due */
+.nd-course-stats { font-size: 0.78rem; font-weight: 600; color: var(--gray); margin: 0 0 8px 2px; }
+.nd-course-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 8px; margin-bottom: 8px; }
+.nd-course-card {
+  display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 14px 10px; min-height: 84px;
+  border: 2px solid var(--border); border-radius: 14px; background: var(--card-bg); cursor: pointer; font-family: inherit;
+}
+.nd-course-card:hover:not(:disabled) { border-color: #ea580c; background: #fff7ed; }
+.nd-course-card:disabled { opacity: 0.45; cursor: default; }
+.nd-course-primary { border-color: #ea580c; background: #fff7ed; }
+.nd-course-icon { font-size: 1.5rem; line-height: 1; }
+.nd-course-title { font-size: 0.9rem; font-weight: 700; color: var(--text); text-align: center; }
+.nd-course-sub { font-size: 0.72rem; color: var(--gray); text-align: center; }
+.nd-path-btn { width: 100%; padding: 10px; margin-bottom: 18px; border: 2px solid var(--border); border-radius: 12px; background: var(--card-bg); font-weight: 700; font-size: 0.85rem; cursor: pointer; font-family: inherit; color: var(--text); min-height: 44px; }
+.nd-path-btn:hover { border-color: #ea580c; color: #c2410c; }
+.nd-path-count { float: right; font-weight: 600; color: var(--gray); }
+.nd-path-seen .nd-ref-extra { color: #16a34a; font-weight: 800; }
+
+/* Introduction card and the word shown on a word → digits card */
+.nd-q-intro { border: 2px solid #fdba74; background: #fff7ed; }
+.nd-q-badge { display: inline-block; font-size: 0.74rem; font-weight: 700; color: #c2410c; background: #ffedd5; padding: 3px 10px; border-radius: 6px; margin-bottom: 8px; }
+.nd-q-word { font-size: 1.7rem; font-weight: 800; color: #c2410c; margin-top: 10px; line-height: 1.25; }
+.nd-q-word-read { margin-top: 4px; }
+.nd-say-inline { background: none; border: none; font-size: 1.1rem; cursor: pointer; vertical-align: middle; }

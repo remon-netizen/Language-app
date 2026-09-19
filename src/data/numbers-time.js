@@ -95,7 +95,7 @@ function cardinalNote(n) {
   };
 }
 
-function cardinalItem(n) {
+export function cardinalItem(n) {
   return {
     key: `card:${n}`, kind: 'cardinal', value: n,
     prompt: String(n),
@@ -170,7 +170,7 @@ function ordinalNote(n, gender) {
   };
 }
 
-function ordinalItem(n, gender) {
+export function ordinalItem(n, gender) {
   return {
     key: `ord:${n}:${gender}`, kind: 'ordinal', value: n, gender,
     prompt: String(n), // suffix is added at render time (native-language dependent)
@@ -208,7 +208,7 @@ export function ordinalGenitive(n) {
   return [...words, gen].join(' ');
 }
 
-function dateItem(d, m) {
+export function dateItem(d, m) {
   const month = MONTHS[m - 1];
   return {
     key: `date:${d}-${m}`, kind: 'date', value: `${d}-${m}`, d, m,
@@ -344,7 +344,7 @@ function timeNote(h, m, at) {
            nl: `за ${cardinal(60 - m)} ${N.nom}: minuten "voor" = за + minuten + uur in de nominatief.` };
 }
 
-function timeItem(h, m, at = false) {
+export function timeItem(h, m, at = false) {
   const hm = `${h}:${String(m).padStart(2, '0')}`;
   return {
     key: `${at ? 'at' : 'time'}:${hm}`, kind: at ? 'attime' : 'time', value: hm, h, m,

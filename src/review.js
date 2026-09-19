@@ -16,6 +16,7 @@ import { getTargetText, getTranslation, getTip } from './data/lesson-helpers.js'
 import { t } from './i18n.js';
 import { getDueWords, getWordsCount } from './words.js';
 import { vocabStats } from './data/vocab-progress.js';
+import { numbersStats } from './data/numbers-progress.js';
 import { levenshtein } from './utils.js';
 import { markActivity } from './data/activity.js';
 
@@ -79,8 +80,8 @@ export function getDuePhrases() {
 }
 // Phrases + words waiting, for the home badge and the Today card.
 export function getDueTotal() {
-  const vocabDue = state.currentLanguage === 'uk' ? vocabStats().due : 0;
-  return getDuePhrases().length + getDueWords().length + vocabDue;
+  const deckDue = state.currentLanguage === 'uk' ? vocabStats().due + numbersStats().due : 0;
+  return getDuePhrases().length + getDueWords().length + deckDue;
 }
 
 // ── Review session state ─────────────────────────────────────────────────────
@@ -107,6 +108,7 @@ export function openReviewScreen() {
   const words = getWordsCount();
   const dueWords = getDueWords().length;
   const vs = state.currentLanguage === 'uk' ? vocabStats() : null;
+  const ns = state.currentLanguage === 'uk' ? numbersStats() : null;
   const s = getScreen();
 
   const row = (icon, title, sub, count, total, onclick, disabled) => `
@@ -140,6 +142,10 @@ export function openReviewScreen() {
             vs.seen ? (nl ? `${vs.due} aan de beurt · ${vs.seen} gezien, ${vs.learned} geleerd van ${vs.total}` : `${vs.due} due · ${vs.seen} seen, ${vs.learned} learned of ${vs.total}`)
                     : (nl ? 'Nog niet gestart — leer 10 nieuwe woorden' : 'Not started — learn 10 new words'),
             vs.due, vs.seen ? vs.learned : '→', vs.due ? 'startVocabReview()' : 'openVocabDrillScreen()', false) : ''}
+      ${ns ? row('🔢', nl ? 'Getallen & tijd' : 'Numbers & time',
+            ns.seen ? (nl ? `${ns.due} aan de beurt · ${ns.seen} gezien, ${ns.learned} geleerd van ${ns.total}` : `${ns.due} due · ${ns.seen} seen, ${ns.learned} learned of ${ns.total}`)
+                    : (nl ? 'Nog niet gestart — leer 0 tot 10' : 'Not started — learn 0 to 10'),
+            ns.due, ns.seen ? ns.learned : '→', ns.due ? 'startNumbersReview()' : 'openNumbersDrillScreen()', false) : ''}
       ${learned === 0 && words === 0 ? `
         <div class="rv-empty">
           <button class="rv-empty-btn" onclick="openLessonBrowse()">📖 ${nl ? 'Naar de lessen' : 'Go to lessons'}</button>
