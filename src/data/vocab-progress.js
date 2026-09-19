@@ -20,10 +20,12 @@ function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
 
 export function getVocabProgress(key) { return load()[key] || null; }
 
-// quality: 5 exact, 3 close, 1 wrong
+// quality: 5 exact, 4 right the easier way round, 3 close, 1 wrong.
+// Returns the entry as it was before, so a wrong verdict can be taken back.
 export function recordVocab(key, quality) {
   const d = load();
-  const prev = d[key] || { a: 0, c: 0 };
+  const before = d[key] || null;
+  const prev = before || { a: 0, c: 0 };
   const next = scheduleWord(prev, quality);
   next.a = prev.a + 1;
   next.c = prev.c + (quality >= 3 ? 1 : 0);
@@ -31,6 +33,14 @@ export function recordVocab(key, quality) {
   d[key] = next;
   save();
   markActivity();
+  return before;
+}
+
+// "I was right": put the entry back as it was and grade the answer again.
+export function regradeVocab(key, before, quality) {
+  const d = load();
+  if (before) d[key] = before; else delete d[key];
+  recordVocab(key, quality);
 }
 
 export function dueVocab() {

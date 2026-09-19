@@ -1,9 +1,9 @@
 import { state } from '../state.js';
-import { escHtml } from '../utils.js';
+import { escHtml, levenshtein } from '../utils.js';
 import { speakText } from '../voice.js';
 import { VOCAB, THEMES, POS_LABEL, vocabByTheme } from '../data/vocab-uk.js';
-import { recordVocab, dueVocab, unseenVocab, weakVocab, vocabStats, getVocabProgress } from '../data/vocab-progress.js';
-import { L, loc, shuffle, grade, resultLine, appendNext, missedListHtml, wireSpeakButtons, scoreMessage, scoreEmoji } from './drill-core.js';
+import { recordVocab, regradeVocab, dueVocab, unseenVocab, weakVocab, vocabStats, getVocabProgress } from '../data/vocab-progress.js';
+import { L, loc, isNL, shuffle, grade, normalise, resultLine, appendNext, missedListHtml, wireSpeakButtons, scoreMessage, scoreEmoji } from './drill-core.js';
 
 // ── State ────────────────────────────────────────────────────────────────────
 
@@ -11,8 +11,12 @@ const PREFS_KEY = 'vocabDrillPrefs';
 
 let vc = {
   theme:  'all',
-  qMode:  'type',     // 'type' (meaning → word) | 'dictate' (audio → word) | 'choose' (word → meaning)
-  queue:  [],         // [{ word, intro }] intro = first exposure: the word is shown and copied
+  // 'type' (meaning → word) | 'translate' (word → meaning, typed) | 'mixed' (both, typed)
+  // | 'dictate' (audio → word) | 'choose' (word → meaning, four options)
+  qMode:  'type',
+  // [{ word, intro, dir, shown }] intro = first exposure: the word is shown and copied.
+  // dir = 'produce' | 'translate'; shown = the Ukrainian form on a translate card.
+  queue:  [],
   current: 0,
   score:  0,
   answered: false,
@@ -25,7 +29,7 @@ function loadPrefs() {
   try {
     const p = JSON.parse(localStorage.getItem(PREFS_KEY));
     if (p?.theme && (p.theme === 'all' || THEMES[p.theme])) vc.theme = p.theme;
-    if (['type', 'dictate', 'choose'].includes(p?.qMode)) vc.qMode = p.qMode;
+    if (['type', 'translate', 'mixed', 'dictate', 'choose'].includes(p?.qMode)) vc.qMode = p.qMode;
   } catch { /* ignore */ }
 }
 function savePrefs() { localStorage.setItem(PREFS_KEY, JSON.stringify({ theme: vc.theme, qMode: vc.qMode })); }
@@ -40,6 +44,79 @@ function wordTag(w) {
   if (w.pos === 'n') return `${loc(POS_LABEL.n)} · ${w.gender}`;
   if (w.pos === 'v') return w.perfective ? `${loc(POS_LABEL.v)} · ${L('perf.', 'volt.')} ${w.perfective}` : loc(POS_LABEL.v);
   return loc(POS_LABEL[w.pos]) || w.pos;
+}
+
+// The tag on a question card. It never names the aspect partner: "perf. зробити"
+// next to "to do" would hand over the stem of the answer.
+function promptTag(w, shown = w.uk) {
+  if (w.pos !== 'v' || !w.perfective) return wordTag(w);
+  return `${loc(POS_LABEL.v)} · ${shown === w.perfective ? L('perfective', 'voltooid') : L('imperfective', 'onvoltooid')}`;
+}
+
+// ── Typed meanings ───────────────────────────────────────────────────────────
+// "to go (on foot) / to walk" accepts "to go", "go", "to walk" and "walk";
+// "potato(es)" accepts both spellings. A leading "to" or article is optional.
+
+// " / " separates answers, except inside a gloss: "you (plural / formal)" is one answer.
+function splitAlts(text) {
+  const out = [];
+  let depth = 0, cur = '';
+  for (let i = 0; i < text.length; i++) {
+    if (text[i] === '(') depth++;
+    else if (text[i] === ')') depth--;
+    if (depth === 0 && text.startsWith(' / ', i)) { out.push(cur); cur = ''; i += 2; } else cur += text[i];
+  }
+  out.push(cur);
+  return out;
+}
+const GLOSS = /\s+\([^)]*\)/g;
+
+// plainOnly keeps the answers that carry no gloss: "to lie (tell lies)" and
+// "to lie (down)" share a spelling in English, not a meaning.
+function meaningForms(text, { plainOnly = false } = {}) {
+  const out = [];
+  for (const alt of splitAlts(text)) {
+    if (plainOnly && /\s\(/.test(alt)) continue;
+    const bare = alt.replace(GLOSS, '').trim();
+    if (!bare) continue;
+    if (bare.includes('(')) out.push(bare.replace(/\([^)]*\)/g, ''), bare.replace(/[()]/g, ''));
+    else out.push(bare);
+  }
+  return out;
+}
+const LEAD = /^(to|a|an|the|de|het|een|om te|te)\s+/;
+const core = s => normalise(s).replace(/[.!?,;:]+$/, '').trim().replace(LEAD, '');
+const meaningCores = w => meaningForms(meaning(w)).map(core);
+
+let allCores = null, allCoresLang = null;
+function everyMeaning() {
+  if (!allCores || allCoresLang !== state.nativeLanguage) {
+    allCores = new Set(VOCAB.flatMap(meaningCores));
+    allCoresLang = state.nativeLanguage;
+  }
+  return allCores;
+}
+
+// English and Dutch words sit closer together than Ukrainian ones (where / there,
+// though / through), so a one-letter slip only passes on 6+ letters and never
+// when what was typed is itself the meaning of another word in the deck.
+function gradeMeaning(answer, w) {
+  const a = core(answer);
+  const forms = meaningCores(w);
+  const isExact = forms.includes(a);
+  const isClose = !isExact && !everyMeaning().has(a) && forms.some(f => f.length >= 6 && levenshtein(f, a) <= 1);
+  return { isExact, isClose, isCorrect: isExact || isClose };
+}
+
+// Another word of the deck that fits the same prompt (теж / також, обирати / вибирати).
+// Only unglossed meanings count as shared.
+function synonymTyped(answer, w) {
+  const a = normalise(answer);
+  const plain = x => meaningForms(meaning(x), { plainOnly: true }).map(core);
+  const mine = new Set(plain(w));
+  return VOCAB.find(o => o.key !== w.key && o.pos === w.pos
+    && (normalise(o.uk) === a || (o.perfective && normalise(o.perfective) === a))
+    && plain(o).some(m => mine.has(m)));
 }
 
 // ── Public entry ─────────────────────────────────────────────────────────────
@@ -62,14 +139,15 @@ export function startVocabReview() {
 function showMenu() {
   const s = getScreen();
   const st = vocabStats();
-  const pool = vc.theme === 'all' ? VOCAB : vocabByTheme(vc.theme);
+  const verbCount = vocabByTheme('verbs').length;
+  const nat = isNL() ? 'NL' : 'EN';
   const unseenHere = unseenVocab().filter(w => vc.theme === 'all' || w.theme === vc.theme).length;
 
   const chips = ['all', ...Object.keys(THEMES)].map(t => `
     <button class="vc-chip ${vc.theme === t ? 'active' : ''}" data-theme="${t}">${t === 'all' ? '🌐' : THEMES[t].icon} ${escHtml(themeName(t))}</button>`).join('');
 
-  const modeBtn = (id, icon, label, sub) => `
-    <button class="vc-mode-btn ${vc.qMode === id ? 'active' : ''}" data-mode="${id}">
+  const modeBtn = (id, icon, label, sub, wide = false) => `
+    <button class="vc-mode-btn ${wide ? 'vc-mode-wide' : ''} ${vc.qMode === id ? 'active' : ''}" data-mode="${id}">
       <span class="vc-mode-icon">${icon}</span>
       <span class="vc-mode-label">${label}</span>
       <span class="vc-mode-sub">${sub}</span>
@@ -80,7 +158,7 @@ function showMenu() {
       <button class="back-btn" id="vcBack">←</button>
       <div>
         <div class="lesson-title">🧠 ${L('Vocabulary', 'Woordenschat')}</div>
-        <div class="lesson-subtitle">${L(`${st.total} core words · see the meaning, type the word`, `${st.total} kernwoorden · zie de betekenis, typ het woord`)}</div>
+        <div class="lesson-subtitle">${L(`${st.total} core words, ${verbCount} of them verbs · typed both ways`, `${st.total} kernwoorden, waarvan ${verbCount} werkwoorden · in beide richtingen typen`)}</div>
       </div>
     </div>
 
@@ -95,9 +173,11 @@ function showMenu() {
 
     <div class="vc-section-label">${L('How', 'Hoe')}</div>
     <div class="vc-mode-row">
-      ${modeBtn('type', '✍️', L('Type', 'Typen'), L('meaning → word', 'betekenis → woord'))}
-      ${modeBtn('dictate', '👂', L('Dictation', 'Dictee'), L('audio → word', 'geluid → woord'))}
-      ${modeBtn('choose', '👆', L('Choose', 'Kiezen'), L('word → meaning', 'woord → betekenis'))}
+      ${modeBtn('type', '✍️', `${nat} → UK`, L('type the word', 'typ het woord'))}
+      ${modeBtn('translate', '💡', `UK → ${nat}`, L('type the meaning', 'typ de betekenis'))}
+      ${modeBtn('mixed', '🔀', L('Both ways', 'Beide kanten'), L('typed, mixed', 'typen, door elkaar'))}
+      ${modeBtn('dictate', '👂', L('Dictation', 'Dictee'), L('audio → word', 'geluid → woord'), true)}
+      ${modeBtn('choose', '👆', L('Choose', 'Kiezen'), L('word → meaning, no typing', 'woord → betekenis, zonder typen'), true)}
     </div>
 
     <div class="vc-session-grid">
@@ -183,8 +263,9 @@ function showReference(theme) {
 }
 
 // ── Sessions ─────────────────────────────────────────────────────────────────
-// 'new'   : next 10 unseen words in frequency order. Each appears twice: first
-//           with the word shown (copy it, hear it), later from the meaning alone.
+// 'new'   : next 10 unseen words in frequency order. Each appears first with the
+//           word shown (copy it, hear it), then from memory: one pass in the chosen
+//           direction, or word → meaning followed by meaning → word in 'mixed'.
 // 'due'   : everything the schedule says is due (max 30).
 // 'weak'  : words answered wrong more than right.
 // 'theme' : 20 random words from the theme, schedule ignored.
@@ -204,11 +285,25 @@ function startSession(kind) {
   }
   if (!words.length) { showMenu(); return; }
 
-  if (kind === 'new' && vc.qMode !== 'choose') {
-    // intro pass, then production pass in a different order
-    vc.queue = [...words.map(w => ({ word: w, intro: true })), ...shuffle(words).map(w => ({ word: w, intro: false }))];
+  // A translate card shows the perfective partner now and then: in real text a
+  // verb turns up in either aspect, and зробити has to ring the same bell as робити.
+  const card = (w, dir) => ({
+    word: w, intro: false, dir,
+    shown: dir === 'translate' && w.perfective && Math.random() < 0.4 ? w.perfective : w.uk,
+  });
+  const dirOf = () => (vc.qMode === 'translate' ? 'translate'
+    : vc.qMode === 'mixed' ? (Math.random() < 0.5 ? 'translate' : 'produce') : 'produce');
+
+  if (vc.qMode === 'choose') {
+    vc.queue = words.map(w => card(w, 'produce'));
+  } else if (kind === 'new') {
+    const passes = vc.qMode === 'mixed' ? ['translate', 'produce'] : [dirOf()];
+    vc.queue = [
+      ...words.map(w => ({ word: w, intro: true, dir: 'produce', shown: w.uk })),
+      ...passes.flatMap(dir => shuffle(words).map(w => card(w, dir))),
+    ];
   } else {
-    vc.queue = words.map(w => ({ word: w, intro: false }));
+    vc.queue = words.map(w => card(w, dirOf()));
   }
   vc.current = 0; vc.score = 0; vc.missed = []; vc.answered = false;
   renderQuestion();
@@ -233,6 +328,7 @@ function renderQuestion() {
   vc.answered = false;
   const q = vc.queue[vc.current];
   if (vc.qMode === 'choose') renderChoose(q);
+  else if (q.dir === 'translate') renderTranslate(q);
   else renderType(q, vc.qMode === 'dictate');
 }
 
@@ -244,7 +340,7 @@ function renderType(q, dictation) {
     ? `<button class="vc-big-listen" id="vcSay" type="button">🔊</button>
        <div class="vc-q-hint">${L('Type what you hear', 'Typ wat je hoort')}</div>`
     : `<div class="vc-q-meaning">${escHtml(meaning(w))}</div>
-       <div class="vc-q-hint">${escHtml(wordTag(w))}</div>`;
+       <div class="vc-q-hint">${escHtml(q.intro ? wordTag(w) : promptTag(w))}</div>`;
 
   s.innerHTML = `
     ${headerHtml()}
@@ -260,6 +356,7 @@ function renderType(q, dictation) {
         autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
       <button class="vc-check-btn" id="vcCheck" type="button">${L('Check', 'Controleer')} ✓</button>
     </div>
+    <div class="vc-synonym-note" id="vcSynonym" hidden></div>
     <div id="vcFeedback"></div>`;
 
   s.querySelector('#vcDrillBack').addEventListener('click', showMenu);
@@ -273,17 +370,82 @@ function renderType(q, dictation) {
     if (vc.answered) return;
     const answer = input.value.trim();
     if (!answer) { input.focus(); return; }
+    let g = grade(answer, [w.uk], { minTypoLen: 5 });
+    // A different word that means the same is not a mistake: ask again, no penalty.
+    const other = !g.isCorrect && !dictation && !q.intro && synonymTyped(answer, w);
+    if (other) {
+      const note = s.querySelector('#vcSynonym');
+      note.textContent = L(`${other.uk} fits too, but here it is another word. Try again.`, `${other.uk} past ook, maar hier is het een ander woord. Probeer opnieuw.`);
+      note.hidden = false;
+      input.value = ''; input.focus();
+      return;
+    }
+    // The perfective partner is the right verb in the other aspect. Checked before the
+    // typo tolerance has its say: вивчити for вивчати is one letter off, but no slip.
+    const otherAspect = !g.isExact && !q.intro && !dictation && w.perfective && normalise(answer) === normalise(w.perfective);
+    if (otherAspect) g = { isExact: false, isClose: true, isCorrect: true };
     vc.answered = true;
     input.disabled = true; check.disabled = true;
-    const g = grade(answer, [w.uk], { minTypoLen: 5 });
     input.classList.add(g.isExact ? 'correct' : g.isClose ? 'close' : 'wrong');
     if (g.isCorrect) vc.score++;
     // Intro cards are copying, so they never count as a failure; the real test is the second pass.
+    let before;
     if (!q.intro) {
-      recordVocab(w.key, g.isExact ? 5 : g.isClose ? 3 : 1);
+      before = recordVocab(w.key, g.isExact ? 5 : otherAspect ? 4 : g.isClose ? 3 : 1);
       if (!g.isCorrect) vc.missed.push({ left: meaning(w), right: w.uk, extra: wordTag(w) });
     }
-    showFeedback(w, { g, answer, showCompare: !g.isExact });
+    showFeedback(w, {
+      g, answer, showCompare: !g.isExact, correct: w.uk,
+      headline: otherAspect ? L('Right verb, but that is the perfective', 'Juiste werkwoord, maar dat is de voltooide vorm') : '',
+      onOverride: !q.intro && !dictation && !g.isCorrect ? () => regradeVocab(w.key, before, 4) : null,
+    });
+  };
+  check.addEventListener('click', submit);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); submit(); } });
+  input.focus();
+}
+
+// Word → meaning, typed. Any one of the listed meanings is enough.
+function renderTranslate(q) {
+  const s = getScreen();
+  const w = q.word;
+  const langName = isNL() ? 'het Nederlands' : 'English';
+
+  s.innerHTML = `
+    ${headerHtml()}
+    <div class="vc-q-card">
+      <div class="vc-q-word vc-q-word-prompt">${escHtml(q.shown)} <button class="vc-say-inline" id="vcSay" type="button">🔊</button></div>
+      <div class="vc-q-hint">${escHtml(promptTag(w, q.shown))}</div>
+    </div>
+    <div class="vc-input-area">
+      <input type="text" class="vc-text-input" id="vcInput" lang="${isNL() ? 'nl' : 'en'}"
+        placeholder="${L(`Type the meaning in ${langName}…`, `Typ de betekenis in ${langName}…`)}"
+        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+      <button class="vc-check-btn" id="vcCheck" type="button">${L('Check', 'Controleer')} ✓</button>
+    </div>
+    <div id="vcFeedback"></div>`;
+
+  s.querySelector('#vcDrillBack').addEventListener('click', showMenu);
+  s.querySelector('#vcSay').addEventListener('click', () => speakText(q.shown, state.currentLanguage));
+
+  const input = s.querySelector('#vcInput');
+  const check = s.querySelector('#vcCheck');
+  const submit = () => {
+    if (vc.answered) return;
+    const answer = input.value.trim();
+    if (!answer) { input.focus(); return; }
+    vc.answered = true;
+    input.disabled = true; check.disabled = true;
+    const g = gradeMeaning(answer, w);
+    input.classList.add(g.isExact ? 'correct' : g.isClose ? 'close' : 'wrong');
+    if (g.isCorrect) vc.score++;
+    // Knowing a word when you see it is the easier half, so it ages a little slower than producing it.
+    const before = recordVocab(w.key, g.isExact ? 4 : g.isClose ? 3 : 1);
+    if (!g.isCorrect) vc.missed.push({ left: q.shown, right: meaning(w), extra: wordTag(w), say: q.shown });
+    showFeedback(w, {
+      g, answer, showCompare: !g.isCorrect, correct: meaning(w),
+      onOverride: g.isCorrect ? null : () => regradeVocab(w.key, before, 4),
+    });
   };
   check.addEventListener('click', submit);
   input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); submit(); } });
@@ -337,15 +499,17 @@ function renderChoose(q) {
   s.querySelector('.vc-option-btn').focus({ preventScroll: true });
 }
 
-function showFeedback(w, { g, answer, showCompare }) {
+function showFeedback(w, { g, answer, showCompare, correct = w.uk, headline = '', onOverride = null }) {
   const fb = document.getElementById('vcFeedback');
-  let html = resultLine(g);
+  let html = headline ? `<div class="ex-feedback-result correct">✓ ${escHtml(headline)}</div>` : resultLine(g);
   if (showCompare) {
     html += `<div class="vc-compare">
       <div class="vc-your-answer"><b>${L('Your answer:', 'Jouw antwoord:')}</b> ${escHtml(answer)}</div>
-      <div class="vc-correct-answer"><b>${L('Correct:', 'Correct:')}</b> ${escHtml(w.uk)}</div>
+      <div class="vc-correct-answer"><b>${L('Correct:', 'Correct:')}</b> ${escHtml(correct)}</div>
     </div>`;
   }
+  // A typed translation can be right without being on the list (a synonym, another turn of phrase).
+  if (onOverride) html += `<button class="vc-override-btn" id="vcOverride" type="button">✓ ${L('My answer was right too', 'Mijn antwoord was ook goed')}</button>`;
   html += `<div class="vc-word-line">
     <span class="vc-word-uk">${escHtml(w.uk)}</span>
     <span class="vc-word-eq">=</span>
@@ -355,6 +519,17 @@ function showFeedback(w, { g, answer, showCompare }) {
   html += `<button class="vc-listen-btn" id="vcListen" type="button">🔊 ${L('Listen', 'Luister')}</button>`;
   fb.innerHTML = html;
   fb.querySelector('#vcListen').addEventListener('click', () => speakText(w.uk, state.currentLanguage));
+  const override = fb.querySelector('#vcOverride');
+  if (override) override.addEventListener('click', () => {
+    onOverride();
+    vc.score++;
+    vc.missed.pop();
+    fb.querySelector('.ex-feedback-result').outerHTML = `<div class="ex-feedback-result correct">✓ ${L('Counted as correct', 'Goed gerekend')}</div>`;
+    override.remove();
+    const input = document.getElementById('vcInput');
+    if (input) { input.classList.remove('wrong'); input.classList.add('close'); }
+    fb.querySelector('.vc-next-btn')?.focus({ preventScroll: true });
+  });
 
   const isLast = vc.current + 1 >= vc.queue.length;
   appendNext(fb, { isLast, className: 'vc-next-btn', onNext: () => {
