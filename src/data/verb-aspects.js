@@ -1,6 +1,8 @@
 // ── 20 Ukrainian verb pairs: imperfective / perfective ───────────────────────
 // Topic: Plans for the week and weekend / Future tense
 // Each pair has 10 sentences covering both aspects with context clues.
+// Asked in Learn One of the Verb Drill (which aspect, and the form in the gap), written
+// out in full in the Sentence Builder, browsable on the Aspect explained screen.
 // Sentences are tagged with aspect, English/Dutch translations, and explanations.
 
 export const VERB_PAIRS = [
@@ -824,86 +826,3 @@ export const VERB_PAIRS = [
     ]
   },
 ];
-
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
-/** Shuffle an array in place (Fisher-Yates). */
-export function shuffle(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
-
-/** Pick `n` random items from `arr` (no duplicates). */
-export function pickRandom(arr, n) {
-  const copy = [...arr];
-  shuffle(copy);
-  return copy.slice(0, Math.min(n, copy.length));
-}
-
-/**
- * Build a randomised exercise set of `count` questions from the full bank.
- * Returns an array of question objects ready for the UI.
- */
-export function buildExerciseSet(count = 25) {
-  const allSentences = [];
-  for (const pair of VERB_PAIRS) {
-    for (const s of pair.sentences) {
-      allSentences.push({ ...s, pair });
-    }
-  }
-  const picked = pickRandom(allSentences, count);
-
-  return picked.map(item => {
-    // Randomly assign an exercise type
-    const rand = Math.random();
-    if (rand < 0.4) {
-      return buildAspectChoiceQ(item);
-    } else if (rand < 0.75) {
-      return buildFillVerbQ(item);
-    } else {
-      return buildSentenceWriteQ(item);
-    }
-  });
-}
-
-/** Type 1: Choose the correct aspect (imperfective or perfective) */
-function buildAspectChoiceQ(item) {
-  const { pair } = item;
-  const correctAspect = item.aspect;
-  return {
-    type: 'aspect_choice',
-    sentence: item.uk.replace(item.verb, '______'),
-    verb: item.verb,
-    translation: item,
-    pair,
-    correctAspect,
-    options: shuffle([
-      { label: `${pair.imperfective} (imperfective)`, value: 'imperfective' },
-      { label: `${pair.perfective} (perfective)`, value: 'perfective' },
-    ]),
-  };
-}
-
-/** Type 2: Fill in the correct verb form (typing) */
-function buildFillVerbQ(item) {
-  const { pair } = item;
-  return {
-    type: 'fill_verb',
-    sentence: item.uk.replace(item.verb, '______'),
-    correctVerb: item.verb,
-    translation: item,
-    pair,
-  };
-}
-
-/** Type 3: Write the full sentence from translation */
-function buildSentenceWriteQ(item) {
-  return {
-    type: 'sentence_write',
-    translation: item,
-    pair: item.pair,
-  };
-}

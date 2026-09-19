@@ -1,20 +1,17 @@
 import { state } from '../state.js';
-import { escHtml, levenshtein } from '../utils.js';
+import { escHtml } from '../utils.js';
 import { CONJUGATIONS, buildDrillSet, findVerb } from '../data/verb-conjugations.js';
 import { VERB_PAIRS } from '../data/verb-aspects.js';
 import { ASPECT_TIPS } from '../data/aspect-tips.js';
-import { speakText } from '../voice.js';
-import { missedListHtml, wireSpeakButtons } from './drill-core.js';
+import { L, loc, shuffle, grade } from './drill-core.js';
+import { runSession } from './course-engine.js';
+import { verbProgress, verbStats, tenseKey, aspectKey, TENSES } from '../data/verb-progress.js';
 import { recordAnswer, getVerbMastery, getAllMastery, getWeakItems, hasWeaknessData, getWeakVerbCount } from '../data/verb-weakness.js';
 import { englishGloss, aspectNote } from './english-gloss.js';
 
 // ── State ────────────────────────────────────────────────────────────────────
 
 let vd = {
-  questions: [],
-  current:   0,
-  score:     0,
-  answered:  false,
   total:     25,
   mode:      'menu',      // 'menu' | 'reference' | 'drill' | 'learnPicker' | 'selectPicker' | 'learnVerb'
   refIdx:    0,
@@ -26,21 +23,10 @@ let vd = {
   // My list: hand-picked verb pairs to drill (e.g. this week's class list)
   selection:    loadSelection(),
   useSelection: localStorage.getItem('verbDrillUseSelection') === '1',
-  // Learn one verb state
-  learnPairIdx: 0,
-  learnStep:    'study',   // 'study' | 'practice' | 'sentences' | 'summary'
-  learnForms:   [],        // all forms to practice
-  learnFormIdx: 0,
-  learnResults: [],        // { pronoun, tense, correct, correctForm, userAnswer }
-  learnSentences: [],      // sentence exercises for current verb
-  learnSentIdx:  0,
 };
 
-const loc = field => {
-  if (!field) return '';
-  if (typeof field === 'string') return field;
-  return field[state.nativeLanguage] || field.en || '';
-};
+const COURSE = { icon: '✍️', get name() { return L('Verbs', 'Werkwoorden'); } };
+const ACCENT = { main: '#0891b2', dark: '#155e75', soft: '#ecfeff', border: '#a5f3fc' };
 
 function getScreen() { return document.getElementById('verbDrillScreen'); }
 
@@ -126,8 +112,6 @@ function getMasteryColor(inf1, inf2) {
   return 'red';
 }
 
-const normalise = s => s.toLowerCase().replace(/['ʼ]/g, "'").replace(/\s+/g, ' ').trim();
-
 // ── Public entry ─────────────────────────────────────────────────────────────
 
 export function openVerbDrillScreen() {
@@ -148,6 +132,7 @@ function showMenu() {
   const allowedTenses = selOn ? ALL_TENSES : getAllowedTenses(vd.level);
   const weakCount = getWeakVerbCount();
   const hasWeak = hasWeaknessData();
+  const st = verbStats();
 
   s.innerHTML = `
     <div class="lesson-header">
@@ -162,7 +147,14 @@ function showMenu() {
       <span class="vd-stat">📊 ${verbCount} ${nl ? 'werkwoorden' : 'verbs'}</span>
       <span class="vd-stat">🎯 ${formCount} ${nl ? 'vormen' : 'forms'}</span>
       <span class="vd-stat">${selOn ? `📝 ${nl ? 'Mijn lijst' : 'My list'}` : `🔀 ${nl ? 'Willekeurig' : 'Randomised'}`}</span>
+      <span class="vd-stat">📚 ${st.learned} ${nl ? (st.learned === 1 ? 'tijd geleerd' : 'tijden geleerd') : (st.learned === 1 ? 'tense learned' : 'tenses learned')}</span>
     </div>
+
+    ${st.seen ? `
+    <button class="vd-review-btn" id="vdReviewBtn" ${st.due ? '' : 'disabled'}>
+      🔄 ${st.due ? (nl ? `Herhalen: ${st.due} aan de beurt` : `Review: ${st.due} due`) : (nl ? 'Niets aan de beurt' : 'Nothing due right now')}
+      <span class="vd-review-sub">${nl ? 'Van de werkwoorden die je met “Leer één” hebt geleerd' : 'From the verbs you learned with “Learn One”'}</span>
+    </button>` : ''}
 
     <div class="vd-filter-section">
       ${vd.selection.size ? `
@@ -212,7 +204,7 @@ function showMenu() {
       <button class="vd-menu-card" id="vdAspectBtn">
         <span class="vd-menu-icon">🔀</span>
         <span class="vd-menu-title">Aspect</span>
-        <span class="vd-menu-sub">${nl ? 'Voltooid / onvoltooid' : 'Perf. / imperf.'}</span>
+        <span class="vd-menu-sub">${nl ? 'Uitleg + voorbeelden' : 'Explained + examples'}</span>
       </button>
       <button class="vd-menu-card" id="vdRefBtn">
         <span class="vd-menu-icon">📖</span>
@@ -244,6 +236,7 @@ function showMenu() {
   s.querySelector('#vdLearnBtn').addEventListener('click', () => showVerbPicker());
   s.querySelector('#vdPickBtn').addEventListener('click', () => showSelectionPicker());
   s.querySelector('#vdStartBtn').addEventListener('click', startDrill);
+  s.querySelector('#vdReviewBtn')?.addEventListener('click', () => startVerbReview(showMenu));
 
   // "Only my list" toggle — re-renders so the stats bar and tense row follow it
   const selToggle = s.querySelector('#vdSelToggle');
@@ -496,13 +489,16 @@ function startDrill() {
   }
   while (sIdx < sentenceQs.length) mixed.push(sentenceQs[sIdx++]);
 
-  vd.questions = mixed.slice(0, vd.total);
-  if (vd.questions.length === 0) { showEmptyState(); return; }
-  vd.current = 0;
-  vd.missed = [];
-  vd.score = 0;
-  vd.answered = false;
-  renderDrillQuestion();
+  const picked = mixed.slice(0, vd.total);
+  if (picked.length === 0) { showEmptyState(); return; }
+  // The free drill only moves the schedule of tenses already learned with Learn One.
+  const units = makeUnits({ onlySeen: true });
+  runSession({
+    screen: getScreen(), icon: COURSE.icon, title: L('Verb Drill', 'Werkwoord Drill'), accent: ACCENT,
+    cards: picked.map(q => formCard(q, { dictation: vd.dictation, units })),
+    onExit: showMenu,
+    again: () => ({ label: '🔄 ' + L('Try again (new questions)', 'Opnieuw (nieuwe vragen)'), run: startDrill }),
+  });
 }
 
 function getTenseLabel(tense) {
@@ -513,15 +509,6 @@ function getTenseLabel(tense) {
     future:     { en: 'Future', nl: 'Toekomst' },
     imperative: { en: 'Imperative', nl: 'Gebiedende wijs' },
   }[tense] || { en: tense, nl: tense };
-}
-
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
 }
 
 function showEmptyState() {
@@ -571,277 +558,6 @@ function buildSentenceQuestions(verbs, allowedTenses, count) {
     }
   }
   return shuffle(all).slice(0, count);
-}
-
-function renderDrillQuestion() {
-  vd.answered = false;
-  const q = vd.questions[vd.current];
-
-  if (q.type === 'sentence') {
-    renderSentenceQuestion(q);
-  } else {
-    renderConjugationQuestion(q);
-  }
-}
-
-function renderSentenceQuestion(q) {
-  const s = getScreen();
-  const nl = state.nativeLanguage === 'nl';
-  const pct = Math.round((vd.current / vd.questions.length) * 100);
-
-  const aspectTag = q.aspect === 'imperfective'
-    ? `<span class="vd-aspect-tag vd-imp">IMP</span>`
-    : `<span class="vd-aspect-tag vd-perf">PERF</span>`;
-
-  s.innerHTML = `
-    <div class="lesson-header">
-      <button class="back-btn" id="vdDrillBack">←</button>
-      <div>
-        <div class="lesson-title">✍️ ${nl ? 'Werkwoord Drill' : 'Verb Drill'}</div>
-        <div class="lesson-subtitle">
-          <div class="vd-progress-wrap"><div class="vd-progress-bar" style="width:${pct}%"></div></div>
-          <div class="vd-progress-text">${vd.current + 1} / ${vd.questions.length}</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="vd-sentence-card">
-      <div class="vd-sentence-translation">${escHtml(q.translation)}</div>
-      <div class="vd-sentence-text">${escHtml(q.sentence).replace('___', '<span class="vd-sentence-blank"></span>')}</div>
-      <div class="vd-sentence-hint">
-        ${aspectTag}
-        ${escHtml(q.infinitive)} — ${escHtml(loc(q.tenseLabel))} — ${escHtml(q.pronoun)}
-      </div>
-    </div>
-
-    <div class="vd-input-area">
-      <input type="text" class="vd-text-input" id="vdInput"
-        placeholder="${nl ? 'Typ de werkwoordsvorm...' : 'Type the verb form...'}"
-        autocomplete="off" autocorrect="off" spellcheck="false" />
-      <button class="vd-check-btn" id="vdCheck">${nl ? 'Controleer ✓' : 'Check ✓'}</button>
-    </div>
-
-    <div id="vdFeedback"></div>`;
-
-  s.querySelector('#vdDrillBack').addEventListener('click', showMenu);
-  setupInputHandlers(q);
-}
-
-function renderConjugationQuestion(q) {
-  const s = getScreen();
-  const nl = state.nativeLanguage === 'nl';
-  const pct = Math.round((vd.current / vd.questions.length) * 100);
-
-  const aspectTag = q.aspect === 'imperfective'
-    ? `<span class="vd-aspect-tag vd-imp">IMP</span>`
-    : `<span class="vd-aspect-tag vd-perf">PERF</span>`;
-
-  const tenseLabel = loc(q.tenseLabel);
-
-  s.innerHTML = `
-    <div class="lesson-header">
-      <button class="back-btn" id="vdDrillBack">←</button>
-      <div>
-        <div class="lesson-title">✍️ ${nl ? 'Werkwoord Drill' : 'Verb Drill'}</div>
-        <div class="lesson-subtitle">
-          <div class="vd-progress-wrap"><div class="vd-progress-bar" style="width:${pct}%"></div></div>
-          <div class="vd-progress-text">${vd.current + 1} / ${vd.questions.length}</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="vd-q-card">
-      <div class="vd-q-verb-row">
-        ${aspectTag}
-        <span class="vd-q-infinitive">${escHtml(q.infinitive)}</span>
-        <span class="vd-q-meaning">${escHtml(loc(q.meaning))}</span>
-      </div>
-      <div class="vd-q-partner">${nl ? 'Paar' : 'Pair'}: ${escHtml(q.partner)}</div>
-      <div class="vd-q-prompt">
-        <span class="vd-q-pronoun">${escHtml(q.pronoun)}</span>
-        <span class="vd-q-tense">${escHtml(tenseLabel)}</span>
-        ${vd.dictation ? `<button class="vd-dict-play" id="vdDictPlay" type="button" title="${nl ? 'Nog eens' : 'Play again'}">🔊</button>` : ''}
-      </div>
-    </div>
-
-    <div class="vd-input-area">
-      <input type="text" class="vd-text-input" id="vdInput"
-        placeholder="${nl ? 'Typ de werkwoordsvorm...' : 'Type the verb form...'}"
-        autocomplete="off" autocorrect="off" spellcheck="false" />
-      <button class="vd-check-btn" id="vdCheck">${nl ? 'Controleer ✓' : 'Check ✓'}</button>
-    </div>
-
-    <div id="vdFeedback"></div>`;
-
-  s.querySelector('#vdDrillBack').addEventListener('click', showMenu);
-  if (vd.dictation) {
-    const say = () => speakText(q.tense === 'imperative' ? q.correctForm : `${q.pronoun} ${q.correctForm}`, state.currentLanguage);
-    s.querySelector('#vdDictPlay').addEventListener('click', say);
-    setTimeout(say, 250);
-  }
-  setupInputHandlers(q);
-}
-
-function setupInputHandlers(q) {
-  const s = getScreen();
-  const input = s.querySelector('#vdInput');
-  const check = s.querySelector('#vdCheck');
-
-  const submit = () => {
-    const answer = input.value.trim();
-    if (!answer) { input.focus(); return; }
-    handleAnswer(q, answer);
-  };
-
-  check.addEventListener('click', submit);
-  input.addEventListener('keydown', e => {
-    if (e.key === 'Enter') { e.preventDefault(); submit(); }
-  });
-  input.focus();
-}
-
-function handleAnswer(q, answer) {
-  if (vd.answered) return;
-  vd.answered = true;
-
-  const input = document.getElementById('vdInput');
-  const check = document.getElementById('vdCheck');
-  input.disabled = true;
-  check.disabled = true;
-
-  const normAnswer = normalise(answer);
-  const normCorrect = normalise(q.correctForm);
-
-  const isExact = normAnswer === normCorrect;
-  const lev = levenshtein(normAnswer, normCorrect);
-  const isClose = !isExact && lev <= 1;
-  const isCorrect = isExact || isClose;
-
-  if (isCorrect) {
-    vd.score++;
-    input.classList.add(isExact ? 'correct' : 'close');
-  } else {
-    input.classList.add('wrong');
-  }
-
-  // Record for weakness tracking
-  recordAnswer(q.infinitive, q.tense, q.pronoun, isCorrect);
-  if (!isCorrect) {
-    vd.missed.push({
-      left: q.infinitive, right: q.correctForm,
-      extra: `${q.tense === 'imperative' ? '' : q.pronoun + ' · '}${loc(q.tenseLabel)}`,
-      say: q.type === 'sentence' && q.fullSentence ? q.fullSentence : q.correctForm,
-    });
-  }
-
-  const fb = document.getElementById('vdFeedback');
-  const nl = state.nativeLanguage === 'nl';
-
-  const resultClass = isCorrect ? 'correct' : 'wrong';
-  const resultText = isExact
-    ? '✓ ' + (nl ? 'Correct!' : 'Correct!')
-    : isClose
-      ? '✓ ' + (nl ? 'Bijna! (kleine typfout)' : 'Almost! (minor typo)')
-      : '✗ ' + (nl ? 'Niet helemaal' : 'Not quite');
-
-  let html = `<div class="ex-feedback-result ${resultClass}">${resultText}</div>`;
-
-  if (!isExact) {
-    html += `
-      <div class="vd-answer-compare">
-        <div class="vd-your-answer"><span class="vd-ans-label">${nl ? 'Jouw antwoord:' : 'Your answer:'}</span> ${escHtml(answer)}</div>
-        <div class="vd-correct-answer"><span class="vd-ans-label">${nl ? 'Correct:' : 'Correct:'}</span> ${escHtml(q.correctForm)}</div>
-      </div>`;
-  }
-
-  // For sentence questions, show the full sentence
-  if (q.type === 'sentence' && q.fullSentence) {
-    html += `<div class="vd-context">${escHtml(q.fullSentence)}</div>`;
-  }
-
-  // Show full conjugation table for this tense
-  const verb = findVerb(q.infinitive);
-  html += renderAnswerTable(verb, q.tense, q.pronoun);
-
-  // Listen button
-  html += `<button class="vd-listen-btn" id="vdListen">🔊 ${nl ? 'Luister' : 'Listen'}</button>`;
-
-  fb.innerHTML = html;
-
-  fb.querySelector('#vdListen').addEventListener('click', () => {
-    const text = q.type === 'sentence' && q.fullSentence
-      ? q.fullSentence
-      : q.tense === 'imperative' ? q.correctForm : `${q.pronoun} ${q.correctForm}`;
-    speakText(text, state.currentLanguage);
-  });
-
-  // Next button
-  const isLast = vd.current + 1 >= vd.questions.length;
-  const nextBtn = document.createElement('button');
-  nextBtn.className = 'vd-next-btn';
-  nextBtn.type = 'button'; // not 'submit': Enter activates this button by design
-  nextBtn.textContent = isLast
-    ? (nl ? '🏁 Resultaten' : '🏁 See results')
-    : (nl ? 'Volgende →' : 'Next →');
-  nextBtn.addEventListener('click', () => {
-    if (isLast) {
-      showDrillScore();
-    } else {
-      vd.current++;
-      renderDrillQuestion();
-      getScreen().scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  });
-  fb.appendChild(nextBtn);
-  // Hand focus to Next so a second Enter advances: the answer input is disabled
-  // once checked, so it can no longer receive the keypress itself. preventScroll
-  // keeps focus from fighting the smooth scroll below.
-  nextBtn.focus({ preventScroll: true });
-  fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-}
-
-// ── Score screen ─────────────────────────────────────────────────────────────
-
-function showDrillScore() {
-  const total = vd.questions.length;
-  const score = vd.score;
-  const pct = Math.round((score / total) * 100);
-  const emoji = pct === 100 ? '🏆' : pct >= 80 ? '🎉' : pct >= 60 ? '👍' : '💪';
-  const nl = state.nativeLanguage === 'nl';
-  const msg = pct === 100 ? (nl ? 'Perfecte score!' : 'Perfect score!')
-            : pct >= 80 ? (nl ? 'Geweldig!' : 'Great job!')
-            : pct >= 60 ? (nl ? 'Goed bezig!' : 'Good effort!')
-            : (nl ? 'Blijf oefenen!' : 'Keep practising!');
-
-  const s = getScreen();
-  s.innerHTML = `
-    <div class="lesson-header">
-      <button class="back-btn" id="vdScoreBack">←</button>
-      <div>
-        <div class="lesson-title">✍️ ${nl ? 'Resultaten' : 'Results'}</div>
-        <div class="lesson-subtitle">${nl ? 'Werkwoord Drill' : 'Verb Drill'}</div>
-      </div>
-    </div>
-
-    <div class="ex-score-card">
-      <div class="ex-score-emoji">${emoji}</div>
-      <div class="ex-score-title">${escHtml(msg)}</div>
-      <div class="ex-score-fraction">${score} / ${total}</div>
-      <div class="ex-score-bar-wrap">
-        <div class="ex-score-bar-fill" style="width: ${pct}%"></div>
-      </div>
-      <div class="ex-score-pct">${pct}%</div>
-      <div class="ex-score-actions">
-        <button class="ex-next-btn" id="vdRetry">🔄 ${nl ? 'Opnieuw (nieuwe vragen)' : 'Try again (new questions)'}</button>
-        <button class="ex-back-btn" id="vdBackMenu">← Menu</button>
-      </div>
-    </div>
-    ${missedListHtml(vd.missed || [], { cls: 'verb' })}`;
-
-  wireSpeakButtons(s);
-  s.querySelector('#vdScoreBack').addEventListener('click', showMenu);
-  s.querySelector('#vdRetry').addEventListener('click', startDrill);
-  s.querySelector('#vdBackMenu').addEventListener('click', showMenu);
 }
 
 // ── Learn one verb: Verb picker ──────────────────────────────────────────────
@@ -1037,7 +753,6 @@ function showSelectionPicker() {
 
 function showLearnVerb(imp, perf) {
   vd.mode = 'learnVerb';
-  vd.learnStep = 'study';
   renderLearnStudy(imp, perf);
 }
 
@@ -1113,435 +828,173 @@ function renderLearnStudy(imp, perf) {
   s.querySelector('#vdLearnStart').addEventListener('click', () => startLearnPractice(imp, perf));
 }
 
+// Test every form of both verbs in table order, then up to five sentences, then
+// (for the pairs that have them) which aspect a sentence needs. This is the
+// "learn" step of the verbs course: it is what puts a tense on the review schedule.
 function startLearnPractice(imp, perf) {
-  vd.learnStep = 'practice';
-  vd.learnResults = [];
-
-  // Build all forms for both verbs
-  const forms = [];
-  const tenseNames = {
-    present:    { en: 'Present', nl: 'Tegenwoordige tijd' },
-    past:       { en: 'Past', nl: 'Verleden tijd' },
-    future:     { en: 'Future', nl: 'Toekomst' },
-    imperative: { en: 'Imperative', nl: 'Gebiedende wijs' },
-  };
-
+  const units = makeUnits();
+  const cards = [];
   for (const verb of [imp, perf]) {
-    for (const tense of ['present', 'past', 'future', 'imperative']) {
+    for (const tense of TENSES) {
       if (!verb[tense]) continue;
-      for (const [pronoun, form] of Object.entries(verb[tense])) {
-        forms.push({
-          infinitive: verb.infinitive,
-          aspect: verb.aspect,
-          partner: verb.partner,
-          meaning: verb.meaning,
-          tense,
-          tenseLabel: tenseNames[tense],
-          pronoun,
-          correctForm: form,
-        });
-      }
+      Object.entries(verb[tense]).forEach(([pronoun, form], i) => {
+        const q = formQuestion(verb, tense, pronoun, form);
+        const divider = i === 0 ? `<div class="vd-tense-divider">${aspectTag(verb.aspect)} ${escHtml(verb.infinitive)} — ${escHtml(loc(q.tenseLabel))}</div>` : '';
+        cards.push(formCard(q, { units, divider }));
+      });
     }
   }
+  cards.push(...buildSentenceQuestions([imp, perf], TENSES, 5).map(q => formCard(q)));
+  cards.push(...aspectCards(imp, units, 4));
 
-  vd.learnForms = forms;
-  vd.learnFormIdx = 0;
-  renderLearnForm(imp, perf);
+  runSession({
+    screen: getScreen(), icon: '🎓', title: `${imp.infinitive} / ${perf.infinitive}`, accent: ACCENT, cards,
+    onExit: showVerbPicker,
+    scoreSubtitle: () => { const st = verbStats(); return `${st.learned} ${L('tenses learned', 'tijden geleerd')} · ${st.due} ${L('due', 'aan de beurt')}`; },
+    again: () => ({ label: '🔄 ' + L('Try again', 'Opnieuw'), run: () => showLearnVerb(imp, perf) }),
+  });
 }
 
-function renderLearnForm(imp, perf) {
-  if (vd.learnFormIdx >= vd.learnForms.length) {
-    // Check if there are sentence exercises
-    const hasSentences = (imp.sentences && imp.sentences.length > 0) || (perf.sentences && perf.sentences.length > 0);
-    if (hasSentences) {
-      startLearnSentences(imp, perf);
-    } else {
-      showLearnSummary(imp, perf);
-    }
-    return;
-  }
+// ── Cards ────────────────────────────────────────────────────────────────────
+// What the course engine needs to ask one verb form, one gapped sentence or one
+// aspect choice. The Review queue uses the same cards between those of other courses.
 
-  // Reset here, as renderDrillQuestion and renderLearnSentence do. Relying on the
-  // Next handler alone left the first question dead when arriving from a drill
-  // question that had been answered but not advanced past.
-  vd.answered = false;
+const aspectTag = aspect => (aspect === 'imperfective'
+  ? '<span class="vd-aspect-tag vd-imp">IMP</span>'
+  : '<span class="vd-aspect-tag vd-perf">PERF</span>');
 
-  const q = vd.learnForms[vd.learnFormIdx];
-  const s = getScreen();
-  const nl = state.nativeLanguage === 'nl';
-  const total = vd.learnForms.length;
-  const pct = Math.round((vd.learnFormIdx / total) * 100);
+function formQuestion(verb, tense, pronoun, form) {
+  return { infinitive: verb.infinitive, aspect: verb.aspect, partner: verb.partner, meaning: verb.meaning,
+           tense, tenseLabel: getTenseLabel(tense), pronoun, correctForm: form };
+}
 
-  const aspectTag = q.aspect === 'imperfective'
-    ? `<span class="vd-aspect-tag vd-imp">IMP</span>`
-    : `<span class="vd-aspect-tag vd-perf">PERF</span>`;
+// A unit ("робити · present", or a pair's aspect) moves on the schedule once per
+// session, when the last of its cards is answered, by how many were right. Asking
+// six forms of one tense must not count as six successful reviews.
+function makeUnits({ onlySeen = false } = {}) {
+  const tally = new Map();
+  return {
+    expect(key) { const t = tally.get(key) || { total: 0, n: 0, ok: 0 }; t.total++; tally.set(key, t); },
+    answer(key, res) {
+      const t = tally.get(key);
+      if (!t) return;
+      t.n++; if (res.isCorrect) t.ok++;
+      if (t.n < t.total) return;
+      if (onlySeen && !verbProgress.get(key)) return;
+      const share = t.ok / t.total;
+      verbProgress.record(key, t.total === 1 ? res.quality : share === 1 ? 5 : share >= 0.8 ? 3 : 1);
+    },
+  };
+}
 
-  // Show tense divider when tense changes
-  const prevForm = vd.learnFormIdx > 0 ? vd.learnForms[vd.learnFormIdx - 1] : null;
-  const showDivider = !prevForm || prevForm.tense !== q.tense || prevForm.infinitive !== q.infinitive;
+// q: a conjugation question, or with type 'sentence' the same form inside a sentence.
+function formCard(q, { dictation = false, divider = '', units = null } = {}) {
+  const isSentence = q.type === 'sentence';
+  const unit = tenseKey(q.infinitive, q.tense);
+  if (units && !isSentence) units.expect(unit);
+  const spoken = isSentence && q.fullSentence ? q.fullSentence
+    : q.tense === 'imperative' ? q.correctForm : `${q.pronoun} ${q.correctForm}`;
+  const heard = dictation && !isSentence;
 
-  s.innerHTML = `
-    <div class="lesson-header">
-      <button class="back-btn" id="vdLearnPracBack">←</button>
-      <div>
-        <div class="lesson-title">🎓 ${escHtml(imp.infinitive)} / ${escHtml(perf.infinitive)}</div>
-        <div class="lesson-subtitle">
-          <div class="vd-progress-wrap"><div class="vd-progress-bar" style="width:${pct}%"></div></div>
-          <div class="vd-progress-text">${vd.learnFormIdx + 1} / ${total} ${nl ? 'vormen' : 'forms'}</div>
-        </div>
-      </div>
-    </div>
-
-    ${showDivider ? `<div class="vd-tense-divider">${aspectTag} ${escHtml(q.infinitive)} — ${escHtml(loc(q.tenseLabel))}</div>` : ''}
-
+  const promptHtml = isSentence ? `
+    <div class="vd-sentence-card">
+      <div class="vd-sentence-translation">${escHtml(q.translation)}</div>
+      <div class="vd-sentence-text">${escHtml(q.sentence).replace('___', '<span class="vd-sentence-blank"></span>')}</div>
+      <div class="vd-sentence-hint">${aspectTag(q.aspect)} ${escHtml(q.infinitive)} — ${escHtml(loc(q.tenseLabel))} — ${escHtml(q.pronoun)}</div>
+    </div>` : `
+    ${divider}
     <div class="vd-q-card">
       <div class="vd-q-verb-row">
-        ${aspectTag}
+        ${aspectTag(q.aspect)}
         <span class="vd-q-infinitive">${escHtml(q.infinitive)}</span>
         <span class="vd-q-meaning">${escHtml(loc(q.meaning))}</span>
       </div>
+      <div class="vd-q-partner">${L('Pair', 'Paar')}: ${escHtml(q.partner)}</div>
       <div class="vd-q-prompt">
         <span class="vd-q-pronoun">${escHtml(q.pronoun)}</span>
         <span class="vd-q-tense">${escHtml(loc(q.tenseLabel))}</span>
+        ${heard ? `<button class="vd-dict-play" type="button" data-say="${escHtml(spoken)}" title="${L('Play again', 'Nog eens')}">🔊</button>` : ''}
       </div>
-    </div>
-
-    <div class="vd-input-area">
-      <input type="text" class="vd-text-input" id="vdInput"
-        placeholder="${nl ? 'Typ de werkwoordsvorm...' : 'Type the verb form...'}"
-        autocomplete="off" autocorrect="off" spellcheck="false" />
-      <button class="vd-check-btn" id="vdCheck">${nl ? 'Controleer ✓' : 'Check ✓'}</button>
-    </div>
-
-    <div id="vdFeedback"></div>`;
-
-  s.querySelector('#vdLearnPracBack').addEventListener('click', () => showLearnSummary(imp, perf));
-
-  const input = s.querySelector('#vdInput');
-  const check = s.querySelector('#vdCheck');
-
-  const submit = () => {
-    const answer = input.value.trim();
-    if (!answer) { input.focus(); return; }
-    handleLearnAnswer(q, answer, imp, perf);
-  };
-
-  check.addEventListener('click', submit);
-  input.addEventListener('keydown', e => {
-    if (e.key === 'Enter') { e.preventDefault(); submit(); }
-  });
-  input.focus();
-}
-
-function handleLearnAnswer(q, answer, imp, perf) {
-  if (vd.answered) return;
-  vd.answered = true;
-
-  const input = document.getElementById('vdInput');
-  const check = document.getElementById('vdCheck');
-  input.disabled = true;
-  check.disabled = true;
-
-  const normAnswer = normalise(answer);
-  const normCorrect = normalise(q.correctForm);
-
-  const isExact = normAnswer === normCorrect;
-  const lev = levenshtein(normAnswer, normCorrect);
-  const isClose = !isExact && lev <= 1;
-  const isCorrect = isExact || isClose;
-
-  if (isCorrect) {
-    input.classList.add(isExact ? 'correct' : 'close');
-  } else {
-    input.classList.add('wrong');
-  }
-
-  recordAnswer(q.infinitive, q.tense, q.pronoun, isCorrect);
-  vd.learnResults.push({
-    pronoun: q.pronoun,
-    tense: q.tense,
-    infinitive: q.infinitive,
-    correct: isCorrect,
-    correctForm: q.correctForm,
-    userAnswer: answer,
-  });
-
-  const fb = document.getElementById('vdFeedback');
-  const nl = state.nativeLanguage === 'nl';
-
-  const resultClass = isCorrect ? 'correct' : 'wrong';
-  const resultText = isExact
-    ? '✓ ' + (nl ? 'Correct!' : 'Correct!')
-    : isClose
-      ? '✓ ' + (nl ? 'Bijna!' : 'Almost!')
-      : '✗ ' + (nl ? 'Niet helemaal' : 'Not quite');
-
-  let html = `<div class="ex-feedback-result ${resultClass}">${resultText}</div>`;
-
-  if (!isExact) {
-    html += `
-      <div class="vd-answer-compare">
-        <div class="vd-your-answer"><span class="vd-ans-label">${nl ? 'Jouw antwoord:' : 'Your answer:'}</span> ${escHtml(answer)}</div>
-        <div class="vd-correct-answer"><span class="vd-ans-label">${nl ? 'Correct:' : 'Correct:'}</span> ${escHtml(q.correctForm)}</div>
-      </div>`;
-  }
-
-  // Show full conjugation table
-  const verb = findVerb(q.infinitive);
-  html += renderAnswerTable(verb, q.tense, q.pronoun);
-
-  html += `<button class="vd-listen-btn" id="vdListen">🔊 ${nl ? 'Luister' : 'Listen'}</button>`;
-
-  fb.innerHTML = html;
-
-  fb.querySelector('#vdListen').addEventListener('click', () => {
-    const text = q.tense === 'imperative' ? q.correctForm : `${q.pronoun} ${q.correctForm}`;
-    speakText(text, state.currentLanguage);
-  });
-
-  const nextBtn = document.createElement('button');
-  nextBtn.className = 'vd-next-btn';
-  nextBtn.type = 'button'; // not 'submit': Enter activates this button by design
-  nextBtn.textContent = nl ? 'Volgende →' : 'Next →';
-  nextBtn.addEventListener('click', () => {
-    vd.learnFormIdx++;
-    renderLearnForm(imp, perf);
-    getScreen().scrollTo({ top: 0, behavior: 'smooth' });
-  });
-  fb.appendChild(nextBtn);
-  // Hand focus to Next so a second Enter advances: the answer input is disabled
-  // once checked, so it can no longer receive the keypress itself. preventScroll
-  // keeps focus from fighting the smooth scroll below.
-  nextBtn.focus({ preventScroll: true });
-  fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-}
-
-// ── Learn one verb: Sentence exercises ───────────────────────────────────────
-
-function startLearnSentences(imp, perf) {
-  vd.learnStep = 'sentences';
-  const allSentences = [...(imp.sentences || []), ...(perf.sentences || [])];
-  // Pick up to 5 sentence exercises
-  const picked = shuffle(allSentences).slice(0, 5);
-  vd.learnSentences = picked;
-  vd.learnSentIdx = 0;
-  renderLearnSentence(imp, perf);
-}
-
-function renderLearnSentence(imp, perf) {
-  if (vd.learnSentIdx >= vd.learnSentences.length) {
-    showLearnSummary(imp, perf);
-    return;
-  }
-
-  const sent = vd.learnSentences[vd.learnSentIdx];
-  const s = getScreen();
-  const nl = state.nativeLanguage === 'nl';
-  vd.answered = false;
-
-  s.innerHTML = `
-    <div class="lesson-header">
-      <button class="back-btn" id="vdSentBack">←</button>
-      <div>
-        <div class="lesson-title">🎓 ${nl ? 'In context' : 'In Context'}</div>
-        <div class="lesson-subtitle">${vd.learnSentIdx + 1} / ${vd.learnSentences.length} ${nl ? 'zinnen' : 'sentences'}</div>
-      </div>
-    </div>
-
-    <div class="vd-sentence-card">
-      <div class="vd-sentence-translation">${escHtml(loc(sent))}</div>
-      <div class="vd-sentence-text">${escHtml(sent.uk).replace('___', '<span class="vd-sentence-blank"></span>')}</div>
-      <div class="vd-sentence-hint">
-        ${escHtml(imp.infinitive)} / ${escHtml(perf.infinitive)}
-      </div>
-    </div>
-
-    <div class="vd-input-area">
-      <input type="text" class="vd-text-input" id="vdInput"
-        placeholder="${nl ? 'Typ de werkwoordsvorm...' : 'Type the verb form...'}"
-        autocomplete="off" autocorrect="off" spellcheck="false" />
-      <button class="vd-check-btn" id="vdCheck">${nl ? 'Controleer ✓' : 'Check ✓'}</button>
-    </div>
-
-    <div id="vdFeedback"></div>`;
-
-  s.querySelector('#vdSentBack').addEventListener('click', () => showLearnSummary(imp, perf));
-
-  const input = s.querySelector('#vdInput');
-  const check = s.querySelector('#vdCheck');
-
-  const submit = () => {
-    const answer = input.value.trim();
-    if (!answer) { input.focus(); return; }
-    handleLearnSentenceAnswer(sent, answer, imp, perf);
-  };
-
-  check.addEventListener('click', submit);
-  input.addEventListener('keydown', e => {
-    if (e.key === 'Enter') { e.preventDefault(); submit(); }
-  });
-  input.focus();
-}
-
-function handleLearnSentenceAnswer(sent, answer, imp, perf) {
-  if (vd.answered) return;
-  vd.answered = true;
-
-  const input = document.getElementById('vdInput');
-  const check = document.getElementById('vdCheck');
-  input.disabled = true;
-  check.disabled = true;
-
-  const normAnswer = normalise(answer);
-  const normCorrect = normalise(sent.answer);
-
-  const isExact = normAnswer === normCorrect;
-  const lev = levenshtein(normAnswer, normCorrect);
-  const isClose = !isExact && lev <= 1;
-  const isCorrect = isExact || isClose;
-
-  if (isCorrect) {
-    input.classList.add(isExact ? 'correct' : 'close');
-  } else {
-    input.classList.add('wrong');
-  }
-
-  // Track in weakness system
-  recordAnswer(
-    imp.infinitive === findVerbForSentence(sent, imp, perf) ? imp.infinitive : perf.infinitive,
-    sent.tense, sent.pronoun, isCorrect
-  );
-
-  vd.learnResults.push({
-    pronoun: sent.pronoun,
-    tense: sent.tense,
-    infinitive: imp.infinitive,
-    correct: isCorrect,
-    correctForm: sent.answer,
-    userAnswer: answer,
-    isSentence: true,
-  });
-
-  const fb = document.getElementById('vdFeedback');
-  const nl = state.nativeLanguage === 'nl';
-
-  const resultClass = isCorrect ? 'correct' : 'wrong';
-  const resultText = isExact
-    ? '✓ ' + (nl ? 'Correct!' : 'Correct!')
-    : isClose
-      ? '✓ ' + (nl ? 'Bijna!' : 'Almost!')
-      : '✗ ' + (nl ? 'Niet helemaal' : 'Not quite');
-
-  let html = `<div class="ex-feedback-result ${resultClass}">${resultText}</div>`;
-
-  if (!isExact) {
-    html += `
-      <div class="vd-answer-compare">
-        <div class="vd-your-answer"><span class="vd-ans-label">${nl ? 'Jouw antwoord:' : 'Your answer:'}</span> ${escHtml(answer)}</div>
-        <div class="vd-correct-answer"><span class="vd-ans-label">${nl ? 'Correct:' : 'Correct:'}</span> ${escHtml(sent.answer)}</div>
-      </div>`;
-  }
-
-  html += `<div class="vd-context">${escHtml(sent.full)}</div>`;
-  html += `<button class="vd-listen-btn" id="vdListen">🔊 ${nl ? 'Luister' : 'Listen'}</button>`;
-
-  fb.innerHTML = html;
-
-  fb.querySelector('#vdListen').addEventListener('click', () => {
-    speakText(sent.full, state.currentLanguage);
-  });
-
-  const nextBtn = document.createElement('button');
-  nextBtn.className = 'vd-next-btn';
-  nextBtn.type = 'button'; // not 'submit': Enter activates this button by design
-  const isLast = vd.learnSentIdx + 1 >= vd.learnSentences.length;
-  nextBtn.textContent = isLast
-    ? (nl ? '🏁 Resultaten' : '🏁 See results')
-    : (nl ? 'Volgende →' : 'Next →');
-  nextBtn.addEventListener('click', () => {
-    vd.learnSentIdx++;
-    renderLearnSentence(imp, perf);
-    getScreen().scrollTo({ top: 0, behavior: 'smooth' });
-  });
-  fb.appendChild(nextBtn);
-  // Hand focus to Next so a second Enter advances: the answer input is disabled
-  // once checked, so it can no longer receive the keypress itself. preventScroll
-  // keeps focus from fighting the smooth scroll below.
-  nextBtn.focus({ preventScroll: true });
-  fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-}
-
-function findVerbForSentence(sent, imp, perf) {
-  // Try to match the answer to one of the verb's forms
-  for (const verb of [imp, perf]) {
-    for (const tense of ['present', 'past', 'future', 'imperative']) {
-      if (!verb[tense]) continue;
-      for (const form of Object.values(verb[tense])) {
-        if (normalise(form) === normalise(sent.answer)) return verb.infinitive;
-      }
-    }
-  }
-  return imp.infinitive;
-}
-
-// ── Learn one verb: Summary ──────────────────────────────────────────────────
-
-function showLearnSummary(imp, perf) {
-  vd.learnStep = 'summary';
-  const s = getScreen();
-  const nl = state.nativeLanguage === 'nl';
-  const results = vd.learnResults;
-  const correct = results.filter(r => r.correct).length;
-  const total = results.length;
-  const pct = total > 0 ? Math.round((correct / total) * 100) : 0;
-  const emoji = total === 0 ? '🎓' : pct === 100 ? '🏆' : pct >= 80 ? '🎉' : pct >= 60 ? '👍' : '💪';
-  const wrongResults = results.filter(r => !r.correct);
-
-  let wrongHtml = '';
-  if (wrongResults.length > 0) {
-    wrongHtml = `<div class="vd-learn-section">
-      <div class="vd-learn-section-title">${nl ? 'Te oefenen' : 'Needs practice'}</div>`;
-    for (const r of wrongResults) {
-      wrongHtml += `
-        <div class="vd-learn-summary-row wrong">
-          <span class="vd-learn-summary-icon">✗</span>
-          <span class="vd-learn-summary-text">
-            ${escHtml(r.pronoun)} — <span class="vd-learn-summary-form">${escHtml(r.correctForm)}</span>
-            <span style="color:var(--gray);font-size:0.75rem"> (${escHtml(r.userAnswer)})</span>
-          </span>
-        </div>`;
-    }
-    wrongHtml += '</div>';
-  }
-
-  s.innerHTML = `
-    <div class="lesson-header">
-      <button class="back-btn" id="vdSumBack">←</button>
-      <div>
-        <div class="lesson-title">🎓 ${escHtml(imp.infinitive)} / ${escHtml(perf.infinitive)}</div>
-        <div class="lesson-subtitle">${nl ? 'Resultaten' : 'Results'}</div>
-      </div>
-    </div>
-
-    <div class="ex-score-card">
-      <div class="ex-score-emoji">${emoji}</div>
-      <div class="ex-score-fraction">${correct} / ${total}</div>
-      <div class="ex-score-bar-wrap">
-        <div class="ex-score-bar-fill" style="width: ${pct}%"></div>
-      </div>
-      <div class="ex-score-pct">${pct}%</div>
-    </div>
-
-    ${wrongHtml}
-
-    <div class="vd-learn-actions">
-      <button id="vdSumRetry">${nl ? '🔄 Opnieuw' : '🔄 Try again'}</button>
-      <button id="vdSumPicker">← ${nl ? 'Werkwoorden' : 'Verb list'}</button>
-      <button id="vdSumMenu">← Menu</button>
     </div>`;
 
-  s.querySelector('#vdSumBack').addEventListener('click', showVerbPicker);
-  s.querySelector('#vdSumRetry').addEventListener('click', () => showLearnVerb(imp, perf));
-  s.querySelector('#vdSumPicker').addEventListener('click', showVerbPicker);
-  s.querySelector('#vdSumMenu').addEventListener('click', showMenu);
+  return {
+    key: `${unit}|${q.pronoun}`, course: COURSE, intro: false,
+    promptHtml, autoSay: heard ? spoken : null,
+    input: { type: 'text', lang: 'uk', placeholder: L('Type the verb form…', 'Typ de werkwoordsvorm…') },
+    // One slip passes only on forms of five letters and up: їм / їж is a real mistake.
+    check(answer) { const g = grade(answer, [q.correctForm], { minTypoLen: 5 }); return { ...g, quality: g.isExact ? 5 : g.isClose ? 3 : 1 }; },
+    record(res) { recordAnswer(q.infinitive, q.tense, q.pronoun, res.isCorrect); if (!isSentence) units?.answer(unit, res); },
+    compareOnClose: true,
+    correctText: q.correctForm,
+    detailHtml: (isSentence && q.fullSentence ? `<div class="vd-context">${escHtml(q.fullSentence)}</div>` : '')
+      + renderAnswerTable(findVerb(q.infinitive), q.tense, q.pronoun),
+    say: spoken,
+    missed: { left: q.infinitive, right: q.correctForm,
+              extra: `${q.tense === 'imperative' ? '' : q.pronoun + ' · '}${loc(q.tenseLabel)}`, say: spoken },
+  };
+}
+
+// "Imperfective or perfective?" on a pair's own sentences: half as a choice, half
+// typed into the gap. 20 of the pairs have such sentences (data/verb-aspects.js).
+function aspectCards(imp, units, count) {
+  const pair = VERB_PAIRS.find(p => p.imperfective === imp.infinitive);
+  if (!pair) return [];
+  return shuffle(pair.sentences).slice(0, count).map((sent, i) => aspectCard(pair, sent, { typed: i % 2 === 1, units }));
+}
+
+function aspectCard(pair, sent, { typed = false, units = null } = {}) {
+  const unit = aspectKey(pair.id);
+  units?.expect(unit);
+  const label = aspect => `${aspect === 'imperfective' ? pair.imperfective : pair.perfective} (${aspect === 'imperfective' ? L('imperfective', 'onvoltooid') : L('perfective', 'voltooid')})`;
+  const card = {
+    key: `${unit}|${sent.uk}`, course: COURSE, intro: false,
+    promptHtml: `
+      <div class="va-verb-hint">
+        <span class="va-hint-imp">${escHtml(pair.imperfective)}</span><span class="va-hint-sep">/</span><span class="va-hint-perf">${escHtml(pair.perfective)}</span>
+        <span class="va-hint-meaning">${escHtml(loc(pair.meaning))}</span>
+      </div>
+      <div class="va-q-card">
+        <div class="va-q-translation">${escHtml(loc(sent))}</div>
+        <div class="va-q-sentence">${escHtml(sent.uk.replace(sent.verb, '______'))}</div>
+      </div>`,
+    record: res => units?.answer(unit, res),
+    correctText: sent.verb,
+    detailHtml: `<div class="vd-context">${escHtml(sent.uk)}</div>${sent.why ? `<div class="vd-full-note vd-aspect-why">💡 ${escHtml(loc(sent.why))}</div>` : ''}`,
+    say: sent.uk,
+    missed: { left: loc(sent), right: sent.uk, extra: label(sent.aspect) },
+  };
+  if (!typed) {
+    return { ...card, input: { type: 'choice', options: shuffle(['imperfective', 'perfective']).map(a => ({ label: label(a), correct: a === sent.aspect })) } };
+  }
+  return { ...card,
+    input: { type: 'text', lang: 'uk', placeholder: L('Type the verb…', 'Typ het werkwoord…') },
+    check(answer) { const g = grade(answer, [sent.verb], { minTypoLen: 5 }); return { ...g, quality: g.isExact ? 5 : g.isClose ? 3 : 1 }; },
+    compareOnClose: true };
+}
+
+// For the Review queue: every due unit as one card: a random form of the tense,
+// or a random sentence of the pair.
+export function verbDueCards() {
+  const units = makeUnits();
+  return verbProgress.dueKeys().map(key => {
+    if (key.startsWith('aspect:')) {
+      const pair = VERB_PAIRS.find(p => aspectKey(p.id) === key);
+      return aspectCard(pair, shuffle(pair.sentences)[0], { typed: Math.random() < 0.5, units });
+    }
+    const [infinitive, tense] = key.slice('verb:'.length).split('|');
+    const verb = findVerb(infinitive);
+    const [pronoun, form] = shuffle(Object.entries(verb[tense]))[0];
+    return formCard(formQuestion(verb, tense, pronoun, form), { units });
+  });
+}
+
+// Due verb units only, from the verb menu or the review hub.
+export function startVerbReview(onExit = showMenu) {
+  window.showScreen('verbDrillScreen');
+  runSession({
+    screen: getScreen(), icon: COURSE.icon, title: `${COURSE.name} · ${L('review', 'herhalen')}`, accent: ACCENT,
+    cards: shuffle(verbDueCards()).slice(0, 30),
+    onExit,
+    again: () => (verbStats().due ? { label: '🔄 ' + L('More reviews', 'Verder herhalen'), run: () => startVerbReview(onExit) } : null),
+  });
 }

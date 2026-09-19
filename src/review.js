@@ -19,6 +19,8 @@ import { vocabStats } from './data/vocab-progress.js';
 import { numbersStats } from './data/numbers-progress.js';
 import { vocabDueCards } from './grammar/vocab-drill-ui.js';
 import { numbersDueCards } from './grammar/numbers-drill-ui.js';
+import { verbDueCards } from './grammar/verb-drill-ui.js';
+import { verbStats } from './data/verb-progress.js';
 import { runSession } from './grammar/course-engine.js';
 import { shuffle } from './grammar/drill-core.js';
 import { levenshtein } from './utils.js';
@@ -84,8 +86,7 @@ export function getDuePhrases() {
 }
 // Phrases + words waiting, for the home badge and the Today card.
 export function getDueTotal() {
-  const deckDue = state.currentLanguage === 'uk' ? vocabStats().due + numbersStats().due : 0;
-  return getDuePhrases().length + getDueWords().length + deckDue;
+  return getDuePhrases().length + getDueWords().length + getCourseDue();
 }
 
 // ── One queue for every course ───────────────────────────────────────────────
@@ -95,14 +96,34 @@ export function getDueTotal() {
 
 const REVIEW_ROUND = 30;
 
+// The courses on the engine (Ukrainian only so far). A new course is one line here:
+// the hub row, the due totals, the Today card and the mixed round all follow.
+const COURSES = [
+  { icon: '🧠', name: { en: 'Vocabulary deck (core words)', nl: 'Woordenschat (kernwoorden)' }, unit: { en: 'words', nl: 'woorden' },
+    fresh: { en: 'Not started — learn 10 new words', nl: 'Nog niet gestart — leer 10 nieuwe woorden' },
+    stats: vocabStats, dueCards: vocabDueCards, review: 'startVocabReview()', open: 'openVocabDrillScreen()' },
+  { icon: '🔢', name: { en: 'Numbers & time', nl: 'Getallen & tijd' }, unit: { en: 'items', nl: 'items' },
+    fresh: { en: 'Not started — learn 0 to 10', nl: 'Nog niet gestart — leer 0 tot 10' },
+    stats: numbersStats, dueCards: numbersDueCards, review: 'startNumbersReview()', open: 'openNumbersDrillScreen()' },
+  { icon: '✍️', name: { en: 'Verbs (tenses you learned)', nl: 'Werkwoorden (geleerde tijden)' }, unit: { en: 'tenses', nl: 'tijden' },
+    fresh: { en: 'Not started — pick a verb under Learn One', nl: 'Nog niet gestart — kies een werkwoord bij Leer één' },
+    stats: verbStats, dueCards: verbDueCards, review: 'startVerbReview()', open: 'openVerbDrillScreen()' },
+];
+const activeCourses = () => (state.currentLanguage === 'uk' ? COURSES : []);
+
+// Everything due across the courses, for the home badge and the Today card.
+export function getCourseDue() {
+  return activeCourses().reduce((n, c) => n + c.stats().due, 0);
+}
+
 export function startReviewAll() {
   showScreen('reviewScreen');
-  const cards = shuffle([...vocabDueCards(), ...numbersDueCards()]).slice(0, REVIEW_ROUND);
+  const cards = shuffle(activeCourses().flatMap(c => c.dueCards())).slice(0, REVIEW_ROUND);
   runSession({
     screen: getScreen(), icon: '🔄', title: state.nativeLanguage === 'nl' ? 'Herhalen' : 'Review', mixed: true, cards,
     onExit: openReviewScreen,
     again: () => {
-      const left = vocabStats().due + numbersStats().due;
+      const left = getCourseDue();
       return left ? { label: state.nativeLanguage === 'nl' ? `🔄 Verder: nog ${left}` : `🔄 Keep going: ${left} left`, run: startReviewAll } : null;
     },
   });
@@ -131,8 +152,7 @@ export function openReviewScreen() {
   const duePhrases = getDuePhrases().length;
   const words = getWordsCount();
   const dueWords = getDueWords().length;
-  const vs = state.currentLanguage === 'uk' ? vocabStats() : null;
-  const ns = state.currentLanguage === 'uk' ? numbersStats() : null;
+  const courses = activeCourses();
   const s = getScreen();
 
   const row = (icon, title, sub, count, total, onclick, disabled) => `
@@ -145,7 +165,14 @@ export function openReviewScreen() {
       <span class="rv-row-count ${count ? 'rv-row-due' : ''}">${count ? count : total}</span>
     </button>`;
 
-  const courseDue = (vs ? vs.due : 0) + (ns ? ns.due : 0);
+  const courseDue = getCourseDue();
+  const pick = f => f[nl ? 'nl' : 'en'];
+  const courseRow = c => {
+    const st = c.stats();
+    return row(c.icon, pick(c.name),
+      st.seen ? (nl ? `${st.due} aan de beurt · ${st.seen} gezien, ${st.learned} geleerd van ${st.total}` : `${st.due} due · ${st.seen} seen, ${st.learned} learned of ${st.total}`) : pick(c.fresh),
+      st.due, st.seen ? st.learned : '→', st.due ? c.review : c.open, false);
+  };
 
   s.innerHTML = `
     <div class="lesson-header">
@@ -155,10 +182,10 @@ export function openReviewScreen() {
         <div class="lesson-subtitle">${nl ? 'Wat vandaag aan de beurt is' : 'What is due today'}</div>
       </div>
     </div>
-    ${vs ? `
+    ${courses.length ? `
     <button class="rv-all-btn" ${courseDue ? 'onclick="startReviewAll()"' : 'disabled'}>
       <span class="rv-all-title">🔄 ${courseDue ? (nl ? `Herhaal alles: ${courseDue} aan de beurt` : `Review everything: ${courseDue} due`) : (nl ? 'Niets aan de beurt' : 'Nothing due right now')}</span>
-      <span class="rv-all-sub">${nl ? 'Woorden, getallen en tijden door elkaar, in één ronde' : 'Words, numbers and times mixed, in one round'}</span>
+      <span class="rv-all-sub">${nl ? 'Woorden, getallen en werkwoorden door elkaar, in één ronde' : 'Words, numbers and verbs mixed, in one round'}</span>
     </button>` : ''}
     <div class="rv-hub">
       ${row('🗣️', nl ? 'Zinnen uit lessen' : 'Phrases from lessons',
@@ -169,14 +196,7 @@ export function openReviewScreen() {
             words ? (nl ? `${dueWords} van ${words} aan de beurt · typen of omdraaien` : `${dueWords} of ${words} due · type or flip`)
                   : (nl ? 'Nog geen woorden — tik op een woord in een gesprek' : 'No words yet — tap a word in a conversation'),
             dueWords, words, 'openFlashcardScreen()', words === 0)}
-      ${vs ? row('🧠', nl ? 'Woordenschat (kernwoorden)' : 'Vocabulary deck (core words)',
-            vs.seen ? (nl ? `${vs.due} aan de beurt · ${vs.seen} gezien, ${vs.learned} geleerd van ${vs.total}` : `${vs.due} due · ${vs.seen} seen, ${vs.learned} learned of ${vs.total}`)
-                    : (nl ? 'Nog niet gestart — leer 10 nieuwe woorden' : 'Not started — learn 10 new words'),
-            vs.due, vs.seen ? vs.learned : '→', vs.due ? 'startVocabReview()' : 'openVocabDrillScreen()', false) : ''}
-      ${ns ? row('🔢', nl ? 'Getallen & tijd' : 'Numbers & time',
-            ns.seen ? (nl ? `${ns.due} aan de beurt · ${ns.seen} gezien, ${ns.learned} geleerd van ${ns.total}` : `${ns.due} due · ${ns.seen} seen, ${ns.learned} learned of ${ns.total}`)
-                    : (nl ? 'Nog niet gestart — leer 0 tot 10' : 'Not started — learn 0 to 10'),
-            ns.due, ns.seen ? ns.learned : '→', ns.due ? 'startNumbersReview()' : 'openNumbersDrillScreen()', false) : ''}
+      ${courses.map(courseRow).join('')}
       ${learned === 0 && words === 0 ? `
         <div class="rv-empty">
           <button class="rv-empty-btn" onclick="openLessonBrowse()">📖 ${nl ? 'Naar de lessen' : 'Go to lessons'}</button>

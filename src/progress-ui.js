@@ -5,6 +5,7 @@ import { getLearnedCount, getDuePhrases } from './review.js';
 import { getWordsCount, getDueWords } from './words.js';
 import { vocabStats } from './data/vocab-progress.js';
 import { numbersStats } from './data/numbers-progress.js';
+import { verbStats } from './data/verb-progress.js';
 import { getAllMastery as verbMastery } from './data/verb-weakness.js';
 import { getAllMastery as caseMastery } from './data/case-weakness.js';
 import { getAllMastery as prefixMastery } from './data/prefix-weakness.js';
@@ -45,6 +46,7 @@ export function openProgressScreen() {
   const words = getWordsCount(), dueWords = getDueWords().length;
   const vs = isUK ? vocabStats() : null;
   const ns = isUK ? numbersStats() : null;
+  const vbs = isUK ? verbStats() : null;
 
   // Drills
   const drills = isUK ? [
@@ -124,6 +126,15 @@ export function openProgressScreen() {
         <span class="pg-row-title">${ns.learned} / ${ns.total} ${L('numbers & times learned', 'getallen & tijden geleerd')} <span class="pg-due">${ns.due ? ns.due + ' ' + L('due', 'aan de beurt') : ''}</span></span>
         <span class="pg-row-sub">${ns.seen} ${L('seen', 'gezien')}</span>
         ${bar(ns.learned / ns.total * 100, 'pg-fill-pink')}
+      </span>
+    </button>` : ''}
+    ${vbs ? `
+    <button class="pg-card pg-row" onclick="openVerbDrillScreen()">
+      <span class="pg-row-icon">✍️</span>
+      <span class="pg-row-text">
+        <span class="pg-row-title">${vbs.learned} / ${vbs.total} ${L('verb tenses learned', 'werkwoordstijden geleerd')} <span class="pg-due">${vbs.due ? vbs.due + ' ' + L('due', 'aan de beurt') : ''}</span></span>
+        <span class="pg-row-sub">${vbs.seen} ${L('seen', 'gezien')} · ${L('learn a verb under Learn One', 'leer een werkwoord bij Leer één')}</span>
+        ${bar(vbs.learned / vbs.total * 100, 'pg-fill-pink')}
       </span>
     </button>` : ''}
 
