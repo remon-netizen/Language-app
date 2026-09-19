@@ -28,8 +28,7 @@ import { openProgressScreen } from './progress-ui.js';
 import { weakVocab } from './data/vocab-progress.js';
 import { startLesson, startHomeworkLesson, restartLesson, buildCategoryCards, buildAlphabet, listenPhrase, listenSlowPhrase, listenTranslation, toggleSpeak as toggleLessonSpeak, nextPhrase, speakAlphabetLetter } from './lesson.js';
 import { readHomeworkFile, generateHomeworkPhrases } from './api/homework.js';
-import { openReviewScreen, startPhraseReview, startNewReview, startReviewAll, getLearnedCount, getDuePhrases, getDueTotal, getCourseDue } from './review.js';
-import { getDueWords } from './words.js';
+import { openReviewScreen, startPhraseReview, startReviewAll, getLearnedCount, getDueTotal } from './review.js';
 import { getLessonsForTarget, getLessonName } from './data/lesson-helpers.js';
 import { getWeakVerbCount as weakVerbs } from './data/verb-weakness.js';
 import { getWeakNounCount as weakNouns } from './data/case-weakness.js';
@@ -272,18 +271,14 @@ function renderTodayCard() {
   const card = document.getElementById('todayCard');
   if (!card) return;
   const nl = state.nativeLanguage === 'nl';
-  const duePhrases = getDuePhrases().length;
-  const dueWords = getDueWords().length + getCourseDue();
+  const due = getDueTotal();
   const weak = weakSpotCount();
   const next = nextLesson();
   const anyProgress = getLearnedCount() > 0 || Object.keys(state.categoryProgress).length > 0;
 
   const rows = [];
-  if (duePhrases + dueWords > 0) {
-    const parts = [];
-    if (duePhrases) parts.push(nl ? `${duePhrases} ${duePhrases === 1 ? 'zin' : 'zinnen'}` : `${duePhrases} phrase${duePhrases === 1 ? '' : 's'}`);
-    if (dueWords) parts.push(nl ? `${dueWords} ${dueWords === 1 ? 'woord' : 'woorden'}` : `${dueWords} word${dueWords === 1 ? '' : 's'}`);
-    rows.push({ icon: '🔄', title: nl ? 'Herhalen' : 'Review', sub: parts.join(' + ') + (nl ? ' aan de beurt' : ' due'), onclick: 'openReviewScreen()', hot: true });
+  if (due > 0) {
+    rows.push({ icon: '🔄', title: nl ? 'Herhalen' : 'Review', sub: nl ? `${due} aan de beurt, in één ronde` : `${due} due, in one round`, onclick: 'openReviewScreen()', hot: true });
   }
   if (weak > 0) {
     rows.push({ icon: '🎯', title: nl ? 'Zwakke plekken' : 'Weak spots', sub: nl ? `${weak} ${weak === 1 ? 'vorm' : 'vormen'} die je eerder fout had` : `${weak} form${weak === 1 ? '' : 's'} you got wrong before`, onclick: 'openExercisesScreen()' });
@@ -597,7 +592,6 @@ window.expandLangPicker    = expandLangPicker;
 window.toggleAutoPlay      = toggleAutoPlay;
 window.openReviewScreen    = openReviewScreen;
 window.startPhraseReview   = startPhraseReview;
-window.startNewReview      = startNewReview;
 window.openVerbAspectScreen = openVerbAspectScreen;
 window.openVerbDrillScreen    = openVerbDrillScreen;
 window.startVerbReview       = () => startVerbReview(openReviewScreen);

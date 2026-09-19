@@ -1,172 +1,154 @@
-// Review system — spaced recall practice for learned phrases.
+// ── Review: one queue for everything that is due ──────────────────────────────
+// Every course (vocabulary, numbers, verbs, cases, prefixes) and the phrases from
+// lessons are scheduled with the same SM-2 code and hand over their due items as
+// course-engine cards, so they can be shuffled into a single round. The hub shows
+// that one button first, then a row per course for reviewing a single subject.
 //
-// Flow: see/hear the native translation → try to say the target phrase
-// from memory → score pronunciation → reveal the correct answer.
-//
-// This is the OPPOSITE of the lesson flow (which is imitation):
-// Lessons:  hear target → repeat target
-// Review:   see meaning → produce target from memory
+// Phrases are the opposite of the lesson flow: a lesson is imitation (hear the
+// phrase, repeat it), review is recall (see the meaning, say or type the phrase).
 
 import { state, getTTSLang } from './state.js';
-import { calcSimilarity, escHtml } from './utils.js';
+import { calcSimilarity, escHtml, levenshtein } from './utils.js';
 import { showScreen } from './router.js';
-import { setupRecognition } from './speech.js';
-import { speakText, speakSlow } from './voice.js';
-import { getTargetText, getTranslation, getTip } from './data/lesson-helpers.js';
-import { t } from './i18n.js';
+import { getTranslation, getTip } from './data/lesson-helpers.js';
 import { getDueWords, getWordsCount } from './words.js';
+import { getLearnedCount, getDuePhrases, recordPhrase, regradePhrase, phraseStats } from './data/phrases.js';
 import { vocabStats } from './data/vocab-progress.js';
 import { numbersStats } from './data/numbers-progress.js';
+import { verbStats } from './data/verb-progress.js';
+import { caseStats } from './data/case-progress.js';
+import { prefixStats } from './data/prefix-progress.js';
 import { vocabDueCards } from './grammar/vocab-drill-ui.js';
 import { numbersDueCards } from './grammar/numbers-drill-ui.js';
 import { verbDueCards } from './grammar/verb-drill-ui.js';
-import { verbStats } from './data/verb-progress.js';
 import { caseDueCards } from './grammar/case-drill-ui.js';
-import { caseStats } from './data/case-progress.js';
 import { prefixDueCards } from './grammar/prefix-drill-ui.js';
-import { prefixStats } from './data/prefix-progress.js';
 import { runSession } from './grammar/course-engine.js';
-import { shuffle } from './grammar/drill-core.js';
-import { levenshtein } from './utils.js';
-import { markActivity } from './data/activity.js';
+import { L, shuffle } from './grammar/drill-core.js';
 
-// ── Storage ──────────────────────────────────────────────────────────────────
+// lesson.js, main.js and the progress screen reach the phrase store through here.
+export { markPhraseAsLearned, getLearnedCount, getDuePhrases } from './data/phrases.js';
 
-const STORAGE_KEY = 'learnedPhrases';
+function getScreen() { return document.getElementById('reviewScreen'); }
 
-function loadLearned() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
-  catch { return []; }
+// ── Phrase cards ─────────────────────────────────────────────────────────────
+
+const PHRASES = { icon: '🗣️', get name() { return L('Phrases from lessons', 'Zinnen uit lessen'); } };
+
+// 0–100: how close a typed phrase is, ignoring case, punctuation and apostrophe style.
+function typedScore(typed, target) {
+  const norm = s => s.toLowerCase().replace(/[’ʼ`´‘]/g, "'").replace(/[.,!?;:"«»—\-]/g, '').replace(/\s+/g, ' ').trim();
+  const a = norm(typed), b = norm(target);
+  if (a === b) return 100;
+  return Math.max(0, Math.round((1 - levenshtein(a, b) / (Math.max(a.length, b.length) || 1)) * 100));
 }
 
-function saveLearned(phrases) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(phrases));
+// 85 and up is remembered, 60 and up is close enough to count, below that it comes back tomorrow.
+const verdict = score => ({
+  isExact: score >= 85, isClose: score >= 60 && score < 85, isCorrect: score >= 60,
+  quality: score >= 85 ? 5 : score >= 60 ? 3 : 1, score,
+  headline: score >= 85 ? `${score}% — ${L('you remembered it', 'je wist het nog')}` : score >= 60 ? `${score}% — ${L('close enough', 'bijna goed')}` : '',
+});
+
+function phraseCard(p) {
+  const tip = getTip(p, state.nativeLanguage);
+  return {
+    key: `phrase:${p.target}`, course: PHRASES, intro: false,
+    promptHtml: `
+      <div class="review-card">
+        <div class="review-prompt">${L('How do you say this?', 'Hoe zeg je dit?')}</div>
+        <div class="review-translation">${escHtml(getTranslation(p, state.nativeLanguage))}</div>
+        ${tip ? `<div class="review-tip">${escHtml(tip)}</div>` : ''}
+        ${p.ph ? `<details class="review-hint"><summary>💡 ${L('Show hint', 'Toon hint')}</summary>[ ${escHtml(p.ph)} ]</details>` : ''}
+      </div>`,
+    input: { type: 'text', lang: state.currentLanguage, placeholder: L('Type it in the language you are learning…', 'Typ het in de taal die je leert…'),
+             speak: { lang: getTTSLang(), check: heard => verdict(calcSimilarity(p.target.toLowerCase().trim(), (heard[0] || '').toLowerCase())) } },
+    check: answer => verdict(typedScore(answer, p.target)),
+    record: res => recordPhrase(p.target, res.score, res.quality),
+    override: before => regradePhrase(p.target, before, 4),   // the microphone mishears
+    compareOnClose: true,
+    correctText: p.target,
+    detailHtml: p.ph ? `<div class="review-answer-phonetic">[ ${escHtml(p.ph)} ]</div>` : '',
+    say: p.target, sayAfter: true,
+    missed: { left: getTranslation(p, state.nativeLanguage), right: p.target, extra: '' },
+  };
 }
 
-// Save a phrase after it's been practised in a lesson.
-// Deduplicates by target text. Updates lastPractised timestamp.
-export function markPhraseAsLearned(phrase) {
-  const target = getTargetText(phrase);
-  if (!target) return;
+// Never-reviewed phrases first, then the longest overdue.
+const phraseDueCards = () => getDuePhrases().sort((a, b) => a.nextReview - b.nextReview).map(phraseCard);
 
-  const learned = loadLearned();
-  const existing = learned.find(p => p.target === target);
+// ── The courses ──────────────────────────────────────────────────────────────
+// A new course is one entry here: hub row, due totals, Today card, Progress
+// screen and the mixed round all follow. langs: 'all', or the targets it exists for.
 
-  if (existing) {
-    existing.lastPractised = Date.now();
-    existing.practiceCount = (existing.practiceCount || 0) + 1;
-  } else {
-    learned.push({
-      target,
-      ph: phrase.ph || '',
-      translations: phrase.translations || {},
-      tip: phrase.tip || {},
-      firstLearned: Date.now(),
-      lastPractised: Date.now(),
-      lastReviewed: 0,
-      practiceCount: 1,
-      reviewScore: 0,   // rolling average of review scores
-      lang: state.currentLanguage,
-    });
-  }
-  saveLearned(learned);
-}
-
-export function getLearnedCount() {
-  return loadLearned().filter(p => p.lang === state.currentLanguage).length;
-}
-
-// Strong phrases wait longer before they count as due. This is the same
-// cooldown curve the session ordering uses: score 0 → now, 50 → ~6h,
-// 80 → ~24h, 95 → ~72h. Never-reviewed phrases are always due.
-function cooldownHours(score) { return Math.pow(score / 100, 2) * 72; }
-export function getDuePhrases() {
-  const now = Date.now(), HOUR = 3600_000;
-  return loadLearned().filter(p => {
-    if (p.lang !== state.currentLanguage) return false;
-    if (!p.lastReviewed) return true;
-    return (now - p.lastReviewed) / HOUR >= cooldownHours(p.reviewScore || 0);
-  });
-}
-// Phrases + words waiting, for the home badge and the Today card.
-export function getDueTotal() {
-  return getDuePhrases().length + getDueWords().length + getCourseDue();
-}
-
-// ── One queue for every course ───────────────────────────────────────────────
-// Every course hands over its due items as course-engine cards, so they can be
-// shuffled into a single round. Phrases (spoken) and saved words still have their
-// own rows below until they move onto the same engine.
-
-const REVIEW_ROUND = 30;
-
-// The courses on the engine (Ukrainian only so far). A new course is one line here:
-// the hub row, the due totals, the Today card and the mixed round all follow.
 const COURSES = [
-  { icon: '🧠', name: { en: 'Vocabulary deck (core words)', nl: 'Woordenschat (kernwoorden)' }, unit: { en: 'core words', nl: 'kernwoorden' },
+  { id: 'phrases', langs: 'all', icon: '🗣️', name: { en: 'Phrases from lessons', nl: 'Zinnen uit lessen' }, unit: { en: 'phrases', nl: 'zinnen' },
+    fresh: { en: 'Nothing learned yet — do a lesson first', nl: 'Nog niets geleerd — doe eerst een les' },
+    sub: (st, nl) => (nl ? `${st.due} van ${st.total} aan de beurt · zeggen of typen uit je hoofd` : `${st.due} of ${st.total} due · say or type them from memory`),
+    stats: phraseStats, dueCards: phraseDueCards, review: 'startPhraseReview()', open: 'openLessonBrowse()' },
+  { id: 'vocab', langs: ['uk'], icon: '🧠', name: { en: 'Vocabulary deck (core words)', nl: 'Woordenschat (kernwoorden)' }, unit: { en: 'core words', nl: 'kernwoorden' },
     fresh: { en: 'Not started — learn 10 new words', nl: 'Nog niet gestart — leer 10 nieuwe woorden' },
     stats: vocabStats, dueCards: vocabDueCards, review: 'startVocabReview()', open: 'openVocabDrillScreen()' },
-  { icon: '🔢', name: { en: 'Numbers & time', nl: 'Getallen & tijd' }, unit: { en: 'numbers & times', nl: 'getallen & tijden' },
+  { id: 'numbers', langs: ['uk'], icon: '🔢', name: { en: 'Numbers & time', nl: 'Getallen & tijd' }, unit: { en: 'numbers & times', nl: 'getallen & tijden' },
     fresh: { en: 'Not started — learn 0 to 10', nl: 'Nog niet gestart — leer 0 tot 10' },
     stats: numbersStats, dueCards: numbersDueCards, review: 'startNumbersReview()', open: 'openNumbersDrillScreen()' },
-  { icon: '✍️', name: { en: 'Verbs (tenses you learned)', nl: 'Werkwoorden (geleerde tijden)' }, unit: { en: 'verb tenses', nl: 'werkwoordstijden' },
+  { id: 'verbs', langs: ['uk'], icon: '✍️', name: { en: 'Verbs (tenses you learned)', nl: 'Werkwoorden (geleerde tijden)' }, unit: { en: 'verb tenses', nl: 'werkwoordstijden' },
     fresh: { en: 'Not started — pick a verb under Learn One', nl: 'Nog niet gestart — kies een werkwoord bij Leer één' },
     stats: verbStats, dueCards: verbDueCards, review: 'startVerbReview()', open: 'openVerbDrillScreen()' },
-  { icon: '📌', name: { en: 'Cases (nouns you learned)', nl: 'Naamvallen (geleerde woorden)' }, unit: { en: 'nouns', nl: 'woorden' },
+  { id: 'cases', langs: ['uk'], icon: '📌', name: { en: 'Cases (nouns you learned)', nl: 'Naamvallen (geleerde woorden)' }, unit: { en: 'nouns', nl: 'woorden' },
     fresh: { en: 'Not started — pick a noun under Learn One', nl: 'Nog niet gestart — kies een woord bij Leer één' },
     stats: caseStats, dueCards: caseDueCards, review: 'startCaseReview()', open: 'openCaseDrillScreen()' },
-  { icon: '🔗', name: { en: 'Prefixed verbs', nl: 'Werkwoorden met voorvoegsel' }, unit: { en: 'prefixed verbs', nl: 'werkwoorden met voorvoegsel' },
+  { id: 'prefixes', langs: ['uk'], icon: '🔗', name: { en: 'Prefixed verbs', nl: 'Werkwoorden met voorvoegsel' }, unit: { en: 'prefixed verbs', nl: 'werkwoorden met voorvoegsel' },
     fresh: { en: 'Not started — learn the first word family', nl: 'Nog niet gestart — leer de eerste woordfamilie' },
     stats: prefixStats, dueCards: prefixDueCards, review: 'startPrefixReview()', open: 'openPrefixDrillScreen()' },
 ];
-const activeCourses = () => (state.currentLanguage === 'uk' ? COURSES : []);
+const activeCourses = () => COURSES.filter(c => c.langs === 'all' || c.langs.includes(state.currentLanguage));
 
-// The courses of the current target language, for the Progress screen.
-export const getCourses = () => activeCourses();
+// The drill courses of the current target language, for the Progress screen
+// (phrases have their own row there, next to the lessons).
+export const getCourses = () => activeCourses().filter(c => c.id !== 'phrases');
 
-// Everything due across the courses, for the home badge and the Today card.
-export function getCourseDue() {
-  return activeCourses().reduce((n, c) => n + c.stats().due, 0);
-}
+// Everything due across the courses, phrases included.
+export const getCourseDue = () => activeCourses().reduce((n, c) => n + c.stats().due, 0);
+
+// Everything waiting, for the home badge and the Today card. Saved words keep
+// their own flashcards until they move into the vocabulary deck.
+export const getDueTotal = () => getCourseDue() + getDueWords().length;
+
+// ── Sessions ─────────────────────────────────────────────────────────────────
+
+const REVIEW_ROUND = 30;
 
 export function startReviewAll() {
   showScreen('reviewScreen');
-  const cards = shuffle(activeCourses().flatMap(c => c.dueCards())).slice(0, REVIEW_ROUND);
   runSession({
-    screen: getScreen(), icon: '🔄', title: state.nativeLanguage === 'nl' ? 'Herhalen' : 'Review', mixed: true, cards,
+    screen: getScreen(), icon: '🔄', title: L('Review', 'Herhalen'), mixed: true,
+    cards: shuffle(activeCourses().flatMap(c => c.dueCards())).slice(0, REVIEW_ROUND),
     onExit: openReviewScreen,
-    again: () => {
-      const left = getCourseDue();
-      return left ? { label: state.nativeLanguage === 'nl' ? `🔄 Verder: nog ${left}` : `🔄 Keep going: ${left} left`, run: startReviewAll } : null;
-    },
+    again: () => { const left = getCourseDue(); return left ? { label: L(`🔄 Keep going: ${left} left`, `🔄 Verder: nog ${left}`), run: startReviewAll } : null; },
   });
 }
 
-// ── Review session state ─────────────────────────────────────────────────────
+// Ten phrases a round: recall takes longer than a single word.
+export function startPhraseReview() {
+  showScreen('reviewScreen');
+  runSession({
+    screen: getScreen(), icon: PHRASES.icon, title: PHRASES.name,
+    cards: phraseDueCards().slice(0, 10),
+    onExit: openReviewScreen,
+    again: () => (getDuePhrases().length ? { label: '🔄 ' + L('Another round', 'Nog een ronde'), run: startPhraseReview } : null),
+  });
+}
 
-let review = {
-  phrases: [],
-  current: 0,
-  scores: [],
-  recognition: null,
-  isRecording: false,
-  revealed: false,
-};
+// ── The hub ──────────────────────────────────────────────────────────────────
 
-// ── Public entry ─────────────────────────────────────────────────────────────
-
-// The review hub: one place for everything that is due, whichever system
-// scheduled it. Phrases (from lessons) are spoken from memory; words (saved
-// from conversations) are typed or flipped as flashcards.
 export function openReviewScreen() {
   showScreen('reviewScreen');
   const nl = state.nativeLanguage === 'nl';
-  const learned = getLearnedCount();
-  const duePhrases = getDuePhrases().length;
   const words = getWordsCount();
   const dueWords = getDueWords().length;
-  const courses = activeCourses();
-  const s = getScreen();
+  const courseDue = getCourseDue();
+  const pick = f => f[nl ? 'nl' : 'en'];
 
   const row = (icon, title, sub, count, total, onclick, disabled) => `
     <button class="rv-row ${disabled ? 'rv-row-disabled' : ''}" ${disabled ? 'disabled' : `onclick="${onclick}"`}>
@@ -178,16 +160,15 @@ export function openReviewScreen() {
       <span class="rv-row-count ${count ? 'rv-row-due' : ''}">${count ? count : total}</span>
     </button>`;
 
-  const courseDue = getCourseDue();
-  const pick = f => f[nl ? 'nl' : 'en'];
   const courseRow = c => {
     const st = c.stats();
-    return row(c.icon, pick(c.name),
-      st.seen ? (nl ? `${st.due} aan de beurt · ${st.seen} gezien, ${st.learned} geleerd van ${st.total}` : `${st.due} due · ${st.seen} seen, ${st.learned} learned of ${st.total}`) : pick(c.fresh),
-      st.due, st.seen ? st.learned : '→', st.due ? c.review : c.open, false);
+    const started = c.id === 'phrases' ? st.total > 0 : st.seen > 0;
+    const sub = !started ? pick(c.fresh) : c.sub ? c.sub(st, nl)
+      : nl ? `${st.due} aan de beurt · ${st.seen} gezien, ${st.learned} geleerd van ${st.total}` : `${st.due} due · ${st.seen} seen, ${st.learned} learned of ${st.total}`;
+    return row(c.icon, pick(c.name), sub, st.due, started ? (c.id === 'phrases' ? st.total : st.learned) : '→', st.due ? c.review : c.open, false);
   };
 
-  s.innerHTML = `
+  getScreen().innerHTML = `
     <div class="lesson-header">
       <button class="back-btn" onclick="showScreen('homeScreen')">←</button>
       <div>
@@ -195,339 +176,20 @@ export function openReviewScreen() {
         <div class="lesson-subtitle">${nl ? 'Wat vandaag aan de beurt is' : 'What is due today'}</div>
       </div>
     </div>
-    ${courses.length ? `
     <button class="rv-all-btn" ${courseDue ? 'onclick="startReviewAll()"' : 'disabled'}>
       <span class="rv-all-title">🔄 ${courseDue ? (nl ? `Herhaal alles: ${courseDue} aan de beurt` : `Review everything: ${courseDue} due`) : (nl ? 'Niets aan de beurt' : 'Nothing due right now')}</span>
-      <span class="rv-all-sub">${nl ? 'Woorden, getallen, werkwoorden en naamvallen door elkaar, in één ronde' : 'Words, numbers, verbs and cases mixed, in one round'}</span>
-    </button>` : ''}
+      <span class="rv-all-sub">${nl ? 'Alles wat aan de beurt is, door elkaar, in één ronde' : 'Everything that is due, mixed, in one round'}</span>
+    </button>
     <div class="rv-hub">
-      ${row('🗣️', nl ? 'Zinnen uit lessen' : 'Phrases from lessons',
-            learned ? (nl ? `${duePhrases} van ${learned} aan de beurt · uit je hoofd zeggen` : `${duePhrases} of ${learned} due · say them from memory`)
-                    : (nl ? 'Nog niets geleerd — doe eerst een les' : 'Nothing learned yet — do a lesson first'),
-            duePhrases, learned, 'startPhraseReview()', learned === 0)}
+      ${activeCourses().map(courseRow).join('')}
       ${row('📇', nl ? 'Woorden uit gesprekken' : 'Words from conversations',
             words ? (nl ? `${dueWords} van ${words} aan de beurt · typen of omdraaien` : `${dueWords} of ${words} due · type or flip`)
                   : (nl ? 'Nog geen woorden — tik op een woord in een gesprek' : 'No words yet — tap a word in a conversation'),
             dueWords, words, 'openFlashcardScreen()', words === 0)}
-      ${courses.map(courseRow).join('')}
-      ${learned === 0 && words === 0 ? `
+      ${getLearnedCount() === 0 && words === 0 ? `
         <div class="rv-empty">
           <button class="rv-empty-btn" onclick="openLessonBrowse()">📖 ${nl ? 'Naar de lessen' : 'Go to lessons'}</button>
           <button class="rv-empty-btn" onclick="openFreeChat()">💬 ${nl ? 'Start een gesprek' : 'Start a conversation'}</button>
         </div>` : ''}
     </div>`;
-}
-
-export function startPhraseReview() {
-  const all = loadLearned().filter(p => p.lang === state.currentLanguage);
-  if (all.length === 0) { openReviewScreen(); return; }
-
-  // ── Smart spaced repetition ──────────────────────────────────────────────
-  // Each phrase gets an urgency score. Higher urgency = reviewed sooner.
-  //
-  // Factors:
-  //  1. Low review score → high urgency  (you struggle with this phrase)
-  //  2. Long time since last review → high urgency  (it's fading from memory)
-  //  3. Never reviewed → highest urgency  (brand new, needs first review)
-  //  4. Small random jitter so sessions don't feel repetitive
-  //
-  // Strong phrases (high reviewScore) get a longer "cooldown" before they
-  // become urgent again — this is the core spaced-repetition idea.
-
-  const now = Date.now();
-  const HOUR = 3600_000;
-
-  all.forEach(p => {
-    const score       = p.reviewScore || 0;       // 0–100 rolling average
-    const lastReview  = p.lastReviewed || 0;
-    const hoursSince  = lastReview ? (now - lastReview) / HOUR : 999;
-
-    // Cooldown: strong phrases need more hours to pass before they're urgent.
-    // score 0 → cooldown 0h (review immediately)
-    // score 50 → cooldown ~6h
-    // score 80 → cooldown ~24h
-    // score 95 → cooldown ~72h
-    const cooldownHours = Math.pow(score / 100, 2) * 72;
-    const overdue       = hoursSince - cooldownHours; // positive = overdue
-
-    // Weakness boost: phrases with low scores get extra urgency.
-    // score 0 → +100, score 50 → +50, score 90 → +10
-    const weaknessBoost = 100 - score;
-
-    // Never-reviewed bonus: brand new phrases get a big push.
-    const newBonus = lastReview === 0 ? 200 : 0;
-
-    // Random jitter (0–15) so tied phrases shuffle each session.
-    const jitter = Math.random() * 15;
-
-    p._urgency = overdue + weaknessBoost + newBonus + jitter;
-  });
-
-  // Sort by urgency descending (most urgent first).
-  all.sort((a, b) => b._urgency - a._urgency);
-
-  // Take up to 10 phrases for this review session.
-  review.phrases = all.slice(0, 10);
-  review.current = 0;
-  review.scores = [];
-  review.revealed = false;
-
-  showScreen('reviewScreen');
-  renderReviewCard();
-}
-
-// ── Rendering ────────────────────────────────────────────────────────────────
-
-function getScreen() {
-  return document.getElementById('reviewScreen');
-}
-
-function renderReviewCard() {
-  const p = review.phrases[review.current];
-  const total = review.phrases.length;
-  const native = state.nativeLanguage;
-  const translation = getTranslation(p, native);
-  const tip = getTip(p, native);
-
-  const lblTitle    = native === 'nl' ? '🔄 Herhaling' : '🔄 Review';
-  const lblSubtitle = native === 'nl' ? `Zin ${review.current + 1} van ${total}` : `Phrase ${review.current + 1} of ${total}`;
-  const lblPrompt   = native === 'nl' ? 'Hoe zeg je dit?' : 'How do you say this?';
-  const lblHear     = native === 'nl' ? '🔊 Hoor betekenis' : '🔊 Hear meaning';
-  const lblHint     = native === 'nl' ? '💡 Toon hint' : '💡 Show hint';
-  const lblSpeak    = native === 'nl' ? '🎙️ Spreek' : '🎙️ Speak';
-  const lblStop     = native === 'nl' ? '⏹ Stop' : '⏹ Stop';
-
-  review.revealed = false;
-  const s = getScreen();
-
-  s.innerHTML = `
-    <div class="lesson-header">
-      <button class="back-btn" id="reviewBack">←</button>
-      <div>
-        <div class="lesson-title">${lblTitle}</div>
-        <div class="lesson-subtitle">${lblSubtitle}</div>
-      </div>
-    </div>
-
-    <div class="review-card">
-      <div class="review-prompt">${lblPrompt}</div>
-      <div class="review-translation">${escHtml(translation)}</div>
-      ${tip ? `<div class="review-tip">${escHtml(tip)}</div>` : ''}
-      <div class="review-answer" id="reviewAnswer" style="display:none">
-        <div class="review-answer-label">${native === 'nl' ? 'Antwoord:' : 'Answer:'}</div>
-        <div class="review-answer-target" id="reviewTarget"></div>
-        <div class="review-answer-phonetic" id="reviewPhonetic"></div>
-      </div>
-    </div>
-
-    <div class="review-type-row">
-      <input type="text" class="review-type-input" id="reviewInput" lang="${state.currentLanguage}"
-        placeholder="${native === 'nl' ? 'Typ het in het Oekraïens…' : 'Type it in the target language…'}"
-        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
-      <button class="review-type-check" id="reviewCheckBtn" type="button">${native === 'nl' ? 'Controleer' : 'Check'} ✓</button>
-    </div>
-    <div class="review-or">${native === 'nl' ? 'of zeg het hardop' : 'or say it out loud'}</div>
-    <div class="controls" style="margin-top:0">
-      <button class="btn btn-speak" id="reviewSpeakBtn">${lblSpeak}</button>
-      <button class="btn btn-translation" id="reviewHearBtn">${lblHear}</button>
-      <button class="btn btn-listen-slow" id="reviewHintBtn">${lblHint}</button>
-    </div>
-
-    <div class="feedback-area" id="reviewFeedback"></div>
-    <button class="next-btn" id="reviewNextBtn" style="display:none">${
-      review.current + 1 >= total
-        ? (native === 'nl' ? '🏁 Bekijk resultaten' : '🏁 See results')
-        : (native === 'nl' ? 'Volgende →' : 'Next →')
-    }</button>
-  `;
-
-  s.querySelector('#reviewBack').addEventListener('click', () => openReviewScreen());
-
-  // Hear the translation in native language
-  s.querySelector('#reviewHearBtn').addEventListener('click', () => {
-    const nativeTTS = native === 'nl' ? 'nl-NL' : 'en-GB';
-    speakText(translation, nativeTTS);
-  });
-
-  // Show hint: reveal phonetic transcription
-  s.querySelector('#reviewHintBtn').addEventListener('click', () => {
-    const hintEl = document.getElementById('reviewAnswer');
-    const phoneticEl = document.getElementById('reviewPhonetic');
-    hintEl.style.display = 'block';
-    document.getElementById('reviewTarget').textContent = '???';
-    phoneticEl.textContent = `[ ${p.ph} ]`;
-  });
-
-  // Speak: record and compare
-  const speakBtn = s.querySelector('#reviewSpeakBtn');
-  speakBtn.addEventListener('click', () => toggleReviewSpeak(speakBtn));
-
-  s.querySelector('#reviewNextBtn').addEventListener('click', nextReviewCard);
-
-  // Typed recall: same scoring path as speech, so the spaced queue treats both alike.
-  const input = s.querySelector('#reviewInput');
-  const check = () => {
-    const typed = input.value.trim();
-    if (!typed || review.revealed) { input.focus(); return; }
-    input.disabled = true;
-    s.querySelector('#reviewCheckBtn').disabled = true;
-    const score = typedScore(typed, p.target);
-    input.classList.add(score >= 85 ? 'correct' : score >= 60 ? 'close' : 'wrong');
-    processReviewResult([typed], score);
-  };
-  s.querySelector('#reviewCheckBtn').addEventListener('click', check);
-  input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); check(); } });
-  input.focus({ preventScroll: true });
-}
-
-// 0–100 similarity of a typed phrase to the target, ignoring case, punctuation
-// and apostrophe variants. Exact → 100; a slip or two in a long phrase still
-// scores high, a different phrase scores low.
-function typedScore(typed, target) {
-  const norm = s => s.toLowerCase().replace(/[’ʼ`´‘]/g, "'").replace(/[.,!?;:"«»—\-]/g, '').replace(/\s+/g, ' ').trim();
-  const a = norm(typed), b = norm(target);
-  if (a === b) return 100;
-  const lev = levenshtein(a, b);
-  const maxLen = Math.max(a.length, b.length) || 1;
-  return Math.max(0, Math.round((1 - lev / maxLen) * 100));
-}
-
-// ── Speech recognition ───────────────────────────────────────────────────────
-
-function toggleReviewSpeak(btn) {
-  if (review.isRecording) {
-    if (review.recognition) review.recognition.stop();
-    return;
-  }
-  review.isRecording = true;
-  const native = state.nativeLanguage;
-  btn.textContent = native === 'nl' ? '⏹ Stop' : '⏹ Stop';
-  btn.classList.add('recording');
-
-  review.recognition = setupRecognition(getTTSLang(), (event) => {
-    const results = Array.from(event.results[0]).map(r => r.transcript.trim().toLowerCase());
-    processReviewResult(results);
-  }, () => {
-    review.isRecording = false;
-    btn.textContent = native === 'nl' ? '🎙️ Spreek' : '🎙️ Speak';
-    btn.classList.remove('recording');
-  });
-  if (review.recognition) review.recognition.start();
-}
-
-function processReviewResult(recognizedList, presetScore) {
-  const p = review.phrases[review.current];
-  const target = p.target.toLowerCase().trim();
-  const heard = recognizedList[0] || '';
-  const score = presetScore !== undefined ? presetScore : calcSimilarity(target, heard);
-  review.scores.push(score);
-  review.revealed = true;
-  markActivity();
-  const ri = document.getElementById('reviewInput');
-  if (ri) { ri.disabled = true; const cb = document.getElementById('reviewCheckBtn'); if (cb) cb.disabled = true; }
-
-  // Update the stored phrase's review data
-  const learned = loadLearned();
-  const stored = learned.find(lp => lp.target === p.target);
-  if (stored) {
-    stored.lastReviewed = Date.now();
-    stored.reviewScore = stored.reviewScore
-      ? Math.round(stored.reviewScore * 0.6 + score * 0.4)  // rolling average
-      : score;
-    saveLearned(learned);
-  }
-
-  showReviewFeedback(score, heard, p);
-}
-
-function showReviewFeedback(score, heard, phrase) {
-  const native = state.nativeLanguage;
-  const fb = document.getElementById('reviewFeedback');
-  let cls, emoji, msg;
-
-  if (score >= 85) {
-    cls = 'excellent'; emoji = '🎉';
-    msg = native === 'nl' ? 'Uitstekend! Je herinnerde het perfect!' : 'Excellent! You remembered it perfectly!';
-  } else if (score >= 60) {
-    cls = 'good'; emoji = '👍';
-    msg = native === 'nl' ? 'Goed bezig! Bijna perfect.' : 'Good job! Almost perfect.';
-  } else if (score > 0) {
-    cls = 'try-again'; emoji = '🔄';
-    msg = native === 'nl' ? 'Bijna — bekijk het juiste antwoord hieronder.' : 'Close — check the correct answer below.';
-  } else {
-    cls = 'no-speech'; emoji = '🎙️';
-    msg = native === 'nl' ? 'Niets gehoord. Probeer het nog eens.' : 'Nothing detected. Try again.';
-  }
-
-  fb.className = `feedback-area show ${cls}`;
-  fb.innerHTML = `
-    <div class="feedback-score ${cls}">${heard ? `${emoji} ${score}%` : emoji}</div>
-    <div class="feedback-text">${msg}</div>
-    ${heard ? `<div class="feedback-heard">${document.getElementById('reviewInput')?.value.trim() === heard ? (native === 'nl' ? 'Jij typte:' : 'You typed:') : (native === 'nl' ? 'Ik hoorde:' : 'I heard:')} <span>"${escHtml(heard)}"</span></div>` : ''}
-  `;
-
-  // Reveal the correct answer
-  const answerEl = document.getElementById('reviewAnswer');
-  answerEl.style.display = 'block';
-  document.getElementById('reviewTarget').textContent = phrase.target;
-  document.getElementById('reviewPhonetic').textContent = `[ ${phrase.ph} ]`;
-
-  // Play the correct pronunciation so they hear how it should sound
-  setTimeout(() => speakText(phrase.target, getTTSLang()), 500);
-
-  // Show the next button and hand it focus so Enter advances
-  const nb = document.getElementById('reviewNextBtn');
-  nb.style.display = '';
-  nb.focus({ preventScroll: true });
-}
-
-function nextReviewCard() {
-  review.current++;
-  if (review.current >= review.phrases.length) {
-    showReviewComplete();
-  } else {
-    renderReviewCard();
-  }
-}
-
-// ── Completion screen ────────────────────────────────────────────────────────
-
-function showReviewComplete() {
-  const native = state.nativeLanguage;
-  const total = review.scores.length;
-  const avg = total ? Math.round(review.scores.reduce((a, b) => a + b, 0) / total) : 0;
-  const perfect = review.scores.filter(s => s >= 85).length;
-  const good = review.scores.filter(s => s >= 60 && s < 85).length;
-  const emoji = avg >= 85 ? '🏆' : avg >= 60 ? '🎉' : '💪';
-
-  const s = getScreen();
-  s.innerHTML = `
-    <div class="lesson-header">
-      <button class="back-btn" onclick="openReviewScreen()">←</button>
-      <div>
-        <div class="lesson-title">${native === 'nl' ? '🔄 Herhaling klaar!' : '🔄 Review complete!'}</div>
-      </div>
-    </div>
-    <div class="lesson-complete show">
-      <div class="complete-icon">${emoji}</div>
-      <div class="complete-title">${avg}%</div>
-      <div class="complete-subtitle">${
-        native === 'nl'
-          ? `Je hebt ${review.phrases.length} zinnen herhaald`
-          : `You reviewed ${review.phrases.length} phrases`
-      }</div>
-      <div class="complete-stats">
-        <div class="stat-box"><div class="num">${perfect}</div><div class="label">${native === 'nl' ? 'Perfect' : 'Perfect'}</div></div>
-        <div class="stat-box"><div class="num">${good}</div><div class="label">${native === 'nl' ? 'Goed' : 'Good'}</div></div>
-        <div class="stat-box"><div class="num">${avg}%</div><div class="label">${native === 'nl' ? 'Gem. score' : 'Avg score'}</div></div>
-      </div>
-      <button class="btn-level-up" onclick="startNewReview()">${native === 'nl' ? '🔄 Nog een ronde' : '🔄 Another round'}</button>
-      <button class="next-btn" onclick="openReviewScreen()">${native === 'nl' ? '← Terug naar herhalen' : '← Back to review'}</button>
-    </div>
-  `;
-}
-
-// Alias for the onclick — starts another phrase round.
-export function startNewReview() {
-  startPhraseReview();
 }

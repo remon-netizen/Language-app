@@ -204,19 +204,6 @@
   padding-top: 16px;
   border-top: 2px solid var(--border);
 }
-.review-answer-label {
-  font-size: 0.75rem;
-  color: var(--gray);
-  text-transform: uppercase;
-  font-weight: 600;
-  margin-bottom: 6px;
-}
-.review-answer-target {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--blue);
-  line-height: 1.3;
-}
 .review-answer-phonetic {
   font-size: 0.95rem;
   color: var(--gray);
@@ -233,19 +220,3 @@
 }
 
 /* Review: type the phrase */
-.review-type-row { display: flex; gap: 8px; margin: 14px 0 6px; }
-.review-type-input {
-  flex: 1; min-width: 0; padding: 13px 14px; border: 2px solid var(--border); border-radius: 11px;
-  font-size: 1.05rem; font-family: inherit; outline: none; background: var(--card-bg); color: var(--text);
-}
-.review-type-input:focus { border-color: var(--blue); }
-.review-type-input:disabled { opacity: 0.8; }
-.review-type-input.correct { border-color: #16a34a; background: #dcfce7; }
-.review-type-input.close { border-color: #f59e0b; background: #fffbeb; }
-.review-type-input.wrong { border-color: #dc2626; background: #fee2e2; }
-.review-type-check {
-  padding: 0 16px; border: none; border-radius: 11px; background: var(--blue); color: white;
-  font-weight: 700; cursor: pointer; font-family: inherit; min-height: 44px;
-}
-.review-type-check:disabled { opacity: 0.5; cursor: default; }
-.review-or { text-align: center; font-size: 0.75rem; color: var(--gray); margin-bottom: 6px; }

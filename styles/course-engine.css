@@ -57,3 +57,9 @@
 @media (max-width: 500px) {
   .ce-options { grid-template-columns: 1fr; }
 }
+
+/* Say the answer instead of typing it */
+.ce-or { text-align: center; font-size: 0.78rem; color: var(--gray); margin: -4px 0 8px; }
+.ce-speak-btn { width: 100%; padding: 12px; margin-bottom: 14px; border: 2px solid var(--ce-border); border-radius: 11px; background: var(--ce-soft); color: var(--ce-dark); font-size: 0.95rem; font-weight: 700; cursor: pointer; font-family: inherit; min-height: 44px; }
+.ce-speak-btn.recording { border-color: #dc2626; background: #fee2e2; color: #991b1b; }
+.ce-speak-btn:disabled { opacity: 0.5; }

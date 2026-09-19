@@ -445,3 +445,6 @@
   background: var(--card-bg); font-weight: 700; cursor: pointer; font-family: inherit; min-height: 44px;
 }
 .rv-empty-btn:hover { border-color: var(--blue); color: var(--blue); }
+
+.review-hint { margin-top: 10px; font-size: 0.9rem; color: var(--gray); }
+.review-hint summary { cursor: pointer; font-weight: 700; list-style: none; }

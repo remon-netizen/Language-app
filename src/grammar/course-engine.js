@@ -15,6 +15,7 @@
 import { state } from '../state.js';
 import { escHtml } from '../utils.js';
 import { speakText } from '../voice.js';
+import { setupRecognition } from '../speech.js';
 import { L, resultLine, appendNext, missedListHtml, wireSpeakButtons, scoreMessage, scoreEmoji } from './drill-core.js';
 
 // ── Sessions ─────────────────────────────────────────────────────────────────
@@ -24,7 +25,8 @@ import { L, resultLine, appendNext, missedListHtml, wireSpeakButtons, scoreMessa
 //   intro        first exposure: the answer is on the card, nothing is recorded
 //   promptHtml   the question block
 //   autoSay      text spoken when the card appears
-//   input        { type: 'text', lang, placeholder, inputmode }
+//   input        { type: 'text', lang, placeholder, inputmode, speak? }
+//                  speak = { lang, check(heard[]) → result }: the answer may be said out loud
 //                | { type: 'choice', options: [{ label, correct }] }
 //   check(a)     → { isExact, isClose, isCorrect, quality, retry?, headline? }
 //                  retry = a note; the answer is not counted and the learner tries again
@@ -33,7 +35,7 @@ import { L, resultLine, appendNext, missedListHtml, wireSpeakButtons, scoreMessa
 //   compareOnClose  show "your answer / correct" for a near miss too
 //   correctText  the right answer, as text
 //   detailHtml   shown under the verdict: the item itself, notes
-//   say          text behind the Listen button
+//   say          text behind the Listen button; with sayAfter it is also played once answered
 //   missed       { left, right, extra, say } row for the end-of-round list
 
 const DEFAULT_ACCENT = { main: '#7c3aed', dark: '#5b21b6', soft: '#f5f3ff', border: '#c4b5fd' };
@@ -80,6 +82,9 @@ export function runSession({ screen, icon, title, accent = DEFAULT_ACCENT, cards
             autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
           <button class="ce-check-btn" id="ceCheck" type="button">${L('Check', 'Controleer')} ✓</button>
         </div>
+        ${card.input.speak ? `
+        <div class="ce-or">${L('or say it out loud', 'of zeg het hardop')}</div>
+        <button class="ce-speak-btn" id="ceSpeak" type="button">🎙️ ${L('Speak', 'Spreek')}</button>` : ''}
         <div class="ce-retry-note" id="ceRetry" hidden></div>`}
       <div id="ceFeedback"></div>`;
 
@@ -112,6 +117,33 @@ export function runSession({ screen, icon, title, accent = DEFAULT_ACCENT, cards
     check.addEventListener('click', submit);
     input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); submit(); } });
     input.focus();
+    if (card.input.speak) wireSpeak(card, input, check);
+  }
+
+  // The microphone is a second way to give the same answer: what was heard is
+  // graded by the card and settled exactly like a typed answer.
+  function wireSpeak(card, input, check) {
+    const btn = s.querySelector('#ceSpeak');
+    let rec = null, recording = false;
+    const idle = () => { recording = false; btn.textContent = '🎙️ ' + L('Speak', 'Spreek'); btn.classList.remove('recording'); };
+    btn.addEventListener('click', () => {
+      if (recording) { rec?.stop(); return; }
+      rec = setupRecognition(card.input.speak.lang, event => {
+        if (run.answered) return;
+        const heard = Array.from(event.results[0]).map(r => r.transcript.trim());
+        rec.stop();
+        if (!heard[0]) { const note = s.querySelector('#ceRetry'); note.textContent = L('Nothing detected. Try again.', 'Niets gehoord. Probeer het nog eens.'); note.hidden = false; return; }
+        run.answered = true;
+        input.disabled = true; check.disabled = true; btn.disabled = true;
+        const res = card.input.speak.check(heard);
+        input.value = heard[0];
+        input.classList.add(res.isExact ? 'correct' : res.isClose ? 'close' : 'wrong');
+        settle(card, res, heard[0], { compare: !res.isExact, heard: true });
+      }, idle);
+      if (!rec) return;
+      recording = true; btn.textContent = '⏹ Stop'; btn.classList.add('recording');
+      rec.start();
+    });
   }
 
   function wireChoice(card) {
@@ -140,7 +172,7 @@ export function runSession({ screen, icon, title, accent = DEFAULT_ACCENT, cards
   }
 
   // Verdict, record, feedback, Next.
-  function settle(card, res, answer, { compare }) {
+  function settle(card, res, answer, { compare, heard = false }) {
     if (res.isCorrect) run.score++;
     // Introduction cards are copying, so they never count as a failure.
     let token = null;
@@ -153,7 +185,7 @@ export function runSession({ screen, icon, title, accent = DEFAULT_ACCENT, cards
     let html = res.headline ? `<div class="ex-feedback-result correct">✓ ${escHtml(res.headline)}</div>` : resultLine(res);
     if (compare) {
       html += `<div class="ce-compare">
-        <div class="ce-your-answer"><b>${L('Your answer:', 'Jouw antwoord:')}</b> ${escHtml(answer)}</div>
+        <div class="ce-your-answer"><b>${heard ? L('I heard:', 'Ik hoorde:') : L('Your answer:', 'Jouw antwoord:')}</b> ${escHtml(answer)}</div>
         <div class="ce-correct-answer"><b>${L('Correct:', 'Correct:')}</b> ${escHtml(card.correctText)}</div>
       </div>`;
     }
@@ -165,6 +197,7 @@ export function runSession({ screen, icon, title, accent = DEFAULT_ACCENT, cards
     fb.innerHTML = html;
     wireSpeakButtons(fb);
     fb.querySelector('#ceListen')?.addEventListener('click', () => speakText(card.say, state.currentLanguage));
+    if (card.sayAfter && card.say) setTimeout(() => speakText(card.say, state.currentLanguage), 400);
 
     if (canOverride) {
       const btn = fb.querySelector('#ceOverride');
