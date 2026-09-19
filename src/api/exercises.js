@@ -10,12 +10,8 @@ const LEVEL_LABELS = {
 };
 
 const TOPIC_HINTS_UK = {
-  cases:        'Focus on choosing the correct grammatical case (Nominative, Genitive, Dative, Accusative, Instrumental, Locative) for a noun or pronoun in context.',
-  aspect:       'Focus on choosing perfective vs imperfective verb aspect (e.g. писати / написати) and explain why.',
-  gender:       'Focus on noun gender (masculine / feminine / neuter) and correct adjective agreement (ending -ий/-а/-е etc.).',
   adverbs:      'Focus on Ukrainian adverbs of time (зараз, вже, ще), place (тут, там, звідси), and manner (добре, швидко). Test correct usage and word position.',
   prepositions: 'Focus on choosing the correct preposition (у/в, на, до, від, з, за, під, над, між…) and the case it requires.',
-  pronouns:     'Focus on personal pronouns (я, ти, він/вона/воно, ми, ви, вони) and possessives (мій, твій, його/її…) in different cases.',
   negation:     'Focus on не, ні, нічого, ніхто, ніде, ніколи and double-negation rules in Ukrainian.',
 };
 

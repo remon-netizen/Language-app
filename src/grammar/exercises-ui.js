@@ -1,4 +1,5 @@
 import { state, flagImg } from '../state.js';
+import { getCourses } from '../review.js';
 import { escHtml } from '../utils.js';
 import { generateExercises } from '../api/exercises.js';
 import { languageName } from '../i18n.js';
@@ -12,25 +13,16 @@ const L = (en, nl) => (NL() ? nl : en);
 // Each topic carries language-specific titles/subtitles per native language.
 // The picker reads `topic.title[native]` and `topic.subtitle[native]`.
 
+// Cases, aspect, gender agreement and pronouns are courses now (Case Drill, Verb
+// Drill): they are learned, scheduled and reviewed there, which a generated quiz
+// cannot do. What is left here is what no course covers.
 const TOPICS_UK = [
-  { id: 'cases',        icon: '📌',
-    title:    { en: 'Cases',                nl: 'Naamvallen' },
-    subtitle: { en: 'відмінки — choosing the right case', nl: 'відмінки — de juiste naamval kiezen' } },
-  { id: 'aspect',       icon: '⚡',
-    title:    { en: 'Verb Aspect',          nl: 'Werkwoordsaspect' },
-    subtitle: { en: 'perfective vs imperfective',         nl: 'voltooid vs onvoltooid' } },
-  { id: 'gender',       icon: '🔤',
-    title:    { en: 'Gender & Agreement',   nl: 'Geslacht & overeenkomst' },
-    subtitle: { en: 'noun gender + adjective forms',      nl: 'geslacht + bijvoeglijk-naamwoorduitgangen' } },
   { id: 'adverbs',      icon: '⏱',
     title:    { en: 'Adverbs',              nl: 'Bijwoorden' },
     subtitle: { en: 'time, place, manner adverbs',        nl: 'bijwoorden van tijd, plaats en wijze' } },
   { id: 'prepositions', icon: '📍',
     title:    { en: 'Prepositions',         nl: 'Voorzetsels' },
     subtitle: { en: 'which preposition + which case',     nl: 'welk voorzetsel + welke naamval' } },
-  { id: 'pronouns',     icon: '👤',
-    title:    { en: 'Pronouns',             nl: 'Voornaamwoorden' },
-    subtitle: { en: 'personal & possessive forms',        nl: 'persoonlijke en bezittelijke vormen' } },
   { id: 'negation',     icon: '🚫',
     title:    { en: 'Negation',             nl: 'Ontkenning' },
     subtitle: { en: 'не, ні, нічого, ніхто…',             nl: 'не, ні, нічого, ніхто…' } },
@@ -172,7 +164,7 @@ function showTopicPicker() {
   const s       = getScreen();
   const native  = state.nativeLanguage;
   const flag    = flagImg(state.currentLanguage);
-  const lblTitle    = native === 'nl' ? '🎯 Grammatica-oefeningen' : '🎯 Grammar Exercises';
+  const lblTitle    = native === 'nl' ? '🎯 Cursussen & drills' : '🎯 Courses & drills';
   const lblPick     = native === 'nl' ? 'kies een onderwerp' : 'pick a topic';
   const lblPracVerb = native === 'nl' ? 'Werkwoord opzoeken' : 'Verb Lookup';
   const lblDissect  = native === 'nl' ? 'Zin ontleden' : 'Dissect a Sentence';
@@ -194,6 +186,23 @@ function showTopicPicker() {
   const lblOff      = native === 'nl' ? 'UIT' : 'OFF';
   const targetName  = languageName(state.currentLanguage);
 
+  // One tile per course, with where the learner stands: "12 / 1168 · 3 due".
+  const courseStats = Object.fromEntries(getCourses().map(c => [c.id, c.stats()]));
+  const tile = (id, cls, icon, label, courseId) => {
+    const st = courseStats[courseId];
+    const meta = !st ? '' : st.seen ? `${st.learned} / ${st.total}${st.due ? ` · ${st.due} ${native === 'nl' ? 'nu' : 'due'}` : ''}` : (native === 'nl' ? 'start hier' : 'start here');
+    return { id, cls, icon, label, meta, due: !!(st && st.due) };
+  };
+  const courseTiles = [
+    tile('exVocabBtn', 'ex-tool-vocab', '🧠', lblVocab, isUK ? 'vocab' : 'mywords'),
+    ...(isUK ? [
+      tile('exDrillBtn', 'ex-tool-drill', '✍️', lblDrill, 'verbs'),
+      tile('exCaseDrillBtn', 'ex-tool-cases', '📌', lblCases, 'cases'),
+      tile('exPrefixDrillBtn', 'ex-tool-prefix', '🔗', lblPrefix, 'prefixes'),
+      tile('exNumbersDrillBtn', 'ex-tool-numbers', '🔢', lblNumbers, 'numbers'),
+    ] : []),
+  ];
+
   s.innerHTML = `
     <div class="lesson-header">
       <button class="back-btn" id="exHomeBack">←</button>
@@ -203,40 +212,31 @@ function showTopicPicker() {
       </div>
     </div>
 
-    <div class="ex-section-label">${native === 'nl' ? '📴 Drills — werken offline, onthouden je fouten' : '📴 Drills — work offline, remember your mistakes'}</div>
+    <div class="ex-section-label">${native === 'nl' ? '📚 Leren — nieuw leren, testen, herhalen' : '📚 Learn — learn it, test it, review it'}</div>
+    <div class="ex-tools-row ex-tools-wrap">
+      ${courseTiles.map(c => `
+      <button class="ex-tool-btn ${c.cls}" id="${c.id}">
+        <span class="ex-tool-icon">${c.icon}</span>
+        <span>${c.label}</span>
+        <span class="ex-tool-meta ${c.due ? 'ex-tool-due' : ''}">${c.meta}</span>
+      </button>`).join('')}
+    </div>
+    ${!isUK ? `<div class="ex-tools-empty">${native === 'nl' ? 'Woordenschat leert de woorden die je in gesprekken opslaat. Andere cursussen zijn er voor deze taal nog niet.' : 'Vocabulary teaches the words you save in conversations. No other courses for this language yet.'}</div>` : ''}
+
+    ${isUK ? `
+    <div class="ex-section-label">${native === 'nl' ? '🧩 Toepassen — hele zinnen en luisteren' : '🧩 Apply — whole sentences and listening'}</div>
     <div class="ex-tools-row">
-      <button class="ex-tool-btn ex-tool-vocab" id="exVocabBtn">
-        <span class="ex-tool-icon">🧠</span>
-        <span>${lblVocab}</span>
-      </button>
-      <button class="ex-tool-btn ex-tool-drill" id="exDrillBtn" style="${isUK ? '' : 'display:none'}">
-        <span class="ex-tool-icon">✍️</span>
-        <span>${lblDrill}</span>
-      </button>
-      <button class="ex-tool-btn ex-tool-cases" id="exCaseDrillBtn" style="${isUK ? '' : 'display:none'}">
-        <span class="ex-tool-icon">📌</span>
-        <span>${lblCases}</span>
-      </button>
-      <button class="ex-tool-btn ex-tool-prefix" id="exPrefixDrillBtn" style="${isUK ? '' : 'display:none'}">
-        <span class="ex-tool-icon">🔗</span>
-        <span>${lblPrefix}</span>
-      </button>
-      <button class="ex-tool-btn ex-tool-numbers" id="exNumbersDrillBtn" style="${isUK ? '' : 'display:none'}">
-        <span class="ex-tool-icon">🔢</span>
-        <span>${lblNumbers}</span>
-      </button>
-      <button class="ex-tool-btn ex-tool-sentence" id="exSentenceBtn" style="${isUK ? '' : 'display:none'}">
+      <button class="ex-tool-btn ex-tool-sentence" id="exSentenceBtn">
         <span class="ex-tool-icon">🧩</span>
         <span>${lblSentence}</span>
       </button>
-      <button class="ex-tool-btn ex-tool-dialog" id="exDialogBtn" style="${isUK ? '' : 'display:none'}">
+      <button class="ex-tool-btn ex-tool-dialog" id="exDialogBtn">
         <span class="ex-tool-icon">🎧</span>
         <span>${lblDialog}</span>
       </button>
-      ${!isUK ? `<div class="ex-tools-empty">${native === 'nl' ? 'Woordenschat leert de woorden die je in gesprekken opslaat. Andere offline drills zijn er voor deze taal nog niet.' : 'Vocabulary teaches the words you save in conversations. No other offline drills for this language yet.'}</div>` : ''}
-    </div>
+    </div>` : ''}
 
-    <div class="ex-section-label">${native === 'nl' ? '🤖 AI-oefeningen — gegenereerd met je API-sleutel' : '🤖 AI exercises — generated with your API key'}</div>
+    <div class="ex-section-label">${native === 'nl' ? '🤖 AI-hulpmiddelen en quizzen — met je API-sleutel' : '🤖 AI tools and quizzes — with your API key'}</div>
     ${keyOk ? '' : `
       <div class="ex-nokey">
         <span>🔑 ${native === 'nl' ? 'Zonder API-sleutel staan de AI-onderdelen uit.' : 'Without an API key the AI parts are off.'}</span>

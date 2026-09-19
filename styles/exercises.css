@@ -544,3 +544,9 @@
 .ex-tool-vocab:hover { border-color: #db2777; background: #fdf2f8; color: #9d174d; }
 .ex-tool-sentence:hover { border-color: #4f46e5; background: #eef2ff; color: #3730a3; }
 .ex-tool-dialog:hover { border-color: #0f766e; background: #f0fdfa; color: #134e4a; }
+
+/* Hub: course tiles carry their progress; the row wraps on a phone */
+.ex-tools-wrap { flex-wrap: wrap; }
+.ex-tools-wrap .ex-tool-btn { flex: 1 1 120px; }
+.ex-tool-meta { font-size: 0.68rem; font-weight: 600; color: var(--gray); min-height: 0.9em; }
+.ex-tool-due { color: #6d28d9; }
