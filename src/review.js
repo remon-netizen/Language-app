@@ -21,6 +21,10 @@ import { vocabDueCards } from './grammar/vocab-drill-ui.js';
 import { numbersDueCards } from './grammar/numbers-drill-ui.js';
 import { verbDueCards } from './grammar/verb-drill-ui.js';
 import { verbStats } from './data/verb-progress.js';
+import { caseDueCards } from './grammar/case-drill-ui.js';
+import { caseStats } from './data/case-progress.js';
+import { prefixDueCards } from './grammar/prefix-drill-ui.js';
+import { prefixStats } from './data/prefix-progress.js';
 import { runSession } from './grammar/course-engine.js';
 import { shuffle } from './grammar/drill-core.js';
 import { levenshtein } from './utils.js';
@@ -99,17 +103,26 @@ const REVIEW_ROUND = 30;
 // The courses on the engine (Ukrainian only so far). A new course is one line here:
 // the hub row, the due totals, the Today card and the mixed round all follow.
 const COURSES = [
-  { icon: '🧠', name: { en: 'Vocabulary deck (core words)', nl: 'Woordenschat (kernwoorden)' }, unit: { en: 'words', nl: 'woorden' },
+  { icon: '🧠', name: { en: 'Vocabulary deck (core words)', nl: 'Woordenschat (kernwoorden)' }, unit: { en: 'core words', nl: 'kernwoorden' },
     fresh: { en: 'Not started — learn 10 new words', nl: 'Nog niet gestart — leer 10 nieuwe woorden' },
     stats: vocabStats, dueCards: vocabDueCards, review: 'startVocabReview()', open: 'openVocabDrillScreen()' },
-  { icon: '🔢', name: { en: 'Numbers & time', nl: 'Getallen & tijd' }, unit: { en: 'items', nl: 'items' },
+  { icon: '🔢', name: { en: 'Numbers & time', nl: 'Getallen & tijd' }, unit: { en: 'numbers & times', nl: 'getallen & tijden' },
     fresh: { en: 'Not started — learn 0 to 10', nl: 'Nog niet gestart — leer 0 tot 10' },
     stats: numbersStats, dueCards: numbersDueCards, review: 'startNumbersReview()', open: 'openNumbersDrillScreen()' },
-  { icon: '✍️', name: { en: 'Verbs (tenses you learned)', nl: 'Werkwoorden (geleerde tijden)' }, unit: { en: 'tenses', nl: 'tijden' },
+  { icon: '✍️', name: { en: 'Verbs (tenses you learned)', nl: 'Werkwoorden (geleerde tijden)' }, unit: { en: 'verb tenses', nl: 'werkwoordstijden' },
     fresh: { en: 'Not started — pick a verb under Learn One', nl: 'Nog niet gestart — kies een werkwoord bij Leer één' },
     stats: verbStats, dueCards: verbDueCards, review: 'startVerbReview()', open: 'openVerbDrillScreen()' },
+  { icon: '📌', name: { en: 'Cases (nouns you learned)', nl: 'Naamvallen (geleerde woorden)' }, unit: { en: 'nouns', nl: 'woorden' },
+    fresh: { en: 'Not started — pick a noun under Learn One', nl: 'Nog niet gestart — kies een woord bij Leer één' },
+    stats: caseStats, dueCards: caseDueCards, review: 'startCaseReview()', open: 'openCaseDrillScreen()' },
+  { icon: '🔗', name: { en: 'Prefixed verbs', nl: 'Werkwoorden met voorvoegsel' }, unit: { en: 'prefixed verbs', nl: 'werkwoorden met voorvoegsel' },
+    fresh: { en: 'Not started — learn the first word family', nl: 'Nog niet gestart — leer de eerste woordfamilie' },
+    stats: prefixStats, dueCards: prefixDueCards, review: 'startPrefixReview()', open: 'openPrefixDrillScreen()' },
 ];
 const activeCourses = () => (state.currentLanguage === 'uk' ? COURSES : []);
+
+// The courses of the current target language, for the Progress screen.
+export const getCourses = () => activeCourses();
 
 // Everything due across the courses, for the home badge and the Today card.
 export function getCourseDue() {
@@ -185,7 +198,7 @@ export function openReviewScreen() {
     ${courses.length ? `
     <button class="rv-all-btn" ${courseDue ? 'onclick="startReviewAll()"' : 'disabled'}>
       <span class="rv-all-title">🔄 ${courseDue ? (nl ? `Herhaal alles: ${courseDue} aan de beurt` : `Review everything: ${courseDue} due`) : (nl ? 'Niets aan de beurt' : 'Nothing due right now')}</span>
-      <span class="rv-all-sub">${nl ? 'Woorden, getallen en werkwoorden door elkaar, in één ronde' : 'Words, numbers and verbs mixed, in one round'}</span>
+      <span class="rv-all-sub">${nl ? 'Woorden, getallen, werkwoorden en naamvallen door elkaar, in één ronde' : 'Words, numbers, verbs and cases mixed, in one round'}</span>
     </button>` : ''}
     <div class="rv-hub">
       ${row('🗣️', nl ? 'Zinnen uit lessen' : 'Phrases from lessons',

@@ -69,12 +69,6 @@
 .cd-menu-sub { font-size: 0.75rem; color: var(--gray); }
 
 /* Progress */
-.cd-progress-wrap {
-  width: 100%; height: 6px; background: rgba(255,255,255,0.2);
-  border-radius: 4px; overflow: hidden; margin-bottom: 4px;
-}
-.cd-progress-bar { height: 100%; background: #6ee7b7; border-radius: 4px; transition: width 0.3s ease; }
-.cd-progress-text { font-size: 0.7rem; color: rgba(255,255,255,0.7); }
 
 /* Question card */
 .cd-q-card {
@@ -98,24 +92,6 @@
 .cd-gender-n { background: #fef3c7; color: #92400e; }
 
 /* Input area */
-.cd-input-area { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
-.cd-text-input {
-  width: 100%; padding: 14px 16px; border: 2px solid var(--border); border-radius: 11px;
-  font-size: 1.1rem; font-family: inherit; outline: none; transition: border-color 0.2s;
-  background: var(--card-bg); color: var(--text);
-}
-.cd-text-input:focus { border-color: #059669; }
-.cd-text-input:disabled { opacity: 0.7; background: var(--bg); }
-.cd-text-input.correct { border-color: #16a34a; background: #dcfce7; }
-.cd-text-input.close { border-color: #f59e0b; background: #fffbeb; }
-.cd-text-input.wrong { border-color: #dc2626; background: #fee2e2; }
-
-.cd-check-btn {
-  padding: 12px; background: #059669; color: white; border: none; border-radius: 11px;
-  font-size: 0.95rem; font-weight: 700; cursor: pointer; font-family: inherit; transition: background 0.2s;
-}
-.cd-check-btn:hover:not(:disabled) { background: #047857; }
-.cd-check-btn:disabled { opacity: 0.5; cursor: default; }
 
 /* Declension table in feedback */
 .cd-decl-table {
@@ -141,35 +117,10 @@
 .cd-highlight-row .cd-decl-pl { color: #14532d; }
 
 /* Feedback */
-.cd-answer-compare { margin-bottom: 10px; }
-.cd-your-answer {
-  font-size: 0.88rem; padding: 8px 12px; background: var(--bg);
-  border: 1px solid var(--border); border-radius: 8px; margin-bottom: 6px; color: var(--text);
-}
-.cd-correct-answer {
-  font-size: 0.88rem; padding: 8px 12px; background: #dcfce7;
-  border: 1px solid #86efac; border-radius: 8px; color: #14532d;
-}
-.cd-ans-label { font-weight: 700; margin-right: 6px; }
 .cd-context {
   font-size: 0.85rem; color: #065f46; padding: 10px 14px;
   background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 10px; margin-bottom: 10px;
 }
-
-.cd-listen-btn {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 8px 16px; border: 2px solid #a7f3d0; border-radius: 10px;
-  background: #ecfdf5; color: #059669; font-size: 0.85rem; font-weight: 700;
-  cursor: pointer; font-family: inherit; transition: all 0.15s; margin-bottom: 10px;
-}
-.cd-listen-btn:hover { background: #d1fae5; border-color: #059669; }
-
-.cd-next-btn {
-  width: 100%; padding: 13px; background: #059669; color: white;
-  border: none; border-radius: 12px; font-size: 0.95rem; font-weight: 700;
-  cursor: pointer; font-family: inherit; transition: background 0.2s; margin-top: 6px;
-}
-.cd-next-btn:hover { background: #047857; }
 
 /* Reference tables */
 .cd-ref-tables { margin-bottom: 16px; }
@@ -240,13 +191,6 @@
 .cd-empty-text { font-size: 0.9rem; color: var(--gray); margin-bottom: 20px; line-height: 1.6; }
 
 /* Summary rows */
-.cd-learn-summary-row {
-  display: flex; align-items: center; gap: 10px;
-  padding: 8px 12px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 4px;
-}
-.cd-learn-summary-row.correct { background: #dcfce7; }
-.cd-learn-summary-row.wrong { background: #fee2e2; }
-.cd-learn-summary-form { font-weight: 700; }
 
 /* Weak toggle */
 .cd-weak-toggle {
@@ -275,7 +219,6 @@
   .cd-decl-row { font-size: 0.75rem; gap: 4px; padding: 4px 4px; }
   .cd-decl-case { min-width: 60px; font-size: 0.7rem; }
   .cd-q-card { padding: 14px; }
-  .cd-text-input { padding: 12px; font-size: 1rem; }
   .cd-sentence-card { padding: 14px; }
   .cd-q-case { font-size: 0.9rem; }
 }
@@ -295,3 +238,13 @@
 /* Pronoun table: four gender columns */
 .cd-pron-row { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr; gap: 6px; }
 .cd-pron-row span { font-size: 0.85rem; }
+
+/* Course: review what Learn One put on the schedule */
+.cd-review-btn {
+  width: 100%; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 12px; margin-bottom: 14px;
+  border: 2px solid #059669; border-radius: 12px; background: #ecfdf5; color: #065f46;
+  font-size: 0.92rem; font-weight: 800; cursor: pointer; font-family: inherit; min-height: 52px;
+}
+.cd-review-btn:hover:not(:disabled) { background: #d1fae5; }
+.cd-review-btn:disabled { border-color: var(--border); background: var(--card-bg); color: var(--gray); cursor: default; }
+.cd-review-sub { font-size: 0.72rem; font-weight: 600; opacity: 0.8; }

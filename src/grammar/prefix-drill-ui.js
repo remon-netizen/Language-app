@@ -1,43 +1,25 @@
 import { state } from '../state.js';
-import { escHtml, levenshtein } from '../utils.js';
-import { PREFIXES, BASE_VERBS, buildPrefixDrillSet, findBaseVerb, getDistractorPrefixes, getDistractorMeanings } from '../data/prefix-verbs.js';
-import { speakText } from '../voice.js';
+import { escHtml } from '../utils.js';
+import { PREFIXES, BASE_VERBS, buildPrefixDrillSet, getDistractorPrefixes, getDistractorMeanings } from '../data/prefix-verbs.js';
 import { recordAnswer, hasWeaknessData, getWeakVerbCount, getWeakItems } from '../data/prefix-weakness.js';
-import { appendNext, missedListHtml, wireSpeakButtons, scoreMessage, scoreEmoji, resultLine } from './drill-core.js';
+import { L, loc, shuffle, grade } from './drill-core.js';
+import { runSession } from './course-engine.js';
+import { prefixProgress, prefixStats, prefixKey } from '../data/prefix-progress.js';
 
 // ── State ────────────────────────────────────────────────────────────────────
 
 let pd = {
-  questions: [],
-  current:   0,
-  score:     0,
-  answered:  false,
   total:     25,
   mode:      'menu',        // 'menu' | 'refPrefix' | 'refVerb' | 'drill'
   refIdx:    0,
   prefixFilter: 'all',
   qMode:     localStorage.getItem('prefixDrillMode') || 'type', // 'type' | 'choose'
-  missed:    [],
 };
 
-const loc = field => {
-  if (!field) return '';
-  if (typeof field === 'string') return field;
-  return field[state.nativeLanguage] || field.en || '';
-};
+const COURSE = { icon: '🔗', get name() { return L('Prefixes', 'Voorvoegsels'); } };
+const ACCENT = { main: '#7c3aed', dark: '#4c1d95', soft: '#f5f3ff', border: '#ddd6fe' };
 
 function getScreen() { return document.getElementById('prefixDrillScreen'); }
-
-const normalise = s => s.toLowerCase().replace(/['ʼ]/g, "'").replace(/\s+/g, ' ').trim();
-
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
 
 // Count total prefixed entries
 function totalEntries() {
@@ -60,6 +42,8 @@ function showMenu() {
   const s = getScreen();
   const nl = state.nativeLanguage === 'nl';
   const count = totalEntries();
+  const st = prefixStats();
+  const family = nextFamily();
 
   const prefixBtns = PREFIXES.map(p =>
     `<button class="pd-filter-btn ${pd.prefixFilter === p.prefix ? 'active' : ''}" data-prefix="${escHtml(p.prefix)}">${escHtml(p.prefix)}</button>`
@@ -96,6 +80,19 @@ function showMenu() {
       </div>
     </div>
 
+    <div class="pd-course-grid">
+      <button class="pd-course-card pd-course-primary" id="pdLearnBtn" ${family ? '' : 'disabled'}>
+        <span class="pd-menu-icon">🎓</span>
+        <span class="pd-menu-title">${family ? `${nl ? 'Leer' : 'Learn'}: ${escHtml(family.bv.base)}` : (nl ? 'Alles gezien' : 'Everything seen')}</span>
+        <span class="pd-menu-sub">${family ? `${family.fresh.length} ${nl ? 'nieuwe werkwoorden' : 'new verbs'} · ${nl ? 'familie' : 'family'} ${family.index + 1}/${BASE_VERBS.length}` : ''}</span>
+      </button>
+      <button class="pd-course-card" id="pdDueBtn" ${st.due ? '' : 'disabled'}>
+        <span class="pd-menu-icon">🔄</span>
+        <span class="pd-menu-title">${nl ? 'Herhalen' : 'Review due'}</span>
+        <span class="pd-menu-sub">${st.due} ${nl ? 'aan de beurt' : 'due'} · ${st.learned}/${st.total} ${nl ? 'geleerd' : 'learned'}</span>
+      </button>
+    </div>
+
     <div class="pd-menu-grid">
       <button class="pd-menu-card" id="pdRefPrefixBtn">
         <span class="pd-menu-icon">📖</span>
@@ -118,6 +115,8 @@ function showMenu() {
   s.querySelector('#pdRefPrefixBtn').addEventListener('click', () => showRefByPrefix(0));
   s.querySelector('#pdRefVerbBtn').addEventListener('click', () => showRefByVerb(0));
   s.querySelector('#pdStartBtn').addEventListener('click', startDrill);
+  s.querySelector('#pdLearnBtn').addEventListener('click', () => family && startLearnFamily(family.index));
+  s.querySelector('#pdDueBtn').addEventListener('click', () => startPrefixReview(showMenu));
 
   s.querySelectorAll('[data-mode]').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -221,10 +220,12 @@ function showRefByVerb(index) {
 
     <div class="pd-ref-nav">
       <button class="pd-nav-btn" id="pdPrev" ${index === 0 ? 'disabled' : ''}>← ${nl ? 'Vorige' : 'Previous'}</button>
+      <button class="pd-nav-btn pd-nav-primary" id="pdLearnFamily">🎓 ${nl ? 'Leer deze familie' : 'Learn this family'}</button>
       <button class="pd-nav-btn" id="pdNext" ${index >= BASE_VERBS.length - 1 ? 'disabled' : ''}>${nl ? 'Volgende' : 'Next'} →</button>
     </div>`;
 
   s.querySelector('#pdRefBack').addEventListener('click', showMenu);
+  s.querySelector('#pdLearnFamily').addEventListener('click', () => startLearnFamily(index, { all: true }));
   if (index > 0) s.querySelector('#pdPrev').addEventListener('click', () => showRefByVerb(index - 1));
   if (index < BASE_VERBS.length - 1) s.querySelector('#pdNext').addEventListener('click', () => showRefByVerb(index + 1));
 }
@@ -265,11 +266,14 @@ function startDrill() {
     });
   }
   if (pd.questions.length === 0) { showEmptyState(); return; }
-  pd.current = 0;
-  pd.score = 0;
-  pd.missed = [];
-  pd.answered = false;
-  renderQuestion();
+  // The free drill only moves the schedule of verbs already learned family by family.
+  const units = makeUnits({ onlySeen: true });
+  runSession({
+    screen: getScreen(), icon: COURSE.icon, title: L('Prefix Drill', 'Voorvoegsel Drill'), accent: ACCENT,
+    cards: pd.questions.map(q => prefixCard(q, { units })),
+    onExit: showMenu,
+    again: () => ({ label: '🔄 ' + L('Try again (new questions)', 'Opnieuw (nieuwe vragen)'), run: startDrill }),
+  });
 }
 
 function showEmptyState() {
@@ -292,360 +296,143 @@ function showEmptyState() {
   s.querySelector('#pdEmptyBack').addEventListener('click', showMenu);
 }
 
-function renderQuestion() {
-  pd.answered = false;
-  const q = pd.questions[pd.current];
+// ── The course: one word family at a time ────────────────────────────────────
 
-  switch (q.type) {
-    case 'choose_prefix': renderChoosePrefix(q); break;
-    case 'identify_meaning': renderIdentifyMeaning(q); break;
-    case 'fill_blank': renderFillBlank(q); break;
-    case 'type_verb': renderTypeVerb(q); break;
-    default: renderChoosePrefix(q);
+// The first family that still holds unseen verbs, and those verbs.
+function nextFamily() {
+  const unseen = new Set(prefixProgress.unseenKeys());
+  const index = BASE_VERBS.findIndex(bv => bv.prefixed.some(pv => unseen.has(prefixKey(pv.verb))));
+  if (index === -1) return null;
+  return { index, bv: BASE_VERBS[index], fresh: BASE_VERBS[index].prefixed.filter(pv => unseen.has(prefixKey(pv.verb))) };
+}
+
+const question = (bv, pv, type) => ({
+  type, base: bv.base, baseMeaning: bv.meaning, verb: pv.verb, prefix: pv.prefix, meaning: pv.meaning,
+  correctPrefix: pv.prefix, correctMeaning: pv.meaning,
+  ...(pv.sentence ? { sentence: pv.sentence.uk, answer: pv.sentence.answer, fullSentence: pv.sentence.full, translation: pv.sentence } : {}),
+});
+
+// Each new verb is shown with its meaning first (hear it, copy it), then asked from
+// memory: meaning → verb, and the verb inside its sentence. At most 8 verbs a round.
+function startLearnFamily(index, { all = false } = {}) {
+  const bv = BASE_VERBS[index];
+  const unseen = new Set(prefixProgress.unseenKeys());
+  const verbs = (all ? bv.prefixed : bv.prefixed.filter(pv => unseen.has(prefixKey(pv.verb)))).slice(0, 8);
+  const units = makeUnits();
+  const cards = [
+    ...verbs.map(pv => prefixCard(question(bv, pv, 'type_verb'), { intro: true })),
+    ...shuffle(verbs).map(pv => prefixCard(question(bv, pv, 'type_verb'), { units })),
+    ...shuffle(verbs.filter(pv => pv.sentence)).map(pv => prefixCard(question(bv, pv, 'fill_blank'), { units })),
+  ];
+  runSession({
+    screen: getScreen(), icon: '🎓', title: `${bv.base} · ${loc(bv.meaning)}`, accent: ACCENT, cards,
+    onExit: showMenu,
+    scoreSubtitle: () => { const st = prefixStats(); return `${st.learned}/${st.total} ${L('learned', 'geleerd')} · ${st.due} ${L('due', 'aan de beurt')}`; },
+    again: () => { const f = nextFamily(); return f ? { label: `📥 ${L('Next', 'Volgende')}: ${f.bv.base}`, run: () => startLearnFamily(f.index) } : null; },
+  });
+}
+
+// ── Cards ────────────────────────────────────────────────────────────────────
+
+// A prefixed verb moves on the schedule once per session, when the last of its
+// cards is answered, by how many were right.
+function makeUnits({ onlySeen = false } = {}) {
+  const tally = new Map();
+  return {
+    expect(key) { const t = tally.get(key) || { total: 0, n: 0, ok: 0 }; t.total++; tally.set(key, t); },
+    answer(key, res) {
+      const t = tally.get(key);
+      if (!t) return;
+      t.n++; if (res.isCorrect) t.ok++;
+      if (t.n < t.total) return;
+      if (onlySeen && !prefixProgress.get(key)) return;
+      prefixProgress.record(key, t.total === 1 ? res.quality : t.ok === t.total ? 5 : t.ok > 0 ? 3 : 1);
+    },
+  };
+}
+
+// q.type: 'type_verb' (meaning → verb, typed) · 'fill_blank' (verb form in a sentence, typed)
+//         'choose_prefix' · 'identify_meaning' (four options each)
+function prefixCard(q, { intro = false, units = null } = {}) {
+  const unit = prefixKey(q.verb);
+  if (units && !intro) units.expect(unit);
+  const wordLine = `<div class="pd-context"><span class="pd-prefix-tag">${escHtml(q.prefix || q.correctPrefix)}</span> ${escHtml(q.verb)} = ${escHtml(loc(q.meaning || q.correctMeaning))}</div>`;
+  const card = {
+    key: `${unit}|${q.type}`, course: COURSE, intro,
+    record(res) { recordAnswer(q.verb, q.type, res.isCorrect); units?.answer(unit, res); },
+    detailHtml: wordLine, say: q.verb, correctText: q.verb,
+    missed: { left: loc(q.meaning || q.correctMeaning), right: q.verb, extra: q.base },
+  };
+
+  if (q.type === 'choose_prefix') {
+    return { ...card,
+      promptHtml: `
+        <div class="pd-q-card">
+          <div class="pd-q-base">${escHtml(q.base)}</div>
+          <div class="pd-q-meaning">${escHtml(loc(q.baseMeaning))}</div>
+          <div class="pd-q-target">${L('Which prefix makes', 'Welk voorvoegsel maakt')}: ${escHtml(loc(q.meaning))}?</div>
+        </div>`,
+      input: { type: 'choice', options: shuffle([q.correctPrefix, ...getDistractorPrefixes(q.correctPrefix, 3)]).map(o => ({ label: `${o}${q.base}`, correct: o === q.correctPrefix })) } };
   }
+  if (q.type === 'identify_meaning') {
+    return { ...card, missed: { left: q.verb, right: loc(q.correctMeaning), extra: q.base, say: q.verb },
+      promptHtml: `
+        <div class="pd-q-card">
+          <div class="pd-q-base"><span class="pd-prefix-tag">${escHtml(q.prefix)}</span>${escHtml(q.verb)}</div>
+          <div class="pd-q-meaning">${L('Base verb', 'Basiswerkwoord')}: ${escHtml(q.base)} — ${escHtml(loc(q.baseMeaning))}</div>
+          <div class="pd-q-target">${L('What does this verb mean?', 'Wat betekent dit werkwoord?')}</div>
+        </div>`,
+      input: { type: 'choice', options: shuffle([q.correctMeaning, ...getDistractorMeanings(q.correctMeaning, 3)]).map(o => ({ label: loc(o), correct: o.en === q.correctMeaning.en })) },
+      correctText: loc(q.correctMeaning) };
+  }
+  if (q.type === 'fill_blank') {
+    return { ...card, say: q.fullSentence, correctText: q.answer,
+      missed: { left: loc(q.meaning), right: q.answer, extra: q.verb, say: q.fullSentence },
+      promptHtml: `
+        <div class="pd-sentence-card">
+          <div class="pd-sentence-translation">${escHtml(loc(q.translation))}</div>
+          <div class="pd-sentence-text">${escHtml(q.sentence).replace('___', '<span class="pd-sentence-blank"></span>')}</div>
+          <div class="pd-sentence-hint"><span class="pd-prefix-tag">${escHtml(q.prefix)}</span> ${escHtml(q.verb)} — ${escHtml(loc(q.meaning))}</div>
+        </div>`,
+      input: { type: 'text', lang: 'uk', placeholder: L('Type the answer…', 'Typ het antwoord…') },
+      check(answer) { const g = grade(answer, [q.answer], { minTypoLen: 5 }); return { ...g, quality: g.isExact ? 5 : g.isClose ? 3 : 1 }; },
+      compareOnClose: true,
+      detailHtml: `<div class="pd-context">${escHtml(q.fullSentence)}</div>${wordLine}` };
+  }
+  // type_verb, and the introduction card that shows the verb to copy
+  return { ...card,
+    promptHtml: `
+      <div class="pd-q-card ${intro ? 'pd-q-intro' : ''}">
+        ${intro ? `<div class="pd-q-badge">✨ ${L('New verb', 'Nieuw werkwoord')}</div>` : ''}
+        <div class="pd-q-base">${escHtml(q.base)}</div>
+        <div class="pd-q-meaning">${escHtml(loc(q.baseMeaning))}</div>
+        <div class="pd-q-target">${L('Which verb means', 'Welk werkwoord betekent')}: ${escHtml(loc(q.meaning))}?</div>
+        ${intro ? `<div class="pd-q-word"><span class="pd-prefix-tag">${escHtml(q.prefix)}</span>${escHtml(q.verb)} <button class="pd-say-inline" type="button" data-say="${escHtml(q.verb)}">🔊</button></div>
+                   <div class="pd-q-hint">${L('Say it, then type it', 'Zeg het, typ het dan')}</div>` : ''}
+      </div>`,
+    autoSay: intro ? q.verb : null,
+    input: { type: 'text', lang: 'uk', placeholder: L('Type the prefixed verb…', 'Typ het werkwoord met voorvoegsel…') },
+    check(answer) { const g = grade(answer, [q.verb], { minTypoLen: 5 }); return { ...g, quality: g.isExact ? 5 : g.isClose ? 3 : 1 }; },
+    compareOnClose: true };
 }
 
-// ── Type 1: Choose prefix (MC) ───────────────────────────────────────────────
-
-function renderChoosePrefix(q) {
-  const s = getScreen();
-  const nl = state.nativeLanguage === 'nl';
-  const pct = Math.round((pd.current / pd.questions.length) * 100);
-
-  const distractors = getDistractorPrefixes(q.correctPrefix, 3);
-  const options = shuffle([q.correctPrefix, ...distractors]);
-
-  s.innerHTML = `
-    <div class="lesson-header">
-      <button class="back-btn" id="pdDrillBack">←</button>
-      <div>
-        <div class="lesson-title">🔗 ${nl ? 'Voorvoegsel Drill' : 'Prefix Drill'}</div>
-        <div class="lesson-subtitle">
-          <div class="pd-progress-wrap"><div class="pd-progress-bar" style="width:${pct}%"></div></div>
-          <div class="pd-progress-text">${pd.current + 1} / ${pd.questions.length}</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="pd-q-card">
-      <div class="pd-q-base">${escHtml(q.base)}</div>
-      <div class="pd-q-meaning">${escHtml(loc(q.baseMeaning))}</div>
-      <div class="pd-q-target">${nl ? 'Welk voorvoegsel maakt' : 'Which prefix makes'}: ${escHtml(loc(q.meaning))}?</div>
-    </div>
-
-    <div class="pd-options">
-      ${options.map(o => `<button class="pd-option-btn" data-option="${escHtml(o)}">${escHtml(o)}${escHtml(q.base)}</button>`).join('')}
-    </div>
-
-    <div id="pdFeedback"></div>`;
-
-  s.querySelector('#pdDrillBack').addEventListener('click', showMenu);
-
-  s.querySelectorAll('.pd-option-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      if (pd.answered) return;
-      pd.answered = true;
-      const chosen = btn.dataset.option;
-      const isCorrect = chosen === q.correctPrefix;
-      if (isCorrect) pd.score++;
-      else pd.missed.push({ left: `${q.base} → ${loc(q.meaning)}`, right: q.verb, extra: q.correctPrefix });
-      recordAnswer(q.verb, 'choose_prefix', isCorrect);
-
-      // Disable all buttons and highlight
-      s.querySelectorAll('.pd-option-btn').forEach(b => {
-        b.disabled = true;
-        if (b.dataset.option === q.correctPrefix) b.classList.add('correct');
-        if (b.dataset.option === chosen && !isCorrect) b.classList.add('wrong');
-      });
-
-      showDrillFeedback(isCorrect, q.verb, q.correctPrefix, q.meaning);
-    });
+// For the Review queue: every due verb as one card, typed: from its meaning, or
+// inside its sentence.
+export function prefixDueCards() {
+  const units = makeUnits();
+  const byVerb = new Map(BASE_VERBS.flatMap(bv => bv.prefixed.map(pv => [pv.verb, [bv, pv]])));
+  return prefixProgress.dueKeys().map(key => {
+    const [bv, pv] = byVerb.get(key.slice('prefix:'.length));
+    return prefixCard(question(bv, pv, pv.sentence && Math.random() < 0.5 ? 'fill_blank' : 'type_verb'), { units });
   });
 }
 
-// ── Type 2: Identify meaning (MC) ────────────────────────────────────────────
-
-function renderIdentifyMeaning(q) {
-  const s = getScreen();
-  const nl = state.nativeLanguage === 'nl';
-  const pct = Math.round((pd.current / pd.questions.length) * 100);
-
-  const distractors = getDistractorMeanings(q.correctMeaning, 3);
-  const options = shuffle([q.correctMeaning, ...distractors]);
-
-  s.innerHTML = `
-    <div class="lesson-header">
-      <button class="back-btn" id="pdDrillBack">←</button>
-      <div>
-        <div class="lesson-title">🔗 ${nl ? 'Voorvoegsel Drill' : 'Prefix Drill'}</div>
-        <div class="lesson-subtitle">
-          <div class="pd-progress-wrap"><div class="pd-progress-bar" style="width:${pct}%"></div></div>
-          <div class="pd-progress-text">${pd.current + 1} / ${pd.questions.length}</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="pd-q-card">
-      <div class="pd-q-base"><span class="pd-prefix-tag">${escHtml(q.prefix)}</span>${escHtml(q.verb)}</div>
-      <div class="pd-q-meaning">${nl ? 'Basiswerkwoord' : 'Base verb'}: ${escHtml(q.base)} — ${escHtml(loc(q.baseMeaning))}</div>
-      <div class="pd-q-target">${nl ? 'Wat betekent dit werkwoord?' : 'What does this verb mean?'}</div>
-    </div>
-
-    <div class="pd-options">
-      ${options.map(o => `<button class="pd-option-btn" data-meaning="${escHtml(o.en)}">${escHtml(loc(o))}</button>`).join('')}
-    </div>
-
-    <div id="pdFeedback"></div>`;
-
-  s.querySelector('#pdDrillBack').addEventListener('click', showMenu);
-
-  s.querySelectorAll('.pd-option-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      if (pd.answered) return;
-      pd.answered = true;
-      const chosenEn = btn.dataset.meaning;
-      const isCorrect = chosenEn === q.correctMeaning.en;
-      if (isCorrect) pd.score++;
-      else pd.missed.push({ left: q.verb, right: loc(q.correctMeaning), extra: q.prefix, say: q.verb });
-      recordAnswer(q.verb, 'identify_meaning', isCorrect);
-
-      s.querySelectorAll('.pd-option-btn').forEach(b => {
-        b.disabled = true;
-        if (b.dataset.meaning === q.correctMeaning.en) b.classList.add('correct');
-        if (b.dataset.meaning === chosenEn && !isCorrect) b.classList.add('wrong');
-      });
-
-      showDrillFeedback(isCorrect, q.verb, q.prefix, q.correctMeaning);
-    });
+export function startPrefixReview(onExit = showMenu) {
+  window.showScreen('prefixDrillScreen');
+  runSession({
+    screen: getScreen(), icon: COURSE.icon, title: `${COURSE.name} · ${L('review', 'herhalen')}`, accent: ACCENT,
+    cards: shuffle(prefixDueCards()).slice(0, 30),
+    onExit,
+    again: () => (prefixStats().due ? { label: '🔄 ' + L('More reviews', 'Verder herhalen'), run: () => startPrefixReview(onExit) } : null),
   });
-}
-
-// ── Type 4: Write the prefixed verb (typing) ─────────────────────────────────
-// Base verb + target meaning → type the whole prefixed verb.
-
-function renderTypeVerb(q) {
-  const s = getScreen();
-  const nl = state.nativeLanguage === 'nl';
-  const pct = Math.round((pd.current / pd.questions.length) * 100);
-
-  s.innerHTML = `
-    <div class="lesson-header">
-      <button class="back-btn" id="pdDrillBack">←</button>
-      <div>
-        <div class="lesson-title">🔗 ${nl ? 'Voorvoegsel Drill' : 'Prefix Drill'}</div>
-        <div class="lesson-subtitle">
-          <div class="pd-progress-wrap"><div class="pd-progress-bar" style="width:${pct}%"></div></div>
-          <div class="pd-progress-text">${pd.current + 1} / ${pd.questions.length}</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="pd-q-card">
-      <div class="pd-q-base">${escHtml(q.base)}</div>
-      <div class="pd-q-meaning">${escHtml(loc(q.baseMeaning))}</div>
-      <div class="pd-q-target">${nl ? 'Welk werkwoord betekent' : 'Which verb means'}: ${escHtml(loc(q.meaning))}?</div>
-    </div>
-
-    <div class="pd-input-area">
-      <input type="text" class="pd-text-input" id="pdInput" lang="uk"
-        placeholder="${nl ? 'Typ het werkwoord met voorvoegsel…' : 'Type the prefixed verb…'}"
-        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
-      <button class="pd-check-btn" id="pdCheck">${nl ? 'Controleer ✓' : 'Check ✓'}</button>
-    </div>
-
-    <div id="pdFeedback"></div>`;
-
-  s.querySelector('#pdDrillBack').addEventListener('click', showMenu);
-  const input = s.querySelector('#pdInput');
-  const check = s.querySelector('#pdCheck');
-
-  const submit = () => {
-    if (pd.answered) return;
-    const answer = input.value.trim();
-    if (!answer) { input.focus(); return; }
-    pd.answered = true;
-    input.disabled = true;
-    check.disabled = true;
-
-    const normAnswer = normalise(answer);
-    const isExact = normAnswer === normalise(q.verb);
-    const isClose = !isExact && q.verb.length >= 5 && levenshtein(normAnswer, normalise(q.verb)) <= 1;
-    const isCorrect = isExact || isClose;
-    if (isCorrect) pd.score++;
-    else pd.missed.push({ left: `${q.base} → ${loc(q.meaning)}`, right: q.verb, extra: q.prefix });
-    input.classList.add(isExact ? 'correct' : isClose ? 'close' : 'wrong');
-    recordAnswer(q.verb, 'type_verb', isCorrect);
-
-    const fb = document.getElementById('pdFeedback');
-    let html = resultLine({ isExact, isCorrect });
-    if (!isExact) {
-      html += `<div class="pd-answer-compare">
-        <div class="pd-your-answer"><span class="pd-ans-label">${nl ? 'Jouw antwoord:' : 'Your answer:'}</span> ${escHtml(answer)}</div>
-        <div class="pd-correct-answer"><span class="pd-ans-label">${nl ? 'Correct:' : 'Correct:'}</span> ${escHtml(q.verb)}</div>
-      </div>`;
-    }
-    html += `<div class="pd-context"><span class="pd-prefix-tag">${escHtml(q.prefix)}</span> ${escHtml(q.verb)} = ${escHtml(loc(q.meaning))}</div>`;
-    html += `<button class="pd-listen-btn" id="pdListen">🔊 ${nl ? 'Luister' : 'Listen'}</button>`;
-    fb.innerHTML = html;
-    fb.querySelector('#pdListen').addEventListener('click', () => speakText(q.verb, state.currentLanguage));
-    appendNextBtn(fb);
-  };
-
-  check.addEventListener('click', submit);
-  input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); submit(); } });
-  input.focus();
-}
-
-// ── Type 3: Fill in blank (typing) ───────────────────────────────────────────
-
-function renderFillBlank(q) {
-  const s = getScreen();
-  const nl = state.nativeLanguage === 'nl';
-  const pct = Math.round((pd.current / pd.questions.length) * 100);
-  const trans = loc(q.translation);
-
-  s.innerHTML = `
-    <div class="lesson-header">
-      <button class="back-btn" id="pdDrillBack">←</button>
-      <div>
-        <div class="lesson-title">🔗 ${nl ? 'Voorvoegsel Drill' : 'Prefix Drill'}</div>
-        <div class="lesson-subtitle">
-          <div class="pd-progress-wrap"><div class="pd-progress-bar" style="width:${pct}%"></div></div>
-          <div class="pd-progress-text">${pd.current + 1} / ${pd.questions.length}</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="pd-sentence-card">
-      <div class="pd-sentence-translation">${escHtml(trans)}</div>
-      <div class="pd-sentence-text">${escHtml(q.sentence).replace('___', '<span class="pd-sentence-blank"></span>')}</div>
-      <div class="pd-sentence-hint">
-        <span class="pd-prefix-tag">${escHtml(q.prefix)}</span>
-        ${escHtml(q.verb)} — ${escHtml(loc(q.meaning))}
-      </div>
-    </div>
-
-    <div class="pd-input-area">
-      <input type="text" class="pd-text-input" id="pdInput"
-        placeholder="${nl ? 'Typ het antwoord...' : 'Type the answer...'}"
-        autocomplete="off" autocorrect="off" spellcheck="false" />
-      <button class="pd-check-btn" id="pdCheck">${nl ? 'Controleer ✓' : 'Check ✓'}</button>
-    </div>
-
-    <div id="pdFeedback"></div>`;
-
-  s.querySelector('#pdDrillBack').addEventListener('click', showMenu);
-  const input = s.querySelector('#pdInput');
-  const check = s.querySelector('#pdCheck');
-
-  const submit = () => {
-    if (pd.answered) return;
-    const answer = input.value.trim();
-    if (!answer) { input.focus(); return; }
-    pd.answered = true;
-    input.disabled = true;
-    check.disabled = true;
-
-    const normAnswer = normalise(answer);
-    const normCorrect = normalise(q.answer);
-    const isExact = normAnswer === normCorrect;
-    const lev = levenshtein(normAnswer, normCorrect);
-    const isClose = !isExact && lev <= 1;
-    const isCorrect = isExact || isClose;
-
-    if (isCorrect) { pd.score++; input.classList.add(isExact ? 'correct' : 'close'); }
-    else { input.classList.add('wrong'); }
-
-    recordAnswer(q.verb, 'fill_blank', isCorrect);
-    if (!isCorrect) pd.missed.push({ left: loc(q.meaning), right: q.answer, extra: q.verb, say: q.fullSentence });
-
-    const fb = document.getElementById('pdFeedback');
-    let html = resultLine({ isExact, isCorrect });
-
-    if (!isExact) {
-      html += `<div class="pd-answer-compare">
-        <div class="pd-your-answer"><span class="pd-ans-label">${nl ? 'Jouw antwoord:' : 'Your answer:'}</span> ${escHtml(answer)}</div>
-        <div class="pd-correct-answer"><span class="pd-ans-label">${nl ? 'Correct:' : 'Correct:'}</span> ${escHtml(q.answer)}</div>
-      </div>`;
-    }
-
-    html += `<div class="pd-context">${escHtml(q.fullSentence)}</div>`;
-    html += `<button class="pd-listen-btn" id="pdListen">🔊 ${nl ? 'Luister' : 'Listen'}</button>`;
-    fb.innerHTML = html;
-
-    fb.querySelector('#pdListen').addEventListener('click', () => speakText(q.fullSentence, state.currentLanguage));
-    appendNextBtn(fb);
-  };
-
-  check.addEventListener('click', submit);
-  input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); submit(); } });
-  input.focus();
-}
-
-// ── Shared feedback & navigation ─────────────────────────────────────────────
-
-function showDrillFeedback(isCorrect, verb, prefix, meaning) {
-  const fb = document.getElementById('pdFeedback');
-  const nl = state.nativeLanguage === 'nl';
-  const resultClass = isCorrect ? 'correct' : 'wrong';
-  const resultText = isCorrect
-    ? '✓ ' + (nl ? 'Correct!' : 'Correct!')
-    : '✗ ' + (nl ? 'Niet helemaal' : 'Not quite');
-
-  let html = `<div class="ex-feedback-result ${resultClass}">${resultText}</div>`;
-  html += `<div class="pd-context"><span class="pd-prefix-tag">${escHtml(prefix)}</span> ${escHtml(verb)} = ${escHtml(loc(meaning))}</div>`;
-  html += `<button class="pd-listen-btn" id="pdListen">🔊 ${nl ? 'Luister' : 'Listen'}</button>`;
-  fb.innerHTML = html;
-
-  fb.querySelector('#pdListen').addEventListener('click', () => speakText(verb, state.currentLanguage));
-  appendNextBtn(fb);
-}
-
-function appendNextBtn(container) {
-  const isLast = pd.current + 1 >= pd.questions.length;
-  appendNext(container, { isLast, className: 'pd-next-btn', onNext: () => {
-    if (isLast) { showScore(); }
-    else { pd.current++; renderQuestion(); getScreen().scrollTo({ top: 0, behavior: 'smooth' }); }
-  } });
-}
-
-// ── Score ─────────────────────────────────────────────────────────────────────
-
-function showScore() {
-  const total = pd.questions.length;
-  const score = pd.score;
-  const pct = Math.round((score / total) * 100);
-  const emoji = scoreEmoji(pct);
-  const nl = state.nativeLanguage === 'nl';
-  const msg = scoreMessage(pct);
-
-  const s = getScreen();
-  s.innerHTML = `
-    <div class="lesson-header">
-      <button class="back-btn" id="pdScoreBack">←</button>
-      <div>
-        <div class="lesson-title">🔗 ${nl ? 'Resultaten' : 'Results'}</div>
-        <div class="lesson-subtitle">${nl ? 'Voorvoegsel Drill' : 'Prefix Drill'}</div>
-      </div>
-    </div>
-
-    <div class="ex-score-card">
-      <div class="ex-score-emoji">${emoji}</div>
-      <div class="ex-score-title">${escHtml(msg)}</div>
-      <div class="ex-score-fraction">${score} / ${total}</div>
-      <div class="ex-score-bar-wrap">
-        <div class="ex-score-bar-fill" style="width: ${pct}%"></div>
-      </div>
-      <div class="ex-score-pct">${pct}%</div>
-      <div class="ex-score-actions">
-        <button class="ex-next-btn" id="pdRetry">🔄 ${nl ? 'Opnieuw' : 'Try again'}</button>
-        <button class="ex-back-btn" id="pdBackMenu">← Menu</button>
-      </div>
-    </div>
-    ${missedListHtml(pd.missed, { cls: 'prefix' })}`;
-
-  wireSpeakButtons(s);
-  s.querySelector('#pdScoreBack').addEventListener('click', showMenu);
-  s.querySelector('#pdRetry').addEventListener('click', startDrill);
-  s.querySelector('#pdBackMenu').addEventListener('click', showMenu);
 }

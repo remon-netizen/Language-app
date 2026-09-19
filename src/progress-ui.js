@@ -1,11 +1,8 @@
 import { state } from './state.js';
 import { escHtml } from './utils.js';
 import { getLessonsForTarget, getLessonName } from './data/lesson-helpers.js';
-import { getLearnedCount, getDuePhrases } from './review.js';
+import { getLearnedCount, getDuePhrases, getCourses } from './review.js';
 import { getWordsCount, getDueWords } from './words.js';
-import { vocabStats } from './data/vocab-progress.js';
-import { numbersStats } from './data/numbers-progress.js';
-import { verbStats } from './data/verb-progress.js';
 import { getAllMastery as verbMastery } from './data/verb-weakness.js';
 import { getAllMastery as caseMastery } from './data/case-weakness.js';
 import { getAllMastery as prefixMastery } from './data/prefix-weakness.js';
@@ -34,6 +31,7 @@ export function openProgressScreen() {
   const s = document.getElementById('progressScreen');
   const nl = state.nativeLanguage === 'nl';
   const isUK = state.currentLanguage === 'uk';
+  const isNL = state.nativeLanguage === 'nl';
 
   // Lessons
   const lessons = getLessonsForTarget(state.currentLanguage) || [];
@@ -44,9 +42,6 @@ export function openProgressScreen() {
   // Review queues
   const learned = getLearnedCount(), duePhrases = getDuePhrases().length;
   const words = getWordsCount(), dueWords = getDueWords().length;
-  const vs = isUK ? vocabStats() : null;
-  const ns = isUK ? numbersStats() : null;
-  const vbs = isUK ? verbStats() : null;
 
   // Drills
   const drills = isUK ? [
@@ -110,33 +105,15 @@ export function openProgressScreen() {
         <span class="pg-row-sub">${L('From conversations', 'Uit gesprekken')}</span>
       </span>
     </button>
-    ${vs ? `
-    <button class="pg-card pg-row" onclick="openVocabDrillScreen()">
-      <span class="pg-row-icon">🧠</span>
+    ${getCourses().map(c => { const st = c.stats(); return `
+    <button class="pg-card pg-row" onclick="${c.open}">
+      <span class="pg-row-icon">${c.icon}</span>
       <span class="pg-row-text">
-        <span class="pg-row-title">${vs.learned} / ${vs.total} ${L('core words learned', 'kernwoorden geleerd')} <span class="pg-due">${vs.due ? vs.due + ' ' + L('due', 'aan de beurt') : ''}</span></span>
-        <span class="pg-row-sub">${vs.seen} ${L('seen', 'gezien')} · ${vs.weak} ${L('weak', 'zwak')}</span>
-        ${bar(vs.learned / vs.total * 100, 'pg-fill-pink')}
+        <span class="pg-row-title">${st.learned} / ${st.total} ${c.unit[isNL ? 'nl' : 'en']} ${L('learned', 'geleerd')} <span class="pg-due">${st.due ? st.due + ' ' + L('due', 'aan de beurt') : ''}</span></span>
+        <span class="pg-row-sub">${c.name[isNL ? 'nl' : 'en']} · ${st.seen} ${L('seen', 'gezien')}${st.weak ? ' · ' + st.weak + ' ' + L('weak', 'zwak') : ''}</span>
+        ${bar(st.learned / st.total * 100, 'pg-fill-pink')}
       </span>
-    </button>` : ''}
-    ${ns ? `
-    <button class="pg-card pg-row" onclick="openNumbersDrillScreen()">
-      <span class="pg-row-icon">🔢</span>
-      <span class="pg-row-text">
-        <span class="pg-row-title">${ns.learned} / ${ns.total} ${L('numbers & times learned', 'getallen & tijden geleerd')} <span class="pg-due">${ns.due ? ns.due + ' ' + L('due', 'aan de beurt') : ''}</span></span>
-        <span class="pg-row-sub">${ns.seen} ${L('seen', 'gezien')}</span>
-        ${bar(ns.learned / ns.total * 100, 'pg-fill-pink')}
-      </span>
-    </button>` : ''}
-    ${vbs ? `
-    <button class="pg-card pg-row" onclick="openVerbDrillScreen()">
-      <span class="pg-row-icon">✍️</span>
-      <span class="pg-row-text">
-        <span class="pg-row-title">${vbs.learned} / ${vbs.total} ${L('verb tenses learned', 'werkwoordstijden geleerd')} <span class="pg-due">${vbs.due ? vbs.due + ' ' + L('due', 'aan de beurt') : ''}</span></span>
-        <span class="pg-row-sub">${vbs.seen} ${L('seen', 'gezien')} · ${L('learn a verb under Learn One', 'leer een werkwoord bij Leer één')}</span>
-        ${bar(vbs.learned / vbs.total * 100, 'pg-fill-pink')}
-      </span>
-    </button>` : ''}
+    </button>`; }).join('')}
 
     ${drills.length ? `<div class="pg-section">${L('Drills', 'Drills')}</div>` : ''}
     ${drills.map(d => `

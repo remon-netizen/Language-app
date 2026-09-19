@@ -1,18 +1,15 @@
 import { state } from '../state.js';
-import { escHtml, levenshtein } from '../utils.js';
+import { escHtml } from '../utils.js';
 import { CASES, CASE_LABELS, NOUNS, CASE_SENTENCES, ADJECTIVE_NOUNS, buildCaseDrillSet, findNoun } from '../data/case-declensions.js';
 import { PERSONAL, POSSESSIVE, PRON_CASES, GENDER_LABELS, INDECLINABLE_NOTE } from '../data/pronouns-uk.js';
-import { speakText } from '../voice.js';
 import { recordAnswer, getNounMastery, getAllMastery, getWeakItems, hasWeaknessData, getWeakNounCount } from '../data/case-weakness.js';
-import { appendNext, missedListHtml, wireSpeakButtons, scoreMessage, scoreEmoji, resultLine } from './drill-core.js';
+import { L, loc, shuffle, grade } from './drill-core.js';
+import { runSession } from './course-engine.js';
+import { caseProgress, caseStats, nounKey, NUMBERS } from '../data/case-progress.js';
 
 // ── State ────────────────────────────────────────────────────────────────────
 
 let cd = {
-  questions: [],
-  current:   0,
-  score:     0,
-  answered:  false,
   total:     25,
   mode:      'menu',
   refIdx:    0,
@@ -24,32 +21,12 @@ let cd = {
   adjMode:   false,   // drill adjective + noun pairs instead of bare nouns
   pronMode:  false,   // drill personal and possessive pronouns
   dictation: localStorage.getItem('caseDrillDictation') === '1', // hear the form, type it
-  missed:    [],
-  // Learn one noun
-  learnNoun:    null,
-  learnForms:   [],
-  learnFormIdx: 0,
-  learnResults: [],
 };
 
-const loc = field => {
-  if (!field) return '';
-  if (typeof field === 'string') return field;
-  return field[state.nativeLanguage] || field.en || '';
-};
+const COURSE = { icon: '📌', get name() { return L('Cases', 'Naamvallen'); } };
+const ACCENT = { main: '#059669', dark: '#065f46', soft: '#ecfdf5', border: '#a7f3d0' };
 
 function getScreen() { return document.getElementById('caseDrillScreen'); }
-
-const normalise = s => s.toLowerCase().replace(/['ʼ]/g, "'").replace(/\s+/g, ' ').trim();
-
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
 
 function getNounsForLevel(level) {
   const levels = { A1: ['A1'], A2: ['A1', 'A2'], B1: ['A1', 'A2', 'B1'] };
@@ -89,6 +66,7 @@ function showMenu() {
   const formCount = nouns.length * 14; // 7 cases × 2 numbers
   const weakCount = getWeakNounCount();
   const hasWeak = hasWeaknessData();
+  const st = caseStats();
 
   const caseBtns = CASES.map(c =>
     `<button class="cd-filter-btn ${cd.caseFilter === c ? 'active' : ''}" data-case="${c}">${escHtml(loc(CASE_LABELS[c]))}</button>`
@@ -106,7 +84,14 @@ function showMenu() {
     <div class="cd-stats-bar">
       <span class="cd-stat">📊 ${nouns.length} ${nl ? 'woorden' : 'nouns'}</span>
       <span class="cd-stat">🎯 ${formCount} ${nl ? 'vormen' : 'forms'}</span>
+      <span class="cd-stat">📚 ${st.learned} ${nl ? 'geleerd' : 'learned'}</span>
     </div>
+
+    ${st.seen ? `
+    <button class="cd-review-btn" id="cdReviewBtn" ${st.due ? '' : 'disabled'}>
+      🔄 ${st.due ? (nl ? `Herhalen: ${st.due} aan de beurt` : `Review: ${st.due} due`) : (nl ? 'Niets aan de beurt' : 'Nothing due right now')}
+      <span class="cd-review-sub">${nl ? 'Van de woorden die je met “Leer één” hebt geleerd' : 'From the nouns you learned with “Learn One”'}</span>
+    </button>` : ''}
 
     <div class="cd-filter-section">
       <div class="cd-filter-label">${nl ? 'Niveau:' : 'Level:'}</div>
@@ -182,6 +167,7 @@ function showMenu() {
   s.querySelector('#cdRefBtn').addEventListener('click', () => showReference(0));
   s.querySelector('#cdLearnBtn').addEventListener('click', showNounPicker);
   s.querySelector('#cdStartBtn').addEventListener('click', startDrill);
+  s.querySelector('#cdReviewBtn')?.addEventListener('click', () => startCaseReview(showMenu));
 
   // Level
   s.querySelectorAll('[data-level]').forEach(btn => {
@@ -314,17 +300,11 @@ function buildPronounQuestions() {
 function startDrill() {
   cd.mode = 'drill';
   if (cd.pronMode) {
-    const qs = shuffle(buildPronounQuestions()).slice(0, cd.total);
-    if (qs.length === 0) { showEmptyState(); return; }
-    cd.questions = qs; cd.current = 0; cd.score = 0; cd.missed = []; cd.answered = false;
-    renderDrillQuestion();
+    play(shuffle(buildPronounQuestions()).slice(0, cd.total));
     return;
   }
   if (cd.adjMode) {
-    const qs = shuffle(buildAdjectiveQuestions()).slice(0, cd.total);
-    if (qs.length === 0) { showEmptyState(); return; }
-    cd.questions = qs; cd.current = 0; cd.score = 0; cd.missed = []; cd.answered = false;
-    renderDrillQuestion();
+    play(shuffle(buildAdjectiveQuestions()).slice(0, cd.total));
     return;
   }
   let questions = buildCaseDrillSet(9999);
@@ -352,17 +332,19 @@ function startDrill() {
   const formQs = pool.slice(0, cd.total - sentenceQs.length);
   const mixed = shuffle([...formQs, ...sentenceQs]).slice(0, cd.total);
 
-  if (mixed.length === 0) {
-    showEmptyState();
-    return;
-  }
+  play(mixed);
+}
 
-  cd.questions = mixed;
-  cd.current = 0;
-  cd.score = 0;
-  cd.missed = [];
-  cd.answered = false;
-  renderDrillQuestion();
+function play(questions) {
+  if (questions.length === 0) { showEmptyState(); return; }
+  // The free drill only moves the schedule of nouns already learned with Learn One.
+  const units = makeUnits({ onlySeen: true });
+  runSession({
+    screen: getScreen(), icon: COURSE.icon, title: L('Case Drill', 'Naamvallen Drill'), accent: ACCENT,
+    cards: questions.map(q => formCard(q, { dictation: cd.dictation, units })),
+    onExit: showMenu,
+    again: () => ({ label: '🔄 ' + L('Try again (new questions)', 'Opnieuw (nieuwe vragen)'), run: startDrill }),
+  });
 }
 
 function showEmptyState() {
@@ -380,185 +362,6 @@ function showEmptyState() {
     </div>`;
   s.querySelector('#cdNoBack').addEventListener('click', showMenu);
   s.querySelector('#cdEmptyBack').addEventListener('click', showMenu);
-}
-
-function renderDrillQuestion() {
-  cd.answered = false;
-  const q = cd.questions[cd.current];
-  if (q.type === 'sentence') renderSentenceQuestion(q);
-  else renderFormQuestion(q);
-}
-
-function renderFormQuestion(q) {
-  const s = getScreen();
-  const nl = state.nativeLanguage === 'nl';
-  const pct = Math.round((cd.current / cd.questions.length) * 100);
-  const caseLabel = loc(CASE_LABELS[q.caseName]);
-  const numLabel = q.type === 'pron'
-    ? (q.pronGender ? loc(GENDER_LABELS[q.pronGender]) : '')
-    : q.number === 'singular' ? (nl ? 'enkelvoud' : 'singular') : (nl ? 'meervoud' : 'plural');
-
-  s.innerHTML = `
-    <div class="lesson-header">
-      <button class="back-btn" id="cdDrillBack">←</button>
-      <div>
-        <div class="lesson-title">📌 ${nl ? 'Naamvallen Drill' : 'Case Drill'}</div>
-        <div class="lesson-subtitle">
-          <div class="cd-progress-wrap"><div class="cd-progress-bar" style="width:${pct}%"></div></div>
-          <div class="cd-progress-text">${cd.current + 1} / ${cd.questions.length}</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="cd-q-card">
-      <div class="cd-q-noun">
-        ${q.gender ? `<span class="cd-gender-tag ${genderClass(q.gender)}">${genderLabel(q.gender)}</span>` : `<span class="cd-gender-tag cd-gender-adj">${escHtml(q.tag || 'ADJ + N')}</span>`}
-        ${escHtml(q.nom_s)}
-      </div>
-      <div class="cd-q-meaning">${escHtml(loc(q.meaning))}</div>
-      <div class="cd-q-prompt">
-        <span class="cd-q-case">${escHtml(caseLabel)}</span>
-        <span class="cd-q-number">${escHtml(numLabel)}</span>
-        ${cd.dictation ? `<button class="cd-dict-play" id="cdDictPlay" type="button" title="${nl ? 'Nog eens' : 'Play again'}">🔊</button>` : ''}
-      </div>
-    </div>
-
-    <div class="cd-input-area">
-      <input type="text" class="cd-text-input" id="cdInput"
-        placeholder="${nl ? 'Typ de vorm...' : 'Type the form...'}"
-        autocomplete="off" autocorrect="off" spellcheck="false" />
-      <button class="cd-check-btn" id="cdCheck">${nl ? 'Controleer ✓' : 'Check ✓'}</button>
-    </div>
-    <div id="cdFeedback"></div>`;
-
-  s.querySelector('#cdDrillBack').addEventListener('click', showMenu);
-  if (cd.dictation) {
-    const say = () => speakText(q.correctForm, state.currentLanguage);
-    s.querySelector('#cdDictPlay').addEventListener('click', say);
-    setTimeout(say, 250);
-  }
-  setupInput(q);
-}
-
-function renderSentenceQuestion(q) {
-  const s = getScreen();
-  const nl = state.nativeLanguage === 'nl';
-  const pct = Math.round((cd.current / cd.questions.length) * 100);
-
-  s.innerHTML = `
-    <div class="lesson-header">
-      <button class="back-btn" id="cdDrillBack">←</button>
-      <div>
-        <div class="lesson-title">📌 ${nl ? 'Naamvallen Drill' : 'Case Drill'}</div>
-        <div class="lesson-subtitle">
-          <div class="cd-progress-wrap"><div class="cd-progress-bar" style="width:${pct}%"></div></div>
-          <div class="cd-progress-text">${cd.current + 1} / ${cd.questions.length}</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="cd-sentence-card">
-      <div class="cd-sentence-translation">${escHtml(loc(q))}</div>
-      <div class="cd-sentence-text">${escHtml(q.uk).replace('___', '<span class="cd-sentence-blank"></span>')}</div>
-      <div class="cd-sentence-hint">${escHtml(q.noun)} → ${escHtml(loc(CASE_LABELS[q.targetCase]))} ${q.number === 'singular' ? '(sg)' : '(pl)'}</div>
-    </div>
-
-    <div class="cd-input-area">
-      <input type="text" class="cd-text-input" id="cdInput"
-        placeholder="${nl ? 'Typ het antwoord...' : 'Type the answer...'}"
-        autocomplete="off" autocorrect="off" spellcheck="false" />
-      <button class="cd-check-btn" id="cdCheck">${nl ? 'Controleer ✓' : 'Check ✓'}</button>
-    </div>
-    <div id="cdFeedback"></div>`;
-
-  s.querySelector('#cdDrillBack').addEventListener('click', showMenu);
-  const sq = { ...q, correctForm: q.answer, caseName: q.targetCase };
-  setupInput(sq);
-}
-
-function setupInput(q) {
-  const s = getScreen();
-  const input = s.querySelector('#cdInput');
-  const check = s.querySelector('#cdCheck');
-  const submit = () => {
-    const answer = input.value.trim();
-    if (!answer) { input.focus(); return; }
-    handleAnswer(q, answer);
-  };
-  check.addEventListener('click', submit);
-  input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); submit(); } });
-  input.focus();
-}
-
-function handleAnswer(q, answer) {
-  if (cd.answered) return;
-  cd.answered = true;
-
-  const input = document.getElementById('cdInput');
-  const check = document.getElementById('cdCheck');
-  input.disabled = true;
-  check.disabled = true;
-
-  const normAnswer = normalise(answer);
-  const normCorrect = normalise(q.correctForm);
-  const accepted = [q.correctForm, ...(q.alts || [])].map(normalise);
-  const isExact = accepted.includes(normAnswer);
-  const lev = levenshtein(normAnswer, normCorrect);
-  const isClose = !isExact && normCorrect.length >= 4 && lev <= 1;
-  const isCorrect = isExact || isClose;
-
-  if (isCorrect) { cd.score++; input.classList.add(isExact ? 'correct' : 'close'); }
-  else { input.classList.add('wrong'); }
-
-  recordAnswer(q.type === 'pron' ? `${q.nom_s}${q.pronGender ? ' (' + q.pronGender + ')' : ''}` : (q.nom_s || q.noun), q.caseName || q.targetCase, q.number, isCorrect);
-  if (!isCorrect) {
-    cd.missed.push({
-      left: q.nom_s || q.noun, right: q.correctForm,
-      extra: `${loc(CASE_LABELS[q.caseName || q.targetCase]).split(' — ')[0]} · ${q.number === 'singular' ? 'sg' : 'pl'}`,
-    });
-  }
-
-  const fb = document.getElementById('cdFeedback');
-  const nl = state.nativeLanguage === 'nl';
-
-  let html = resultLine({ isExact, isCorrect });
-
-  if (!isExact) {
-    html += `<div class="cd-answer-compare">
-      <div class="cd-your-answer"><span class="cd-ans-label">${nl ? 'Jouw antwoord:' : 'Your answer:'}</span> ${escHtml(answer)}</div>
-      <div class="cd-correct-answer"><span class="cd-ans-label">${nl ? 'Correct:' : 'Correct:'}</span> ${escHtml(q.correctForm)}</div>
-    </div>`;
-  }
-
-  // Show sentence context if available
-  if (q.type === 'sentence' && q.full) {
-    html += `<div class="cd-context">${escHtml(q.full)}</div>`;
-  }
-
-  // Show declension table
-  const noun = q.type === 'adj' ? null : findNoun(q.nom_s || q.noun);
-  if (noun) {
-    html += renderDeclTable(noun, q.caseName || q.targetCase, q.number);
-  } else if (q.type === 'adj') {
-    html += renderAdjTable(q.entry, q.caseName, q.number);
-  } else if (q.type === 'pron') {
-    html += renderPronTable(q.entry, q.caseName, q.pronGender);
-    if (q.alts && q.alts.length) html += `<div class="cd-context">${nl ? 'Ook goed' : 'Also fine'}: ${q.alts.map(escHtml).join(' · ')}</div>`;
-    if (q.entry.kind === 'possessive') html += `<div class="cd-context">💡 ${escHtml(loc(INDECLINABLE_NOTE))}</div>`;
-  }
-
-  html += `<button class="cd-listen-btn" id="cdListen">🔊 ${nl ? 'Luister' : 'Listen'}</button>`;
-  fb.innerHTML = html;
-
-  fb.querySelector('#cdListen').addEventListener('click', () => {
-    speakText(q.type === 'sentence' ? q.full : q.correctForm, state.currentLanguage);
-  });
-
-  const isLast = cd.current + 1 >= cd.questions.length;
-  appendNext(fb, { isLast, className: 'cd-next-btn', onNext: () => {
-    if (isLast) showScore();
-    else { cd.current++; renderDrillQuestion(); getScreen().scrollTo({ top: 0, behavior: 'smooth' }); }
-  } });
 }
 
 function renderDeclTable(noun, highlightCase, highlightNumber) {
@@ -615,44 +418,6 @@ function renderAdjTable(entry, highlightCase, highlightNumber) {
     </div>`;
   }
   return html + '</div>';
-}
-
-// ── Score ─────────────────────────────────────────────────────────────────────
-
-function showScore() {
-  const total = cd.questions.length;
-  const score = cd.score;
-  const pct = Math.round((score / total) * 100);
-  const emoji = scoreEmoji(pct);
-  const nl = state.nativeLanguage === 'nl';
-  const msg = scoreMessage(pct);
-
-  const s = getScreen();
-  s.innerHTML = `
-    <div class="lesson-header">
-      <button class="back-btn" id="cdScoreBack">←</button>
-      <div>
-        <div class="lesson-title">📌 ${nl ? 'Resultaten' : 'Results'}</div>
-        <div class="lesson-subtitle">${nl ? 'Naamvallen Drill' : 'Case Drill'}</div>
-      </div>
-    </div>
-    <div class="ex-score-card">
-      <div class="ex-score-emoji">${emoji}</div>
-      <div class="ex-score-title">${escHtml(msg)}</div>
-      <div class="ex-score-fraction">${score} / ${total}</div>
-      <div class="ex-score-bar-wrap"><div class="ex-score-bar-fill" style="width: ${pct}%"></div></div>
-      <div class="ex-score-pct">${pct}%</div>
-      <div class="ex-score-actions">
-        <button class="ex-next-btn" id="cdRetry">🔄 ${nl ? 'Opnieuw' : 'Try again'}</button>
-        <button class="ex-back-btn" id="cdBackMenu">← Menu</button>
-      </div>
-    </div>
-    ${missedListHtml(cd.missed, { cls: 'case' })}`;
-
-  wireSpeakButtons(s);
-  s.querySelector('#cdScoreBack').addEventListener('click', showMenu);
-  s.querySelector('#cdRetry').addEventListener('click', startDrill);
-  s.querySelector('#cdBackMenu').addEventListener('click', showMenu);
 }
 
 // ── Learn one noun: picker ───────────────────────────────────────────────────
@@ -715,8 +480,6 @@ function showNounPicker() {
 
 function showLearnNoun(noun) {
   cd.mode = 'learnNoun';
-  cd.learnNoun = noun;
-  cd.learnResults = [];
 
   const s = getScreen();
   const nl = state.nativeLanguage === 'nl';
@@ -742,144 +505,132 @@ function showLearnNoun(noun) {
   s.querySelector('#cdLearnStart').addEventListener('click', () => startLearnPractice(noun));
 }
 
+// Every form of the noun in table order: singular, then plural. This is the
+// "learn" step of the cases course: it puts the noun on the review schedule.
 function startLearnPractice(noun) {
-  const forms = [];
-  for (const number of ['singular', 'plural']) {
+  const units = makeUnits();
+  const cards = [];
+  for (const number of NUMBERS) {
     for (const caseName of CASES) {
       const form = noun[number]?.[caseName];
-      if (!form) continue;
-      forms.push({ nom_s: noun.nom_s, gender: noun.gender, meaning: noun.meaning, caseName, number, correctForm: form });
+      if (form) cards.push(formCard(nounQuestion(noun, caseName, number, form), { units }));
     }
   }
-  cd.learnForms = forms;
-  cd.learnFormIdx = 0;
-  cd.learnResults = [];
-  renderLearnForm(noun);
+  runSession({
+    screen: getScreen(), icon: '🎓', title: noun.nom_s, accent: ACCENT, cards,
+    onExit: showNounPicker,
+    scoreSubtitle: () => { const st = caseStats(); return `${st.learned} ${L('learned', 'geleerd')} · ${st.due} ${L('due', 'aan de beurt')}`; },
+    again: () => ({ label: '🔄 ' + L('Try again', 'Opnieuw'), run: () => showLearnNoun(noun) }),
+  });
 }
 
-function renderLearnForm(noun) {
-  if (cd.learnFormIdx >= cd.learnForms.length) { showLearnSummary(noun); return; }
-  cd.answered = false;
-  const q = cd.learnForms[cd.learnFormIdx];
-  const s = getScreen();
-  const nl = state.nativeLanguage === 'nl';
-  const pct = Math.round((cd.learnFormIdx / cd.learnForms.length) * 100);
-  const caseLabel = loc(CASE_LABELS[q.caseName]);
-  const numLabel = q.number === 'singular' ? 'sg' : 'pl';
+// ── Cards ────────────────────────────────────────────────────────────────────
+// What the course engine needs to ask one declined form or one gapped sentence.
+// The Review queue uses the same cards between those of other courses.
 
-  s.innerHTML = `
-    <div class="lesson-header">
-      <button class="back-btn" id="cdLearnPracBack">←</button>
-      <div>
-        <div class="lesson-title">🎓 ${escHtml(noun.nom_s)}</div>
-        <div class="lesson-subtitle">
-          <div class="cd-progress-wrap"><div class="cd-progress-bar" style="width:${pct}%"></div></div>
-          <div class="cd-progress-text">${cd.learnFormIdx + 1} / ${cd.learnForms.length}</div>
-        </div>
-      </div>
-    </div>
-    <div class="cd-q-card">
-      <div class="cd-q-noun"><span class="cd-gender-tag ${genderClass(q.gender)}">${genderLabel(q.gender)}</span> ${escHtml(q.nom_s)}</div>
-      <div class="cd-q-prompt"><span class="cd-q-case">${escHtml(caseLabel)}</span><span class="cd-q-number">${numLabel}</span></div>
-    </div>
-    <div class="cd-input-area">
-      <input type="text" class="cd-text-input" id="cdInput" placeholder="${nl ? 'Typ de vorm...' : 'Type the form...'}" autocomplete="off" autocorrect="off" spellcheck="false" />
-      <button class="cd-check-btn" id="cdCheck">${nl ? 'Controleer ✓' : 'Check ✓'}</button>
-    </div>
-    <div id="cdFeedback"></div>`;
+const nounQuestion = (noun, caseName, number, form) =>
+  ({ nom_s: noun.nom_s, gender: noun.gender, meaning: noun.meaning, caseName, number, correctForm: form });
 
-  s.querySelector('#cdLearnPracBack').addEventListener('click', () => showLearnSummary(noun));
-
-  const input = s.querySelector('#cdInput');
-  const check = s.querySelector('#cdCheck');
-  const submit = () => {
-    if (cd.answered) return;
-    const answer = input.value.trim();
-    if (!answer) { input.focus(); return; }
-    cd.answered = true;
-    input.disabled = true; check.disabled = true;
-
-    const normAnswer = normalise(answer);
-    const normCorrect = normalise(q.correctForm);
-    const isExact = normAnswer === normCorrect;
-    const lev = levenshtein(normAnswer, normCorrect);
-    const isClose = !isExact && lev <= 1;
-    const isCorrect = isExact || isClose;
-
-    if (isCorrect) input.classList.add(isExact ? 'correct' : 'close');
-    else input.classList.add('wrong');
-
-    recordAnswer(q.nom_s, q.caseName, q.number, isCorrect);
-    cd.learnResults.push({ caseName: q.caseName, number: q.number, correct: isCorrect, correctForm: q.correctForm, userAnswer: answer });
-
-    const fb = document.getElementById('cdFeedback');
-    const resultClass = isCorrect ? 'correct' : 'wrong';
-    const resultText = isExact ? '✓ Correct!' : isClose ? '✓ Almost!' : '✗ Not quite';
-    let html = `<div class="ex-feedback-result ${resultClass}">${resultText}</div>`;
-    if (!isExact) {
-      html += `<div class="cd-answer-compare">
-        <div class="cd-your-answer"><span class="cd-ans-label">${nl ? 'Jouw:' : 'Yours:'}</span> ${escHtml(answer)}</div>
-        <div class="cd-correct-answer"><span class="cd-ans-label">${nl ? 'Correct:' : 'Correct:'}</span> ${escHtml(q.correctForm)}</div>
-      </div>`;
-    }
-    html += renderDeclTable(noun, q.caseName, q.number);
-    fb.innerHTML = html;
-
-    const nextBtn = document.createElement('button');
-    nextBtn.className = 'cd-next-btn';
-    nextBtn.textContent = nl ? 'Volgende →' : 'Next →';
-    nextBtn.addEventListener('click', () => {
-      cd.learnFormIdx++;
-      renderLearnForm(noun);
-      getScreen().scrollTo({ top: 0, behavior: 'smooth' });
-    });
-    fb.appendChild(nextBtn);
+// A unit ("книга · singular") moves on the schedule once per session, when the
+// last of its cards is answered, by how many were right. Seven cases of one noun
+// must not count as seven successful reviews.
+function makeUnits({ onlySeen = false } = {}) {
+  const tally = new Map();
+  return {
+    expect(key) { const t = tally.get(key) || { total: 0, n: 0, ok: 0 }; t.total++; tally.set(key, t); },
+    answer(key, res) {
+      const t = tally.get(key);
+      if (!t) return;
+      t.n++; if (res.isCorrect) t.ok++;
+      if (t.n < t.total) return;
+      if (onlySeen && !caseProgress.get(key)) return;
+      const share = t.ok / t.total;
+      caseProgress.record(key, t.total === 1 ? res.quality : share === 1 ? 5 : share >= 0.8 ? 3 : 1);
+    },
   };
-
-  check.addEventListener('click', submit);
-  input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); submit(); } });
-  input.focus();
 }
 
-function showLearnSummary(noun) {
-  const s = getScreen();
-  const nl = state.nativeLanguage === 'nl';
-  const results = cd.learnResults;
-  const correct = results.filter(r => r.correct).length;
-  const total = results.length;
-  const pct = total > 0 ? Math.round((correct / total) * 100) : 0;
-  const emoji = total === 0 ? '🎓' : pct === 100 ? '🏆' : pct >= 80 ? '🎉' : pct >= 60 ? '👍' : '💪';
+// q: a noun, adjective + noun or pronoun form, or with type 'sentence' a noun form inside a sentence.
+function formCard(q, { dictation = false, units = null } = {}) {
+  const isSentence = q.type === 'sentence';
+  const caseName = q.caseName || q.targetCase;
+  const correct = isSentence ? q.answer : q.correctForm;
+  const name = q.nom_s || q.noun;
+  const isNoun = !q.type;                          // only plain nouns are on the schedule
+  const unit = nounKey(name, q.number);
+  if (units && isNoun) units.expect(unit);
+  const heard = dictation && !isSentence;
+  const numLabel = q.type === 'pron'
+    ? (q.pronGender ? loc(GENDER_LABELS[q.pronGender]) : '')
+    : q.number === 'singular' ? L('singular', 'enkelvoud') : L('plural', 'meervoud');
 
-  const wrongHtml = results.filter(r => !r.correct).map(r =>
-    `<div class="cd-learn-summary-row wrong">
-      <span>✗</span>
-      <span>${escHtml(loc(CASE_LABELS[r.caseName]))} ${r.number === 'singular' ? 'sg' : 'pl'} — <span class="cd-learn-summary-form">${escHtml(r.correctForm)}</span> <span style="color:var(--gray);font-size:0.75rem">(${escHtml(r.userAnswer)})</span></span>
-    </div>`
-  ).join('');
-
-  s.innerHTML = `
-    <div class="lesson-header">
-      <button class="back-btn" id="cdSumBack">←</button>
-      <div>
-        <div class="lesson-title">🎓 ${escHtml(noun.nom_s)}</div>
-        <div class="lesson-subtitle">${nl ? 'Resultaten' : 'Results'}</div>
+  const promptHtml = isSentence ? `
+    <div class="cd-sentence-card">
+      <div class="cd-sentence-translation">${escHtml(loc(q))}</div>
+      <div class="cd-sentence-text">${escHtml(q.uk).replace('___', '<span class="cd-sentence-blank"></span>')}</div>
+      <div class="cd-sentence-hint">${escHtml(q.noun)} → ${escHtml(loc(CASE_LABELS[q.targetCase]))} ${q.number === 'singular' ? '(sg)' : '(pl)'}</div>
+    </div>` : `
+    <div class="cd-q-card">
+      <div class="cd-q-noun">
+        ${q.gender ? `<span class="cd-gender-tag ${genderClass(q.gender)}">${genderLabel(q.gender)}</span>` : `<span class="cd-gender-tag cd-gender-adj">${escHtml(q.tag || 'ADJ + N')}</span>`}
+        ${escHtml(q.nom_s)}
       </div>
-    </div>
-    <div class="ex-score-card">
-      <div class="ex-score-emoji">${emoji}</div>
-      <div class="ex-score-fraction">${correct} / ${total}</div>
-      <div class="ex-score-bar-wrap"><div class="ex-score-bar-fill" style="width: ${pct}%"></div></div>
-      <div class="ex-score-pct">${pct}%</div>
-    </div>
-    ${wrongHtml ? `<div style="margin-bottom:14px">${wrongHtml}</div>` : ''}
-    <div class="cd-learn-actions">
-      <button id="cdSumRetry">${nl ? '🔄 Opnieuw' : '🔄 Try again'}</button>
-      <button id="cdSumPicker">← ${nl ? 'Woorden' : 'Noun list'}</button>
-      <button id="cdSumMenu">← Menu</button>
+      <div class="cd-q-meaning">${escHtml(loc(q.meaning))}</div>
+      <div class="cd-q-prompt">
+        <span class="cd-q-case">${escHtml(loc(CASE_LABELS[caseName]))}</span>
+        <span class="cd-q-number">${escHtml(numLabel)}</span>
+        ${heard ? `<button class="cd-dict-play" type="button" data-say="${escHtml(correct)}" title="${L('Play again', 'Nog eens')}">🔊</button>` : ''}
+      </div>
     </div>`;
 
-  s.querySelector('#cdSumBack').addEventListener('click', showNounPicker);
-  s.querySelector('#cdSumRetry').addEventListener('click', () => showLearnNoun(noun));
-  s.querySelector('#cdSumPicker').addEventListener('click', showNounPicker);
-  s.querySelector('#cdSumMenu').addEventListener('click', showMenu);
+  let detail = isSentence && q.full ? `<div class="cd-context">${escHtml(q.full)}</div>` : '';
+  const noun = q.type === 'adj' || q.type === 'pron' ? null : findNoun(name);
+  if (noun) detail += renderDeclTable(noun, caseName, q.number);
+  else if (q.type === 'adj') detail += renderAdjTable(q.entry, q.caseName, q.number);
+  else if (q.type === 'pron') {
+    detail += renderPronTable(q.entry, q.caseName, q.pronGender);
+    if (q.alts && q.alts.length) detail += `<div class="cd-context">${L('Also fine', 'Ook goed')}: ${q.alts.map(escHtml).join(' · ')}</div>`;
+    if (q.entry.kind === 'possessive') detail += `<div class="cd-context">💡 ${escHtml(loc(INDECLINABLE_NOTE))}</div>`;
+  }
+
+  return {
+    key: `${name}|${caseName}|${q.number}|${q.pronGender || ''}`, course: COURSE, intro: false,
+    promptHtml, autoSay: heard ? correct : null,
+    input: { type: 'text', lang: 'uk', placeholder: isSentence ? L('Type the answer…', 'Typ het antwoord…') : L('Type the form…', 'Typ de vorm…') },
+    check(answer) { const g = grade(answer, [correct, ...(q.alts || [])], { minTypoLen: 5 }); return { ...g, quality: g.isExact ? 5 : g.isClose ? 3 : 1 }; },
+    record(res) {
+      recordAnswer(q.type === 'pron' ? `${q.nom_s}${q.pronGender ? ' (' + q.pronGender + ')' : ''}` : name, caseName, q.number, res.isCorrect);
+      if (isNoun) units?.answer(unit, res);
+    },
+    compareOnClose: true,
+    correctText: correct,
+    detailHtml: detail,
+    say: isSentence && q.full ? q.full : correct,
+    missed: { left: name, right: correct, extra: `${loc(CASE_LABELS[caseName]).split(' — ')[0]} · ${q.number === 'singular' ? 'sg' : 'pl'}`,
+              say: isSentence && q.full ? q.full : correct },
+  };
+}
+
+// For the Review queue: every due noun as one card, a random case other than the
+// nominative singular (that one is the word itself).
+export function caseDueCards() {
+  const units = makeUnits();
+  return caseProgress.dueKeys().map(key => {
+    const [nomS, number] = key.slice('noun:'.length).split('|');
+    const noun = findNoun(nomS);
+    const cases = CASES.filter(c => noun[number]?.[c] && !(number === 'singular' && c === 'nominative'));
+    const caseName = shuffle(cases)[0];
+    return formCard(nounQuestion(noun, caseName, number, noun[number][caseName]), { units });
+  });
+}
+
+// Due nouns only, from the case menu or the review hub.
+export function startCaseReview(onExit = showMenu) {
+  window.showScreen('caseDrillScreen');
+  runSession({
+    screen: getScreen(), icon: COURSE.icon, title: `${COURSE.name} · ${L('review', 'herhalen')}`, accent: ACCENT,
+    cards: shuffle(caseDueCards()).slice(0, 30),
+    onExit,
+    again: () => (caseStats().due ? { label: '🔄 ' + L('More reviews', 'Verder herhalen'), run: () => startCaseReview(onExit) } : null),
+  });
 }
