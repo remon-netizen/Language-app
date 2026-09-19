@@ -65,14 +65,6 @@
 .welcome-card h2 { font-size: 1.5rem; margin-bottom: 8px; }
 .welcome-card p { opacity: 0.85; font-size: 0.95rem; }
 
-.start-btn {
-  width: 100%; padding: 18px; background: var(--yellow); color: var(--dark);
-  border: none; border-radius: 14px; font-size: 1.1rem; font-weight: 700;
-  cursor: pointer; transition: all 0.2s; margin-top: 0;
-  letter-spacing: 0.01em;
-}
-.start-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(255,213,0,0.45); }
-
 /* ── Browser banner ── */
 .browser-banner {
   display: flex; align-items: center; gap: 12px;
@@ -378,7 +370,6 @@
   .home-tool-card { padding: 14px 10px; }
   .home-tool-icon { font-size: 1.5rem; }
   .home-tool-title { font-size: 0.85rem; }
-  .start-btn { padding: 14px; font-size: 1rem; }
   .lang-choice-btn { padding: 8px 12px; font-size: 0.82rem; }
 }
 
@@ -405,10 +396,14 @@
 .today-row-title { font-size: 0.9rem; font-weight: 700; color: var(--text); }
 .today-row-sub { font-size: 0.74rem; color: var(--gray); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .today-arrow { color: var(--gray); font-weight: 700; }
-.start-btn { position: relative; }
-.start-btn-ai {
-  position: absolute; top: 6px; right: 10px; font-size: 0.62rem; font-weight: 700;
-  background: rgba(0,0,0,0.12); color: inherit; padding: 2px 7px; border-radius: 8px; opacity: 0.85;
+/* The conversation card: same shape as the others, a touch of the brand yellow,
+   and a small tag saying it needs an AI key. */
+.home-tool-chat { background: linear-gradient(180deg, #fffbeb 0%, var(--card-bg) 70%); border-color: #fde68a; }
+.home-tool-chat:hover { border-color: #f59e0b; }
+.home-tool-title .flag-icon { vertical-align: -1px; margin-right: 2px; border-radius: 2px; }
+.home-tool-ai {
+  position: absolute; top: 8px; right: 8px; font-size: 0.62rem; font-weight: 700;
+  background: rgba(0,0,0,0.07); color: var(--gray); padding: 2px 7px; border-radius: 8px;
 }
 
 /* ── Review hub ── */

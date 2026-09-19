@@ -24,5 +24,3 @@
 .pg-bar { height: 6px; background: var(--border); border-radius: 4px; overflow: hidden; margin-top: 4px; }
 .pg-bar-fill { height: 100%; background: var(--blue); border-radius: 4px; }
 .pg-fill-pink { background: #db2777; } .pg-fill-green { background: #22c55e; } .pg-fill-amber { background: #f59e0b; } .pg-fill-red { background: #ef4444; }
-.home-progress-link { display: block; width: 100%; margin-top: 8px; padding: 10px; border: 2px solid var(--border); border-radius: 12px; background: var(--card-bg); font-weight: 700; color: var(--text); cursor: pointer; font-family: inherit; min-height: 44px; }
-.home-progress-link:hover { border-color: var(--blue); color: var(--blue); }

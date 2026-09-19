@@ -168,18 +168,22 @@
         <button class="home-tool-card" onclick="openWordsScreen()">
           <span class="home-tool-icon">📚</span>
           <span class="home-tool-title" id="myWordsLabel">My Words</span>
-          <span class="home-tool-sub" id="myWordsSub">Saved words</span>
+          <span class="home-tool-sub" id="myWordsSub">Saved from conversations</span>
           <span class="words-count-badge" id="wordsBadge" style="display:none"></span>
+        </button>
+        <button class="home-tool-card home-tool-chat" id="startBtn" onclick="openFreeChat()">
+          <span class="home-tool-icon">💬</span>
+          <span class="home-tool-title"><span id="startBtnFlag"><img src="https://flagcdn.com/ua.svg" alt="" class="flag-icon" width="20" height="13"></span> <span id="startBtnLabel">Conversation</span></span>
+          <span class="home-tool-sub" id="startBtnSub">Talk with your AI tutor</span>
+          <span class="home-tool-ai" id="startBtnAi">🔑 AI</span>
+        </button>
+        <button class="home-tool-card" id="progressLink" onclick="openProgressScreen()">
+          <span class="home-tool-icon">📊</span>
+          <span class="home-tool-title" id="progressLinkLabel">Progress</span>
+          <span class="home-tool-sub" id="progressLinkSub">Streak &amp; what you know</span>
         </button>
       </div>
 
-      <button class="home-progress-link" id="progressLink" onclick="openProgressScreen()">📊 <span id="progressLinkLabel">Progress</span></button>
-
-      <!-- ═══ AI conversation ═══ -->
-      <button class="start-btn" id="startBtn" onclick="openFreeChat()">
-        <span id="startBtnFlag"><img src="https://flagcdn.com/ua.svg" alt="" class="flag-icon" width="20" height="13"></span> <span id="startBtnLabel">Start Conversation</span>
-        <span class="start-btn-ai" id="startBtnAi">🔑 AI</span>
-      </button>
 
       <!-- Inburgering — only shown when Dutch is the target AND native is not Dutch -->
       <button class="inburgering-btn nl-only" id="inburgeringBtn" onclick="openInburgeringScreen()">

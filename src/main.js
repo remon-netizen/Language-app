@@ -149,6 +149,7 @@ function applyStaticI18n() {
 
   // Home screen
   setText('progressLinkLabel', 'home.progress');
+  setText('progressLinkSub', 'home.progressSub');
   setText('apiNoticeText', 'home.apiNotice');
   setText('apiNoticeBtn', 'home.apiNoticeBtn');
   setText('grammarSub', 'home.grammarSub');
@@ -179,7 +180,9 @@ function applyStaticI18n() {
   setText('iLearnLabel', 'home.iLearn');
   setText('grammarLabel', 'home.grammarTitle');
   setText('myWordsLabel', 'home.myWords');
+  setText('myWordsSub', 'home.myWordsSub');
   setText('startBtnLabel', 'home.start');
+  setText('startBtnSub', 'home.startSub');
   setText('lessonsBtnTitle', 'home.lessonsBtnTitle');
   setText('lessonsBtnSub', 'home.lessonsBtnSub');
   setText('reviewBtnTitle', 'home.reviewTitle');
