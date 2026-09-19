@@ -2,7 +2,7 @@ import { state, getTTSLang } from './state.js';
 import { getLessonsForTarget, getTargetText, getTranslation, getTip, getLessonName } from './data/lesson-helpers.js';
 import { ALPHABET } from './data/alphabet.js';
 import { calcSimilarity, escHtml } from './utils.js';
-import { saveProgress, updatePointsBadge } from './storage.js';
+import { saveProgress } from './storage.js';
 import { showScreen } from './router.js';
 import { setupRecognition } from './speech.js';
 import { speakText, speakSlow } from './voice.js';
@@ -335,7 +335,6 @@ export function processLessonResult(recognizedList) {
   markPhraseAsLearned(phrase);
   const pts = score >= 80 ? 10 : score >= 50 ? 5 : 2;
   state.totalPoints += pts;
-  updatePointsBadge();
   if (!state.categoryProgress[state.currentLesson.id]) state.categoryProgress[state.currentLesson.id] = [];
   if (!state.categoryProgress[state.currentLesson.id].includes(state.currentPhraseIndex)) state.categoryProgress[state.currentLesson.id].push(state.currentPhraseIndex);
   saveProgress();

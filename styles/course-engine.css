@@ -1,0 +1,59 @@
+/* ── Course engine: the parts every course session shares ────────────────────
+   Colours come from the course through --ce-main / --ce-dark / --ce-soft /
+   --ce-border, set on the screen element by runSession(). */
+
+.ce-header {
+  display: flex; align-items: center; gap: 14px;
+  background: linear-gradient(135deg, var(--ce-main) 0%, var(--ce-dark) 100%);
+  border-radius: 16px; padding: 14px 18px; margin-bottom: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+}
+.ce-header .back-btn {
+  background: rgba(255,255,255,0.18); border: none; border-radius: 10px;
+  color: white; font-size: 1.2rem; width: 36px; height: 36px; padding: 0; flex-shrink: 0;
+}
+.ce-header .back-btn:hover { background: rgba(255,255,255,0.32); }
+.ce-header .lesson-title { font-size: 1.05rem; font-weight: 700; color: white; }
+.ce-header .lesson-subtitle { font-size: 0.75rem; color: rgba(255,255,255,0.78); margin-top: 2px; }
+.ce-header-text { flex: 1; min-width: 0; }
+.ce-progress-wrap { width: 100%; max-width: 200px; height: 6px; background: rgba(255,255,255,0.2); border-radius: 4px; overflow: hidden; margin-bottom: 4px; }
+.ce-progress-bar { height: 100%; background: rgba(255,255,255,0.85); border-radius: 4px; transition: width 0.3s ease; }
+.ce-progress-text { font-size: 0.7rem; color: rgba(255,255,255,0.75); }
+
+.ce-course-chip {
+  display: inline-block; margin: 0 0 8px 2px; padding: 3px 10px; border-radius: 999px;
+  font-size: 0.74rem; font-weight: 700; color: var(--ce-dark); background: var(--ce-soft); border: 1px solid var(--ce-border);
+}
+
+.ce-input-area { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+.ce-text-input {
+  width: 100%; padding: 14px 16px; border: 2px solid var(--border); border-radius: 11px;
+  font-size: 1.15rem; font-family: inherit; outline: none; background: var(--card-bg); color: var(--text); text-align: center;
+}
+.ce-text-input:focus { border-color: var(--ce-main); }
+.ce-text-input.correct { border-color: #16a34a; background: #dcfce7; }
+.ce-text-input.close { border-color: #f59e0b; background: #fffbeb; }
+.ce-text-input.wrong { border-color: #dc2626; background: #fee2e2; }
+.ce-check-btn { padding: 12px; background: var(--ce-main); color: white; border: none; border-radius: 11px; font-size: 0.95rem; font-weight: 700; cursor: pointer; font-family: inherit; min-height: 44px; }
+.ce-check-btn:hover:not(:disabled) { background: var(--ce-dark); }
+.ce-check-btn:disabled { opacity: 0.5; }
+.ce-retry-note { padding: 10px 12px; margin-bottom: 12px; background: #fffbeb; border: 1px solid #fcd34d; border-radius: 10px; color: #92400e; font-size: 0.88rem; font-weight: 600; text-align: center; }
+
+.ce-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.ce-option-btn { padding: 14px; border: 2px solid var(--border); border-radius: 12px; background: var(--card-bg); font-size: 0.95rem; font-weight: 700; cursor: pointer; font-family: inherit; color: var(--text); min-height: 52px; }
+.ce-option-btn:hover:not(:disabled), .ce-option-btn:focus-visible { border-color: var(--ce-main); background: var(--ce-soft); outline: none; }
+.ce-option-btn.correct { border-color: #16a34a; background: #dcfce7; color: #14532d; }
+.ce-option-btn.wrong { border-color: #dc2626; background: #fee2e2; color: #991b1b; }
+
+.ce-compare { margin-bottom: 10px; font-size: 0.88rem; }
+.ce-your-answer { padding: 8px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 6px; }
+.ce-correct-answer { padding: 8px 12px; background: #dcfce7; border: 1px solid #86efac; border-radius: 8px; color: #14532d; }
+.ce-override-btn { width: 100%; padding: 10px; margin-bottom: 10px; border: 2px dashed #86efac; border-radius: 10px; background: none; color: #15803d; font-size: 0.85rem; font-weight: 700; cursor: pointer; font-family: inherit; min-height: 44px; }
+.ce-override-btn:hover { background: #f0fdf4; }
+.ce-listen-btn { display: inline-flex; gap: 6px; padding: 8px 16px; border: 2px solid var(--ce-border); border-radius: 10px; background: var(--ce-soft); color: var(--ce-dark); font-size: 0.85rem; font-weight: 700; cursor: pointer; font-family: inherit; margin-bottom: 10px; }
+.ce-next-btn { width: 100%; padding: 13px; background: var(--ce-main); color: white; border: none; border-radius: 12px; font-size: 0.95rem; font-weight: 700; cursor: pointer; font-family: inherit; margin-top: 6px; min-height: 44px; }
+.ce-next-btn:hover, .ce-next-btn:focus-visible { background: var(--ce-dark); outline: none; }
+
+@media (max-width: 500px) {
+  .ce-options { grid-template-columns: 1fr; }
+}

@@ -413,6 +413,15 @@
 
 /* ── Review hub ── */
 .rv-hub { display: flex; flex-direction: column; gap: 10px; }
+.rv-all-btn {
+  width: 100%; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 16px 14px; margin-bottom: 12px;
+  border: none; border-radius: 14px; background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%); color: white;
+  cursor: pointer; font-family: inherit; min-height: 64px; box-shadow: 0 2px 12px rgba(124,58,237,0.25);
+}
+.rv-all-btn:hover:not(:disabled) { filter: brightness(1.08); }
+.rv-all-btn:disabled { background: var(--card-bg); color: var(--gray); border: 2px dashed var(--border); box-shadow: none; cursor: default; }
+.rv-all-title { font-size: 1rem; font-weight: 800; }
+.rv-all-sub { font-size: 0.76rem; opacity: 0.85; }
 .rv-row {
   display: flex; align-items: center; gap: 12px; width: 100%;
   padding: 14px; border-radius: 14px; border: 2px solid var(--border);

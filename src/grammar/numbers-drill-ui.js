@@ -1,10 +1,12 @@
 import { state } from '../state.js';
-import { escHtml, levenshtein } from '../utils.js';
+import { escHtml } from '../utils.js';
 import { speakText } from '../voice.js';
 import { CATEGORIES, getCategory, referenceRows, TIME_PATTERNS, ordinalSuffix, GENDER_LABEL, timeGloss, MONTHS } from '../data/numbers-time.js';
 import { recordAnswer, weight, weakKeys, totalAttempts } from '../data/numbers-weakness.js';
 import { STAGES } from '../data/numbers-course.js';
 import { recordNumber, dueNumbers, unseenNumbers, numbersStats } from '../data/numbers-progress.js';
+import { L, loc, shuffle, grade } from './drill-core.js';
+import { runSession } from './course-engine.js';
 
 // ── State ────────────────────────────────────────────────────────────────────
 
@@ -17,14 +19,11 @@ let nd = {
   qMode:     'type',
   session:   'drill',     // 'drill' (random, weighted) | 'new' (next course stage) | 'due' (scheduled review)
   total:     25,
-  questions: [],
-  current:   0,
-  score:     0,
-  answered:  false,
-  missed:    [],
   refIdx:    0,
-  keyHandler: null,
 };
+
+const COURSE = { icon: '🔢', get name() { return L('Numbers & time', 'Getallen & tijd'); } };
+const ACCENT = { main: '#ea580c', dark: '#9a3412', soft: '#fff7ed', border: '#fdba74' };
 
 function loadPrefs() {
   try {
@@ -40,25 +39,7 @@ function savePrefs() {
   localStorage.setItem(PREFS_KEY, JSON.stringify({ cats: nd.cats, qMode: nd.qMode, total: nd.total }));
 }
 
-const loc = field => {
-  if (!field) return '';
-  if (typeof field === 'string') return field;
-  return field[state.nativeLanguage] || field.en || '';
-};
-
 function getScreen() { return document.getElementById('numbersDrillScreen'); }
-
-// Apostrophe variants (’ ʼ ` ´) all count as the Ukrainian apostrophe.
-const normalise = s => s.toLowerCase().replace(/[’ʼ`´‘]/g, "'").replace(/\s+/g, ' ').trim();
-
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
 
 // ── Prompt labels ────────────────────────────────────────────────────────────
 
@@ -395,11 +376,7 @@ function startCourse(kind) {
   } else {
     questions = shuffle(dueNumbers()).slice(0, 30).map(c => ({ item: c.item, pool: c.stage.items, catId: c.stage.id, mode: modeFor() }));
   }
-  if (!questions.length) return showMenu();
-  nd.session = kind;
-  nd.questions = questions;
-  nd.current = 0; nd.score = 0; nd.missed = []; nd.answered = false;
-  renderQuestion();
+  play(kind, questions);
 }
 
 // One place for both records: the weak-spot counter every drill feeds, and the
@@ -441,43 +418,25 @@ function showPath() {
 }
 
 function startDrill() {
-  nd.session = 'drill';
-  nd.questions = buildQuestions().map(q => ({ ...q, mode: modeFor() }));
-  if (!nd.questions.length) return showMenu();
-  nd.current = 0;
-  nd.score = 0;
-  nd.missed = [];
-  nd.answered = false;
-  renderQuestion();
+  play('drill', buildQuestions().map(q => ({ ...q, mode: modeFor() })));
 }
 
-// ── Question rendering ───────────────────────────────────────────────────────
-
-function headerHtml() {
-  const nl = state.nativeLanguage === 'nl';
-  const pct = Math.round((nd.current / nd.questions.length) * 100);
-  return `
-    <div class="lesson-header">
-      <button class="back-btn" id="ndDrillBack">←</button>
-      <div>
-        <div class="lesson-title">🔢 ${nl ? 'Getallen & Tijd Drill' : 'Numbers & Time Drill'}</div>
-        <div class="lesson-subtitle">
-          <div class="nd-progress-wrap"><div class="nd-progress-bar" style="width:${pct}%"></div></div>
-          <div class="nd-progress-text">${nd.current + 1} / ${nd.questions.length}</div>
-        </div>
-      </div>
-    </div>`;
+function play(kind, questions) {
+  nd.session = kind;
+  runSession({
+    screen: getScreen(), icon: COURSE.icon, title: L('Numbers & Time Drill', 'Getallen & Tijd Drill'), accent: ACCENT,
+    cards: questions.map(numberCard),
+    onExit: showMenu,
+    scoreSubtitle: () => { const st = numbersStats(); return `${COURSE.name} · ${st.learned}/${st.total} ${L('learned', 'geleerd')}`; },
+    again: () => {
+      if (kind === 'new') { const stage = nextStage(); return stage ? { label: `📥 ${L('Next', 'Volgende')}: ${loc(stage.title)}`, run: () => startCourse('new') } : null; }
+      if (kind === 'due') return dueNumbers().length ? { label: '🔄 ' + L('More reviews', 'Verder herhalen'), run: () => startCourse('due') } : null;
+      return { label: '🔄 ' + L('Another round', 'Nog een ronde'), run: startDrill };
+    },
+  });
 }
 
-function renderQuestion() {
-  nd.answered = false;
-  const q = nd.questions[nd.current];
-  if (q.mode === 'choose') renderChoose(q);
-  else if (q.mode === 'listen') renderListen(q);
-  else if (q.mode === 'read') renderListen(q, { read: true });
-  else if (q.mode === 'dictate') renderType(q, { dictation: true });
-  else renderType(q);
-}
+// ── Prompt pieces ────────────────────────────────────────────────────────────
 
 // Prompt card: big digits / "3rd" / "7:30" with clock, plus the question word.
 function promptCard(item, { hideClock = false, intro = false } = {}) {
@@ -493,171 +452,9 @@ function promptCard(item, { hideClock = false, intro = false } = {}) {
         <div class="nd-q-prompt ${item.kind === 'cardinal' && item.value >= 1000 ? 'nd-q-prompt-long' : ''}">${escHtml(promptText(item))}</div>
       </div>
       ${hint ? `<div class="nd-q-hint">${escHtml(hint)}</div>` : ''}
-      ${intro ? `<div class="nd-q-word">${escHtml(item.answers[0])} <button class="nd-say-inline" id="ndSayIntro" type="button">🔊</button></div>
+      ${intro ? `<div class="nd-q-word">${escHtml(item.answers[0])} <button class="nd-say-inline" type="button" data-say="${escHtml(item.answers[0])}">🔊</button></div>
                  <div class="nd-q-hint">${nl ? 'Zeg het, typ het dan' : 'Say it, then type it'}</div>` : ''}
     </div>`;
-}
-
-// Mode 1: see the digits, type the Ukrainian word.
-// With dictation on, the word is spoken and the digits are hidden: type what you hear.
-function renderType(q, { dictation = false } = {}) {
-  const s = getScreen();
-  const nl = state.nativeLanguage === 'nl';
-  const word = q.item.answers[0];
-  s.innerHTML = `
-    ${headerHtml()}
-    ${dictation ? `
-    <div class="nd-q-card nd-q-card-listen">
-      <div class="nd-q-question">${escHtml(questionWord(q.item))}</div>
-      <button class="nd-big-listen" id="ndSay">🔊</button>
-      <div class="nd-q-hint">${nl ? 'Typ wat je hoort' : 'Type what you hear'}</div>
-    </div>` : promptCard(q.item, { intro: q.intro })}
-    <div class="nd-input-area">
-      <input type="text" class="nd-text-input" id="ndInput" lang="uk"
-        placeholder="${nl ? 'Typ het in het Oekraïens…' : 'Type it in Ukrainian…'}"
-        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
-      <button class="nd-check-btn" id="ndCheck">${nl ? 'Controleer ✓' : 'Check ✓'}</button>
-    </div>
-    <div id="ndFeedback"></div>`;
-
-  s.querySelector('#ndDrillBack').addEventListener('click', showMenu);
-  if (dictation) {
-    const say = () => speakText(word, state.currentLanguage);
-    s.querySelector('#ndSay').addEventListener('click', say);
-    say();
-  }
-  if (q.intro) {
-    const say = () => speakText(word, state.currentLanguage);
-    s.querySelector('#ndSayIntro').addEventListener('click', say);
-    setTimeout(say, 200);
-  }
-  const input = s.querySelector('#ndInput');
-  const check = s.querySelector('#ndCheck');
-
-  const submit = () => {
-    if (nd.answered) return;
-    const answer = input.value.trim();
-    if (!answer) { input.focus(); return; }
-    nd.answered = true;
-    input.disabled = true; check.disabled = true;
-
-    const normAnswer = normalise(answer);
-    const isExact = q.item.answers.some(a => normalise(a) === normAnswer);
-    // Typo tolerance only on longer words: два/дві, три/тре are real errors.
-    const isClose = !isExact && q.item.answers.some(a => a.length >= 5 && levenshtein(normalise(a), normAnswer) <= 1);
-    const isCorrect = isExact || isClose;
-    if (isCorrect) nd.score++;
-    input.classList.add(isExact ? 'correct' : isClose ? 'close' : 'wrong');
-    record(q, isCorrect, isExact ? 5 : isClose ? 3 : 1);
-    showFeedback(q, { isCorrect, isExact, answer });
-  };
-  check.addEventListener('click', submit);
-  input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); submit(); } });
-  input.focus();
-}
-
-// Mode 2: see the Ukrainian word, pick the right digits.
-function renderChoose(q) {
-  const s = getScreen();
-  const nl = state.nativeLanguage === 'nl';
-  const options = shuffle([q.item, ...distractors(q)]);
-  const word = q.item.answers[0];
-
-  s.innerHTML = `
-    ${headerHtml()}
-    <div class="nd-q-card">
-      <div class="nd-q-question">${escHtml(questionWord(q.item))}</div>
-      <div class="nd-q-word">${escHtml(word)}</div>
-      <button class="nd-listen-btn nd-listen-inline" id="ndSay">🔊 ${nl ? 'Luister' : 'Listen'}</button>
-    </div>
-    <div class="nd-options">
-      ${options.map((o, i) => `<button class="nd-option-btn" data-idx="${i}" data-key="${escHtml(o.key)}">${escHtml(optionLabel(o))}</button>`).join('')}
-    </div>
-    <div id="ndFeedback"></div>`;
-
-  s.querySelector('#ndDrillBack').addEventListener('click', showMenu);
-  s.querySelector('#ndSay').addEventListener('click', () => speakText(word, state.currentLanguage));
-
-  const pick = btn => {
-    if (nd.answered) return;
-    nd.answered = true;
-    const isCorrect = btn.dataset.key === q.item.key;
-    if (isCorrect) nd.score++;
-    record(q, isCorrect, isCorrect ? 3 : 1);
-    s.querySelectorAll('.nd-option-btn').forEach(b => {
-      b.disabled = true;
-      if (b.dataset.key === q.item.key) b.classList.add('correct');
-      else if (b === btn) b.classList.add('wrong');
-    });
-    showFeedback(q, { isCorrect, isExact: isCorrect, answer: btn.textContent, showWord: false });
-  };
-  s.querySelectorAll('.nd-option-btn').forEach(btn => btn.addEventListener('click', () => pick(btn)));
-  // Keys 1–4 pick an option, so the whole drill can be done from the keyboard.
-  const keyHandler = e => {
-    if (nd.answered || !/^[1-4]$/.test(e.key)) return;
-    const btn = s.querySelector(`.nd-option-btn[data-idx="${Number(e.key) - 1}"]`);
-    if (btn) { e.preventDefault(); pick(btn); }
-  };
-  if (nd.keyHandler) s.removeEventListener('keydown', nd.keyHandler);
-  nd.keyHandler = keyHandler;
-  s.addEventListener('keydown', keyHandler);
-  s.querySelector('.nd-option-btn').focus({ preventScroll: true });
-}
-
-// Mode 3: hear the Ukrainian, type the digits.
-// With read on, the word is shown instead of spoken: word → digits, typed.
-function renderListen(q, { read = false } = {}) {
-  const s = getScreen();
-  const nl = state.nativeLanguage === 'nl';
-  const word = q.item.answers[0];
-  const isTime = q.item.kind === 'time' || q.item.kind === 'attime';
-  const isDate = q.item.kind === 'date';
-  const placeholder = isTime ? '7:30' : isDate ? (nl ? '15-9 (dag-maand)' : '15-9 (day-month)') : q.item.kind === 'ordinal' ? (nl ? '3 (rangtelwoord)' : '3 (ordinal)') : '17';
-  const what = read ? (nl ? 'Typ het in cijfers' : 'Type it in digits')
-    : q.item.kind === 'ordinal' ? (nl ? 'Welk rangtelwoord hoor je?' : 'Which ordinal do you hear?')
-    : isTime ? (nl ? 'Hoe laat hoor je?' : 'What time do you hear?')
-    : isDate ? (nl ? 'Welke datum hoor je?' : 'Which date do you hear?')
-    : (nl ? 'Welk getal hoor je?' : 'Which number do you hear?');
-
-  s.innerHTML = `
-    ${headerHtml()}
-    <div class="nd-q-card nd-q-card-listen">
-      <div class="nd-q-question">${escHtml(questionWord(q.item))}</div>
-      ${read ? `<div class="nd-q-word nd-q-word-read">${escHtml(word)} <button class="nd-say-inline" id="ndSay" type="button">🔊</button></div>`
-             : '<button class="nd-big-listen" id="ndSay">🔊</button>'}
-      <div class="nd-q-hint">${what}${q.item.kind === 'ordinal' ? ` · ${escHtml(loc(GENDER_LABEL[q.item.gender]))}` : ''}</div>
-    </div>
-    <div class="nd-input-area">
-      <input type="text" class="nd-text-input nd-digits-input" id="ndInput" inputmode="${isTime || isDate ? 'text' : 'numeric'}"
-        placeholder="${placeholder}" autocomplete="off" autocorrect="off" spellcheck="false" />
-      <button class="nd-check-btn" id="ndCheck">${nl ? 'Controleer ✓' : 'Check ✓'}</button>
-    </div>
-    <div id="ndFeedback"></div>`;
-
-  s.querySelector('#ndDrillBack').addEventListener('click', showMenu);
-  const say = () => speakText(word, state.currentLanguage);
-  s.querySelector('#ndSay').addEventListener('click', say);
-  if (!read) say();
-
-  const input = s.querySelector('#ndInput');
-  const check = s.querySelector('#ndCheck');
-  const submit = () => {
-    if (nd.answered) return;
-    const answer = input.value.trim();
-    if (!answer) { input.focus(); return; }
-    nd.answered = true;
-    input.disabled = true; check.disabled = true;
-    const isCorrect = isTime ? parseTime(answer) === q.item.value
-      : isDate ? parseDate(answer) === q.item.value
-      : parseNumber(answer) === q.item.value;
-    if (isCorrect) nd.score++;
-    input.classList.add(isCorrect ? 'correct' : 'wrong');
-    record(q, isCorrect, isCorrect ? 4 : 1);
-    showFeedback(q, { isCorrect, isExact: isCorrect, answer, expectedDigits: promptText(q.item) });
-  };
-  check.addEventListener('click', submit);
-  input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); submit(); } });
-  input.focus();
 }
 
 // "17", "17th", "17e", "17." → 17
@@ -721,118 +518,96 @@ function distractors(q) {
   return picked;
 }
 
-// ── Feedback ─────────────────────────────────────────────────────────────────
+// ── Cards ─────────────────────────────────────────────────────────────────────
+// One question { item, pool, mode, intro } as a course-engine card. The Review
+// queue uses the same cards between those of other courses.
 
-function showFeedback(q, { isCorrect, isExact, answer, showWord = true, expectedDigits = null }) {
-  const fb = document.getElementById('ndFeedback');
-  const nl = state.nativeLanguage === 'nl';
-  const item = q.item;
-  if (!isCorrect && !q.intro) nd.missed.push(q);
-  const resultText = isExact ? '✓ ' + (nl ? 'Correct!' : 'Correct!')
-    : isCorrect ? '✓ ' + (nl ? 'Bijna! (kleine typfout)' : 'Almost! (minor typo)')
-    : '✗ ' + (nl ? 'Niet helemaal' : 'Not quite');
-
-  let html = `<div class="ex-feedback-result ${isCorrect ? 'correct' : 'wrong'}">${resultText}</div>`;
-
-  if (!isExact) {
-    html += `<div class="nd-answer-compare">
-      <div class="nd-your-answer"><span class="nd-ans-label">${nl ? 'Jouw antwoord:' : 'Your answer:'}</span> ${escHtml(answer)}</div>
-      <div class="nd-correct-answer"><span class="nd-ans-label">${nl ? 'Correct:' : 'Correct:'}</span> ${escHtml(expectedDigits || item.answers[0])}</div>
-    </div>`;
-  }
-
-  // The word itself (always shown so every question doubles as a study card).
-  if (showWord || expectedDigits) {
+function detailHtml(item, { wordLine = true } = {}) {
+  let html = '';
+  // The word itself, so every question doubles as a study card.
+  if (wordLine) {
     html += `<div class="nd-word-line">
       <span class="nd-word-prompt">${escHtml(promptText(item))}</span>
       <span class="nd-word-arrow">=</span>
       <span class="nd-word-uk">${escHtml(item.answers[0])}</span>
     </div>`;
   }
-
   const alts = item.answers.slice(1, 3);
-  if (alts.length) {
-    html += `<div class="nd-alts">${nl ? 'Ook goed:' : 'Also fine:'} ${alts.map(a => `<span>${escHtml(a)}</span>`).join(' · ')}</div>`;
-  }
+  if (alts.length) html += `<div class="nd-alts">${L('Also fine:', 'Ook goed:')} ${alts.map(a => `<span>${escHtml(a)}</span>`).join(' · ')}</div>`;
   if (item.note) html += `<div class="nd-note">💡 ${escHtml(loc(item.note))}</div>`;
-
-  html += `<button class="nd-listen-btn" id="ndListen">🔊 ${nl ? 'Luister' : 'Listen'}</button>`;
-  fb.innerHTML = html;
-  fb.querySelector('#ndListen').addEventListener('click', () => speakText(item.answers[0], state.currentLanguage));
-
-  const isLast = nd.current + 1 >= nd.questions.length;
-  const nextBtn = document.createElement('button');
-  nextBtn.className = 'nd-next-btn';
-  nextBtn.type = 'button';
-  nextBtn.textContent = isLast ? (nl ? '🏁 Resultaten' : '🏁 See results') : (nl ? 'Volgende →' : 'Next →');
-  nextBtn.addEventListener('click', () => {
-    if (isLast) showScore();
-    else { nd.current++; renderQuestion(); getScreen().scrollTo({ top: 0, behavior: 'smooth' }); }
-  });
-  fb.appendChild(nextBtn);
-  // Enter again advances: the input is disabled now, so Next takes the focus.
-  nextBtn.focus({ preventScroll: true });
-  fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  return html;
 }
 
-// ── Score ─────────────────────────────────────────────────────────────────────
+function numberCard(q) {
+  const { item, mode, intro = false } = q;
+  const word = item.answers[0];
+  const isTime = item.kind === 'time' || item.kind === 'attime';
+  const isDate = item.kind === 'date';
+  const card = {
+    key: item.key, course: COURSE, intro, say: word,
+    record: res => record(q, res.isCorrect, res.quality),
+    missed: { left: promptText(item), right: word, extra: promptHint(item) },
+    detailHtml: detailHtml(item),
+  };
+  const listenCard = (inner, hint) => `
+    <div class="nd-q-card nd-q-card-listen">
+      <div class="nd-q-question">${escHtml(questionWord(item))}</div>
+      ${inner}
+      <div class="nd-q-hint">${hint}</div>
+    </div>`;
+  const bigListen = `<button class="nd-big-listen" type="button" data-say="${escHtml(word)}">🔊</button>`;
 
-function showScore() {
-  const total = nd.questions.length;
-  const score = nd.score;
-  const pct = Math.round((score / total) * 100);
-  const emoji = pct === 100 ? '🏆' : pct >= 80 ? '🎉' : pct >= 60 ? '👍' : '💪';
-  const nl = state.nativeLanguage === 'nl';
-  const msg = pct === 100 ? (nl ? 'Perfecte score!' : 'Perfect score!')
-            : pct >= 80 ? (nl ? 'Geweldig!' : 'Great job!')
-            : pct >= 60 ? (nl ? 'Goed bezig!' : 'Good effort!')
-            : (nl ? 'Blijf oefenen!' : 'Keep practising!');
+  // Word → digits, four options.
+  if (mode === 'choose') {
+    return { ...card, detailHtml: detailHtml(item, { wordLine: false }),
+      promptHtml: `
+        <div class="nd-q-card">
+          <div class="nd-q-question">${escHtml(questionWord(item))}</div>
+          <div class="nd-q-word">${escHtml(word)}</div>
+          <button class="nd-listen-btn nd-listen-inline" type="button" data-say="${escHtml(word)}">🔊 ${L('Listen', 'Luister')}</button>
+        </div>`,
+      input: { type: 'choice', options: shuffle([item, ...distractors(q)]).map(o => ({ label: optionLabel(o), correct: o.key === item.key })) },
+      correctText: promptText(item) };
+  }
 
-  // List what went wrong this round so it can be studied right away.
-  const missed = nd.missed;
-  const stage = nextStage();
-  const again = nd.session === 'new'
-    ? (stage ? `📥 ${nl ? 'Volgende' : 'Next'}: ${escHtml(loc(stage.title))}` : '')
-    : nd.session === 'due' ? (dueNumbers().length ? `🔄 ${nl ? 'Verder herhalen' : 'More reviews'}` : '')
-    : `🔄 ${nl ? 'Nog een ronde' : 'Another round'}`;
-  const s = getScreen();
-  s.innerHTML = `
-    <div class="lesson-header">
-      <button class="back-btn" id="ndScoreBack">←</button>
-      <div>
-        <div class="lesson-title">🔢 ${nl ? 'Resultaten' : 'Results'}</div>
-        <div class="lesson-subtitle">${nl ? 'Getallen & Tijd Drill' : 'Numbers & Time Drill'}</div>
-      </div>
-    </div>
+  // Audio → digits, or with 'read' the word shown → digits. Typed.
+  if (mode === 'listen' || mode === 'read') {
+    const read = mode === 'read';
+    const what = read ? L('Type it in digits', 'Typ het in cijfers')
+      : item.kind === 'ordinal' ? L('Which ordinal do you hear?', 'Welk rangtelwoord hoor je?')
+      : isTime ? L('What time do you hear?', 'Hoe laat hoor je?')
+      : isDate ? L('Which date do you hear?', 'Welke datum hoor je?')
+      : L('Which number do you hear?', 'Welk getal hoor je?');
+    const gender = item.kind === 'ordinal' ? ` · ${escHtml(loc(GENDER_LABEL[item.gender]))}` : '';
+    return { ...card,
+      promptHtml: listenCard(read
+        ? `<div class="nd-q-word nd-q-word-read">${escHtml(word)} <button class="nd-say-inline" type="button" data-say="${escHtml(word)}">🔊</button></div>`
+        : bigListen, what + gender),
+      autoSay: read ? null : word,
+      input: { type: 'text', lang: 'en', inputmode: isTime || isDate ? 'text' : 'numeric',
+               placeholder: isTime ? '7:30' : isDate ? L('15-9 (day-month)', '15-9 (dag-maand)') : item.kind === 'ordinal' ? L('3 (ordinal)', '3 (rangtelwoord)') : '17' },
+      check(answer) {
+        const ok = (isTime ? parseTime(answer) : isDate ? parseDate(answer) : parseNumber(answer)) === item.value;
+        return { isExact: ok, isClose: false, isCorrect: ok, quality: ok ? 4 : 1 };
+      },
+      compareOnClose: false,
+      correctText: promptText(item) };
+  }
 
-    <div class="ex-score-card">
-      <div class="ex-score-emoji">${emoji}</div>
-      <div class="ex-score-title">${escHtml(msg)}</div>
-      <div class="ex-score-fraction">${score} / ${total}</div>
-      <div class="ex-score-bar-wrap"><div class="ex-score-bar-fill" style="width: ${pct}%"></div></div>
-      <div class="ex-score-pct">${pct}%</div>
-      <div class="ex-score-actions">
-        ${again ? `<button class="ex-next-btn" id="ndRetry">${again}</button>` : ''}
-        <button class="ex-back-btn" id="ndBackMenu">← Menu</button>
-      </div>
-    </div>
-    ${missed.length ? `
-      <div class="nd-ref-section">
-        <div class="nd-ref-title">${nl ? 'Fout deze ronde' : 'Missed this round'}</div>
-        ${missed.map(q => `
-          <div class="nd-ref-row">
-            <span class="nd-ref-left">${escHtml(promptText(q.item))}</span>
-            <span class="nd-ref-right">${escHtml(q.item.answers[0])}</span>
-            <span class="nd-ref-extra">${escHtml(promptHint(q.item))}</span>
-            <button class="nd-ref-speak" data-say="${escHtml(q.item.answers[0])}">🔊</button>
-          </div>`).join('')}
-      </div>` : ''}`;
+  // Digits → word, typed. With dictation the word is spoken and the digits are hidden.
+  const dictation = mode === 'dictate' && !intro;
+  return { ...card,
+    promptHtml: dictation ? listenCard(bigListen, L('Type what you hear', 'Typ wat je hoort')) : promptCard(item, { intro }),
+    autoSay: dictation || intro ? word : null,
+    input: { type: 'text', lang: 'uk', placeholder: L('Type it in Ukrainian…', 'Typ het in het Oekraïens…') },
+    // Typo tolerance only on longer words: два/дві, три/тре are real errors.
+    check(answer) { const g = grade(answer, item.answers, { minTypoLen: 5 }); return { ...g, quality: g.isExact ? 5 : g.isClose ? 3 : 1 }; },
+    compareOnClose: true,
+    correctText: word };
+}
 
-  s.querySelector('#ndScoreBack').addEventListener('click', showMenu);
-  s.querySelector('#ndRetry')?.addEventListener('click', () => (nd.session === 'drill' ? startDrill() : startCourse(nd.session)));
-  s.querySelector('#ndBackMenu').addEventListener('click', showMenu);
-  s.querySelectorAll('[data-say]').forEach(btn => {
-    btn.addEventListener('click', () => speakText(btn.dataset.say, state.currentLanguage));
-  });
-  s.scrollTo({ top: 0 });
+// For the Review queue: every due item as a card, asked the way the menu is set.
+export function numbersDueCards() {
+  loadPrefs();
+  return dueNumbers().map(c => numberCard({ item: c.item, pool: c.stage.items, catId: c.stage.id, mode: modeFor() }));
 }

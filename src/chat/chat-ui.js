@@ -141,17 +141,6 @@ export function practicePronunciation(btn) {
   });
 }
 
-export function addSpeechFeedback() {
-  // Chrome doesn't provide real confidence scores for free-form speech,
-  // so we just confirm the mic picked up the input — no fake percentage.
-  const chatArea = document.getElementById('chatArea');
-  const div = document.createElement('div');
-  div.className = 'speech-feedback';
-  div.innerHTML = `<span class="sf-emoji">🎙️</span><span class="sf-label neutral">Mic input received</span>`;
-  chatArea.appendChild(div);
-  chatArea.scrollTop = chatArea.scrollHeight;
-}
-
 export function addGrammarFeedback(fb, original) {
   const chatArea = document.getElementById('chatArea');
   const div = document.createElement('div');

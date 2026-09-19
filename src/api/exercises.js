@@ -17,11 +17,9 @@ const TOPIC_HINTS_UK = {
   prepositions: 'Focus on choosing the correct preposition (у/в, на, до, від, з, за, під, над, між…) and the case it requires.',
   pronouns:     'Focus on personal pronouns (я, ти, він/вона/воно, ми, ви, вони) and possessives (мій, твій, його/її…) in different cases.',
   negation:     'Focus on не, ні, нічого, ніхто, ніде, ніколи and double-negation rules in Ukrainian.',
-  numbers:      'Focus on numeral agreement with nouns: 1 рік / 2–4 роки / 5+ років and ordinal forms.',
 };
 
 const TOPIC_HINTS_NL = {
-  de_het:       'Focus on whether a noun takes "de" or "het" as its definite article, including common patterns and exceptions.',
   conjugation:  'Focus on present-tense verb conjugation: stem + endings, irregular verbs (zijn, hebben, gaan, doen), and t-rules.',
   past_tense:   'Focus on choosing between simple past (reed, liep) and present perfect (heeft gereden, heeft gelopen), and weak vs strong verb patterns.',
   word_order:   'Focus on the V2 rule (verb-second in main clauses), inversion after fronted adverbials, and verb-final order in subordinate clauses.',

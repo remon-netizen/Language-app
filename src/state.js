@@ -86,16 +86,6 @@ export function getLTLang() {
   }
 }
 
-// Long human-readable name of the target language, written in the user's
-// native language. Used in UI labels like "Translate to Ukrainian".
-export function getTargetLanguageName(inLang = state.nativeLanguage) {
-  const names = {
-    en: { uk: 'Ukrainian', nl: 'Dutch',     en: 'English', fr: 'French' },
-    nl: { uk: 'Oekraïens', nl: 'Nederlands', en: 'Engels',  fr: 'Frans' },
-  };
-  return names[inLang]?.[state.currentLanguage] || state.currentLanguage;
-}
-
 // SVG flag image for a language code. Returns an <img> HTML string.
 const FLAG_CC = { uk: 'ua', nl: 'nl', en: 'gb', fr: 'fr' };
 export function flagImg(langCode, size = 20) {

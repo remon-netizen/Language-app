@@ -17,6 +17,10 @@ import { t } from './i18n.js';
 import { getDueWords, getWordsCount } from './words.js';
 import { vocabStats } from './data/vocab-progress.js';
 import { numbersStats } from './data/numbers-progress.js';
+import { vocabDueCards } from './grammar/vocab-drill-ui.js';
+import { numbersDueCards } from './grammar/numbers-drill-ui.js';
+import { runSession } from './grammar/course-engine.js';
+import { shuffle } from './grammar/drill-core.js';
 import { levenshtein } from './utils.js';
 import { markActivity } from './data/activity.js';
 
@@ -84,6 +88,26 @@ export function getDueTotal() {
   return getDuePhrases().length + getDueWords().length + deckDue;
 }
 
+// ── One queue for every course ───────────────────────────────────────────────
+// Every course hands over its due items as course-engine cards, so they can be
+// shuffled into a single round. Phrases (spoken) and saved words still have their
+// own rows below until they move onto the same engine.
+
+const REVIEW_ROUND = 30;
+
+export function startReviewAll() {
+  showScreen('reviewScreen');
+  const cards = shuffle([...vocabDueCards(), ...numbersDueCards()]).slice(0, REVIEW_ROUND);
+  runSession({
+    screen: getScreen(), icon: '🔄', title: state.nativeLanguage === 'nl' ? 'Herhalen' : 'Review', mixed: true, cards,
+    onExit: openReviewScreen,
+    again: () => {
+      const left = vocabStats().due + numbersStats().due;
+      return left ? { label: state.nativeLanguage === 'nl' ? `🔄 Verder: nog ${left}` : `🔄 Keep going: ${left} left`, run: startReviewAll } : null;
+    },
+  });
+}
+
 // ── Review session state ─────────────────────────────────────────────────────
 
 let review = {
@@ -121,6 +145,8 @@ export function openReviewScreen() {
       <span class="rv-row-count ${count ? 'rv-row-due' : ''}">${count ? count : total}</span>
     </button>`;
 
+  const courseDue = (vs ? vs.due : 0) + (ns ? ns.due : 0);
+
   s.innerHTML = `
     <div class="lesson-header">
       <button class="back-btn" onclick="showScreen('homeScreen')">←</button>
@@ -129,6 +155,11 @@ export function openReviewScreen() {
         <div class="lesson-subtitle">${nl ? 'Wat vandaag aan de beurt is' : 'What is due today'}</div>
       </div>
     </div>
+    ${vs ? `
+    <button class="rv-all-btn" ${courseDue ? 'onclick="startReviewAll()"' : 'disabled'}>
+      <span class="rv-all-title">🔄 ${courseDue ? (nl ? `Herhaal alles: ${courseDue} aan de beurt` : `Review everything: ${courseDue} due`) : (nl ? 'Niets aan de beurt' : 'Nothing due right now')}</span>
+      <span class="rv-all-sub">${nl ? 'Woorden, getallen en tijden door elkaar, in één ronde' : 'Words, numbers and times mixed, in one round'}</span>
+    </button>` : ''}
     <div class="rv-hub">
       ${row('🗣️', nl ? 'Zinnen uit lessen' : 'Phrases from lessons',
             learned ? (nl ? `${duePhrases} van ${learned} aan de beurt · uit je hoofd zeggen` : `${duePhrases} of ${learned} due · say them from memory`)

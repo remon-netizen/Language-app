@@ -164,7 +164,6 @@ function renderDoneScreen() {
 
 // ── Exported actions (called via window.* from onclick) ───────────────────────
 
-export function flipFlashcard() { reveal(null, ''); }
 
 export function rateFlashcard(quality) {
   const word    = fc.cards[fc.current];

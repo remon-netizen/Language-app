@@ -12,10 +12,6 @@ export function saveProgress() {
   localStorage.setItem('ukProgress', JSON.stringify({ categories: state.categoryProgress, points: state.totalPoints }));
 }
 
-export function updatePointsBadge() {
-  // points badge removed — kept as no-op so existing callers don't break
-}
-
 export function loadApiKey() {
   const radio = document.querySelector(`input[name="aiProvider"][value="${state.currentProvider}"]`);
   if (radio) radio.checked = true;

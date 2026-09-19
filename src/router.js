@@ -62,4 +62,3 @@ export function showScreen(id) {
   }
 }
 
-export function currentScreen() { return stack[stack.length - 1]; }

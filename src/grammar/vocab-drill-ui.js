@@ -3,7 +3,8 @@ import { escHtml, levenshtein } from '../utils.js';
 import { speakText } from '../voice.js';
 import { VOCAB, THEMES, POS_LABEL, vocabByTheme } from '../data/vocab-uk.js';
 import { recordVocab, regradeVocab, dueVocab, unseenVocab, weakVocab, vocabStats, getVocabProgress } from '../data/vocab-progress.js';
-import { L, loc, isNL, shuffle, grade, normalise, resultLine, appendNext, missedListHtml, wireSpeakButtons, scoreMessage, scoreEmoji } from './drill-core.js';
+import { L, loc, isNL, shuffle, grade, normalise, wireSpeakButtons } from './drill-core.js';
+import { runSession } from './course-engine.js';
 
 // ── State ────────────────────────────────────────────────────────────────────
 
@@ -14,16 +15,12 @@ let vc = {
   // 'type' (meaning → word) | 'translate' (word → meaning, typed) | 'mixed' (both, typed)
   // | 'dictate' (audio → word) | 'choose' (word → meaning, four options)
   qMode:  'type',
-  // [{ word, intro, dir, shown }] intro = first exposure: the word is shown and copied.
-  // dir = 'produce' | 'translate'; shown = the Ukrainian form on a translate card.
-  queue:  [],
-  current: 0,
-  score:  0,
-  answered: false,
-  missed: [],
   sessionKind: 'new',
   refTheme: 'basics',
 };
+
+const COURSE = { icon: '🧠', get name() { return L('Vocabulary', 'Woordenschat'); } };
+const ACCENT = { main: '#db2777', dark: '#9d174d', soft: '#fdf2f8', border: '#fbcfe8' };
 
 function loadPrefs() {
   try {
@@ -287,287 +284,135 @@ function startSession(kind) {
 
   // A translate card shows the perfective partner now and then: in real text a
   // verb turns up in either aspect, and зробити has to ring the same bell as робити.
-  const card = (w, dir) => ({
-    word: w, intro: false, dir,
-    shown: dir === 'translate' && w.perfective && Math.random() < 0.4 ? w.perfective : w.uk,
-  });
+  const card = (w, dir) => (dir === 'translate' ? translateCard(w) : produceCard(w, { dictation: vc.qMode === 'dictate' }));
   const dirOf = () => (vc.qMode === 'translate' ? 'translate'
     : vc.qMode === 'mixed' ? (Math.random() < 0.5 ? 'translate' : 'produce') : 'produce');
 
+  let cards;
   if (vc.qMode === 'choose') {
-    vc.queue = words.map(w => card(w, 'produce'));
+    cards = words.map(chooseCard);
   } else if (kind === 'new') {
+    // first the word shown and copied, then from memory: one pass in the chosen
+    // direction, or word → meaning followed by meaning → word in 'mixed'
     const passes = vc.qMode === 'mixed' ? ['translate', 'produce'] : [dirOf()];
-    vc.queue = [
-      ...words.map(w => ({ word: w, intro: true, dir: 'produce', shown: w.uk })),
+    cards = [
+      ...words.map(w => produceCard(w, { intro: true })),
       ...passes.flatMap(dir => shuffle(words).map(w => card(w, dir))),
     ];
   } else {
-    vc.queue = words.map(w => card(w, dirOf()));
+    cards = words.map(w => card(w, dirOf()));
   }
-  vc.current = 0; vc.score = 0; vc.missed = []; vc.answered = false;
-  renderQuestion();
+
+  runSession({
+    screen: getScreen(), icon: COURSE.icon, title: COURSE.name, accent: ACCENT, cards,
+    onExit: showMenu,
+    scoreSubtitle: () => { const st = vocabStats(); return `${COURSE.name} · ${st.learned}/${st.total} ${L('learned', 'geleerd')}`; },
+    again: () => {
+      if (kind === 'new') return unseenVocab().some(inTheme) ? { label: '📥 ' + L('Next 10 new', 'Volgende 10'), run: () => startSession('new') } : null;
+      if (kind === 'due') return dueVocab().length ? { label: '🔄 ' + L('More reviews', 'Verder herhalen'), run: () => startSession('due') } : null;
+      return { label: '🔄 ' + L('Another round', 'Nog een ronde'), run: () => startSession(kind) };
+    },
+  });
 }
 
-function headerHtml() {
-  const pct = Math.round((vc.current / vc.queue.length) * 100);
-  return `
-    <div class="lesson-header">
-      <button class="back-btn" id="vcDrillBack">←</button>
-      <div>
-        <div class="lesson-title">🧠 ${L('Vocabulary', 'Woordenschat')}</div>
-        <div class="lesson-subtitle">
-          <div class="vc-progress-wrap"><div class="vc-progress-bar" style="width:${pct}%"></div></div>
-          <div class="vc-progress-text">${vc.current + 1} / ${vc.queue.length}</div>
-        </div>
-      </div>
-    </div>`;
-}
+// ── Cards ────────────────────────────────────────────────────────────────────
+// What the course engine needs to ask one word. Also used by the Review queue,
+// where vocabulary cards sit between cards of other courses.
 
-function renderQuestion() {
-  vc.answered = false;
-  const q = vc.queue[vc.current];
-  if (vc.qMode === 'choose') renderChoose(q);
-  else if (q.dir === 'translate') renderTranslate(q);
-  else renderType(q, vc.qMode === 'dictate');
-}
-
-// Meaning → word (or audio → word). Intro cards show the word too.
-function renderType(q, dictation) {
-  const s = getScreen();
-  const w = q.word;
-  const prompt = dictation && !q.intro
-    ? `<button class="vc-big-listen" id="vcSay" type="button">🔊</button>
-       <div class="vc-q-hint">${L('Type what you hear', 'Typ wat je hoort')}</div>`
-    : `<div class="vc-q-meaning">${escHtml(meaning(w))}</div>
-       <div class="vc-q-hint">${escHtml(q.intro ? wordTag(w) : promptTag(w))}</div>`;
-
-  s.innerHTML = `
-    ${headerHtml()}
-    <div class="vc-q-card ${q.intro ? 'vc-q-intro' : ''}">
-      ${q.intro ? `<div class="vc-q-badge">✨ ${L('New word', 'Nieuw woord')}</div>` : ''}
-      ${prompt}
-      ${q.intro ? `<div class="vc-q-word">${escHtml(w.uk)} <button class="vc-say-inline" id="vcSayIntro" type="button">🔊</button></div>
-                   <div class="vc-q-hint">${L('Say it, then type it', 'Zeg het, typ het dan')}</div>` : ''}
-    </div>
-    <div class="vc-input-area">
-      <input type="text" class="vc-text-input" id="vcInput" lang="uk"
-        placeholder="${L('Type the Ukrainian…', 'Typ het Oekraïens…')}"
-        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
-      <button class="vc-check-btn" id="vcCheck" type="button">${L('Check', 'Controleer')} ✓</button>
-    </div>
-    <div class="vc-synonym-note" id="vcSynonym" hidden></div>
-    <div id="vcFeedback"></div>`;
-
-  s.querySelector('#vcDrillBack').addEventListener('click', showMenu);
-  const say = () => speakText(w.uk, state.currentLanguage);
-  const sayBtn = s.querySelector('#vcSay'); if (sayBtn) { sayBtn.addEventListener('click', say); say(); }
-  const introBtn = s.querySelector('#vcSayIntro'); if (introBtn) { introBtn.addEventListener('click', say); setTimeout(say, 200); }
-
-  const input = s.querySelector('#vcInput');
-  const check = s.querySelector('#vcCheck');
-  const submit = () => {
-    if (vc.answered) return;
-    const answer = input.value.trim();
-    if (!answer) { input.focus(); return; }
-    let g = grade(answer, [w.uk], { minTypoLen: 5 });
-    // A different word that means the same is not a mistake: ask again, no penalty.
-    const other = !g.isCorrect && !dictation && !q.intro && synonymTyped(answer, w);
-    if (other) {
-      const note = s.querySelector('#vcSynonym');
-      note.textContent = L(`${other.uk} fits too, but here it is another word. Try again.`, `${other.uk} past ook, maar hier is het een ander woord. Probeer opnieuw.`);
-      note.hidden = false;
-      input.value = ''; input.focus();
-      return;
-    }
-    // The perfective partner is the right verb in the other aspect. Checked before the
-    // typo tolerance has its say: вивчити for вивчати is one letter off, but no slip.
-    const otherAspect = !g.isExact && !q.intro && !dictation && w.perfective && normalise(answer) === normalise(w.perfective);
-    if (otherAspect) g = { isExact: false, isClose: true, isCorrect: true };
-    vc.answered = true;
-    input.disabled = true; check.disabled = true;
-    input.classList.add(g.isExact ? 'correct' : g.isClose ? 'close' : 'wrong');
-    if (g.isCorrect) vc.score++;
-    // Intro cards are copying, so they never count as a failure; the real test is the second pass.
-    let before;
-    if (!q.intro) {
-      before = recordVocab(w.key, g.isExact ? 5 : otherAspect ? 4 : g.isClose ? 3 : 1);
-      if (!g.isCorrect) vc.missed.push({ left: meaning(w), right: w.uk, extra: wordTag(w) });
-    }
-    showFeedback(w, {
-      g, answer, showCompare: !g.isExact, correct: w.uk,
-      headline: otherAspect ? L('Right verb, but that is the perfective', 'Juiste werkwoord, maar dat is de voltooide vorm') : '',
-      onOverride: !q.intro && !dictation && !g.isCorrect ? () => regradeVocab(w.key, before, 4) : null,
-    });
-  };
-  check.addEventListener('click', submit);
-  input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); submit(); } });
-  input.focus();
-}
-
-// Word → meaning, typed. Any one of the listed meanings is enough.
-function renderTranslate(q) {
-  const s = getScreen();
-  const w = q.word;
-  const langName = isNL() ? 'het Nederlands' : 'English';
-
-  s.innerHTML = `
-    ${headerHtml()}
-    <div class="vc-q-card">
-      <div class="vc-q-word vc-q-word-prompt">${escHtml(q.shown)} <button class="vc-say-inline" id="vcSay" type="button">🔊</button></div>
-      <div class="vc-q-hint">${escHtml(promptTag(w, q.shown))}</div>
-    </div>
-    <div class="vc-input-area">
-      <input type="text" class="vc-text-input" id="vcInput" lang="${isNL() ? 'nl' : 'en'}"
-        placeholder="${L(`Type the meaning in ${langName}…`, `Typ de betekenis in ${langName}…`)}"
-        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
-      <button class="vc-check-btn" id="vcCheck" type="button">${L('Check', 'Controleer')} ✓</button>
-    </div>
-    <div id="vcFeedback"></div>`;
-
-  s.querySelector('#vcDrillBack').addEventListener('click', showMenu);
-  s.querySelector('#vcSay').addEventListener('click', () => speakText(q.shown, state.currentLanguage));
-
-  const input = s.querySelector('#vcInput');
-  const check = s.querySelector('#vcCheck');
-  const submit = () => {
-    if (vc.answered) return;
-    const answer = input.value.trim();
-    if (!answer) { input.focus(); return; }
-    vc.answered = true;
-    input.disabled = true; check.disabled = true;
-    const g = gradeMeaning(answer, w);
-    input.classList.add(g.isExact ? 'correct' : g.isClose ? 'close' : 'wrong');
-    if (g.isCorrect) vc.score++;
-    // Knowing a word when you see it is the easier half, so it ages a little slower than producing it.
-    const before = recordVocab(w.key, g.isExact ? 4 : g.isClose ? 3 : 1);
-    if (!g.isCorrect) vc.missed.push({ left: q.shown, right: meaning(w), extra: wordTag(w), say: q.shown });
-    showFeedback(w, {
-      g, answer, showCompare: !g.isCorrect, correct: meaning(w),
-      onOverride: g.isCorrect ? null : () => regradeVocab(w.key, before, 4),
-    });
-  };
-  check.addEventListener('click', submit);
-  input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); submit(); } });
-  input.focus();
-}
-
-// Word → meaning, four options. Recognition only, so it does not touch the schedule
-// as strongly: a right answer counts as "hard", a wrong one as "again".
-function renderChoose(q) {
-  const s = getScreen();
-  const w = q.word;
-  const pool = VOCAB.filter(o => o.key !== w.key && (o.pos === w.pos || Math.random() < 0.3));
-  const options = shuffle([w, ...shuffle(pool).slice(0, 3)]);
-
-  s.innerHTML = `
-    ${headerHtml()}
-    <div class="vc-q-card">
-      <div class="vc-q-word">${escHtml(w.uk)} <button class="vc-say-inline" id="vcSay" type="button">🔊</button></div>
-      <div class="vc-q-hint">${escHtml(loc(POS_LABEL[w.pos]) || '')}</div>
-    </div>
-    <div class="vc-options">
-      ${options.map((o, i) => `<button class="vc-option-btn" type="button" data-idx="${i}" data-key="${escHtml(o.key)}">${escHtml(meaning(o))}</button>`).join('')}
-    </div>
-    <div id="vcFeedback"></div>`;
-
-  s.querySelector('#vcDrillBack').addEventListener('click', showMenu);
-  s.querySelector('#vcSay').addEventListener('click', () => speakText(w.uk, state.currentLanguage));
-  const pick = btn => {
-    if (vc.answered) return;
-    vc.answered = true;
-    const ok = btn.dataset.key === w.key;
-    if (ok) vc.score++;
-    recordVocab(w.key, ok ? 3 : 1);
-    if (!ok) vc.missed.push({ left: meaning(w), right: w.uk, extra: wordTag(w) });
-    s.querySelectorAll('.vc-option-btn').forEach(b => {
-      b.disabled = true;
-      if (b.dataset.key === w.key) b.classList.add('correct');
-      else if (b === btn) b.classList.add('wrong');
-    });
-    showFeedback(w, { g: { isExact: ok, isCorrect: ok }, answer: btn.textContent, showCompare: false });
-  };
-  s.querySelectorAll('.vc-option-btn').forEach(btn => btn.addEventListener('click', () => pick(btn)));
-  const keyHandler = e => {
-    if (vc.answered || !/^[1-4]$/.test(e.key)) return;
-    const btn = s.querySelector(`.vc-option-btn[data-idx="${Number(e.key) - 1}"]`);
-    if (btn) { e.preventDefault(); pick(btn); }
-  };
-  if (vc.keyHandler) s.removeEventListener('keydown', vc.keyHandler);
-  vc.keyHandler = keyHandler;
-  s.addEventListener('keydown', keyHandler);
-  s.querySelector('.vc-option-btn').focus({ preventScroll: true });
-}
-
-function showFeedback(w, { g, answer, showCompare, correct = w.uk, headline = '', onOverride = null }) {
-  const fb = document.getElementById('vcFeedback');
-  let html = headline ? `<div class="ex-feedback-result correct">✓ ${escHtml(headline)}</div>` : resultLine(g);
-  if (showCompare) {
-    html += `<div class="vc-compare">
-      <div class="vc-your-answer"><b>${L('Your answer:', 'Jouw antwoord:')}</b> ${escHtml(answer)}</div>
-      <div class="vc-correct-answer"><b>${L('Correct:', 'Correct:')}</b> ${escHtml(correct)}</div>
-    </div>`;
-  }
-  // A typed translation can be right without being on the list (a synonym, another turn of phrase).
-  if (onOverride) html += `<button class="vc-override-btn" id="vcOverride" type="button">✓ ${L('My answer was right too', 'Mijn antwoord was ook goed')}</button>`;
-  html += `<div class="vc-word-line">
+const wordLine = w => `
+  <div class="vc-word-line">
     <span class="vc-word-uk">${escHtml(w.uk)}</span>
     <span class="vc-word-eq">=</span>
     <span class="vc-word-meaning">${escHtml(meaning(w))}</span>
     <span class="vc-word-tag">${escHtml(wordTag(w))}</span>
   </div>`;
-  html += `<button class="vc-listen-btn" id="vcListen" type="button">🔊 ${L('Listen', 'Luister')}</button>`;
-  fb.innerHTML = html;
-  fb.querySelector('#vcListen').addEventListener('click', () => speakText(w.uk, state.currentLanguage));
-  const override = fb.querySelector('#vcOverride');
-  if (override) override.addEventListener('click', () => {
-    onOverride();
-    vc.score++;
-    vc.missed.pop();
-    fb.querySelector('.ex-feedback-result').outerHTML = `<div class="ex-feedback-result correct">✓ ${L('Counted as correct', 'Goed gerekend')}</div>`;
-    override.remove();
-    const input = document.getElementById('vcInput');
-    if (input) { input.classList.remove('wrong'); input.classList.add('close'); }
-    fb.querySelector('.vc-next-btn')?.focus({ preventScroll: true });
-  });
 
-  const isLast = vc.current + 1 >= vc.queue.length;
-  appendNext(fb, { isLast, className: 'vc-next-btn', onNext: () => {
-    if (isLast) showScore();
-    else { vc.current++; renderQuestion(); getScreen().scrollTo({ top: 0, behavior: 'smooth' }); }
-  } });
+const base = w => ({ key: w.key, course: COURSE, say: w.uk, detailHtml: wordLine(w) });
+
+// Meaning → word (or audio → word). Introduction cards show the word too.
+function produceCard(w, { intro = false, dictation = false } = {}) {
+  const heard = dictation && !intro;
+  return {
+    ...base(w), intro,
+    promptHtml: `
+      <div class="vc-q-card ${intro ? 'vc-q-intro' : ''}">
+        ${intro ? `<div class="vc-q-badge">✨ ${L('New word', 'Nieuw woord')}</div>` : ''}
+        ${heard ? `<button class="vc-big-listen" type="button" data-say="${escHtml(w.uk)}">🔊</button>
+                   <div class="vc-q-hint">${L('Type what you hear', 'Typ wat je hoort')}</div>`
+                : `<div class="vc-q-meaning">${escHtml(meaning(w))}</div>
+                   <div class="vc-q-hint">${escHtml(intro ? wordTag(w) : promptTag(w))}</div>`}
+        ${intro ? `<div class="vc-q-word">${escHtml(w.uk)} <button class="vc-say-inline" type="button" data-say="${escHtml(w.uk)}">🔊</button></div>
+                   <div class="vc-q-hint">${L('Say it, then type it', 'Zeg het, typ het dan')}</div>` : ''}
+      </div>`,
+    autoSay: intro || heard ? w.uk : null,
+    input: { type: 'text', lang: 'uk', placeholder: L('Type the Ukrainian…', 'Typ het Oekraïens…') },
+    check(answer) {
+      const g = grade(answer, [w.uk], { minTypoLen: 5 });
+      if (intro) return { ...g, quality: 0 };
+      // A different word that means the same is not a mistake: ask again, no penalty.
+      const other = !g.isCorrect && !heard && synonymTyped(answer, w);
+      if (other) return { retry: L(`${other.uk} fits too, but here it is another word. Try again.`, `${other.uk} past ook, maar hier is het een ander woord. Probeer opnieuw.`) };
+      // The perfective partner is the right verb in the other aspect. Checked before the
+      // typo tolerance has its say: вивчити for вивчати is one letter off, but no slip.
+      if (!g.isExact && !heard && w.perfective && normalise(answer) === normalise(w.perfective)) {
+        return { isExact: false, isClose: true, isCorrect: true, quality: 4,
+                 headline: L('Right verb, but that is the perfective', 'Juiste werkwoord, maar dat is de voltooide vorm') };
+      }
+      return { ...g, quality: g.isExact ? 5 : g.isClose ? 3 : 1 };
+    },
+    record: res => recordVocab(w.key, res.quality),
+    override: heard ? null : before => regradeVocab(w.key, before, 4),
+    compareOnClose: true,
+    correctText: w.uk,
+    missed: { left: meaning(w), right: w.uk, extra: wordTag(w) },
+  };
 }
 
-// ── Score ─────────────────────────────────────────────────────────────────────
+// Word → meaning, typed. Any one of the listed meanings is enough. The card shows
+// the perfective partner now and then: in real text a verb turns up in either
+// aspect, and зробити has to ring the same bell as робити.
+function translateCard(w) {
+  const shown = w.perfective && Math.random() < 0.4 ? w.perfective : w.uk;
+  const langName = isNL() ? 'het Nederlands' : 'English';
+  return {
+    ...base(w), intro: false,
+    promptHtml: `
+      <div class="vc-q-card">
+        <div class="vc-q-word vc-q-word-prompt">${escHtml(shown)} <button class="vc-say-inline" type="button" data-say="${escHtml(shown)}">🔊</button></div>
+        <div class="vc-q-hint">${escHtml(promptTag(w, shown))}</div>
+      </div>`,
+    input: { type: 'text', lang: isNL() ? 'nl' : 'en', placeholder: L(`Type the meaning in ${langName}…`, `Typ de betekenis in ${langName}…`) },
+    // Knowing a word when you see it is the easier half, so it ages a little slower than producing it.
+    check(answer) { const g = gradeMeaning(answer, w); return { ...g, quality: g.isExact ? 4 : g.isClose ? 3 : 1 }; },
+    record: res => recordVocab(w.key, res.quality),
+    override: before => regradeVocab(w.key, before, 4),
+    compareOnClose: false,
+    correctText: meaning(w),
+    missed: { left: shown, right: meaning(w), extra: wordTag(w), say: shown },
+  };
+}
 
-function showScore() {
-  const total = vc.queue.length;
-  const pct = Math.round((vc.score / total) * 100);
-  const st = vocabStats();
-  const s = getScreen();
-  s.innerHTML = `
-    <div class="lesson-header">
-      <button class="back-btn" id="vcScoreBack">←</button>
-      <div>
-        <div class="lesson-title">🧠 ${L('Results', 'Resultaten')}</div>
-        <div class="lesson-subtitle">${L('Vocabulary', 'Woordenschat')} · ${st.learned}/${st.total} ${L('learned', 'geleerd')}</div>
-      </div>
-    </div>
-    <div class="ex-score-card">
-      <div class="ex-score-emoji">${scoreEmoji(pct)}</div>
-      <div class="ex-score-title">${escHtml(scoreMessage(pct))}</div>
-      <div class="ex-score-fraction">${vc.score} / ${total}</div>
-      <div class="ex-score-bar-wrap"><div class="ex-score-bar-fill" style="width: ${pct}%"></div></div>
-      <div class="ex-score-pct">${pct}%</div>
-      <div class="ex-score-actions">
-        <button class="ex-next-btn" id="vcAgain">${vc.sessionKind === 'new' ? '📥 ' + L('Next 10 new', 'Volgende 10') : '🔄 ' + L('Another round', 'Nog een ronde')}</button>
-        <button class="ex-back-btn" id="vcBackMenu">← Menu</button>
-      </div>
-    </div>
-    ${missedListHtml(vc.missed, { cls: 'vocab' })}`;
-  wireSpeakButtons(s);
-  s.querySelector('#vcScoreBack').addEventListener('click', showMenu);
-  s.querySelector('#vcAgain').addEventListener('click', () => startSession(vc.sessionKind));
-  s.querySelector('#vcBackMenu').addEventListener('click', showMenu);
-  s.scrollTo({ top: 0 });
+// Word → meaning, four options. Recognition only, so a right answer counts as
+// "hard" on the schedule and a wrong one as "again".
+function chooseCard(w) {
+  const pool = VOCAB.filter(o => o.key !== w.key && (o.pos === w.pos || Math.random() < 0.3));
+  const options = shuffle([w, ...shuffle(pool).slice(0, 3)]);
+  return {
+    ...base(w), intro: false,
+    promptHtml: `
+      <div class="vc-q-card">
+        <div class="vc-q-word vc-q-word-prompt">${escHtml(w.uk)} <button class="vc-say-inline" type="button" data-say="${escHtml(w.uk)}">🔊</button></div>
+        <div class="vc-q-hint">${escHtml(loc(POS_LABEL[w.pos]) || '')}</div>
+      </div>`,
+    input: { type: 'choice', options: options.map(o => ({ label: meaning(o), correct: o.key === w.key })) },
+    record: res => recordVocab(w.key, res.quality),
+    correctText: meaning(w),
+    missed: { left: meaning(w), right: w.uk, extra: wordTag(w) },
+  };
+}
+
+// For the Review queue: every due word as a card, in the direction set on the menu.
+export function vocabDueCards() {
+  loadPrefs();
+  return dueVocab().map(w => (vc.qMode === 'translate' || (vc.qMode === 'mixed' && Math.random() < 0.5) ? translateCard(w) : produceCard(w)));
 }

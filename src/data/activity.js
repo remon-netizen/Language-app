@@ -24,7 +24,6 @@ export function markActivity(n = 1) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
 }
 
-export function activityOn(date) { return load()[dayKey(date)] || 0; }
 
 // Consecutive days ending today (or yesterday, so an evening session
 // still shows the streak the next morning).

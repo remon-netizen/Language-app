@@ -1,6 +1,6 @@
 import { state, getTTSLang, getTutorFirstName } from '../state.js';
 import { showScreen } from '../router.js';
-import { loadApiKey, saveProgress, updatePointsBadge, getApiKey } from '../storage.js';
+import { loadApiKey, saveProgress, getApiKey } from '../storage.js';
 import { setupRecognition } from '../speech.js';
 import { calcSimilarity, escHtml } from '../utils.js';
 import { callGeminiAPI } from '../api/gemini.js';
@@ -285,12 +285,6 @@ export function setDifficulty(diff) {
   addSystemNotice(labels[diff]);
 }
 
-export function setLang(lang) {
-  state.freeChatLang = lang;
-  document.getElementById('langUk').className = 'lang-btn' + (lang === 'uk' ? ' active' : '');
-  document.getElementById('langEn').className = 'lang-btn' + (lang === 'en' ? ' active' : '');
-}
-
 export async function sendText() {
   const input = document.getElementById('talkInput');
   const text = input.value.trim();
@@ -316,7 +310,6 @@ export async function processUserInput(text) {
   userMsgDiv.querySelector('.redo-btn').addEventListener('click', () => redoFromMessage(userMsgDiv));
 
   state.totalPoints += 3;
-  updatePointsBadge();
   saveProgress();
 
   showTypingIndicator();
@@ -578,7 +571,7 @@ export async function showConversationSummary() {
   if (!card || !body) return;
 
   btn.disabled = true;
-  btn.textContent = '⏳ Generating…';
+  btn.textContent = t('chat.generating');
   card.style.display = 'block';
   body.innerHTML = '<div style="color:var(--gray);font-size:0.85rem;text-align:center;padding:12px">Analysing conversation…</div>';
 
@@ -626,6 +619,6 @@ export async function showConversationSummary() {
     body.innerHTML = `<div style="color:#dc2626;font-size:0.85rem;padding:8px">${escHtml(err.message)}</div>`;
   } finally {
     btn.disabled = false;
-    btn.textContent = '📊 Refresh Summary';
+    btn.textContent = t('chat.refreshSummary');
   }
 }

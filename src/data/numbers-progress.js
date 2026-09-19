@@ -1,50 +1,17 @@
 // ── Numbers course progress ───────────────────────────────────────────────────
-// Structure: { [key]: { interval, easeFactor, repetitions, nextReview, a, c, t } }
-// Same SM-2 code as the vocabulary deck and the saved words.
+// Storage key 'numbersProgress'; structure and scheduling in course-progress.js.
+// Only course items are scheduled: the free drill's other numbers are ignored.
+// Activity is already marked by numbers-weakness.js, which every answer also feeds.
 
-import { COURSE, inCourse } from './numbers-course.js';
-import { scheduleWord } from '../words.js';
+import { COURSE } from './numbers-course.js';
+import { makeProgress } from './course-progress.js';
 
-const STORAGE_KEY = 'numbersProgress';
-let data = null;
+const BY_KEY = new Map(COURSE.map(c => [c.item.key, c]));
+const progress = makeProgress('numbersProgress', () => COURSE.map(c => c.item.key), { activity: false });
+const entries = keys => keys.map(k => BY_KEY.get(k));
 
-function load() {
-  if (data) return data;
-  try { data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { data = {}; }
-  return data;
-}
-function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
-
-// quality: 5 typed exactly, 4 read or heard correctly, 3 close or chosen, 1 wrong.
-// Only course items are scheduled; the random drill's other numbers are not.
-export function recordNumber(key, quality) {
-  if (!inCourse(key)) return;
-  const d = load();
-  const prev = d[key] || { a: 0, c: 0 };
-  const next = scheduleWord(prev, quality);
-  next.a = prev.a + 1;
-  next.c = prev.c + (quality >= 3 ? 1 : 0);
-  next.t = Date.now();
-  d[key] = next;
-  save();
-}
-
-export function dueNumbers() {
-  const d = load(), now = Date.now();
-  return COURSE.filter(c => d[c.item.key] && d[c.item.key].nextReview <= now);
-}
-export function unseenNumbers() {
-  const d = load();
-  return COURSE.filter(c => !d[c.item.key]);
-}
-export function numbersStats() {
-  const d = load();
-  const seen = COURSE.filter(c => d[c.item.key]);
-  return {
-    total: COURSE.length,
-    seen: seen.length,
-    // learned = answered correctly at least twice, as in the vocabulary deck
-    learned: seen.filter(c => d[c.item.key].c >= 2).length,
-    due: dueNumbers().length,
-  };
-}
+// quality: 5 typed exactly, 4 read or heard correctly, 3 close or chosen, 1 wrong
+export const recordNumber  = (key, quality) => progress.record(key, quality);
+export const dueNumbers    = () => entries(progress.dueKeys());
+export const unseenNumbers = () => entries(progress.unseenKeys());
+export const numbersStats  = () => progress.stats();

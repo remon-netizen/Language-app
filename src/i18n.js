@@ -22,7 +22,6 @@ const dict = {
     'home.iLearn':        'I want to learn',
     'home.start':         'Start Conversation',
     'home.grammarTitle':  'Grammar Exercises',
-    'home.grammarBtn':    '🎯 Grammar Exercises →',
     'home.myWords':       'My Words',
     'home.inburgering':   'Inburgeringsexamen',
     'home.inburgeringSub':'Practise KNS & language skills for the exam',
@@ -91,14 +90,12 @@ const dict = {
     // Settings drawer
     'settings.title':     'Settings',
     'settings.voice':     'Voice',
-    'settings.voiceLoading':'Loading voices…',
     'settings.speed':     'Speech speed',
     'settings.speedSlow': '🐢 Slow',
     'settings.speedNormal':'▶ Normal',
     'settings.aiTitle':   'AI Provider & API Key',
     'settings.test':      '▶ Test',
     'settings.save':      'Save',
-    'settings.noKey':     'No key — conversations will use fallback responses',
 
     // My Words
     'words.title':        '📚 My Words',
@@ -137,7 +134,6 @@ const dict = {
     'home.iLearn':        'Ik wil leren',
     'home.start':         'Begin gesprek',
     'home.grammarTitle':  'Grammatica-oefeningen',
-    'home.grammarBtn':    '🎯 Grammatica-oefeningen →',
     'home.myWords':       'Mijn woorden',
     'home.inburgering':   'Inburgeringsexamen',
     'home.inburgeringSub':'Oefen KNS & taalvaardigheid voor het examen',
@@ -206,14 +202,12 @@ const dict = {
     // Settings drawer
     'settings.title':     'Instellingen',
     'settings.voice':     'Stem',
-    'settings.voiceLoading':'Stemmen laden…',
     'settings.speed':     'Spreeksnelheid',
     'settings.speedSlow': '🐢 Langzaam',
     'settings.speedNormal':'▶ Normaal',
     'settings.aiTitle':   'AI-aanbieder & API-sleutel',
     'settings.test':      '▶ Test',
     'settings.save':      'Opslaan',
-    'settings.noKey':     'Geen sleutel — gesprekken gebruiken standaardantwoorden',
 
     // My Words
     'words.title':        '📚 Mijn woorden',
