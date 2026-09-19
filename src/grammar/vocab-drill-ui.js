@@ -1,8 +1,8 @@
 import { state } from '../state.js';
 import { escHtml, levenshtein } from '../utils.js';
 import { speakText } from '../voice.js';
-import { VOCAB, THEMES, POS_LABEL, vocabByTheme } from '../data/vocab-uk.js';
-import { recordVocab, regradeVocab, dueVocab, unseenVocab, weakVocab, vocabStats, getVocabProgress } from '../data/vocab-progress.js';
+import { THEMES as CORE_THEMES, POS_LABEL } from '../data/vocab-uk.js';
+import { deck, myWords, recordVocab, regradeVocab, dueVocab, unseenVocab, weakVocab, vocabStats, getVocabProgress } from '../data/vocab-progress.js';
 import { L, loc, isNL, shuffle, grade, normalise, wireSpeakButtons } from './drill-core.js';
 import { runSession } from './course-engine.js';
 
@@ -16,7 +16,6 @@ let vc = {
   // | 'dictate' (audio → word) | 'choose' (word → meaning, four options)
   qMode:  'type',
   sessionKind: 'new',
-  refTheme: 'basics',
 };
 
 const COURSE = { icon: '🧠', get name() { return L('Vocabulary', 'Woordenschat'); } };
@@ -25,7 +24,7 @@ const ACCENT = { main: '#db2777', dark: '#9d174d', soft: '#fdf2f8', border: '#fb
 function loadPrefs() {
   try {
     const p = JSON.parse(localStorage.getItem(PREFS_KEY));
-    if (p?.theme && (p.theme === 'all' || THEMES[p.theme])) vc.theme = p.theme;
+    if (p?.theme) vc.theme = p.theme;
     if (['type', 'translate', 'mixed', 'dictate', 'choose'].includes(p?.qMode)) vc.qMode = p.qMode;
   } catch { /* ignore */ }
 }
@@ -34,12 +33,23 @@ function savePrefs() { localStorage.setItem(PREFS_KEY, JSON.stringify({ theme: v
 function getScreen() { return document.getElementById('vocabDrillScreen'); }
 
 const meaning = w => (state.nativeLanguage === 'nl' ? w.nl : w.en);
-const themeName = t => (t === 'all' ? L('All themes', 'Alle thema\'s') : loc(THEMES[t]));
+// The themes on offer: the core themes for Ukrainian, plus "My words" (saved from
+// conversations) whenever there are any. For other languages that is the whole deck.
+const MINE = { icon: '📇', en: 'My words', nl: 'Mijn woorden' };
+const isUK = () => state.currentLanguage === 'uk';
+function themes() {
+  const t = isUK() ? { ...CORE_THEMES } : {};
+  if (myWords().length || !isUK()) t.mine = MINE;
+  return t;
+}
+const themeName = t => (t === 'all' ? L('All themes', 'Alle thema\'s') : loc(themes()[t] || MINE));
+const wordsOf = theme => deck().filter(w => theme === 'all' || w.theme === theme);
 
 // Grammar tag shown with a word: gender for nouns, aspect partner for verbs.
 function wordTag(w) {
   if (w.pos === 'n') return `${loc(POS_LABEL.n)} · ${w.gender}`;
   if (w.pos === 'v') return w.perfective ? `${loc(POS_LABEL.v)} · ${L('perf.', 'volt.')} ${w.perfective}` : loc(POS_LABEL.v);
+  if (w.pos === 'saved') return w.posText;
   return loc(POS_LABEL[w.pos]) || w.pos;
 }
 
@@ -87,9 +97,10 @@ const meaningCores = w => meaningForms(meaning(w)).map(core);
 
 let allCores = null, allCoresLang = null;
 function everyMeaning() {
-  if (!allCores || allCoresLang !== state.nativeLanguage) {
-    allCores = new Set(VOCAB.flatMap(meaningCores));
-    allCoresLang = state.nativeLanguage;
+  const stamp = `${state.nativeLanguage}|${state.currentLanguage}|${myWords().length}`;
+  if (!allCores || allCoresLang !== stamp) {
+    allCores = new Set(deck().flatMap(meaningCores));
+    allCoresLang = stamp;
   }
   return allCores;
 }
@@ -111,15 +122,16 @@ function synonymTyped(answer, w) {
   const a = normalise(answer);
   const plain = x => meaningForms(meaning(x), { plainOnly: true }).map(core);
   const mine = new Set(plain(w));
-  return VOCAB.find(o => o.key !== w.key && o.pos === w.pos
+  return deck().find(o => o.key !== w.key && o.pos === w.pos
     && (normalise(o.uk) === a || (o.perfective && normalise(o.perfective) === a))
     && plain(o).some(m => mine.has(m)));
 }
 
 // ── Public entry ─────────────────────────────────────────────────────────────
 
-export function openVocabDrillScreen() {
+export function openVocabDrillScreen(theme) {
   loadPrefs();
+  if (theme) vc.theme = theme;
   window.showScreen('vocabDrillScreen');
   showMenu();
 }
@@ -136,12 +148,15 @@ export function startVocabReview() {
 function showMenu() {
   const s = getScreen();
   const st = vocabStats();
-  const verbCount = vocabByTheme('verbs').length;
+  if (vc.theme !== 'all' && !themes()[vc.theme]) vc.theme = 'all';
+  const verbCount = wordsOf('verbs').length;
+  const mineCount = myWords().length;
   const nat = isNL() ? 'NL' : 'EN';
+  const target = state.currentLanguage.toUpperCase();
   const unseenHere = unseenVocab().filter(w => vc.theme === 'all' || w.theme === vc.theme).length;
 
-  const chips = ['all', ...Object.keys(THEMES)].map(t => `
-    <button class="vc-chip ${vc.theme === t ? 'active' : ''}" data-theme="${t}">${t === 'all' ? '🌐' : THEMES[t].icon} ${escHtml(themeName(t))}</button>`).join('');
+  const chips = ['all', ...Object.keys(themes())].map(t => `
+    <button class="vc-chip ${vc.theme === t ? 'active' : ''}" data-theme="${t}">${t === 'all' ? '🌐' : themes()[t].icon} ${escHtml(themeName(t))}${t === 'mine' ? ` (${mineCount})` : ''}</button>`).join('');
 
   const modeBtn = (id, icon, label, sub, wide = false) => `
     <button class="vc-mode-btn ${wide ? 'vc-mode-wide' : ''} ${vc.qMode === id ? 'active' : ''}" data-mode="${id}">
@@ -155,7 +170,9 @@ function showMenu() {
       <button class="back-btn" id="vcBack">←</button>
       <div>
         <div class="lesson-title">🧠 ${L('Vocabulary', 'Woordenschat')}</div>
-        <div class="lesson-subtitle">${L(`${st.total} core words, ${verbCount} of them verbs · typed both ways`, `${st.total} kernwoorden, waarvan ${verbCount} werkwoorden · in beide richtingen typen`)}</div>
+        <div class="lesson-subtitle">${isUK()
+          ? L(`${st.total - mineCount} core words, ${verbCount} of them verbs${mineCount ? ` · ${mineCount} of your own` : ''}`, `${st.total - mineCount} kernwoorden, waarvan ${verbCount} werkwoorden${mineCount ? ` · ${mineCount} van jezelf` : ''}`)
+          : L(`${mineCount} words you saved from conversations · typed both ways`, `${mineCount} woorden die je uit gesprekken hebt opgeslagen · in beide richtingen typen`)}</div>
       </div>
     </div>
 
@@ -170,8 +187,8 @@ function showMenu() {
 
     <div class="vc-section-label">${L('How', 'Hoe')}</div>
     <div class="vc-mode-row">
-      ${modeBtn('type', '✍️', `${nat} → UK`, L('type the word', 'typ het woord'))}
-      ${modeBtn('translate', '💡', `UK → ${nat}`, L('type the meaning', 'typ de betekenis'))}
+      ${modeBtn('type', '✍️', `${nat} → ${target}`, L('type the word', 'typ het woord'))}
+      ${modeBtn('translate', '💡', `${target} → ${nat}`, L('type the meaning', 'typ de betekenis'))}
       ${modeBtn('mixed', '🔀', L('Both ways', 'Beide kanten'), L('typed, mixed', 'typen, door elkaar'))}
       ${modeBtn('dictate', '👂', L('Dictation', 'Dictee'), L('audio → word', 'geluid → woord'), true)}
       ${modeBtn('choose', '👆', L('Choose', 'Kiezen'), L('word → meaning, no typing', 'woord → betekenis, zonder typen'), true)}
@@ -212,23 +229,27 @@ function showMenu() {
   s.querySelector('#vcDue').addEventListener('click', () => startSession('due'));
   s.querySelector('#vcWeak').addEventListener('click', () => startSession('weak'));
   s.querySelector('#vcTheme').addEventListener('click', () => startSession('theme'));
-  s.querySelector('#vcBrowse').addEventListener('click', () => showReference(vc.theme === 'all' ? 'basics' : vc.theme));
+  s.querySelector('#vcBrowse').addEventListener('click', () => showReference(vc.theme === 'all' ? Object.keys(themes())[0] : vc.theme));
+  if (!st.total) {   // another language, nothing saved yet
+    s.querySelector('.vc-session-grid').outerHTML = `<div class="vc-empty">${L('No words yet. Tap any word in a conversation to look it up and save it; it then shows up here to learn.', 'Nog geen woorden. Tik in een gesprek op een woord om het op te zoeken en op te slaan; daarna kun je het hier leren.')}</div>`;
+    s.querySelector('#vcBrowse').remove();
+  }
 }
 
 // ── Reference ────────────────────────────────────────────────────────────────
 
 function showReference(theme) {
-  vc.refTheme = theme;
   const s = getScreen();
-  const keys = Object.keys(THEMES);
+  const all = themes();
+  const keys = Object.keys(all);
   const idx = keys.indexOf(theme);
-  const words = vocabByTheme(theme);
+  const words = wordsOf(theme);
 
   s.innerHTML = `
     <div class="lesson-header">
       <button class="back-btn" id="vcRefBack">←</button>
       <div>
-        <div class="lesson-title">${THEMES[theme].icon} ${escHtml(loc(THEMES[theme]))}</div>
+        <div class="lesson-title">${all[theme].icon} ${escHtml(loc(all[theme]))}</div>
         <div class="lesson-subtitle">${words.length} ${L('words', 'woorden')} · ${idx + 1}/${keys.length}</div>
       </div>
     </div>
@@ -278,7 +299,7 @@ function startSession(kind) {
   } else if (kind === 'weak') {
     words = shuffle(weakVocab()).slice(0, 25);
   } else {
-    words = shuffle(VOCAB.filter(inTheme)).slice(0, 20);
+    words = shuffle(deck().filter(inTheme)).slice(0, 20);
   }
   if (!words.length) { showMenu(); return; }
 
@@ -325,6 +346,7 @@ const wordLine = w => `
     <span class="vc-word-eq">=</span>
     <span class="vc-word-meaning">${escHtml(meaning(w))}</span>
     <span class="vc-word-tag">${escHtml(wordTag(w))}</span>
+    ${w.details ? `<span class="vc-word-tag">${escHtml(w.details)}</span>` : ''}
   </div>`;
 
 const base = w => ({ key: w.key, course: COURSE, say: w.uk, detailHtml: wordLine(w) });
@@ -345,7 +367,7 @@ function produceCard(w, { intro = false, dictation = false } = {}) {
                    <div class="vc-q-hint">${L('Say it, then type it', 'Zeg het, typ het dan')}</div>` : ''}
       </div>`,
     autoSay: intro || heard ? w.uk : null,
-    input: { type: 'text', lang: 'uk', placeholder: L('Type the Ukrainian…', 'Typ het Oekraïens…') },
+    input: { type: 'text', lang: state.currentLanguage, placeholder: isUK() ? L('Type the Ukrainian…', 'Typ het Oekraïens…') : L('Type the word…', 'Typ het woord…') },
     check(answer) {
       const g = grade(answer, [w.uk], { minTypoLen: 5 });
       if (intro) return { ...g, quality: 0 };
@@ -395,7 +417,7 @@ function translateCard(w) {
 // Word → meaning, four options. Recognition only, so a right answer counts as
 // "hard" on the schedule and a wrong one as "again".
 function chooseCard(w) {
-  const pool = VOCAB.filter(o => o.key !== w.key && (o.pos === w.pos || Math.random() < 0.3));
+  const pool = deck().filter(o => o.key !== w.key && (o.pos === w.pos || Math.random() < 0.3));
   const options = shuffle([w, ...shuffle(pool).slice(0, 3)]);
   return {
     ...base(w), intro: false,

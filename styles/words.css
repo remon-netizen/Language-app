@@ -231,3 +231,15 @@
   .wl-card { border-radius: 18px 18px 0 0; padding: 18px 16px 28px; }
   .wl-word { font-size: 1.3rem; }
 }
+
+/* Practise button on My Words: opens the "My words" theme of the vocabulary deck */
+.words-practise-btn {
+  width: 100%; display: flex; align-items: center; gap: 10px; padding: 14px 18px; margin-bottom: 16px; text-align: left;
+  background: linear-gradient(135deg, #db2777 0%, #9d174d 100%); color: white; border: none; border-radius: 14px;
+  font-size: 0.95rem; font-weight: 700; cursor: pointer; font-family: inherit; min-height: 56px;
+}
+.words-practise-btn:hover { opacity: 0.92; }
+.words-practise-icon { font-size: 1.3rem; }
+.words-practise-text { flex: 1; }
+.words-practise-title { display: block; font-size: 1rem; }
+.words-practise-sub { display: block; font-size: 0.8rem; opacity: 0.85; font-weight: 400; }

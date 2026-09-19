@@ -1,7 +1,7 @@
 // Language App — Service Worker
 // Cache the app shell so it works offline after first load.
 // Bump CACHE version whenever shell file list changes or content updates.
-const CACHE = 'language-app-v58';
+const CACHE = 'language-app-v59';
 const SHELL = [
   './index.html',
   './manifest.json',
@@ -49,11 +49,9 @@ const SHELL = [
   './src/inburgering/inburgering-ui.js',
   './src/api/inburgering.js',
   './styles/inburgering.css',
-  './src/grammar/flashcards-ui.js',
   './src/grammar/dehet-ui.js',
   './src/api/dehet.js',
   './src/api/conversation-summary.js',
-  './styles/flashcards.css',
   './styles/dehet.css',
   './src/grammar/verb-aspect-ui.js',
   './src/data/verb-aspects.js',

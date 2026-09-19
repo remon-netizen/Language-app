@@ -92,3 +92,5 @@
   .vc-ref-nav { flex-wrap: wrap; }
   .vc-nav-primary { flex-basis: 100%; order: -1; }
 }
+
+.vc-empty { padding: 18px; border: 2px dashed var(--border); border-radius: 14px; color: var(--gray); font-size: 0.92rem; line-height: 1.45; text-align: center; }

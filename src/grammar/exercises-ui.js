@@ -205,7 +205,7 @@ function showTopicPicker() {
 
     <div class="ex-section-label">${native === 'nl' ? '📴 Drills — werken offline, onthouden je fouten' : '📴 Drills — work offline, remember your mistakes'}</div>
     <div class="ex-tools-row">
-      <button class="ex-tool-btn ex-tool-vocab" id="exVocabBtn" style="${isUK ? '' : 'display:none'}">
+      <button class="ex-tool-btn ex-tool-vocab" id="exVocabBtn">
         <span class="ex-tool-icon">🧠</span>
         <span>${lblVocab}</span>
       </button>
@@ -233,7 +233,7 @@ function showTopicPicker() {
         <span class="ex-tool-icon">🎧</span>
         <span>${lblDialog}</span>
       </button>
-      ${!isUK ? `<div class="ex-tools-empty">${native === 'nl' ? 'Nog geen offline drills voor deze taal.' : 'No offline drills for this language yet.'}</div>` : ''}
+      ${!isUK ? `<div class="ex-tools-empty">${native === 'nl' ? 'Woordenschat leert de woorden die je in gesprekken opslaat. Andere offline drills zijn er voor deze taal nog niet.' : 'Vocabulary teaches the words you save in conversations. No other offline drills for this language yet.'}</div>` : ''}
     </div>
 
     <div class="ex-section-label">${native === 'nl' ? '🤖 AI-oefeningen — gegenereerd met je API-sleutel' : '🤖 AI exercises — generated with your API key'}</div>

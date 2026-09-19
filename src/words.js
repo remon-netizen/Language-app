@@ -90,10 +90,13 @@ export function updateWordAfterReview(updatedWord) {
   updateWordsCount();
 }
 
+// A word that has been reviewed before and whose date has come. A word that was
+// never reviewed is new: the vocabulary deck introduces it first.
 export function getDueWords() {
   const now = Date.now();
-  return loadSavedWords().filter(w => !w.nextReview || w.nextReview <= now);
+  return loadSavedWords().filter(w => w.nextReview && w.nextReview <= now);
 }
+const getNewWords = () => loadSavedWords().filter(w => !w.nextReview && !w.a);
 
 export function getDueCount() {
   return getDueWords().length;
@@ -170,16 +173,18 @@ export function renderWordsScreen() {
     return;
   }
 
-  const due = getDueCount();
-  const reviewBtn = due > 0 ? `
-    <button class="fc-review-btn" onclick="openFlashcardScreen()">
-      <span class="fc-review-icon">📇</span>
-      <span class="fc-review-text">
-        <span class="fc-review-title">${L(`Review ${due} word${due === 1 ? '' : 's'} due`, `${due} ${due === 1 ? 'woord' : 'woorden'} herhalen`)}</span>
-        <span class="fc-review-sub">${L('Flashcards: type it or flip it', 'Flashcards: typen of omdraaien')}</span>
+  // Saved words are the theme "My words" of the vocabulary deck: learned by typing,
+  // both ways, and reviewed in the same queue as everything else.
+  const due = getDueCount(), fresh = getNewWords().length;
+  const reviewBtn = `
+    <button class="words-practise-btn" onclick="openVocabDrillScreen('mine')">
+      <span class="words-practise-icon">🧠</span>
+      <span class="words-practise-text">
+        <span class="words-practise-title">${L('Practise my words', 'Mijn woorden oefenen')}</span>
+        <span class="words-practise-sub">${fresh} ${L('new', 'nieuw')} · ${due} ${L('due', 'aan de beurt')} · ${L('in Vocabulary, typed both ways', 'in Woordenschat, in beide richtingen typen')}</span>
       </span>
       <span>→</span>
-    </button>` : '';
+    </button>`;
 
   container.innerHTML = reviewBtn + words.map(w => `
     <div class="word-card">

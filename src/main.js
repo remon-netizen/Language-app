@@ -14,7 +14,6 @@ import { openDissectScreen, submitDissect } from './grammar/sentence-dissection.
 import { openWordsScreen, closeWordLookup, updateWordsCount } from './words.js';
 import { openExercisesScreen, setExLevel } from './grammar/exercises-ui.js';
 import { openInburgeringScreen } from './inburgering/inburgering-ui.js';
-import { openFlashcardScreen, rateFlashcard } from './grammar/flashcards-ui.js';
 import { openDeHetScreen, setDhLevel, startDeHetDrill, answerDeHet } from './grammar/dehet-ui.js';
 import { openVerbAspectScreen } from './grammar/verb-aspect-ui.js';
 import { openVerbDrillScreen, startVerbReview } from './grammar/verb-drill-ui.js';
@@ -571,8 +570,6 @@ window.closeWordLookup       = closeWordLookup;
 window.openExercisesScreen   = openExercisesScreen;
 window.setExLevel            = setExLevel;
 window.openInburgeringScreen = openInburgeringScreen;
-window.openFlashcardScreen   = openFlashcardScreen;
-window.rateFlashcard         = rateFlashcard;
 window.openDeHetScreen       = openDeHetScreen;
 window.setDhLevel            = setDhLevel;
 window.startDeHetDrill       = startDeHetDrill;

@@ -11,7 +11,7 @@ import { state, getTTSLang } from './state.js';
 import { calcSimilarity, escHtml, levenshtein } from './utils.js';
 import { showScreen } from './router.js';
 import { getTranslation, getTip } from './data/lesson-helpers.js';
-import { getDueWords, getWordsCount } from './words.js';
+import { getWordsCount } from './words.js';
 import { getLearnedCount, getDuePhrases, recordPhrase, regradePhrase, phraseStats } from './data/phrases.js';
 import { vocabStats } from './data/vocab-progress.js';
 import { numbersStats } from './data/numbers-progress.js';
@@ -86,8 +86,12 @@ const COURSES = [
     fresh: { en: 'Nothing learned yet — do a lesson first', nl: 'Nog niets geleerd — doe eerst een les' },
     sub: (st, nl) => (nl ? `${st.due} van ${st.total} aan de beurt · zeggen of typen uit je hoofd` : `${st.due} of ${st.total} due · say or type them from memory`),
     stats: phraseStats, dueCards: phraseDueCards, review: 'startPhraseReview()', open: 'openLessonBrowse()' },
-  { id: 'vocab', langs: ['uk'], icon: '🧠', name: { en: 'Vocabulary deck (core words)', nl: 'Woordenschat (kernwoorden)' }, unit: { en: 'core words', nl: 'kernwoorden' },
+  { id: 'vocab', langs: ['uk'], icon: '🧠', name: { en: 'Vocabulary (core words + my words)', nl: 'Woordenschat (kernwoorden + mijn woorden)' }, unit: { en: 'words', nl: 'woorden' },
     fresh: { en: 'Not started — learn 10 new words', nl: 'Nog niet gestart — leer 10 nieuwe woorden' },
+    stats: vocabStats, dueCards: vocabDueCards, review: 'startVocabReview()', open: 'openVocabDrillScreen()' },
+  // The other target languages have no core list: their deck is the words saved from conversations.
+  { id: 'mywords', langs: ['nl', 'en', 'fr'], icon: '🧠', name: { en: 'Vocabulary (my words)', nl: 'Woordenschat (mijn woorden)' }, unit: { en: 'words', nl: 'woorden' },
+    fresh: { en: 'Tap a word in a conversation to save it, then learn it here', nl: 'Tik op een woord in een gesprek om het op te slaan en leer het dan hier' },
     stats: vocabStats, dueCards: vocabDueCards, review: 'startVocabReview()', open: 'openVocabDrillScreen()' },
   { id: 'numbers', langs: ['uk'], icon: '🔢', name: { en: 'Numbers & time', nl: 'Getallen & tijd' }, unit: { en: 'numbers & times', nl: 'getallen & tijden' },
     fresh: { en: 'Not started — learn 0 to 10', nl: 'Nog niet gestart — leer 0 tot 10' },
@@ -111,9 +115,8 @@ export const getCourses = () => activeCourses().filter(c => c.id !== 'phrases');
 // Everything due across the courses, phrases included.
 export const getCourseDue = () => activeCourses().reduce((n, c) => n + c.stats().due, 0);
 
-// Everything waiting, for the home badge and the Today card. Saved words keep
-// their own flashcards until they move into the vocabulary deck.
-export const getDueTotal = () => getCourseDue() + getDueWords().length;
+// Everything waiting, for the home badge and the Today card.
+export const getDueTotal = () => getCourseDue();
 
 // ── Sessions ─────────────────────────────────────────────────────────────────
 
@@ -146,7 +149,6 @@ export function openReviewScreen() {
   showScreen('reviewScreen');
   const nl = state.nativeLanguage === 'nl';
   const words = getWordsCount();
-  const dueWords = getDueWords().length;
   const courseDue = getCourseDue();
   const pick = f => f[nl ? 'nl' : 'en'];
 
@@ -182,10 +184,6 @@ export function openReviewScreen() {
     </button>
     <div class="rv-hub">
       ${activeCourses().map(courseRow).join('')}
-      ${row('📇', nl ? 'Woorden uit gesprekken' : 'Words from conversations',
-            words ? (nl ? `${dueWords} van ${words} aan de beurt · typen of omdraaien` : `${dueWords} of ${words} due · type or flip`)
-                  : (nl ? 'Nog geen woorden — tik op een woord in een gesprek' : 'No words yet — tap a word in a conversation'),
-            dueWords, words, 'openFlashcardScreen()', words === 0)}
       ${getLearnedCount() === 0 && words === 0 ? `
         <div class="rv-empty">
           <button class="rv-empty-btn" onclick="openLessonBrowse()">📖 ${nl ? 'Naar de lessen' : 'Go to lessons'}</button>
