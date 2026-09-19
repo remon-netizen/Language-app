@@ -5,7 +5,7 @@ import { CATEGORIES, getCategory, referenceRows, TIME_PATTERNS, ordinalSuffix, G
 import { recordAnswer, weight, weakKeys, totalAttempts } from '../data/numbers-weakness.js';
 import { STAGES } from '../data/numbers-course.js';
 import { recordNumber, dueNumbers, unseenNumbers, numbersStats } from '../data/numbers-progress.js';
-import { L, loc, shuffle, grade } from './drill-core.js';
+import { L, loc, targetCode, shuffle, grade } from './drill-core.js';
 import { runSession } from './course-engine.js';
 
 // ── State ────────────────────────────────────────────────────────────────────
@@ -166,8 +166,8 @@ function showMenu() {
 
     <div class="nd-section-label">${nl ? 'Hoe?' : 'How?'}</div>
     <div class="nd-mode-row">
-      ${modeBtn('type',   '✍️', '12 → UK', nl ? 'typ het woord' : 'type the word')}
-      ${modeBtn('read',   '💡', 'UK → 12', nl ? 'typ het cijfer' : 'type the digits')}
+      ${modeBtn('type',   '✍️', `12 → ${targetCode()}`, nl ? 'typ het woord' : 'type the word')}
+      ${modeBtn('read',   '💡', `${targetCode()} → 12`, nl ? 'typ het cijfer' : 'type the digits')}
       ${modeBtn('mixed',  '🔀', nl ? 'Beide kanten' : 'Both ways', nl ? 'typen, door elkaar' : 'typed, mixed')}
       ${modeBtn('listen', '👂', nl ? 'Luisteren' : 'Listen', nl ? 'geluid → cijfer' : 'audio → digits')}
       ${modeBtn('dictate', '👂✍️', nl ? 'Dictee' : 'Dictation', nl ? 'geluid → woord' : 'audio → word')}

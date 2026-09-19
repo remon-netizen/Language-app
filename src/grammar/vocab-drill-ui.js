@@ -3,7 +3,7 @@ import { escHtml, levenshtein } from '../utils.js';
 import { speakText } from '../voice.js';
 import { THEMES as CORE_THEMES, POS_LABEL } from '../data/vocab-uk.js';
 import { deck, myWords, recordVocab, regradeVocab, dueVocab, unseenVocab, weakVocab, vocabStats, getVocabProgress } from '../data/vocab-progress.js';
-import { L, loc, isNL, shuffle, grade, normalise, wireSpeakButtons } from './drill-core.js';
+import { L, loc, isNL, targetCode, shuffle, grade, normalise, wireSpeakButtons } from './drill-core.js';
 import { runSession } from './course-engine.js';
 
 // ── State ────────────────────────────────────────────────────────────────────
@@ -152,7 +152,7 @@ function showMenu() {
   const verbCount = wordsOf('verbs').length;
   const mineCount = myWords().length;
   const nat = isNL() ? 'NL' : 'EN';
-  const target = state.currentLanguage.toUpperCase();
+  const target = targetCode();
   const unseenHere = unseenVocab().filter(w => vc.theme === 'all' || w.theme === vc.theme).length;
 
   const chips = ['all', ...Object.keys(themes())].map(t => `

@@ -11,6 +11,11 @@ import { speakText } from '../voice.js';
 export const isNL = () => state.nativeLanguage === 'nl';
 export const L = (en, nl) => (isNL() ? nl : en);
 
+// Short label of the language being learned, for direction buttons ("EN → UKR").
+// The code for Ukrainian is 'uk' everywhere inside the app, but on a button "UK"
+// reads as the United Kingdom, so the learner sees UKR.
+export const targetCode = () => ({ uk: 'UKR' })[state.currentLanguage] || state.currentLanguage.toUpperCase();
+
 // Picks the native-language variant of a { en, nl } field, or passes strings through.
 export function loc(field) {
   if (!field) return '';
