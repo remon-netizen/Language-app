@@ -1,7 +1,7 @@
 import { state } from '../state.js';
 import { escHtml, levenshtein } from '../utils.js';
 import { speakText } from '../voice.js';
-import { THEMES as CORE_THEMES, POS_LABEL } from '../data/vocab-uk.js';
+import { THEMES as CORE_THEMES, WORK_THEMES, POS_LABEL } from '../data/vocab-uk.js';
 import { deck, myWords, recordVocab, regradeVocab, dueVocab, unseenVocab, weakVocab, vocabStats, getVocabProgress } from '../data/vocab-progress.js';
 import { L, loc, isNL, targetCode, shuffle, grade, normalise, wireSpeakButtons } from './drill-core.js';
 import { runSession } from './course-engine.js';
@@ -43,6 +43,9 @@ function themes() {
   return t;
 }
 const themeName = t => (t === 'all' ? L('All themes', 'Alle thema\'s') : loc(themes()[t] || MINE));
+// "All themes" is the general deck: a work theme (electronic warfare) is drilled
+// and counted only when it is the chosen theme.
+const inTheme = w => (vc.theme === 'all' ? !WORK_THEMES.has(w.theme) : w.theme === vc.theme);
 const wordsOf = theme => deck().filter(w => theme === 'all' || w.theme === theme);
 
 // Grammar tag shown with a word: gender for nouns, aspect partner for verbs.
@@ -153,7 +156,7 @@ function showMenu() {
   const mineCount = myWords().length;
   const nat = isNL() ? 'NL' : 'EN';
   const target = targetCode();
-  const unseenHere = unseenVocab().filter(w => vc.theme === 'all' || w.theme === vc.theme).length;
+  const unseenHere = unseenVocab().filter(inTheme).length;
 
   const chips = ['all', ...Object.keys(themes())].map(t => `
     <button class="vc-chip ${vc.theme === t ? 'active' : ''}" data-theme="${t}">${t === 'all' ? '🌐' : themes()[t].icon} ${escHtml(themeName(t))}${t === 'mine' ? ` (${mineCount})` : ''}</button>`).join('');
@@ -290,7 +293,6 @@ function showReference(theme) {
 
 function startSession(kind) {
   vc.sessionKind = kind;
-  const inTheme = w => vc.theme === 'all' || w.theme === vc.theme;
   let words;
   if (kind === 'new') {
     words = unseenVocab().filter(inTheme).slice(0, 10);
