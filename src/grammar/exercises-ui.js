@@ -174,6 +174,7 @@ function showTopicPicker() {
   const lblPrefix   = native === 'nl' ? 'Voorvoegsel Drill' : 'Prefix Drill';
   const lblNumbers  = native === 'nl' ? 'Getallen & Tijd' : 'Numbers & Time';
   const lblVocab    = native === 'nl' ? 'Woordenschat' : 'Vocabulary';
+  const lblPath     = native === 'nl' ? 'Leerpad A1 → B2' : 'Course path A1 → B2';
   const lblSentence = native === 'nl' ? 'Zinnen bouwen' : 'Sentence Builder';
   const lblDialog   = native === 'nl' ? 'Dialogen' : 'Dialogues';
   const isUK        = state.currentLanguage === 'uk';
@@ -194,6 +195,7 @@ function showTopicPicker() {
     return { id, cls, icon, label, meta, due: !!(st && st.due) };
   };
   const courseTiles = [
+    ...(isUK ? [tile('exPathBtn', 'ex-tool-path', '🗺️', lblPath, 'path')] : []),
     tile('exVocabBtn', 'ex-tool-vocab', '🧠', lblVocab, isUK ? 'vocab' : 'mywords'),
     ...(isUK ? [
       tile('exDrillBtn', 'ex-tool-drill', '✍️', lblDrill, 'verbs'),
@@ -292,6 +294,8 @@ function showTopicPicker() {
   if (sentenceBtn) sentenceBtn.addEventListener('click', () => window.openSentenceBuildScreen());
   const vocabBtn = s.querySelector('#exVocabBtn');
   if (vocabBtn) vocabBtn.addEventListener('click', () => window.openVocabDrillScreen());
+  const pathBtn = s.querySelector('#exPathBtn');
+  if (pathBtn) pathBtn.addEventListener('click', () => window.openPathScreen());
   const numbersDrillBtn = s.querySelector('#exNumbersDrillBtn');
   if (numbersDrillBtn) numbersDrillBtn.addEventListener('click', () => window.openNumbersDrillScreen());
 

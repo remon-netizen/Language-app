@@ -32,7 +32,7 @@ function savePrefs() { localStorage.setItem(PREFS_KEY, JSON.stringify({ theme: v
 
 function getScreen() { return document.getElementById('vocabDrillScreen'); }
 
-const meaning = w => (state.nativeLanguage === 'nl' ? w.nl : w.en);
+export const meaning = w => (state.nativeLanguage === 'nl' ? w.nl : w.en);
 // The themes on offer: the core themes for Ukrainian, plus "My words" (saved from
 // conversations) whenever there are any. For other languages that is the whole deck.
 const MINE = { icon: '📇', en: 'My words', nl: 'Mijn woorden' };
@@ -111,7 +111,7 @@ function everyMeaning() {
 // English and Dutch words sit closer together than Ukrainian ones (where / there,
 // though / through), so a one-letter slip only passes on 6+ letters and never
 // when what was typed is itself the meaning of another word in the deck.
-function gradeMeaning(answer, w) {
+export function gradeMeaning(answer, w) {
   const a = core(answer);
   const forms = meaningCores(w);
   const isExact = forms.includes(a);

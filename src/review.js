@@ -18,11 +18,13 @@ import { numbersStats } from './data/numbers-progress.js';
 import { verbStats } from './data/verb-progress.js';
 import { caseStats } from './data/case-progress.js';
 import { prefixStats } from './data/prefix-progress.js';
+import { pathStats } from './data/path-progress.js';
 import { vocabDueCards } from './grammar/vocab-drill-ui.js';
 import { numbersDueCards } from './grammar/numbers-drill-ui.js';
 import { verbDueCards } from './grammar/verb-drill-ui.js';
 import { caseDueCards } from './grammar/case-drill-ui.js';
 import { prefixDueCards } from './grammar/prefix-drill-ui.js';
+import { pathDueCards } from './grammar/path-ui.js';
 import { runSession } from './grammar/course-engine.js';
 import { L, shuffle } from './grammar/drill-core.js';
 
@@ -86,6 +88,9 @@ const COURSES = [
     fresh: { en: 'Nothing learned yet — do a lesson first', nl: 'Nog niets geleerd — doe eerst een les' },
     sub: (st, nl) => (nl ? `${st.due} van ${st.total} aan de beurt · zeggen of typen uit je hoofd` : `${st.due} of ${st.total} due · say or type them from memory`),
     stats: phraseStats, dueCards: phraseDueCards, review: 'startPhraseReview()', open: 'openLessonBrowse()' },
+  { id: 'path', langs: ['uk'], icon: '🗺️', name: { en: 'Course path (A1 → B2)', nl: 'Leerpad (A1 → B2)' }, unit: { en: 'words & sentences', nl: 'woorden & zinnen' },
+    fresh: { en: 'Not started — open unit A1 · 1', nl: 'Nog niet gestart — open unit A1 · 1' },
+    stats: pathStats, dueCards: pathDueCards, review: 'startPathReview()', open: 'openPathScreen()' },
   { id: 'vocab', langs: ['uk'], icon: '🧠', name: { en: 'Vocabulary (core words + my words)', nl: 'Woordenschat (kernwoorden + mijn woorden)' }, unit: { en: 'words', nl: 'woorden' },
     fresh: { en: 'Not started — learn 10 new words', nl: 'Nog niet gestart — leer 10 nieuwe woorden' },
     stats: vocabStats, dueCards: vocabDueCards, review: 'startVocabReview()', open: 'openVocabDrillScreen()' },

@@ -24,6 +24,7 @@ import { openVocabDrillScreen, startVocabReview } from './grammar/vocab-drill-ui
 import { openSentenceBuildScreen, tracker as sentenceTracker } from './grammar/sentence-build-ui.js';
 import { openDialogueScreen, tracker as dialogueTracker } from './grammar/dialogue-ui.js';
 import { openProgressScreen } from './progress-ui.js';
+import { openPathScreen, startPathReview } from './grammar/path-ui.js';
 import { weakVocab } from './data/vocab-progress.js';
 import { startLesson, startHomeworkLesson, restartLesson, buildCategoryCards, buildAlphabet, listenPhrase, listenSlowPhrase, listenTranslation, toggleSpeak as toggleLessonSpeak, nextPhrase, speakAlphabetLetter } from './lesson.js';
 import { readHomeworkFile, generateHomeworkPhrases } from './api/homework.js';
@@ -606,4 +607,6 @@ window.openVocabDrillScreen   = openVocabDrillScreen;
 window.openSentenceBuildScreen = openSentenceBuildScreen;
 window.openDialogueScreen     = openDialogueScreen;
 window.openProgressScreen     = openProgressScreen;
+window.openPathScreen         = openPathScreen;
+window.startPathReview        = startPathReview;
 window.startVocabReview       = startVocabReview;
