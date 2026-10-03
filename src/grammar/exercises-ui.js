@@ -174,7 +174,6 @@ function showTopicPicker() {
   const lblPrefix   = native === 'nl' ? 'Voorvoegsel Drill' : 'Prefix Drill';
   const lblNumbers  = native === 'nl' ? 'Getallen & Tijd' : 'Numbers & Time';
   const lblVocab    = native === 'nl' ? 'Woordenschat' : 'Vocabulary';
-  const lblPath     = native === 'nl' ? 'Leerpad A1 → B2' : 'Course path A1 → B2';
   const lblSentence = native === 'nl' ? 'Zinnen bouwen' : 'Sentence Builder';
   const lblDialog   = native === 'nl' ? 'Dialogen' : 'Dialogues';
   const lblAlphabet = native === 'nl' ? 'Alfabet' : 'Alphabet';
@@ -196,7 +195,6 @@ function showTopicPicker() {
     return { id, cls, icon, label, meta, due: !!(st && st.due) };
   };
   const courseTiles = [
-    ...(isUK ? [tile('exPathBtn', 'ex-tool-path', '🗺️', lblPath, 'path')] : []),
     tile('exVocabBtn', 'ex-tool-vocab', '🧠', lblVocab, isUK ? 'vocab' : 'mywords'),
     ...(isUK ? [
       tile('exDrillBtn', 'ex-tool-drill', '✍️', lblDrill, 'verbs'),
@@ -215,7 +213,7 @@ function showTopicPicker() {
       </div>
     </div>
 
-    <div class="ex-section-label">${native === 'nl' ? '📚 Leren — nieuw leren, testen, herhalen' : '📚 Learn — learn it, test it, review it'}</div>
+    <div class="ex-section-label">${native === 'nl' ? '📚 Cursussen naast het leerpad — leren, testen, herhalen' : '📚 Courses beside the path — learn it, test it, review it'}</div>
     <div class="ex-tools-row ex-tools-wrap">
       ${courseTiles.map(c => `
       <button class="ex-tool-btn ${c.cls}" id="${c.id}">
@@ -301,8 +299,6 @@ function showTopicPicker() {
   if (alphabetBtn) alphabetBtn.addEventListener('click', () => window.openAlphabetScreen());
   const vocabBtn = s.querySelector('#exVocabBtn');
   if (vocabBtn) vocabBtn.addEventListener('click', () => window.openVocabDrillScreen());
-  const pathBtn = s.querySelector('#exPathBtn');
-  if (pathBtn) pathBtn.addEventListener('click', () => window.openPathScreen());
   const numbersDrillBtn = s.querySelector('#exNumbersDrillBtn');
   if (numbersDrillBtn) numbersDrillBtn.addEventListener('click', () => window.openNumbersDrillScreen());
 
