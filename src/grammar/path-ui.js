@@ -12,9 +12,9 @@ import { speakText } from '../voice.js';
 import { showScreen } from '../router.js';
 import { POS_LABEL } from '../data/vocab-uk.js';
 import { LEVELS, UNITS, unitsOf, getUnit, unitIndex, nextUnit } from '../data/path/index.js';
-import { unitItems, entryOf, recordItem, regradeItem, dueItems, pathStats, unitProgress, unitState, markUnitStep, unitDone, unitStarted, nextOpenUnit, STEPS } from '../data/path-progress.js';
+import { unitItems, entryOf, recordItem, regradeItem, dueItems, learnedDueItems, pathStats, unitProgress, unitState, markUnitStep, unitDone, unitStarted, nextOpenUnit, STEPS } from '../data/path-progress.js';
 import { meaning, gradeMeaning } from './vocab-drill-ui.js';
-import { runSession, dueCount } from './course-engine.js';
+import { runSession } from './course-engine.js';
 import { L, loc, shuffle, grade, normalise, wireSpeakButtons } from './drill-core.js';
 
 const COURSE = { icon: '🗺️', get name() { return L('Course path', 'Leerpad'); } };
@@ -55,7 +55,7 @@ function showMenu() {
   const st = pathStats();
   const doneCount = UNITS.filter(u => unitDone(u.id)).length;
   const cont = firstOpen();
-  const dueAll = dueCount();
+  const dueAll = learnedDueItems().length;
   const level = LEVELS.find(l => l.id === pt.level);
   const units = unitsOf(pt.level);
 
@@ -94,7 +94,7 @@ function showMenu() {
     ${cont ? `<button class="pt-continue" id="ptContinue">
       <span class="pt-continue-icon">${cont.icon}</span>
       <span><span class="pt-continue-title">▶ ${unitStarted(cont.id) ? L('Continue', 'Verder') : L('Start', 'Start')}: ${escHtml(unitName(cont))}</span><br>
-      <span class="pt-continue-sub">${escHtml(loc(cont.grammar))}${dueAll ? ` · 🔁 ${dueAll} ${L('due, warm-up first', 'aan de beurt, eerst opwarmen')}` : ''}</span></span>
+      <span class="pt-continue-sub">${escHtml(loc(cont.grammar))}${dueAll ? ` · 🔁 ${dueAll} ${L('due from earlier units', 'aan de beurt uit eerdere units')}` : ''}</span></span>
     </button>` : `<div class="pt-empty">🎉 ${L('Every unit is done.', 'Alle units zijn klaar.')}</div>`}
     ${practisePool().length ? `<button class="vc-browse-btn pt-practise" id="ptPractise">✍️ ${L('Practise what you learned', 'Oefen wat je geleerd hebt')} · ${L('20 exercises from finished units', '20 oefeningen uit afgeronde units')}</button>` : ''}
 
@@ -157,7 +157,7 @@ function showUnit(unit) {
   const items = unitItems(unit);
   const st = unitState(unit.id);
   const next = nextUnit(unit);
-  const due = dueCount();
+  const due = learnedDueItems().length;
   const action = (id, icon, title, sub, step, primary = false) => `
     <button class="pt-action ${primary ? 'pt-action-primary' : ''} ${step && st[step] ? 'done' : ''}" id="${id}">
       <span class="pt-action-icon">${icon}</span>
@@ -202,8 +202,8 @@ function showUnit(unit) {
     </div>
 
     ${due ? `<button class="pt-due-row" id="ptDue">
-      <span>🔁 ${due} ${L('due across your courses', 'aan de beurt in je cursussen')}</span>
-      <span class="pt-due-hint">${L('Each step starts with a warm-up of up to 8 · tap for a full round', 'Elke stap begint met een opwarmer van max. 8 · tik voor een hele ronde')}</span>
+      <span>🔁 ${due} ${L('due from earlier units', 'aan de beurt uit eerdere units')}</span>
+      <span class="pt-due-hint">${L('Each step starts with a warm-up of up to 8 of them · tap for a full round', 'Elke stap begint met een opwarmer van max. 8 ervan · tik voor een hele ronde')}</span>
     </button>` : ''}
     <div class="pt-section-label">${L('Practise', 'Oefenen')}</div>
     <div class="pt-actions">
@@ -221,7 +221,7 @@ function showUnit(unit) {
   s.querySelector('#ptExercises').addEventListener('click', () => startStep(unit, 'exercises'));
   s.querySelector('#ptAll').addEventListener('click', () => startStep(unit, 'all'));
   s.querySelector('#ptNext')?.addEventListener('click', () => showUnit(next));
-  s.querySelector('#ptDue')?.addEventListener('click', () => window.startReviewAll());
+  s.querySelector('#ptDue')?.addEventListener('click', () => startLearnedReview(unit));
   s.scrollTo({ top: 0 });
 }
 
@@ -380,7 +380,7 @@ function startStep(unit, step) {
   if (!cards.length) { showUnit(unit); return; }
   const done = step === 'all' ? STEPS : [step];
   runSession({
-    screen: getScreen(), icon: unit.icon, title: `${unit.level} · ${unitIndex(unit)} · ${stepName(step)}`, accent: ACCENT, cards, warmUp: 8,
+    screen: getScreen(), icon: unit.icon, title: `${unit.level} · ${unitIndex(unit)} · ${stepName(step)}`, accent: ACCENT, cards, warmUp: 8, warmUpSource: learnedDueCards,
     onExit: () => showUnit(unit),
     scoreSubtitle: () => unitName(unit),
     // The step is done once the round ends; offer the next step, or the next unit.
@@ -392,6 +392,19 @@ function startStep(unit, step) {
       const next = nextUnit(unit);
       return next ? { label: `→ ${L('Next unit', 'Volgende unit')}: ${loc(next.title)}`, run: () => showUnit(next) } : null;
     },
+  });
+}
+
+// ── The path's own review ───────────────────────────────────────────────────
+// Due words and sentences from the units already done, core words included:
+// the warm-up of every step, and a full round from the unit page.
+const learnedDueCards = () => learnedDueItems().map(i => (i.kind === 'sentence' ? sentenceCard(i) : wordCard(i, { dir: Math.random() < 0.5 ? 'produce' : 'translate' })));
+function startLearnedReview(unit) {
+  runSession({
+    screen: getScreen(), icon: '🔁', title: L('Review from earlier units', 'Herhalen uit eerdere units'), accent: ACCENT,
+    cards: shuffle(learnedDueCards()).slice(0, 30),
+    onExit: () => showUnit(unit),
+    again: () => { const left = learnedDueItems().length; return left ? { label: L(`🔄 Keep going: ${left} left`, `🔄 Verder: nog ${left}`), run: () => startLearnedReview(unit) } : null; },
   });
 }
 

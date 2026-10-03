@@ -55,6 +55,17 @@ export function pathStats() {
   };
 }
 
+// Due items among what the learner has actually done in the path (the words of
+// units whose words step is done, the sentences of units whose sentences step is
+// done), core words included: this is the path's own warm-up material.
+export function learnedDueItems() {
+  const now = Date.now();
+  return UNITS.flatMap(u => {
+    const st = unitState(u.id), it = unitItems(u);
+    return [...(st.words ? it.words : []), ...(st.sentences ? it.sentences : [])];
+  }).filter(i => { const e = entryOf(i); return e && e.nextReview <= now; });
+}
+
 // How far a unit is: the share of its items that were met at least once.
 export function unitProgress(unit) {
   const items = unitItems(unit).all;

@@ -328,7 +328,7 @@ function startSession(kind) {
 
   runSession({
     screen: getScreen(), icon: COURSE.icon, title: COURSE.name, accent: ACCENT, cards,
-    warmUp: kind === 'new' || kind === 'theme' ? 8 : 0,
+    warmUp: kind === 'new' || kind === 'theme' ? 8 : 0, warmUpSource: vocabDueCards,
     onExit: showMenu,
     scoreSubtitle: () => { const st = vocabStats(); return `${COURSE.name} · ${st.learned}/${st.total} ${L('learned', 'geleerd')}`; },
     again: () => {

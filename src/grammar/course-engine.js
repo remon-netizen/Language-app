@@ -48,16 +48,19 @@ let dueSource = null;
 export function registerDueSource(src) { dueSource = src; }   // { cards(): card[], count(): number }
 export const dueCount = () => (dueSource ? dueSource.count() : 0);
 
-function warmUpCards(n, own) {
-  if (!dueSource || n <= 0) return [];
+function warmUpCards(n, own, source) {
+  const src = source || (dueSource && dueSource.cards);
+  if (!src || n <= 0) return [];
   const taken = new Set(own.map(c => c.key));
-  const due = dueSource.cards().filter(c => !taken.has(c.key));
+  const due = src().filter(c => !taken.has(c.key));
   return shuffle(due).slice(0, n).map(c => ({ ...c, warmup: true }));
 }
 
-export function runSession({ screen, icon, title, accent = DEFAULT_ACCENT, cards, mixed = false, warmUp = 0, onExit, again, scoreSubtitle }) {
+// warmUp: how many due items open the session; warmUpSource: where they come from
+// (a course's own due cards), default every course.
+export function runSession({ screen, icon, title, accent = DEFAULT_ACCENT, cards, mixed = false, warmUp = 0, warmUpSource = null, onExit, again, scoreSubtitle }) {
   const s = screen;
-  const warm = warmUpCards(warmUp, cards);
+  const warm = warmUpCards(warmUp, cards, warmUpSource);
   if (warm.length) cards = [...warm, ...cards];
   const run = { current: 0, score: 0, answered: false, missed: [], keyHandler: null };
   s.style.setProperty('--ce-main', accent.main);
