@@ -1,7 +1,7 @@
 // Language App — Service Worker
 // Cache the app shell so it works offline after first load.
 // Bump CACHE version whenever shell file list changes or content updates.
-const CACHE = 'language-app-v65';
+const CACHE = 'language-app-v66';
 const SHELL = [
   './index.html',
   './manifest.json',
@@ -9,7 +9,6 @@ const SHELL = [
   './styles/variables.css',
   './styles/base.css',
   './styles/home.css',
-  './styles/lesson.css',
   './styles/chat.css',
   './styles/grammar.css',
   './styles/words.css',
@@ -22,14 +21,9 @@ const SHELL = [
   './src/speech.js',
   './src/voice.js',
   './src/words.js',
-  './src/lesson.js',
   './src/review.js',
-  './src/data/lessons.js',
-  './src/data/dutch-lessons.js',
-  './src/data/english-lessons.js',
-  './src/data/french-lessons.js',
-  './src/data/lesson-helpers.js',
   './src/data/alphabet.js',
+  './src/alphabet-ui.js',
   './src/api/languagetool.js',
   './src/api/gemini.js',
   './src/api/claude.js',
@@ -43,8 +37,6 @@ const SHELL = [
   './src/grammar/sentence-dissection.js',
   './src/grammar/exercises-ui.js',
   './src/api/exercises.js',
-  './src/api/homework.js',
-  './src/api/level-up.js',
   './styles/exercises.css',
   './src/inburgering/inburgering-ui.js',
   './src/api/inburgering.js',
@@ -78,7 +70,6 @@ const SHELL = [
   './src/data/verb-progress.js',
   './src/data/case-progress.js',
   './src/data/prefix-progress.js',
-  './src/data/phrases.js',
   './src/grammar/course-engine.js',
   './styles/course-engine.css',
   './src/data/numbers-progress.js',

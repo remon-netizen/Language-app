@@ -148,6 +148,11 @@ body.drawer-open { overflow: hidden; }
 .mic-notice { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 10px; padding: 12px 16px; font-size: 0.85rem; color: #c2410c; margin-bottom: 16px; display: none; }
 .mic-notice.show { display: block; }
 
+/* Screen header shared by every screen (each screen may recolour it). */
+.lesson-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+.lesson-title { font-size: 1.3rem; font-weight: 700; }
+.lesson-subtitle { font-size: 0.85rem; color: var(--gray); }
+
 .back-btn {
   background: none; border: none; font-size: 1.4rem; cursor: pointer; padding: 4px; line-height: 1;
   min-width: 36px; min-height: 36px; display: inline-flex; align-items: center; justify-content: center;

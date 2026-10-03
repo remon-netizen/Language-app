@@ -1,7 +1,6 @@
 import { state } from './state.js';
 import { escHtml } from './utils.js';
-import { getLessonsForTarget, getLessonName } from './data/lesson-helpers.js';
-import { getLearnedCount, getDuePhrases, getCourses } from './review.js';
+import { getCourses } from './review.js';
 import { getWordsCount, getDueWords } from './words.js';
 import { getAllMastery as verbMastery } from './data/verb-weakness.js';
 import { getAllMastery as caseMastery } from './data/case-weakness.js';
@@ -34,14 +33,7 @@ export function openProgressScreen() {
   const isUK = state.currentLanguage === 'uk';
   const isNL = state.nativeLanguage === 'nl';
 
-  // Lessons
-  const lessons = getLessonsForTarget(state.currentLanguage) || [];
-  const totalPhrases = lessons.reduce((a, l) => a + l.phrases.length, 0);
-  const donePhrases = lessons.reduce((a, l) => a + Math.min(l.phrases.length, (state.categoryProgress[l.id] || []).length), 0);
-  const finished = lessons.filter(l => (state.categoryProgress[l.id] || []).length >= l.phrases.length).length;
-
   // Review queues
-  const learned = getLearnedCount(), duePhrases = getDuePhrases().length;
   const words = getWordsCount(), dueWords = getDueWords().length;
 
   // Drills
@@ -100,24 +92,7 @@ export function openProgressScreen() {
       <div class="pg-backup-note" id="pgBackupNote" hidden></div>
     </div>
 
-    <div class="pg-section">${L('Lessons', 'Lessen')}</div>
-    <button class="pg-card pg-row" onclick="openLessonBrowse()">
-      <span class="pg-row-icon">📖</span>
-      <span class="pg-row-text">
-        <span class="pg-row-title">${finished} / ${lessons.length} ${L('lessons finished', 'lessen afgerond')}</span>
-        <span class="pg-row-sub">${donePhrases} / ${totalPhrases} ${L('phrases practised', 'zinnen geoefend')}</span>
-        ${bar(totalPhrases ? donePhrases / totalPhrases * 100 : 0)}
-      </span>
-    </button>
-
     <div class="pg-section">${L('Review queues', 'Herhaalrijen')}</div>
-    <button class="pg-card pg-row" onclick="openReviewScreen()">
-      <span class="pg-row-icon">🗣️</span>
-      <span class="pg-row-text">
-        <span class="pg-row-title">${learned} ${L('phrases learned', 'zinnen geleerd')} ${duePhrases ? `<span class="pg-due">${duePhrases} ${L('due', 'aan de beurt')}</span>` : ''}</span>
-        <span class="pg-row-sub">${L('From lessons, spoken or typed from memory', 'Uit lessen, gesproken of getypt uit je hoofd')}</span>
-      </span>
-    </button>
     <button class="pg-card pg-row" onclick="openWordsScreen()">
       <span class="pg-row-icon">📇</span>
       <span class="pg-row-text">

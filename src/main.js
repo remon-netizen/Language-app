@@ -26,10 +26,11 @@ import { openDialogueScreen, tracker as dialogueTracker } from './grammar/dialog
 import { openProgressScreen } from './progress-ui.js';
 import { openPathScreen, startPathReview } from './grammar/path-ui.js';
 import { weakVocab } from './data/vocab-progress.js';
-import { startLesson, startHomeworkLesson, restartLesson, buildCategoryCards, buildAlphabet, listenPhrase, listenSlowPhrase, listenTranslation, toggleSpeak as toggleLessonSpeak, nextPhrase, speakAlphabetLetter } from './lesson.js';
-import { readHomeworkFile, generateHomeworkPhrases } from './api/homework.js';
-import { openReviewScreen, startPhraseReview, startReviewAll, getLearnedCount, getDueTotal } from './review.js';
-import { getLessonsForTarget, getLessonName } from './data/lesson-helpers.js';
+import { openReviewScreen, startReviewAll, getDueTotal } from './review.js';
+import { openAlphabetScreen } from './alphabet-ui.js';
+import { nextOpenUnit, pathStats, unitStarted } from './data/path-progress.js';
+import { unitIndex } from './data/path/index.js';
+import { loc } from './grammar/drill-core.js';
 import { getWeakVerbCount as weakVerbs } from './data/verb-weakness.js';
 import { getWeakNounCount as weakNouns } from './data/case-weakness.js';
 import { getWeakVerbCount as weakPrefixVerbs } from './data/prefix-weakness.js';
@@ -86,18 +87,6 @@ function updateApiNotice() {
   notice.style.display = hasKey ? 'none' : '';
 }
 
-// ── Auto-play toggle ──────────────────────────────────────────────────────────
-function toggleAutoPlay(enabled) {
-  state.autoPlayLesson = enabled;
-  localStorage.setItem('autoPlayLesson', enabled ? '1' : '0');
-}
-
-function initAutoPlay() {
-  const saved = localStorage.getItem('autoPlayLesson');
-  state.autoPlayLesson = saved !== '0'; // default ON
-  const toggle = document.getElementById('autoPlayToggle');
-  if (toggle) toggle.checked = state.autoPlayLesson;
-}
 
 // ── Speech speed ──────────────────────────────────────────────────────────────
 function setSpeechRate(rate) {
@@ -158,17 +147,6 @@ function applyStaticI18n() {
   setText('geminiFreeLabel', 'settings.geminiFree');
   setText('updateToastText', 'app.updateReady');
   setText('updateToastBtn', 'app.reload');
-  // Lesson screen (static buttons; lesson.js re-labels them during recording)
-  setText('listenBtn', 'lesson.listen'); const lb = document.getElementById('listenBtn'); if (lb) lb.textContent = '🔊 ' + t('lesson.listen');
-  const lsb = document.getElementById('listenSlowBtn'); if (lsb) lsb.textContent = '🐢 ' + t('lesson.listenSlow');
-  const ltb = document.getElementById('listenTranslationBtn'); if (ltb) ltb.textContent = '💬 ' + t('lesson.hearMeaning');
-  const spk = document.getElementById('speakBtn'); if (spk) { spk.textContent = '🎙️ ' + t('lesson.speak'); spk.dataset.idleLabel = '🎙️ ' + t('lesson.speak'); }
-  setText('nextBtn', 'lesson.next');
-  setText('completeTitle', 'lesson.completeTitle');
-  setText('restartBtn', 'lesson.restart');
-  setText('backToLessonsBtn', 'lesson.backToLessons');
-  setText('micNotice', 'lesson.micNotice');
-  setText('alphabetTitle', 'lesson.alphabet');
   // Verb lookup / dissection screens
   setText('verbScreenTitle', 'grammar.verbTitle');
   setText('verbSubmitBtn', 'grammar.verbBtn');
@@ -184,14 +162,11 @@ function applyStaticI18n() {
   setText('myWordsSub', 'home.myWordsSub');
   setText('startBtnLabel', 'home.start');
   setText('startBtnSub', 'home.startSub');
-  setText('lessonsBtnTitle', 'home.lessonsBtnTitle');
-  setText('lessonsBtnSub', 'home.lessonsBtnSub');
+  setText('pathBtnTitle', 'home.pathBtnTitle');
+  setText('pathBtnSub', 'home.pathBtnSub');
   setText('reviewBtnTitle', 'home.reviewTitle');
   setText('reviewBtnSub', 'home.reviewSub');
   updateReviewCount();
-  setText('hwTitle', 'home.hwTitle');
-  setText('hwSub', 'home.hwSub');
-  setText('hwBtn', 'home.hwBtn');
   setText('bbTitle', 'home.browserTitle');
   setText('bbSub', 'home.browserSub');
   setText('bbCloseBtn', 'home.browserClose');
@@ -257,17 +232,6 @@ function weakSpotCount() {
   catch { return 0; }
 }
 
-// The first lesson that is not finished yet, for "continue where you left off".
-function nextLesson() {
-  const lessons = getLessonsForTarget(state.currentLanguage) || [];
-  let started = null;
-  for (const l of lessons) {
-    const done = (state.categoryProgress[l.id] || []).length;
-    if (done > 0 && done < l.phrases.length) return { lesson: l, done };
-    if (done === 0 && !started) started = { lesson: l, done: 0 };
-  }
-  return started;
-}
 
 // One card at the top of Home that answers "what should I do now?".
 function renderTodayCard() {
@@ -276,8 +240,8 @@ function renderTodayCard() {
   const nl = state.nativeLanguage === 'nl';
   const due = getDueTotal();
   const weak = weakSpotCount();
-  const next = nextLesson();
-  const anyProgress = getLearnedCount() > 0 || Object.keys(state.categoryProgress).length > 0;
+  const next = nextOpenUnit();
+  const anyProgress = pathStats().seen > 0 || due > 0;
 
   const rows = [];
   if (due > 0) {
@@ -287,12 +251,9 @@ function renderTodayCard() {
     rows.push({ icon: '🎯', title: nl ? 'Zwakke plekken' : 'Weak spots', sub: nl ? `${weak} ${weak === 1 ? 'vorm' : 'vormen'} die je eerder fout had` : `${weak} form${weak === 1 ? '' : 's'} you got wrong before`, onclick: 'openExercisesScreen()' });
   }
   if (next) {
-    const name = getLessonName(next.lesson, state.nativeLanguage);
-    rows.push({ icon: next.lesson.icon || '📖', title: next.done ? (nl ? 'Ga verder' : 'Continue') : (nl ? 'Volgende les' : 'Next lesson'),
-      sub: `${name} · ${next.done}/${next.lesson.phrases.length}`, onclick: `startLesson('${next.lesson.id}')` });
-  }
-  if (!rows.length && !anyProgress) {
-    rows.push({ icon: '👋', title: nl ? 'Begin met een les' : 'Start with a lesson', sub: nl ? 'Luister, spreek na, en de zinnen komen terug om te herhalen' : 'Listen, repeat, and the phrases come back for review', onclick: 'openLessonBrowse()', hot: true });
+    const started = unitStarted(next.id);
+    rows.push({ icon: next.icon, title: started ? (nl ? 'Ga verder' : 'Continue') : (nl ? 'Volgende unit' : 'Next unit'),
+      sub: `${next.level} · ${unitIndex(next)} — ${loc(next.title)}`, onclick: `openPathScreen('${next.id}')`, hot: !anyProgress });
   }
   if (!rows.length) { card.style.display = 'none'; return; }
 
@@ -307,67 +268,6 @@ function renderTodayCard() {
       </button>`).join('')}`;
 }
 document.addEventListener('screenShown', e => { if (e.detail.id === 'homeScreen') updateReviewCount(); });
-
-// ── Homework upload ───────────────────────────────────────────────────────────
-async function handleHomeworkUpload(file) {
-  if (!file) return;
-  const statusEl = document.getElementById('hwStatus');
-  const btn      = document.getElementById('hwBtn');
-  const native   = state.nativeLanguage;
-  const loading  = native === 'nl' ? '⏳ Document lezen en oefenzinnen genereren…' : '⏳ Reading document and generating practice phrases…';
-  const errPre   = native === 'nl' ? '⚠️ Fout: ' : '⚠️ Error: ';
-
-  statusEl.textContent = loading;
-  statusEl.className = 'hw-status loading';
-  btn.disabled = true;
-
-  try {
-    const text = await readHomeworkFile(file);
-    if (!text.trim()) throw new Error(native === 'nl' ? 'Document is leeg' : 'Document is empty');
-
-    const result = await generateHomeworkPhrases(text);
-
-    statusEl.textContent = '';
-    statusEl.className = 'hw-status';
-
-    // Build a temporary lesson object and start the lesson practice flow.
-    startHomeworkLesson(result.topicSummary, result.phrases);
-  } catch (err) {
-    statusEl.textContent = errPre + err.message;
-    statusEl.className = 'hw-status error';
-  } finally {
-    btn.disabled = false;
-    // Reset the file input so the same file can be re-uploaded.
-    document.getElementById('homeworkFileInput').value = '';
-  }
-}
-
-// ── Lesson browse ─────────────────────────────────────────────────────────────
-function openLessonBrowse() {
-  showScreen('lessonBrowseScreen');
-  buildCategoryCards();
-  buildAlphabet();
-
-  // Hide alphabet section if target isn't Ukrainian
-  const alphaSection = document.getElementById('alphabetSection');
-  if (alphaSection) alphaSection.style.display = state.currentLanguage === 'uk' ? '' : 'none';
-
-  // Update browse header
-  const title = document.getElementById('lessonBrowseTitle');
-  if (title) title.textContent = t('home.lessons');
-  const sub = document.getElementById('lessonBrowseSubtitle');
-  if (sub) sub.textContent = t('home.lessonsSub');
-
-  // Update review button text + count badge
-  const reviewText = document.getElementById('lessonReviewText');
-  if (reviewText) reviewText.textContent = state.nativeLanguage === 'nl' ? 'Herhaal geleerde zinnen' : 'Review learned phrases';
-  const count = getLearnedCount();
-  const badge = document.getElementById('lessonReviewCount');
-  if (badge) {
-    badge.textContent = count > 0 ? count : '';
-    badge.style.display = count > 0 ? '' : 'none';
-  }
-}
 
 // ── Language switchers ────────────────────────────────────────────────────────
 
@@ -501,7 +401,6 @@ function init() {
   updateWordsCount();
   collapseLangPicker();
   updateApiNotice();
-  initAutoPlay();
   document.addEventListener('apiKeyChanged', updateApiNotice);
 }
 
@@ -579,20 +478,9 @@ window.setDhLevel            = setDhLevel;
 window.startDeHetDrill       = startDeHetDrill;
 window.answerDeHet           = answerDeHet;
 window.showConversationSummary = showConversationSummary;
-window.openLessonBrowse    = openLessonBrowse;
-window.startLesson         = startLesson;
-window.restartLesson       = restartLesson;
-window.listenPhrase        = listenPhrase;
-window.listenSlowPhrase    = listenSlowPhrase;
-window.listenTranslation   = listenTranslation;
-window.toggleLessonSpeak   = toggleLessonSpeak;
-window.nextPhrase          = nextPhrase;
-window.speakAlphabetLetter = speakAlphabetLetter;
-window.handleHomeworkUpload = handleHomeworkUpload;
 window.expandLangPicker    = expandLangPicker;
-window.toggleAutoPlay      = toggleAutoPlay;
+window.openAlphabetScreen  = openAlphabetScreen;
 window.openReviewScreen    = openReviewScreen;
-window.startPhraseReview   = startPhraseReview;
 window.openVerbAspectScreen = openVerbAspectScreen;
 window.openVerbDrillScreen    = openVerbDrillScreen;
 window.startVerbReview       = () => startVerbReview(openReviewScreen);

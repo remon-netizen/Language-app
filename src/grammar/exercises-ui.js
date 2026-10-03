@@ -177,6 +177,7 @@ function showTopicPicker() {
   const lblPath     = native === 'nl' ? 'Leerpad A1 → B2' : 'Course path A1 → B2';
   const lblSentence = native === 'nl' ? 'Zinnen bouwen' : 'Sentence Builder';
   const lblDialog   = native === 'nl' ? 'Dialogen' : 'Dialogues';
+  const lblAlphabet = native === 'nl' ? 'Alfabet' : 'Alphabet';
   const isUK        = state.currentLanguage === 'uk';
   const lblLevel    = native === 'nl' ? 'Niveau (AI-onderwerpen):' : 'Level (AI topics):';
   const keyOk       = hasApiKey();
@@ -236,6 +237,10 @@ function showTopicPicker() {
         <span class="ex-tool-icon">🎧</span>
         <span>${lblDialog}</span>
       </button>
+      <button class="ex-tool-btn ex-tool-alphabet" id="exAlphabetBtn">
+        <span class="ex-tool-icon">🔤</span>
+        <span>${lblAlphabet}</span>
+      </button>
     </div>` : ''}
 
     <div class="ex-section-label">${native === 'nl' ? '🤖 AI-hulpmiddelen en quizzen — met je API-sleutel' : '🤖 AI tools and quizzes — with your API key'}</div>
@@ -292,6 +297,8 @@ function showTopicPicker() {
   if (dialogBtn) dialogBtn.addEventListener('click', () => window.openDialogueScreen());
   const sentenceBtn = s.querySelector('#exSentenceBtn');
   if (sentenceBtn) sentenceBtn.addEventListener('click', () => window.openSentenceBuildScreen());
+  const alphabetBtn = s.querySelector('#exAlphabetBtn');
+  if (alphabetBtn) alphabetBtn.addEventListener('click', () => window.openAlphabetScreen());
   const vocabBtn = s.querySelector('#exVocabBtn');
   if (vocabBtn) vocabBtn.addEventListener('click', () => window.openVocabDrillScreen());
   const pathBtn = s.querySelector('#exPathBtn');

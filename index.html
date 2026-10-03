@@ -19,7 +19,6 @@
   <link rel="stylesheet" href="styles/variables.css" />
   <link rel="stylesheet" href="styles/base.css" />
   <link rel="stylesheet" href="styles/home.css" />
-  <link rel="stylesheet" href="styles/lesson.css" />
   <link rel="stylesheet" href="styles/chat.css" />
   <link rel="stylesheet" href="styles/grammar.css" />
   <link rel="stylesheet" href="styles/words.css" />
@@ -86,14 +85,6 @@
     </div>
   </div>
 
-  <!-- Auto-play toggle -->
-  <div class="drawer-section">
-    <label class="drawer-toggle">
-      <input type="checkbox" id="autoPlayToggle" onchange="toggleAutoPlay(this.checked)" checked />
-      <span class="drawer-toggle-label" id="autoPlayLabel">Auto-play phrases in lessons</span>
-    </label>
-  </div>
-
   <!-- AI settings -->
   <div class="drawer-section">
     <div class="settings-label" id="aiLabel">AI Provider &amp; API Key</div>
@@ -142,15 +133,15 @@
         <button class="api-notice-btn" id="apiNoticeBtn" onclick="toggleSettingsDrawer()">Settings →</button>
       </div>
 
-      <!-- ═══ Today: what is due, weak spots, next lesson (filled by main.js) ═══ -->
+      <!-- ═══ Today: what is due, weak spots, next unit (filled by main.js) ═══ -->
       <div class="today-card" id="todayCard" style="display:none"></div>
 
       <!-- ═══ Learning tools (2-column grid) ═══ -->
       <div class="home-tools-grid">
-        <button class="home-tool-card" id="lessonsBtn" onclick="openLessonBrowse()">
-          <span class="home-tool-icon">📖</span>
-          <span class="home-tool-title" id="lessonsBtnTitle">Lessons</span>
-          <span class="home-tool-sub" id="lessonsBtnSub">Words & phrases</span>
+        <button class="home-tool-card" id="pathBtn" onclick="openPathScreen()">
+          <span class="home-tool-icon">🗺️</span>
+          <span class="home-tool-title" id="pathBtnTitle">Course path</span>
+          <span class="home-tool-sub" id="pathBtnSub">Ukrainian from A1 to B2</span>
         </button>
         <button class="home-tool-card" id="reviewBtn" onclick="openReviewScreen()">
           <span class="home-tool-icon">🔄</span>
@@ -206,93 +197,9 @@
 
   </div>
 
-  <!-- ══════════ LESSON BROWSE SCREEN ══════════ -->
-  <div class="screen" id="lessonBrowseScreen">
-    <div class="lesson-header">
-      <button class="back-btn" onclick="showScreen('homeScreen')">←</button>
-      <div>
-        <div class="lesson-title" id="lessonBrowseTitle">📖 Lessons</div>
-        <div class="lesson-subtitle" id="lessonBrowseSubtitle">Practise words and phrases</div>
-      </div>
-    </div>
-    <!-- Quick review button -->
-    <button class="lesson-review-btn" id="lessonReviewBtn" onclick="openReviewScreen()">
-      <span>🔄</span>
-      <span class="lesson-review-text" id="lessonReviewText">Review learned phrases</span>
-      <span class="review-btn-count" id="lessonReviewCount" style="display:none"></span>
-      <span>→</span>
-    </button>
-
-    <!-- Homework upload -->
-    <div class="homework-upload-card" id="homeworkCard">
-      <div class="hw-icon">📄</div>
-      <div class="hw-text">
-        <div class="hw-title" id="hwTitle">Upload homework</div>
-        <div class="hw-sub" id="hwSub">Upload a .docx or .txt and practise speaking the vocabulary</div>
-      </div>
-      <input type="file" id="homeworkFileInput" accept=".docx,.txt,.text" style="display:none"
-             onchange="handleHomeworkUpload(this.files[0])" />
-      <button class="hw-btn" id="hwBtn" onclick="document.getElementById('homeworkFileInput').click()">Choose file</button>
-    </div>
-    <div class="hw-status" id="hwStatus"></div>
-
-    <div class="categories-grid" id="categoriesGrid"></div>
-    <div class="alphabet-section" id="alphabetSection">
-      <div class="alphabet-title" id="alphabetTitle">Cyrillic Alphabet</div>
-      <div class="alphabet-grid" id="alphabetGrid"></div>
-    </div>
-  </div>
-
-  <!-- ══════════ LESSON PRACTICE SCREEN ══════════ -->
-  <div class="screen" id="lessonScreen">
-    <div class="lesson-header">
-      <button class="back-btn" onclick="openLessonBrowse()">←</button>
-      <div>
-        <div class="lesson-title" id="lessonTitle"></div>
-        <div class="lesson-subtitle" id="lessonSubtitle"></div>
-      </div>
-    </div>
-
-    <div id="lessonContent">
-      <div class="nav-dots" id="navDots"></div>
-      <div class="phrase-card">
-        <div class="phrase-counter" id="phraseCounter"></div>
-        <div class="ukrainian" id="phraseUkrainian"></div>
-        <div class="phonetic" id="phrasePhonetic"></div>
-        <div class="english" id="phraseEnglish"></div>
-        <div class="tip" id="phraseTip"></div>
-      </div>
-
-      <div class="controls">
-        <button class="btn btn-listen" id="listenBtn" onclick="listenPhrase()">🔊 Listen</button>
-        <button class="btn btn-listen-slow" id="listenSlowBtn" onclick="listenSlowPhrase()">🐢 Slow</button>
-        <button class="btn btn-translation" id="listenTranslationBtn" onclick="listenTranslation()">💬 Hear meaning</button>
-      </div>
-      <div class="controls" style="margin-top:0">
-        <button class="btn btn-speak" id="speakBtn" onclick="toggleLessonSpeak()">🎙️ Speak</button>
-      </div>
-
-      <div class="mic-notice" id="micNotice">🎙️ Microphone permission needed</div>
-
-      <div class="feedback-area" id="feedbackArea">
-        <div class="feedback-score" id="feedbackScore"></div>
-        <div class="feedback-text" id="feedbackText"></div>
-        <div class="feedback-heard" id="feedbackHeard"></div>
-        <div class="comparison" id="comparisonView"></div>
-      </div>
-
-      <button class="next-btn" id="nextBtn" onclick="nextPhrase()">Next →</button>
-    </div>
-
-    <div class="lesson-complete" id="lessonComplete">
-      <div class="complete-icon">🎉</div>
-      <div class="complete-title" id="completeTitle">Lesson Complete!</div>
-      <div class="complete-subtitle" id="completeSubtitle"></div>
-      <div class="complete-stats" id="completeStats"></div>
-      <!-- Level-up button injected dynamically by showLessonComplete() -->
-      <button class="btn-restart" id="restartBtn" onclick="restartLesson()">🔄 Restart</button>
-      <button class="next-btn" id="backToLessonsBtn" onclick="openLessonBrowse()">← Back to lessons</button>
-    </div>
+  <!-- ══════════ ALPHABET SCREEN ══════════ -->
+  <div class="screen" id="alphabetScreen">
+    <!-- Content populated dynamically by alphabet-ui.js -->
   </div>
 
   <!-- ══════════ REVIEW SCREEN ══════════ -->

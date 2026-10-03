@@ -76,4 +76,6 @@ export function markUnitStep(id, step) {
   localStorage.setItem(STEPS_KEY, JSON.stringify(d));
 }
 export const unitDone = id => STEPS.every(s => unitState(id)[s]);
+// The unit to continue with: the first one not finished.
+export const nextOpenUnit = () => UNITS.find(u => !unitDone(u.id)) || null;
 export const unitStarted = id => Object.keys(unitState(id)).length > 0;

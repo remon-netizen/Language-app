@@ -304,6 +304,11 @@
 .category-card .progress-fill { height: 100%; background: var(--blue); border-radius: 2px; transition: width 0.3s; }
 
 /* ── Alphabet section ── */
+#alphabetScreen .lesson-header { background: linear-gradient(135deg, var(--blue) 0%, #003d80 100%); border-radius: 16px; padding: 14px 18px; margin-bottom: 16px; }
+#alphabetScreen .lesson-header .back-btn { background: rgba(255,255,255,0.18); border: none; border-radius: 10px; color: white; font-size: 1.2rem; width: 36px; height: 36px; padding: 0; flex-shrink: 0; }
+#alphabetScreen .lesson-header .lesson-title { font-size: 1.05rem; font-weight: 700; color: white; }
+#alphabetScreen .lesson-header .lesson-subtitle { font-size: 0.75rem; color: rgba(255,255,255,0.72); margin-top: 2px; }
+#alphabetScreen .letter-card { font-family: inherit; cursor: pointer; }
 .alphabet-section { padding: 0 16px 24px; }
 .alphabet-title {
   font-weight: 700; font-size: 1rem; color: var(--text);

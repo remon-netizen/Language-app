@@ -12,7 +12,7 @@ import { speakText } from '../voice.js';
 import { showScreen } from '../router.js';
 import { POS_LABEL } from '../data/vocab-uk.js';
 import { LEVELS, UNITS, unitsOf, getUnit, unitIndex, nextUnit } from '../data/path/index.js';
-import { unitItems, entryOf, recordItem, regradeItem, dueItems, pathStats, unitProgress, unitState, markUnitStep, unitDone, unitStarted, STEPS } from '../data/path-progress.js';
+import { unitItems, entryOf, recordItem, regradeItem, dueItems, pathStats, unitProgress, unitState, markUnitStep, unitDone, unitStarted, nextOpenUnit, STEPS } from '../data/path-progress.js';
 import { meaning, gradeMeaning } from './vocab-drill-ui.js';
 import { runSession } from './course-engine.js';
 import { L, loc, shuffle, grade, normalise, wireSpeakButtons } from './drill-core.js';
@@ -37,8 +37,7 @@ function wordTag(w) {
   return loc(POS_LABEL[w.pos]) || w.pos;
 }
 
-// The first unit that is not finished: the one to continue with.
-const firstOpen = () => UNITS.find(u => !unitDone(u.id)) || null;
+const firstOpen = nextOpenUnit;
 
 // ── Public entry ─────────────────────────────────────────────────────────────
 
