@@ -3,7 +3,9 @@
 // Target = the language the learner is studying.
 // Invariant: native !== target.
 export const NATIVE_LANGUAGES = ['nl', 'en'];
-export const TARGET_LANGUAGES = ['uk', 'nl', 'en', 'fr'];
+// The app is a Ukrainian course now (2026-10): the Dutch, English and French
+// targets are switched off here; their modules stay until they are removed.
+export const TARGET_LANGUAGES = ['uk'];
 
 const DEFAULT_NATIVE = 'nl';
 const DEFAULT_TARGET = 'uk';
@@ -21,6 +23,8 @@ function loadInitialLanguages() {
   if (target === native) {
     target = TARGET_LANGUAGES.find(t => t !== native) || DEFAULT_TARGET;
   }
+  // An install that had another target keeps a stale value: write back what applies.
+  if (localStorage.getItem('appLanguage') !== target) localStorage.setItem('appLanguage', target);
   return { native, target };
 }
 

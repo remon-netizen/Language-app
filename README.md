@@ -6,6 +6,8 @@ A Progressive Web App (PWA) for learning Ukrainian through speech recognition, t
 
 ## 1. Project Overview
 
+> **Since October 2026 the app is a Ukrainian course only.** `TARGET_LANGUAGES` in `src/state.js` is `['uk']` and the picker offers Ukrainian alone; an older install that had Dutch, English or French as target falls back to Ukrainian. The modules and data for those targets (Dutch/English/French lessons, inburgering, de/het) are still in the tree, unused, until they are removed in a later clean-up.
+
 **What it does:**
 - Guided phrase lessons with speech recognition scoring (listen → speak → get scored)
 - Cyrillic alphabet reference with tap-to-hear pronunciation
