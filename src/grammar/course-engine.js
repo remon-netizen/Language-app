@@ -81,13 +81,18 @@ export function runSession({ screen, icon, title, accent = DEFAULT_ACCENT, cards
     run.answered = false;
     detachKeys();
     const card = cards[run.current];
-    const pct = Math.round((run.current / cards.length) * 100);
+    const inWarm = !!card.warmup, own = cards.length - warm.length;
+    const pos = inWarm ? run.current : run.current - warm.length, total = inWarm ? warm.length : own;
+    const pct = Math.round((pos / total) * 100);
     const isChoice = card.input.type === 'choice';
 
     s.innerHTML = `
       ${header(title, `<div class="ce-progress-wrap"><div class="ce-progress-bar" style="width:${pct}%"></div></div>
-                       <div class="ce-progress-text">${run.current + 1} / ${cards.length}</div>`)}
-      ${card.warmup ? `<div class="ce-course-chip ce-warmup-chip">🔁 ${L('Warm-up', 'Opwarmen')}${card.course ? ` · ${card.course.icon} ${escHtml(card.course.name)}` : ''}${run.current === warm.length - 1 ? ` · ${L('last one, then the new material', 'laatste, dan het nieuwe')}` : ''}</div>`
+                       <div class="ce-progress-text">${inWarm ? L('Warm-up', 'Opwarmen') + ' · ' : ''}${pos + 1} / ${total}</div>`)}
+      ${inWarm ? `<div class="ce-warmup-banner">
+          <span class="ce-warmup-title">🔁 ${L('Warm-up', 'Opwarmen')} ${pos + 1}/${warm.length}: ${L('something you learned before', 'iets wat je al geleerd hebt')}${card.course ? ` · ${card.course.icon} ${escHtml(card.course.name)}` : ''}</span>
+          <span class="ce-warmup-sub">${L(`Then the new material (${own} cards).`, `Daarna het nieuwe (${own} kaarten).`)} <button class="ce-warmup-skip" id="ceSkipWarm" type="button">${L('Skip warm-up →', 'Opwarmen overslaan →')}</button></span>
+        </div>`
         : mixed && card.course ? `<div class="ce-course-chip">${card.course.icon} ${escHtml(card.course.name)}</div>` : ''}
       ${card.promptHtml}
       ${isChoice ? `
@@ -107,6 +112,7 @@ export function runSession({ screen, icon, title, accent = DEFAULT_ACCENT, cards
       <div id="ceFeedback"></div>`;
 
     s.querySelector('#ceBack').addEventListener('click', exit);
+    s.querySelector('#ceSkipWarm')?.addEventListener('click', () => { run.current = warm.length; renderCard(); s.scrollTo({ top: 0 }); });
     wireSpeakButtons(s);
     if (card.autoSay) setTimeout(() => speakText(card.autoSay, state.currentLanguage), card.intro ? 200 : 0);
 
