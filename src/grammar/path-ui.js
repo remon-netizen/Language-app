@@ -70,7 +70,7 @@ function showMenu() {
     return `<button class="pt-unit ${done ? 'done' : ''}" data-unit="${u.id}">
       <span class="pt-unit-num">${unitIndex(u)}</span>
       <span class="pt-unit-icon">${u.icon}</span>
-      <span><span class="pt-unit-title">${escHtml(loc(u.title))}</span><br><span class="pt-unit-grammar">${escHtml(loc(u.grammar))}</span></span>
+      <span><span class="pt-unit-title">${escHtml(loc(u.title))}</span>${u.track ? ` <span class="pt-track">${u.track === 'ew' ? 'EW' : L('work', 'werk')}</span>` : ''}<br><span class="pt-unit-grammar">${escHtml(loc(u.grammar))}</span></span>
       <span class="pt-unit-status">${done ? '✓ ' + L('done', 'klaar') : started ? `${pct}%` : ''}</span>
       ${started && !done ? `<span class="pt-unit-bar"><div style="width:${pct}%"></div></span>` : ''}
     </button>`;
@@ -122,16 +122,24 @@ function exampleLine(t) {
   return `<div class="pt-ex-line"><span class="pt-ex-uk">${inline(uk)}</span> ${say(uk)} <span class="pt-ex-gloss">${inline(gloss)}</span></div>`;
 }
 // markdown-lite: paragraphs, "- " bullets, "> uk — gloss" example lines, "### " headings, **bold**, `code`
+// A block may mix kinds (a sentence, then two example lines): consecutive lines
+// of one kind form a run, and each run is rendered on its own.
+const kindOf = l => (l.startsWith('- ') ? 'ul' : l.startsWith('> ') ? 'ex' : /^#{1,4} /.test(l) ? 'h' : 'p');
 export function renderExplain(text) {
   return String(text).trim().split(/\n\s*\n/).map(block => {
     const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
-    if (!lines.length) return '';
-    if (lines.every(l => l.startsWith('- '))) return `<ul>${lines.map(l => `<li>${inline(l.slice(2))}</li>`).join('')}</ul>`;
-    if (lines.every(l => l.startsWith('> '))) return `<div class="pt-ex">${lines.map(l => exampleLine(l.slice(2))).join('')}</div>`;
-    let html = '';
-    if (/^#{1,4} /.test(lines[0])) { html += `<h4>${inline(lines[0].replace(/^#+ /, ''))}</h4>`; lines.shift(); }
-    if (lines.length) html += `<p>${lines.map(inline).join('<br>')}</p>`;
-    return html;
+    const runs = [];
+    for (const l of lines) {
+      const k = kindOf(l);
+      if (runs.length && runs[runs.length - 1].k === k && k !== 'h') runs[runs.length - 1].lines.push(l);
+      else runs.push({ k, lines: [l] });
+    }
+    return runs.map(({ k, lines }) => {
+      if (k === 'ul') return `<ul>${lines.map(l => `<li>${inline(l.slice(2))}</li>`).join('')}</ul>`;
+      if (k === 'ex') return `<div class="pt-ex">${lines.map(l => exampleLine(l.slice(2))).join('')}</div>`;
+      if (k === 'h') return `<h4>${inline(lines[0].replace(/^#+ /, ''))}</h4>`;
+      return `<p>${lines.map(inline).join('<br>')}</p>`;
+    }).join('');
   }).join('');
 }
 

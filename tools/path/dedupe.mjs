@@ -14,6 +14,7 @@ const sylPath = args.includes('--syllabus') ? args[args.indexOf('--syllabus') + 
 const write = args.includes('--write');
 if (!dir || !sylPath) { console.error('usage: dedupe.mjs <dir> --syllabus syllabus.json [--write]'); process.exit(2); }
 
+const FLOOR = 12;
 const order = JSON.parse(fs.readFileSync(sylPath, 'utf8')).units.map(u => u.id);
 const files = fs.readdirSync(dir).filter(f => f.endsWith('.json'));
 const units = files.map(f => ({ f, u: JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')) }))
@@ -22,14 +23,18 @@ const units = files.map(f => ({ f, u: JSON.parse(fs.readFileSync(path.join(dir, 
 const seen = new Map(), sents = new Map();
 let dropped = 0;
 for (const { f, u } of units) {
+  // A repeated word shares one schedule entry whichever unit teaches it, so
+  // repeating is harmless; it is only dropped to make room for new words, and
+  // never below FLOOR words (the work units revisit their vocabulary on purpose).
   const keep = [], gone = [];
+  let room = Math.max(0, u.words.length - FLOOR);
   for (const w of u.words) {
-    if (seen.has(w[0])) gone.push(`${w[0]} (${seen.get(w[0])})`);
-    else { seen.set(w[0], u.id); keep.push(w); }
+    if (seen.has(w[0]) && room > 0) { gone.push(`${w[0]} (${seen.get(w[0])})`); room--; }
+    else { if (!seen.has(w[0])) seen.set(w[0], u.id); keep.push(w); }
   }
   if (gone.length) {
     dropped += gone.length;
-    const flag = keep.length < 10 ? 'ERROR' : keep.length < 12 ? 'warn ' : '     ';
+    const flag = '     ';
     console.log(`${flag} ${u.id}: drop ${gone.length} → ${keep.length} words left · ${gone.join(', ')}`);
     if (write) { u.words = keep; fs.writeFileSync(path.join(dir, f), JSON.stringify(u, null, 2) + '\n'); }
   }

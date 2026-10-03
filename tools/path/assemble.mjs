@@ -13,13 +13,16 @@ if (!dir) { console.error('usage: assemble.mjs <dir> [--syllabus file]'); proces
 
 const here = path.dirname(new URL(import.meta.url).pathname);
 const outDir = path.resolve(here, '../../src/data/path');
-const order = sylPath ? JSON.parse(fs.readFileSync(sylPath, 'utf8')).units.map(u => u.id) : null;
+const syl = sylPath ? JSON.parse(fs.readFileSync(sylPath, 'utf8')).units : null;
+const order = syl ? syl.map(u => u.id) : null;
+// The track (work units: 'ew', 'work') is a property of the syllabus, not of the writer.
+const track = syl ? Object.fromEntries(syl.filter(u => u.track).map(u => [u.id, u.track])) : {};
 
 const units = fs.readdirSync(dir).filter(f => f.endsWith('.json')).map(f => JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')));
 units.sort((a, b) => (order ? order.indexOf(a.id) - order.indexOf(b.id) : a.id.localeCompare(b.id)));
 
-const KEYS = ['id', 'level', 'icon', 'title', 'grammar', 'explain', 'words', 'sentences', 'exercises'];
-const pick = u => Object.fromEntries(KEYS.filter(k => k in u).map(k => [k, u[k]]));
+const KEYS = ['id', 'level', 'icon', 'track', 'title', 'grammar', 'explain', 'words', 'sentences', 'exercises'];
+const pick = u => Object.fromEntries(KEYS.filter(k => k in u || (k === 'track' && track[u.id])).map(k => [k, k === 'track' ? track[u.id] : u[k]]));
 
 for (const level of ['A1', 'A2', 'B1', 'B2']) {
   const mine = units.filter(u => u.level === level).map(pick);

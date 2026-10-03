@@ -6,6 +6,7 @@
 //
 // A unit (one entry in a1.js … b2.js):
 //   id        'a1-04'                      level 'A1' · icon an emoji
+//   track     'ew' on the work units (electronic warfare), interleaved with the others
 //   title     { en, nl }                   what the unit is about, a few words
 //   grammar   { en, nl }                   the grammar point, a few words
 //   explain   { en, nl }                   the explanation, markdown-lite:

@@ -50,6 +50,7 @@
 .pt-unit-icon { font-size: 1.25rem; line-height: 1; }
 .pt-unit-title { font-size: 0.9rem; font-weight: 700; color: var(--text); }
 .pt-unit-grammar { font-size: 0.74rem; color: var(--gray); }
+.pt-track { display: inline-block; font-size: 0.64rem; font-weight: 800; color: #0f766e; background: #ccfbf1; padding: 1px 7px; border-radius: 999px; vertical-align: middle; text-transform: uppercase; letter-spacing: 0.04em; }
 .pt-unit-status { font-size: 0.72rem; font-weight: 700; color: var(--gray); white-space: nowrap; }
 .pt-unit.done .pt-unit-status { color: #0f766e; }
 .pt-unit-bar { grid-column: 3 / 5; height: 4px; border-radius: 2px; background: var(--border); overflow: hidden; }

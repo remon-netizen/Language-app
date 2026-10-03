@@ -129,8 +129,9 @@ export function validateDir(dir, syllabus = null) {
     ids.set(u.id, true);
     for (const w of u.words || []) {
       if (!Array.isArray(w)) continue;
-      if (words.has(w[0])) report.cross.push(`word "${w[0]}" is in ${words.get(w[0])} and ${u.id}; a word belongs to one unit`);
-      else words.set(w[0], u.id);
+      // A word may be taught again in a later unit (the work units do this on
+      // purpose); it shares one schedule entry. dedupe.mjs trims the surplus.
+      if (!words.has(w[0])) words.set(w[0], u.id);
     }
     for (const s of u.sentences || []) {
       if (s?.uk && sents.has(s.uk)) report.cross.push(`sentence "${s.uk}" is in ${sents.get(s.uk)} and ${u.id}`);

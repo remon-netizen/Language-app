@@ -1,19 +1,19 @@
 {
   "levels": {
     "A1": {
-      "units": 23,
+      "units": 26,
       "lexicalMinimum": "800–1000"
     },
     "A2": {
-      "units": 26,
+      "units": 30,
       "lexicalMinimum": "≈2000"
     },
     "B1": {
-      "units": 30,
+      "units": 35,
       "lexicalMinimum": "3000–4000"
     },
     "B2": {
-      "units": 25,
+      "units": 31,
       "lexicalMinimum": "5000–6000"
     }
   },
@@ -555,6 +555,41 @@
       "brief": "Where something is: у/в or на + locative, ending -і for most nouns (стіл → на столі, місто → у місті, школа → у школі, Київ → у Києві, Львів → у Львові with і → о), and -у for some masculine nouns (у банку, у парку). Use на for open spaces and events (на пошті, на вокзалі, на уроці) and у/в for enclosed places. Teach the у/в choice by sound (був у Львові, жила в Києві). Contrast with a1-13: the accusative answers \"what\", the locative answers \"where\". Avoid nouns whose stem ends in к/г/х (руці, нозі) — that alternation comes at A2."
     },
     {
+      "id": "a1-24",
+      "icon": "📡",
+      "title": {
+        "en": "At the EW post",
+        "nl": "Op de EOV-post"
+      },
+      "grammar": {
+        "en": "Equipment nouns: gender, це / де, locative of place (у/на + -і)",
+        "nl": "Apparatuur: geslacht, це / де, locatief van plaats (у/на + -і)"
+      },
+      "theme": {
+        "en": "Work: the electronic warfare station",
+        "nl": "Werk: het EOV-station"
+      },
+      "focus": [
+        "антена",
+        "радар",
+        "станція",
+        "передавач",
+        "приймач",
+        "рація",
+        "Де антена? — На даху.",
+        "Радар на позиції."
+      ],
+      "brief": "First work unit. Name the equipment of an EW station and say where it is: nominative with це (Це антена, це приймач), gender read off the ending (антена f, радар m, обладнання n), and the locative of place from a1-15 (на даху, у машині, на позиції, у штабі). Short dialogues an operator would really have on day one: what is this, where is it, is it on. Do not use cases the learner does not have yet (no instrumental, no genitive beyond з + place). Words: take them first from the learner's own work vocabulary, the theme 'ew' at the end of src/data/vocab-uk.js (rows ending in 'ew']: radio, radar, jamming, spectrum, drones, command, radio procedure); reuse at least 10 of those exact dictionary forms so they share the schedule, and add at most 4 new words. The learner works in electronic warfare / electromagnetic spectrum operations and wants to talk about it in Ukrainian with colleagues; keep sentences realistic for a staff officer or operator (no fiction, no heroics).",
+      "level": "A1",
+      "track": "ew",
+      "standard": [
+        "МІСЦЕВИЙ ВІДМІНОК з у, в, на — місце",
+        "Чергування прийменників у – в: був у Львові, жила в Києві",
+        "Відмінювання у знахідному та місцевому відмінках, сер. р. (закінчення -о, -е)",
+        "Відмінювання у знахідному та місцевому відмінках, чол. р., тверда основа"
+      ]
+    },
+    {
       "id": "a1-16",
       "level": "A1",
       "icon": "🏡",
@@ -728,6 +763,75 @@
         "подарунок"
       ],
       "brief": "Months are masculine and go into the locative after у/в to say when: у травні, у березні, у листопаді (лютий is an adjective: у лютому — learn as a phrase). Ordinal numbers 1st–12th behave like adjectives and agree in gender: перший поверх, перша зустріч, перше місце; третій is soft (третя, третє), and give the genitive forms першого/першої as a preview of dates. Use them for floors, places in a race and \"first time\"; full dates (десятого травня) wait until A2. Learner knows the past tense (народився/народилася) from a1-19."
+    },
+    {
+      "id": "a1-25",
+      "icon": "📡",
+      "title": {
+        "en": "Frequencies and comms windows",
+        "nl": "Frequenties en verbindingsmomenten"
+      },
+      "grammar": {
+        "en": "Numerals with nouns (мегагерц); at what time: о + locative hour",
+        "nl": "Telwoorden met zelfstandige naamwoorden (мегагерц); om hoe laat: о + locatief"
+      },
+      "theme": {
+        "en": "Work: frequencies, channels and times",
+        "nl": "Werk: frequenties, kanalen en tijden"
+      },
+      "focus": [
+        "мегагерц",
+        "гігагерц",
+        "частота",
+        "канал",
+        "сеанс зв'язку",
+        "о сьомій",
+        "один мегагерц, два мегагерци, п'ять мегагерців"
+      ],
+      "brief": "Apply the counting rule from a1-11/a1-13 to units of frequency (один мегагерц, два/три/чотири мегагерци, п'ять мегагерців; гігагерц the same), and the clock: о котрій? о сьомій, о дев'ятій (feminine ordinal in the locative, from a1-20's ordinals). Sentences about a comms plan: which channel, which frequency, when the window is, present tense of працювати / слухати / передавати. Keep numbers to the hundreds (сто сорок п'ять мегагерців) and show that the noun after a compound number follows its last word. Words: take them first from the learner's own work vocabulary, the theme 'ew' at the end of src/data/vocab-uk.js (rows ending in 'ew']: radio, radar, jamming, spectrum, drones, command, radio procedure); reuse at least 10 of those exact dictionary forms so they share the schedule, and add at most 4 new words. The learner works in electronic warfare / electromagnetic spectrum operations and wants to talk about it in Ukrainian with colleagues; keep sentences realistic for a staff officer or operator (no fiction, no heroics).",
+      "level": "A1",
+      "track": "ew",
+      "standard": [
+        "МІСЦЕВИЙ ВІДМІНОК з у, в — момент часу з назвами місяців",
+        "Уживання родових форм порядкових числівників із закінченням –ий, -а, -е",
+        "Утворення родових форм порядкових числівників"
+      ]
+    },
+    {
+      "id": "a1-26",
+      "icon": "🗓️",
+      "title": {
+        "en": "My week at work",
+        "nl": "Mijn werkweek"
+      },
+      "grammar": {
+        "en": "Days of the week with у/в + accusative; the daily routine in the present tense",
+        "nl": "Dagen van de week met у/в + accusatief; de dagelijkse routine in de tegenwoordige tijd"
+      },
+      "theme": {
+        "en": "Work: the weekly schedule",
+        "nl": "Werk: het weekrooster"
+      },
+      "focus": [
+        "понеділок",
+        "вівторок",
+        "середа",
+        "четвер",
+        "п'ятниця",
+        "у вівторок",
+        "нарада",
+        "зустріч",
+        "графік",
+        "вихідний"
+      ],
+      "brief": "The seven days and 'on Monday' = у/в + accusative (у понеділок, у середу, у п'ятницю; note the feminine -у), with the present tense from a1-08/a1-09 and the clock from a1-25 (о дев'ятій). A typical staff week: the Monday meeting, a training day, a day off, who works when. Keep it to nominative/accusative plus what the learner has; no dative, no instrumental. The learner works in a Dutch defence organisation with Ukrainian colleagues and partners; office situations should be realistic for a staff officer (meetings, email, planning), neutral in tone, with ви forms unless colleagues are clearly on ти terms.",
+      "level": "A1",
+      "track": "work",
+      "standard": [
+        "МІСЦЕВИЙ ВІДМІНОК з у, в — момент часу з назвами місяців",
+        "Уживання родових форм порядкових числівників із закінченням –ий, -а, -е",
+        "Утворення родових форм порядкових числівників"
+      ]
     },
     {
       "id": "a1-21",
@@ -1208,6 +1312,42 @@
       "brief": "Systematise the three question types: intonation only (Ви прочитали цей текст?), чи (Чи ви прочитали…?), and a question word (хто, що, де, куди, звідки, коли, кому, чому, скільки). Question words take the case the answer needs: Кому ви дзвоните? — Мамі. With подобатися the liked person or thing is the grammatical subject in the nominative and the verb agrees with it: Мені подобається Ігор / подобаються ці пісні. Phone phrases for leaving a message and calling back. Learner knows dative forms from a2-09."
     },
     {
+      "id": "a2-30",
+      "icon": "🤝",
+      "title": {
+        "en": "Can we meet on Thursday?",
+        "nl": "Kunnen we donderdag afspreken?"
+      },
+      "grammar": {
+        "en": "Proposing and moving a meeting: мені зручно / вам підходить (dative), перенести на + accusative, чи-questions",
+        "nl": "Een afspraak voorstellen en verzetten: мені зручно / вам підходить (datief), перенести на + accusatief, чи-vragen"
+      },
+      "theme": {
+        "en": "Work: arranging a meeting",
+        "nl": "Werk: een afspraak maken"
+      },
+      "focus": [
+        "зустріч",
+        "нарада",
+        "домовитися",
+        "перенести",
+        "скасувати",
+        "зручно",
+        "підходить",
+        "вільний",
+        "Чи вам зручно о третій?"
+      ],
+      "brief": "Everything around fixing a time: dative of the person for convenience (мені зручно, вам підходить, from a2-09), чи for yes/no questions (a1-05), the time with о + locative (a1-25) and the day with у + accusative (a1-26), moving to another time with перенести на + accusative (на четвер, на другу годину), cancelling, confirming. Six short phone/chat exchanges between colleagues. Explain домовитися (to agree on a time) and its perfective-only use here. The learner works in a Dutch defence organisation with Ukrainian colleagues and partners; office situations should be realistic for a staff officer (meetings, email, planning), neutral in tone, with ви forms unless colleagues are clearly on ти terms.",
+      "level": "A2",
+      "track": "work",
+      "standard": [
+        "Питальне з питальним словом",
+        "Питальне, просте інтонаційне",
+        "Питальне, просте загальне з \"чи\"",
+        "НАЗИВНИЙ — об'єкт зацікавлення"
+      ]
+    },
+    {
       "id": "a2-11",
       "level": "A2",
       "icon": "👩‍🍳",
@@ -1313,6 +1453,40 @@
         "килим"
       ],
       "brief": "Five location prepositions govern the instrumental: над (above), під (under), перед (in front of), за (behind), між (between). Describe a room: Над столом висить лампа, Під ліжком лежить кіт. Then the two non-spatial uses: між друзями (among friends, between us) and перед + time (перед обідом, перед сном). Learner knows instrumental endings (a2-11/12); add the plural -ами here (між вікнами, за дверима). Dutch \"voor\" is both \"in front of\" and \"before\" — перед covers both too."
+    },
+    {
+      "id": "a2-27",
+      "icon": "📡",
+      "title": {
+        "en": "Operating the station",
+        "nl": "Het station bedienen"
+      },
+      "grammar": {
+        "en": "Instrumental of means and company: керувати станцією, зв'язок з командиром",
+        "nl": "Instrumentalis van middel en gezelschap: керувати станцією, зв'язок з командиром"
+      },
+      "theme": {
+        "en": "Work: handling the equipment",
+        "nl": "Werk: omgaan met de apparatuur"
+      },
+      "focus": [
+        "оператор",
+        "обладнання",
+        "живлення",
+        "акумулятор",
+        "кабель",
+        "керувати",
+        "налаштовувати",
+        "зв'язок з"
+      ],
+      "brief": "The instrumental the learner has from a2-11/a2-12/a2-13 applied to equipment: verbs that govern it (керувати станцією, користуватися рацією), means (живити акумулятором, з'єднати кабелем), company (зв'язок з командиром, разом з розрахунком), and place with над/під/за (антена над машиною). Everyday operator routine: powering up, connecting, checking, who you are in contact with. Words: take them first from the learner's own work vocabulary, the theme 'ew' at the end of src/data/vocab-uk.js (rows ending in 'ew']: radio, radar, jamming, spectrum, drones, command, radio procedure); reuse at least 10 of those exact dictionary forms so they share the schedule, and add at most 4 new words. The learner works in electronic warfare / electromagnetic spectrum operations and wants to talk about it in Ukrainian with colleagues; keep sentences realistic for a staff officer or operator (no fiction, no heroics).",
+      "level": "A2",
+      "track": "ew",
+      "standard": [
+        "ОРУДНИЙ з НАД, ПІД, ПЕРЕД, ЗА, МІЖ — місце розташування",
+        "ОРУДНИЙ з МІЖ — об'єктні відношення",
+        "ОРУДНИЙ з ПЕРЕД — часові поняття"
+      ]
     },
     {
       "id": "a2-14",
@@ -1499,6 +1673,40 @@
       "brief": "Imperatives for forms and counters (заповніть бланк, підпишіть тут, покажіть паспорт) and the third-person imperative with хай/нехай (Нехай він зачекає). Show the four functions the standard lists — order, request, advice, suggestion — and how будь ласка, a vocative (Пане викладачу) or давайте soften them. Vocative of masculine nouns in -ач/-ч (викладачу, читачу). Learner knows the basic forms from a1-22; here add perfective imperatives for one-off requests (напишіть) versus imperfective ones for general advice (пийте воду)."
     },
     {
+      "id": "a2-28",
+      "icon": "📡",
+      "title": {
+        "en": "Jam it, now",
+        "nl": "Stoor het, nu"
+      },
+      "grammar": {
+        "en": "Imperative in commands; aspect pairs глушити – заглушити, вмикати – увімкнути",
+        "nl": "Gebiedende wijs in commando's; aspectparen глушити – заглушити, вмикати – увімкнути"
+      },
+      "theme": {
+        "en": "Work: commands and radio procedure",
+        "nl": "Werk: commando's en radioprocedure"
+      },
+      "focus": [
+        "глушити",
+        "придушувати",
+        "вмикати",
+        "перевіряти",
+        "повторіть",
+        "підтвердіть",
+        "прийом",
+        "зрозумів"
+      ],
+      "brief": "Commands as given on a net and in the vehicle, with the imperative from a1-22/a2-18 (ви forms for the net, ти forms between colleagues) and the aspect choice from a2-17: Увімкніть станцію (one action, perfective) vs Глушіть канал (keep doing it, imperfective); Перевірте живлення; Заглушіть частоту; Повторіть; Підтвердіть. Include the fixed radio phrases of the ew theme (прийом, зрозумів, кінець зв'язку, як чуєте?) and explain that they are formulas, not grammar. Words: take them first from the learner's own work vocabulary, the theme 'ew' at the end of src/data/vocab-uk.js (rows ending in 'ew']: radio, radar, jamming, spectrum, drones, command, radio procedure); reuse at least 10 of those exact dictionary forms so they share the schedule, and add at most 4 new words. The learner works in electronic warfare / electromagnetic spectrum operations and wants to talk about it in Ukrainian with colleagues; keep sentences realistic for a staff officer or operator (no fiction, no heroics).",
+      "level": "A2",
+      "track": "ew",
+      "standard": [
+        "НАКАЗОВИЙ СПОСІБ: мрій, кажіть (скажіть), пий, пийте, борися, боріться, хай/нехай бореться/борються",
+        "Спонукальне — розпорядження, прохання, порада, пропозиція",
+        "КЛИЧНИЙ — адресат-об'єкт"
+      ]
+    },
+    {
       "id": "a2-19",
       "level": "A2",
       "icon": "🏷️",
@@ -1533,6 +1741,40 @@
         "дорого"
       ],
       "brief": "Simple comparative with -ший/-іший (дешевий → дешевший, важливий → важливіший), the consonant changes in the common ones (дорогий → дорожчий, високий → вищий, солодкий → солодший), and the superlative with най- (найдешевший). Suppletive pairs to memorise: великий – більший – найбільший, малий – менший – найменший, добрий – кращий, поганий – гірший. At this level compare with ніж only (Ця сумка дешевша, ніж та); за/від come at B1. Weights and measures with the genitive (кілограм яблук, літр молока). Dutch -er/-st maps closely; English learners tend to overuse більш."
+    },
+    {
+      "id": "a2-29",
+      "icon": "📡",
+      "title": {
+        "en": "Stronger, weaker, further",
+        "nl": "Sterker, zwakker, verder"
+      },
+      "grammar": {
+        "en": "Comparative and superlative applied to signals and range",
+        "nl": "Vergrotende en overtreffende trap bij signalen en bereik"
+      },
+      "theme": {
+        "en": "Work: assessing signal and coverage",
+        "nl": "Werk: signaal en dekking beoordelen"
+      },
+      "focus": [
+        "потужність",
+        "дальність",
+        "сигнал",
+        "шум",
+        "сильніший",
+        "слабший",
+        "найкращий канал",
+        "далі"
+      ],
+      "brief": "Comparison from a2-19 in the vocabulary of signal assessment: сигнал сильніший / слабший, ніж учора; шум більший; дальність менша; найкращий канал, найпотужніший передавач; adverbs далі, ближче, краще, гірше. Sentences an operator says when comparing two positions, two antennas or two channels, with ніж + nominative (the за/від options come at B1, do not use them). Words: take them first from the learner's own work vocabulary, the theme 'ew' at the end of src/data/vocab-uk.js (rows ending in 'ew']: radio, radar, jamming, spectrum, drones, command, radio procedure); reuse at least 10 of those exact dictionary forms so they share the schedule, and add at most 4 new words. The learner works in electronic warfare / electromagnetic spectrum operations and wants to talk about it in Ukrainian with colleagues; keep sentences realistic for a staff officer or operator (no fiction, no heroics).",
+      "level": "A2",
+      "track": "ew",
+      "standard": [
+        "Ступені порівняння прикметників, проста форма вищого ступеня",
+        "Проста форма найвищого ступеня",
+        "Суплетивні форми: великий – більший, найбільший; малий – менший, найменший"
+      ]
     },
     {
       "id": "a2-20",
@@ -2416,6 +2658,42 @@
       "brief": "A fuller set of location prepositions with the genitive (серед, посеред, недалеко від, справа/зліва від, навпроти, біля) and the instrumental set extended to landscapes (між горами, над річкою, за містом). Masculine soft nouns (кінь – коня – конем, велетень) and the hard-stem set with place and personal names (Лондон, континент, Валентин, Лев – Лева). Neuter -о nouns (відро, гроно). Scenario: describing a town, its surroundings and how to find a landmark. Learner has біля/навпроти (a2-07) and над/під/між (a2-13)."
     },
     {
+      "id": "b1-31",
+      "icon": "📡",
+      "title": {
+        "en": "Where the emitter is",
+        "nl": "Waar de zender staat"
+      },
+      "grammar": {
+        "en": "Place and distance: за 5 км на північ від + genitive, між + instrumental; numerals with кілометр",
+        "nl": "Plaats en afstand: за 5 км на північ від + genitief, між + instrumentalis; telwoorden met кілометр"
+      },
+      "theme": {
+        "en": "Work: locating an emitter",
+        "nl": "Werk: een zender lokaliseren"
+      },
+      "focus": [
+        "джерело випромінювання",
+        "пеленгування",
+        "пеленг",
+        "азимут",
+        "координати",
+        "північ",
+        "кілометр",
+        "недалеко від"
+      ],
+      "brief": "Reporting where a source of emission is: distance and direction with за + accusative of distance and на північ / південь / схід / захід від + genitive (b1-17), між + instrumental, недалеко від, посеред; numerals with кілометр / метр (b1-09: два кілометри, п'ять кілометрів); bearings as plain numbers (азимут сто двадцять). Explain the difference between пеленг (a bearing you measured) and азимут (a direction on the map) in one line. Words: take them first from the learner's own work vocabulary, the theme 'ew' at the end of src/data/vocab-uk.js (rows ending in 'ew']: radio, radar, jamming, spectrum, drones, command, radio procedure); reuse at least 10 of those exact dictionary forms so they share the schedule, and add at most 4 new words. The learner works in electronic warfare / electromagnetic spectrum operations and wants to talk about it in Ukrainian with colleagues; keep sentences realistic for a staff officer or operator (no fiction, no heroics).",
+      "level": "B1",
+      "track": "ew",
+      "standard": [
+        "РОДОВИЙ з БІЛЯ, СЕРЕД, НЕДАЛЕКО ВІД, СПРАВА/ЗЛІВА ВІД, НАВПРОТИ, ПОСЕРЕД — місце",
+        "ОРУДНИЙ з НАД,ПІД,ПЕРЕД,ЗА,МІЖ — місце, extended",
+        "Чол. р. м'яка основа (ь, й)",
+        "Сер. р. (-о)",
+        "Чол. р. тверда основа, розширений список"
+      ]
+    },
+    {
       "id": "b1-18",
       "level": "B1",
       "icon": "🖼️",
@@ -2527,6 +2805,41 @@
       "brief": "Dative of the addressee with писати, надсилати, відповідати (пишу батькам, відповідаю колезі — г → з before -і), and the dative plural -ам/-ям. Vocative of masculine nouns ending in г/к/х (друг – друже, козак – козаче) combined with an imperative (Максиме, напиши!). Two registers side by side: a formal letter (Шановний пане директоре, capital Ви, З повагою) versus an informal message (Привіт, Олю! Цілую). Dutch u/jij maps well; English learners must learn the capital Ви and the fixed closing formulas."
     },
     {
+      "id": "b1-32",
+      "icon": "📡",
+      "title": {
+        "en": "Reporting a contact",
+        "nl": "Een contact melden"
+      },
+      "grammar": {
+        "en": "The report: dative addressee (доповідаю командирові), formal register, time and place in one sentence",
+        "nl": "Het rapport: datief van de geadresseerde (доповідаю командирові), formeel register, tijd en plaats in één zin"
+      },
+      "theme": {
+        "en": "Work: the spoken and written report",
+        "nl": "Werk: de mondelinge en schriftelijke melding"
+      },
+      "focus": [
+        "доповідати",
+        "доповідь",
+        "командир",
+        "штаб",
+        "виявлення",
+        "виявити",
+        "о десятій тридцять",
+        "у районі"
+      ],
+      "brief": "How a contact report is built: Доповідаю (кому? dative from b1-20: командирові, начальникові штабу), what (виявлено / виявив сигнал, працює РЛС), when (о + locative hour, b1-08 accusative of duration: протягом години), where (у районі + genitive, за + distance from b1-31). Formal vs informal: the written report with nouns (виявлення, робота станції) vs the spoken one with verbs. Six to eight model sentences a Dutch officer could say on a Ukrainian net. Words: take them first from the learner's own work vocabulary, the theme 'ew' at the end of src/data/vocab-uk.js (rows ending in 'ew']: radio, radar, jamming, spectrum, drones, command, radio procedure); reuse at least 10 of those exact dictionary forms so they share the schedule, and add at most 4 new words. The learner works in electronic warfare / electromagnetic spectrum operations and wants to talk about it in Ukrainian with colleagues; keep sentences realistic for a staff officer or operator (no fiction, no heroics).",
+      "level": "B1",
+      "track": "ew",
+      "standard": [
+        "ДАВАЛЬНИЙ — адресат дії",
+        "КЛИЧНИЙ — адресат-суб'єкт, що потенційно виконує волю мовця",
+        "Чергування [к], [х], [г] з [ч], [ш], [ж] у кличному відмінку",
+        "Офіційна і неофіційна тональності спілкування"
+      ]
+    },
+    {
       "id": "b1-21",
       "level": "B1",
       "icon": "🎊",
@@ -2601,6 +2914,43 @@
         "парламент"
       ],
       "brief": "Make action nouns with -ння/-ття (читання, говоріння, бачення, голосування) and place nouns with -льня (спальня, приймальня, читальня, вітальня). Masculine nouns in -анин/-янин lose -ин in the plural (громадянин – громадяни, киянин – кияни) and nouns in -ець/-ень drop the е (українець – українця, хлопець – хлопця, червень – червня). за + accusative with боротися, молитися, голосувати (боротися за свободу, молитися за мир). Scenario: talking about elections, institutions, war and peace at B1 level of abstraction."
+    },
+    {
+      "id": "b1-34",
+      "icon": "📋",
+      "title": {
+        "en": "The agenda and the minutes",
+        "nl": "De agenda en de notulen"
+      },
+      "grammar": {
+        "en": "Verbal nouns in an agenda (обговорення, затвердження, рішення); genitive chains (протокол наради відділу)",
+        "nl": "Werkwoordelijke naamwoorden in een agenda (обговорення, затвердження, рішення); genitiefketens (протокол наради відділу)"
+      },
+      "theme": {
+        "en": "Work: running a meeting",
+        "nl": "Werk: een vergadering leiden"
+      },
+      "focus": [
+        "порядок денний",
+        "протокол",
+        "обговорення",
+        "затвердження",
+        "рішення",
+        "пункт",
+        "відповідальний",
+        "термін виконання",
+        "Переходимо до наступного пункту."
+      ],
+      "brief": "Build on b1-22 (nouns from verbs) and b1-04 (genitive of attribute): the language of an agenda and minutes is nominal (обговорення бюджету, затвердження плану, розподіл завдань) and stacks genitives (протокол наради відділу планування). Then the chair's spoken phrases: Починаємо; переходимо до наступного пункту; хто відповідальний?; термін — до п'ятниці; записуємо рішення. Contrast the written nominal style with the spoken verbal one in one paragraph. The learner works in a Dutch defence organisation with Ukrainian colleagues and partners; office situations should be realistic for a staff officer (meetings, email, planning), neutral in tone, with ви forms unless colleagues are clearly on ти terms.",
+      "level": "B1",
+      "track": "work",
+      "standard": [
+        "Утворення іменників від дієслів",
+        "Утворення іменників-назв місць за дією: спати – спальня, приймати – приймальня, читати – читальня, вітати – вітальня",
+        "Чол. р. на –ин (-анин, -янин)",
+        "Чол. р. на –ець, –ень: хлопець, червень, українець, пень",
+        "ЗНАХІДНИЙ з ЗА,ПРО — об'єктні відношення"
+      ]
     },
     {
       "id": "b1-23",
@@ -2822,6 +3172,41 @@
       "brief": "Purpose clauses with щоб + past tense when subjects differ (Я прошу, щоб ви прийшли) beside щоб + infinitive from a2-24 (ходимо в музеї, щоб краще знати історію). Causes expressed by prepositions: через + accusative for an obstacle or blame (через хворобу, через погану погоду) and від/з + genitive for an emotional cause (від сорому, з радості). Concessive clauses with хоч, дарма що, незважаючи на те що, always with a comma. Scenario: giving and justifying an opinion on a social problem (по-перше…, по-друге…). Dutch \"hoewel/ondanks\" and English \"although/despite\" map directly; the case after через is what learners miss."
     },
     {
+      "id": "b1-35",
+      "icon": "🙏",
+      "title": {
+        "en": "Could you…? Asking colleagues",
+        "nl": "Zou u…? Collega's iets vragen"
+      },
+      "grammar": {
+        "en": "Polite requests: чи не могли б ви, я хотів би, щоб + past; softening an imperative; deadlines with до + genitive",
+        "nl": "Beleefde verzoeken: чи не могли б ви, я хотів би, щоб + verleden tijd; een gebiedende wijs verzachten; deadlines met до + genitief"
+      },
+      "theme": {
+        "en": "Work: requests, help and deadlines",
+        "nl": "Werk: verzoeken, hulp en deadlines"
+      },
+      "focus": [
+        "Чи не могли б ви…",
+        "Я хотів би попросити…",
+        "Будьте ласкаві",
+        "надіслати",
+        "переглянути",
+        "до кінця тижня",
+        "якомога швидше",
+        "допомогти"
+      ],
+      "brief": "Politeness built from the conditional (b1-27: чи не могли б ви надіслати…, я хотів би попросити вас…), purpose/request clauses with щоб + past (b1-28: Прошу, щоб ви переглянули документ), and the softened imperative (Надішліть, будь ласка; Будьте ласкаві, перегляньте). Deadlines: до + genitive (до п'ятниці, до кінця тижня), не пізніше + genitive, якомога швидше. Show the scale from blunt to very polite with the same request in four versions. The learner works in a Dutch defence organisation with Ukrainian colleagues and partners; office situations should be realistic for a staff officer (meetings, email, planning), neutral in tone, with ви forms unless colleagues are clearly on ти terms.",
+      "level": "B1",
+      "track": "work",
+      "standard": [
+        "Складнопідрядні з підрядною мети (щоб)",
+        "Складнопідрядні з допустовою частиною (хоч, дарма що, незважаючи на те що)",
+        "ЗНАХІДНИЙ з ЧЕРЕЗ — причина дії/бездіяльності",
+        "РОДОВИЙ з ВІД, З — причина"
+      ]
+    },
+    {
       "id": "b1-29",
       "level": "B1",
       "icon": "📎",
@@ -2852,6 +3237,38 @@
         "відкритий"
       ],
       "brief": "Passive past participles in -ний/-тий behave like adjectives and agree with the noun (екскурсія, організована для учасників; лист, написаний другом; двері, зачинені), set off by commas when they follow it. Adverbial participles: imperfective -учи/-ючи/-ачи (читаючи = while reading) and perfective -вши/-ши (повернувшись = having returned), always with the same subject as the main verb — a rule English dangling participles break. Scenario: writing up an excursion. These are written-register tools; show the spoken alternatives with коли / який."
+    },
+    {
+      "id": "b1-33",
+      "icon": "📡",
+      "title": {
+        "en": "If they jam us",
+        "nl": "Als ze ons storen"
+      },
+      "grammar": {
+        "en": "Real and unreal conditions on the net; participles as adjectives: виявлений, заглушений, перехоплений",
+        "nl": "Reële en irreële voorwaarden op het net; deelwoorden als bijvoeglijk naamwoord: виявлений, заглушений, перехоплений"
+      },
+      "theme": {
+        "en": "Work: contingencies and the signal picture",
+        "nl": "Werk: wat als, en het signaalbeeld"
+      },
+      "focus": [
+        "якщо противник глушитиме",
+        "запасна частота",
+        "перейти на",
+        "виявлений сигнал",
+        "заглушений канал",
+        "перехоплене повідомлення",
+        "зашифрований"
+      ],
+      "brief": "Combine b1-27 (якщо + future for a plan, якби + past for a hypothetical) with b1-29 (passive participles used as adjectives) in EW situations: Якщо противник глушитиме основну частоту, перейдемо на запасну; Якби ми мали другий пеленгатор, визначили б координати точніше; виявлений сигнал, заглушений канал, перехоплене повідомлення, зашифрований зв'язок. Make the participle formation explicit for these verbs (виявити → виявлений, заглушити → заглушений, перехопити → перехоплений, зашифрувати → зашифрований). Words: take them first from the learner's own work vocabulary, the theme 'ew' at the end of src/data/vocab-uk.js (rows ending in 'ew']: radio, radar, jamming, spectrum, drones, command, radio procedure); reuse at least 10 of those exact dictionary forms so they share the schedule, and add at most 4 new words. The learner works in electronic warfare / electromagnetic spectrum operations and wants to talk about it in Ukrainian with colleagues; keep sentences realistic for a staff officer or operator (no fiction, no heroics).",
+      "level": "B1",
+      "track": "ew",
+      "standard": [
+        "Просте ускладнене речення з дієприкметниковим зворотом",
+        "Просте ускладнене речення з дієприслівниковим зворотом"
+      ]
     },
     {
       "id": "b1-30",
@@ -3071,6 +3488,39 @@
         "дедлайн"
       ],
       "brief": "Official time (о дванадцятій тридцять) and the colloquial system: пів на восьму = 7:30 (exactly Dutch \"half acht\"; English speakers must not read it as 8:30), чверть на третю = 2:15, за двадцять шоста = 5:40, двадцять по шостій = 6:20. Dates: nominative for naming the day (Сьогодні перше вересня), genitive for \"on\" (першого вересня) and after prepositions (після двадцять восьмого лютого, з першого до десятого травня). Standard abbreviations in business texts (год., р., ст., хв.). Scenario: setting up meetings and deadlines by email and phone."
+    },
+    {
+      "id": "b2-26",
+      "icon": "📡",
+      "title": {
+        "en": "Numbers in the spectrum",
+        "nl": "Getallen in het spectrum"
+      },
+      "grammar": {
+        "en": "Numerals in oblique cases: на частоті ста сорока п'яти мегагерців; bearings and times",
+        "nl": "Telwoorden in verbogen naamvallen: на частоті ста сорока п'яти мегагерців; peilingen en tijden"
+      },
+      "theme": {
+        "en": "Work: precise frequencies, bearings, times",
+        "nl": "Werk: precieze frequenties, peilingen, tijden"
+      },
+      "focus": [
+        "на частоті",
+        "мегагерців",
+        "азимут",
+        "градус",
+        "о пів на четверту",
+        "за двадцять шоста",
+        "з 06:00 до 18:00"
+      ],
+      "brief": "The declension of numerals from b2-04 and the clock from b2-05, applied where an EW officer actually needs them: на частоті (locative) + genitive numeral phrase (ста сорока п'яти мегагерців), в діапазоні від … до … (genitive), азимут + nominative number, з … до … for operating hours, о пів на четверту / за двадцять шоста for a comms window. Spell every number out in words at least once next to its digits. Words: take them first from the learner's own work vocabulary, the theme 'ew' at the end of src/data/vocab-uk.js (rows ending in 'ew']: radio, radar, jamming, spectrum, drones, command, radio procedure); reuse at least 10 of those exact dictionary forms so they share the schedule, and add at most 4 new words. The learner works in electronic warfare / electromagnetic spectrum operations and wants to talk about it in Ukrainian with colleagues; keep sentences realistic for a staff officer or operator (no fiction, no heroics).",
+      "level": "B2",
+      "track": "ew",
+      "standard": [
+        "Відмінювання числівників на позначення часу",
+        "Відмінювання числівників для позначення дати",
+        "Скорочення (частково)"
+      ]
     },
     {
       "id": "b2-06",
@@ -3322,6 +3772,40 @@
         "свідок"
       ],
       "brief": "Ukrainian often leaves out the subject on purpose: 3rd-person plural without an agent for \"they/someone\" (повідомили, затримали, кажуть — the main way to render the English passive \"he was arrested\"); impersonal sentences with a neuter past or an -о/-е predicate (було приємно, темніє, треба, можна, не можна); and 1st/2nd person sentences where the ending identifies the subject (Іду повз пам'ятник). Dutch \"men / er wordt\" and English passives both map onto the indefinite-personal type. Scenario: understanding and retelling a police report or news item, with vocabulary for rights and procedure."
+    },
+    {
+      "id": "b2-27",
+      "icon": "📡",
+      "title": {
+        "en": "The operations report",
+        "nl": "Het operationeel rapport"
+      },
+      "grammar": {
+        "en": "One-part sentences in reports: зафіксовано, виявлено (impersonal), повідомили (indefinite-personal)",
+        "nl": "Eendelige zinnen in rapporten: зафіксовано, виявлено (onpersoonlijk), повідомили (onbepaald-persoonlijk)"
+      },
+      "theme": {
+        "en": "Work: the written situation report",
+        "nl": "Werk: de schriftelijke situatiemelding"
+      },
+      "focus": [
+        "зафіксовано роботу РЛС",
+        "виявлено",
+        "повідомили про",
+        "обстановка",
+        "засоби РЕБ",
+        "противник",
+        "втрата зв'язку",
+        "протягом доби"
+      ],
+      "brief": "The register of a written situation report, with the one-part sentences from b2-12: impersonal -но/-то forms (зафіксовано роботу двох РЛС, виявлено нове джерело, зв'язок відновлено) and indefinite-personal plurals (повідомили про втрату зв'язку, зафіксували спроби глушіння). Show the nominalised style (робота станції, втрата зв'язку, застосування засобів РЕБ) against the spoken verb style, and the standard order of a report: time, place, what, assessment. Words: take them first from the learner's own work vocabulary, the theme 'ew' at the end of src/data/vocab-uk.js (rows ending in 'ew']: radio, radar, jamming, spectrum, drones, command, radio procedure); reuse at least 10 of those exact dictionary forms so they share the schedule, and add at most 4 new words. The learner works in electronic warfare / electromagnetic spectrum operations and wants to talk about it in Ukrainian with colleagues; keep sentences realistic for a staff officer or operator (no fiction, no heroics).",
+      "level": "B2",
+      "track": "ew",
+      "standard": [
+        "Односкладне, неозначено-особові",
+        "Односкладне, безособові",
+        "ОДНОСКЛАДНЕ РЕЧЕННЯ, означено-особові"
+      ]
     },
     {
       "id": "b2-13",
@@ -3578,6 +4062,40 @@
       "brief": "Systematise reported speech: statement → що, yes/no question → чи (Я запитав, чи є товар), a question with a question word keeps it, command or request → щоб + past tense; shift pronouns and time words (сьогодні → того дня) but never tenses. від + genitive for the source of a message or a return from a person (лист від постачальника, прийшов від менеджера) beside з/із/зі for places. по + locative for relations (колеги по роботі, товариші по навчанню). Scenario: a written complaint about an online order, quoting what customer service said. Learner has b1-30."
     },
     {
+      "id": "b2-30",
+      "icon": "📧",
+      "title": {
+        "en": "Decisions and deadlines by email",
+        "nl": "Besluiten en deadlines per e-mail"
+      },
+      "grammar": {
+        "en": "The formal email: address and closing, reported decisions (вирішили, що; погодили), passive and impersonal forms, до / не пізніше + genitive",
+        "nl": "De formele e-mail: aanhef en afsluiting, gerapporteerde besluiten (вирішили, що; погодили), passieve en onpersoonlijke vormen, до / не пізніше + genitief"
+      },
+      "theme": {
+        "en": "Work: written follow-up after a meeting",
+        "nl": "Werk: schriftelijke opvolging na een vergadering"
+      },
+      "focus": [
+        "Шановний пане полковнику",
+        "З повагою",
+        "За результатами наради",
+        "погоджено",
+        "вирішили, що",
+        "прошу підтвердити",
+        "у додатку",
+        "не пізніше"
+      ],
+      "brief": "A follow-up email after a meeting: the formal frame (Шановний пане / Шановна пані + vocative, b1-20; З повагою), reporting what was decided with indirect speech (b2-19: вирішили, що…; домовилися, що…; погодили + accusative), impersonal -но/-то forms for outcomes (b2-12: затверджено, погоджено, перенесено), deadlines and attachments (у додатку, прошу підтвердити отримання, не пізніше + genitive). End with one complete model email of eight sentences, each sentence as its own entry. The learner works in a Dutch defence organisation with Ukrainian colleagues and partners; office situations should be realistic for a staff officer (meetings, email, planning), neutral in tone, with ви forms unless colleagues are clearly on ти terms.",
+      "level": "B2",
+      "track": "work",
+      "standard": [
+        "РОДОВИЙ з прийменниками ВІД (додатково до З,ІЗ,ЗІ) — початок руху",
+        "МІСЦЕВИЙ з ПО — означальна відносна характеристика об'єкта",
+        "Пряма і непряма мова — сполучники що, щоб, частка чи при заміні прямої мови непрямою (systematized as its own subsection at B2)"
+      ]
+    },
+    {
       "id": "b2-20",
       "level": "B2",
       "icon": "🍲",
@@ -3685,6 +4203,40 @@
       "brief": "Compound adjectives with a hyphen (equal parts: науково-пізнавальний, українсько-англійський) versus one word (subordinated: сільськогосподарський), and compound nouns in environmental vocabulary. Onomatopoeic verbs for animals and nature (нявкати, гавкати, дзижчати, дзюрчати). Masculine nouns ending in ж/ч/ш/щ, including place names (вуж – вужа – вужем, хрущ, Гадяч – у Гадячі), with -ем in the instrumental. Scenario: an opinion piece on pollution and protection of nature, using the connectors from b2-13."
     },
     {
+      "id": "b2-28",
+      "icon": "📡",
+      "title": {
+        "en": "Who does what: EW word formation",
+        "nl": "Wie doet wat: EOV-woordvorming"
+      },
+      "grammar": {
+        "en": "Agent and instrument nouns (-ник, -ач, -тор), compounds (радіоелектронний, широкосмуговий), -ість nouns",
+        "nl": "Handelende en instrumentnomina (-ник, -ач, -тор), samenstellingen (радіоелектронний, широкосмуговий), -ість-woorden"
+      },
+      "theme": {
+        "en": "Work: the terminology itself",
+        "nl": "Werk: de terminologie zelf"
+      },
+      "focus": [
+        "постановник перешкод",
+        "випромінювач",
+        "пеленгатор",
+        "підсилювач",
+        "радіоелектронний",
+        "широкосмуговий",
+        "завадозахищеність",
+        "скритність"
+      ],
+      "brief": "Take the word-formation units b2-15 and b2-22 into the EW lexicon: agent / instrument nouns (постановник, випромінювач, підсилювач, пеленгатор, оператор, ретранслятор), compounds with радіо-, електро-, широко-/вузько- (радіоелектронний, електромагнітний, широкосмуговий), abstract -ість nouns from adjectives (завадостійкий → завадостійкість, скритний → скритність, вразливий → вразливість), and the abbreviations РЕБ, РЕР, РЕП, РЛС, БпЛА with how they are read aloud and whether they decline. Sentences that define or compare terms, as in a briefing or a glossary. Words: take them first from the learner's own work vocabulary, the theme 'ew' at the end of src/data/vocab-uk.js (rows ending in 'ew']: radio, radar, jamming, spectrum, drones, command, radio procedure); reuse at least 10 of those exact dictionary forms so they share the schedule, and add at most 4 new words. The learner works in electronic warfare / electromagnetic spectrum operations and wants to talk about it in Ukrainian with colleagues; keep sentences realistic for a staff officer or operator (no fiction, no heroics).",
+      "level": "B2",
+      "track": "ew",
+      "standard": [
+        "Складні слова",
+        "Звуконаслідування",
+        "Чол. р. на ж, ч, щ, ш, incl. proper names"
+      ]
+    },
+    {
       "id": "b2-23",
       "level": "B2",
       "icon": "🔬",
@@ -3759,6 +4311,72 @@
         "дезінформація"
       ],
       "brief": "Discourse markers for a structured argument (по-перше…, по-друге…, крім того, з одного боку… з іншого боку, отже, таким чином, нарешті), their punctuation and their informal substitutes. Masculine nouns in -ар/-яр and the hard/soft split in their declension (календар – календаря, газетяр – газетяра, парламентар, ліхтар; place names Катар – у Катарі). Scenario: writing a structured opinion piece or a long comment on social media about the role of the press, fake news and influencers. Learner has the argument connectors of b1-28 and b2-13."
+    },
+    {
+      "id": "b2-29",
+      "icon": "📡",
+      "title": {
+        "en": "Briefing the allies",
+        "nl": "De bondgenoten briefen"
+      },
+      "grammar": {
+        "en": "Reported speech and discourse markers in a briefing: повідомили, що…; по-перше… отже…",
+        "nl": "Indirecte rede en structuurwoorden in een briefing: повідомили, що…; по-перше… отже…"
+      },
+      "theme": {
+        "en": "Work: the briefing and the debrief",
+        "nl": "Werk: de briefing en de debriefing"
+      },
+      "focus": [
+        "союзники повідомили, що",
+        "за даними розвідки",
+        "по-перше",
+        "отже",
+        "таким чином",
+        "слід очікувати",
+        "рекомендую",
+        "взаємодія"
+      ],
+      "brief": "A spoken briefing to allied officers: reported speech from b2-19 (Оператор доповів, що…; Штаб запитав, чи…; Командир наказав, щоб…), the discourse markers from b2-24 (по-перше, по-друге, крім того, отже, таким чином, підсумовуючи), hedging and assessment (за даними розвідки, слід очікувати, ймовірно), and a recommendation (рекомендую + infinitive / щоб). End with a short model briefing of six to eight sentences, split into separate sentence entries. Words: take them first from the learner's own work vocabulary, the theme 'ew' at the end of src/data/vocab-uk.js (rows ending in 'ew']: radio, radar, jamming, spectrum, drones, command, radio procedure); reuse at least 10 of those exact dictionary forms so they share the schedule, and add at most 4 new words. The learner works in electronic warfare / electromagnetic spectrum operations and wants to talk about it in Ukrainian with colleagues; keep sentences realistic for a staff officer or operator (no fiction, no heroics).",
+      "level": "B2",
+      "track": "ew",
+      "standard": [
+        "Елементи структурування тексту (вставні слова)",
+        "Чол. р. на –ар/–яр, incl. proper names"
+      ]
+    },
+    {
+      "id": "b2-31",
+      "icon": "🗣️",
+      "title": {
+        "en": "Feedback and presenting",
+        "nl": "Feedback geven en presenteren"
+      },
+      "grammar": {
+        "en": "Hedging and discourse markers in feedback and a presentation: мені здається, варто було б, по-перше, перейдімо до",
+        "nl": "Afzwakken en structuurwoorden bij feedback en een presentatie: мені здається, варто було б, по-перше, перейдімо до"
+      },
+      "theme": {
+        "en": "Work: feedback and the slide deck",
+        "nl": "Werk: feedback en de presentatie"
+      },
+      "focus": [
+        "мені здається",
+        "варто було б",
+        "з одного боку, з іншого боку",
+        "на цьому слайді",
+        "перейдімо до",
+        "підсумовуючи",
+        "пропоную",
+        "зауваження"
+      ],
+      "brief": "Giving feedback without offending: hedges (мені здається, можливо, варто було б + infinitive, я б запропонував), balance (з одного боку… з іншого боку…), the -мо imperative for moving a presentation along (b2-16: перейдімо до наступного слайда, розгляньмо), discourse markers (b2-24), and the vocabulary of a slide deck (слайд, графік, таблиця, висновок, зауваження, пропозиція). Include a short model: three feedback sentences and five presentation sentences. The learner works in a Dutch defence organisation with Ukrainian colleagues and partners; office situations should be realistic for a staff officer (meetings, email, planning), neutral in tone, with ви forms unless colleagues are clearly on ти terms.",
+      "level": "B2",
+      "track": "work",
+      "standard": [
+        "Елементи структурування тексту (вставні слова)",
+        "Чол. р. на –ар/–яр, incl. proper names"
+      ]
     },
     {
       "id": "b2-25",
