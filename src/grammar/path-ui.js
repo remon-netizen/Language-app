@@ -14,7 +14,7 @@ import { POS_LABEL } from '../data/vocab-uk.js';
 import { LEVELS, UNITS, unitsOf, getUnit, unitIndex, nextUnit } from '../data/path/index.js';
 import { unitItems, entryOf, recordItem, regradeItem, dueItems, pathStats, unitProgress, unitState, markUnitStep, unitDone, unitStarted, nextOpenUnit, STEPS } from '../data/path-progress.js';
 import { meaning, gradeMeaning } from './vocab-drill-ui.js';
-import { runSession } from './course-engine.js';
+import { runSession, dueCount } from './course-engine.js';
 import { L, loc, shuffle, grade, normalise, wireSpeakButtons } from './drill-core.js';
 
 const COURSE = { icon: '🗺️', get name() { return L('Course path', 'Leerpad'); } };
@@ -55,6 +55,7 @@ function showMenu() {
   const st = pathStats();
   const doneCount = UNITS.filter(u => unitDone(u.id)).length;
   const cont = firstOpen();
+  const dueAll = dueCount();
   const level = LEVELS.find(l => l.id === pt.level);
   const units = unitsOf(pt.level);
 
@@ -93,8 +94,9 @@ function showMenu() {
     ${cont ? `<button class="pt-continue" id="ptContinue">
       <span class="pt-continue-icon">${cont.icon}</span>
       <span><span class="pt-continue-title">▶ ${unitStarted(cont.id) ? L('Continue', 'Verder') : L('Start', 'Start')}: ${escHtml(unitName(cont))}</span><br>
-      <span class="pt-continue-sub">${escHtml(loc(cont.grammar))}</span></span>
+      <span class="pt-continue-sub">${escHtml(loc(cont.grammar))}${dueAll ? ` · 🔁 ${dueAll} ${L('due, warm-up first', 'aan de beurt, eerst opwarmen')}` : ''}</span></span>
     </button>` : `<div class="pt-empty">🎉 ${L('Every unit is done.', 'Alle units zijn klaar.')}</div>`}
+    ${practisePool().length ? `<button class="vc-browse-btn pt-practise" id="ptPractise">✍️ ${L('Practise what you learned', 'Oefen wat je geleerd hebt')} · ${L('20 exercises from finished units', '20 oefeningen uit afgeronde units')}</button>` : ''}
 
     <div class="pt-section-label">${L('Level', 'Niveau')}</div>
     <div class="pt-level-row">${LEVELS.map(levelBtn).join('')}</div>
@@ -108,6 +110,7 @@ function showMenu() {
   s.querySelectorAll('[data-level]').forEach(b => b.addEventListener('click', () => { pt.level = b.dataset.level; savePrefs(); showMenu(); }));
   s.querySelectorAll('[data-unit]').forEach(b => b.addEventListener('click', () => showUnit(getUnit(b.dataset.unit))));
   s.querySelector('#ptContinue')?.addEventListener('click', () => { pt.level = cont.level; savePrefs(); showUnit(cont); });
+  s.querySelector('#ptPractise')?.addEventListener('click', startPractise);
   s.scrollTo({ top: 0 });
 }
 
@@ -154,6 +157,7 @@ function showUnit(unit) {
   const items = unitItems(unit);
   const st = unitState(unit.id);
   const next = nextUnit(unit);
+  const due = dueCount();
   const action = (id, icon, title, sub, step, primary = false) => `
     <button class="pt-action ${primary ? 'pt-action-primary' : ''} ${step && st[step] ? 'done' : ''}" id="${id}">
       <span class="pt-action-icon">${icon}</span>
@@ -197,6 +201,10 @@ function showUnit(unit) {
         </div>`).join('')}
     </div>
 
+    ${due ? `<button class="pt-due-row" id="ptDue">
+      <span>🔁 ${due} ${L('due across your courses', 'aan de beurt in je cursussen')}</span>
+      <span class="pt-due-hint">${L('Each step starts with a warm-up of up to 8 · tap for a full round', 'Elke stap begint met een opwarmer van max. 8 · tik voor een hele ronde')}</span>
+    </button>` : ''}
     <div class="pt-section-label">${L('Practise', 'Oefenen')}</div>
     <div class="pt-actions">
       ${action('ptWords', '🧠', L('Learn the words', 'Leer de woorden'), `${items.words.length} ${L('words · shown, then typed both ways', 'woorden · eerst zien, dan beide kanten typen')}`, 'words')}
@@ -213,6 +221,7 @@ function showUnit(unit) {
   s.querySelector('#ptExercises').addEventListener('click', () => startStep(unit, 'exercises'));
   s.querySelector('#ptAll').addEventListener('click', () => startStep(unit, 'all'));
   s.querySelector('#ptNext')?.addEventListener('click', () => showUnit(next));
+  s.querySelector('#ptDue')?.addEventListener('click', () => window.startReviewAll());
   s.scrollTo({ top: 0 });
 }
 
@@ -371,7 +380,7 @@ function startStep(unit, step) {
   if (!cards.length) { showUnit(unit); return; }
   const done = step === 'all' ? STEPS : [step];
   runSession({
-    screen: getScreen(), icon: unit.icon, title: `${unit.level} · ${unitIndex(unit)} · ${stepName(step)}`, accent: ACCENT, cards,
+    screen: getScreen(), icon: unit.icon, title: `${unit.level} · ${unitIndex(unit)} · ${stepName(step)}`, accent: ACCENT, cards, warmUp: 8,
     onExit: () => showUnit(unit),
     scoreSubtitle: () => unitName(unit),
     // The step is done once the round ends; offer the next step, or the next unit.
@@ -383,6 +392,21 @@ function startStep(unit, step) {
       const next = nextUnit(unit);
       return next ? { label: `→ ${L('Next unit', 'Volgende unit')}: ${loc(next.title)}`, run: () => showUnit(next) } : null;
     },
+  });
+}
+
+// ── Practise what you learned ────────────────────────────────────────────────
+// The exercises of units whose exercise step is done, as a mixed round. They are
+// not scheduled (the words and sentences are), so this is the free practice.
+const practisePool = () => UNITS.filter(u => unitState(u.id).exercises).flatMap(u => u.exercises.map(x => ({ x, unit: u })));
+function startPractise() {
+  const pool = practisePool();
+  if (!pool.length) { showMenu(); return; }
+  const cards = shuffle(pool).slice(0, 20).map(({ x, unit }) => ({ ...exerciseCard(x), course: { icon: unit.icon, name: unitName(unit) } }));
+  runSession({
+    screen: getScreen(), icon: '✍️', title: L('Practise what you learned', 'Oefen wat je geleerd hebt'), accent: ACCENT, cards, mixed: true,
+    onExit: showMenu,
+    again: () => ({ label: '🔄 ' + L('Another round', 'Nog een ronde'), run: startPractise }),
   });
 }
 

@@ -88,6 +88,9 @@
 .pt-sentence-native { color: var(--gray); font-size: 0.86rem; margin-top: 2px; }
 .pt-sentence-note { font-size: 0.8rem; color: #115e59; margin-top: 4px; }
 
+.pt-due-row { display: flex; flex-direction: column; gap: 2px; width: 100%; padding: 10px 14px; margin-top: 12px; border: 2px solid #fdba74; border-radius: 12px; background: #fff7ed; color: #9a3412; font-family: inherit; font-size: 0.88rem; font-weight: 700; text-align: left; cursor: pointer; }
+.pt-due-hint { font-size: 0.72rem; font-weight: 600; color: #c2410c; }
+.pt-practise { margin-bottom: 12px; }
 .pt-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 14px 0; }
 .pt-action {
   display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 14px 10px;

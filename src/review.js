@@ -20,7 +20,7 @@ import { verbDueCards } from './grammar/verb-drill-ui.js';
 import { caseDueCards } from './grammar/case-drill-ui.js';
 import { prefixDueCards } from './grammar/prefix-drill-ui.js';
 import { pathDueCards } from './grammar/path-ui.js';
-import { runSession } from './grammar/course-engine.js';
+import { runSession, registerDueSource } from './grammar/course-engine.js';
 import { L, shuffle } from './grammar/drill-core.js';
 
 function getScreen() { return document.getElementById('reviewScreen'); }
@@ -64,22 +64,71 @@ export const getCourseDue = () => activeCourses().reduce((n, c) => n + c.stats()
 // Everything waiting, for the home badge and the Today card.
 export const getDueTotal = () => getCourseDue();
 
+// Sessions that teach something new start with a few of these (course-engine warm-up).
+registerDueSource({ cards: () => activeCourses().flatMap(c => c.dueCards()), count: getCourseDue });
+
+// ── Catch-up ─────────────────────────────────────────────────────────────────
+// After a break the queue can be hundreds deep. Catch-up spreads it: the learner
+// takes a daily share (the queue over seven days) and the rest simply waits;
+// nothing is rescheduled. { date, share, done } under 'reviewCatchUp'.
+const CATCH_KEY = 'reviewCatchUp';
+const CATCH_FROM = 100, CATCH_DAYS = 7;
+const today = () => new Date().toISOString().slice(0, 10);
+function catchUp() {
+  try { const c = JSON.parse(localStorage.getItem(CATCH_KEY)); return c && c.date === today() ? c : null; } catch { return null; }
+}
+const saveCatchUp = c => localStorage.setItem(CATCH_KEY, JSON.stringify(c));
+export function startCatchUp() { saveCatchUp({ date: today(), share: Math.ceil(getCourseDue() / CATCH_DAYS), done: 0 }); }
+function stopCatchUp() { localStorage.removeItem(CATCH_KEY); }
+// How many the mixed round may take right now: the daily share left, or the usual cap.
+function roundSize() {
+  const c = catchUp();
+  return c ? Math.max(0, Math.min(REVIEW_ROUND, c.share - c.done)) : REVIEW_ROUND;
+}
+function countDone(n) { const c = catchUp(); if (c) saveCatchUp({ ...c, done: c.done + n }); }
+
 // ── Sessions ─────────────────────────────────────────────────────────────────
 
 const REVIEW_ROUND = 30;
 
 export function startReviewAll() {
   showScreen('reviewScreen');
+  const cards = shuffle(activeCourses().flatMap(c => c.dueCards())).slice(0, roundSize());
   runSession({
     screen: getScreen(), icon: '🔄', title: L('Review', 'Herhalen'), mixed: true,
-    cards: shuffle(activeCourses().flatMap(c => c.dueCards())).slice(0, REVIEW_ROUND),
+    cards,
     onExit: openReviewScreen,
-    again: () => { const left = getCourseDue(); return left ? { label: L(`🔄 Keep going: ${left} left`, `🔄 Verder: nog ${left}`), run: startReviewAll } : null; },
+    again: () => {
+      countDone(cards.length);
+      const left = getCourseDue(), c = catchUp();
+      if (c && c.done >= c.share) return left ? { label: L(`✓ Done for today · ${left} wait for tomorrow`, `✓ Klaar voor vandaag · ${left} wachten tot morgen`), run: openReviewScreen } : null;
+      return left ? { label: L(`🔄 Keep going: ${left} left`, `🔄 Verder: nog ${left}`), run: startReviewAll } : null;
+    },
   });
 }
+window.startCatchUp = () => { startCatchUp(); openReviewScreen(); };
+window.stopCatchUp = () => { stopCatchUp(); openReviewScreen(); };
 
 
 // ── The hub ──────────────────────────────────────────────────────────────────
+
+// The big review button, or the catch-up offer / state when the queue is deep.
+function catchUpHtml(courseDue, nl) {
+  const c = catchUp();
+  if (!courseDue) return `<button class="rv-all-btn" disabled><span class="rv-all-title">🔄 ${nl ? 'Niets aan de beurt' : 'Nothing due right now'}</span></button>`;
+  if (c) {
+    const left = Math.max(0, c.share - c.done);
+    const title = left ? (nl ? `🔄 Vandaag nog ${left} van je deel (${c.share})` : `🔄 ${left} of today's share (${c.share}) to go`) : (nl ? `✓ Klaar voor vandaag` : `✓ Done for today`);
+    const sub = nl ? `Inhalen: ${courseDue} aan de beurt, verdeeld over ${CATCH_DAYS} dagen. De rest wacht gewoon.` : `Catching up: ${courseDue} due, spread over ${CATCH_DAYS} days. The rest just waits.`;
+    return `<button class="rv-all-btn" ${left ? 'onclick="startReviewAll()"' : 'disabled'}><span class="rv-all-title">${title}</span><span class="rv-all-sub">${sub}</span></button>
+      <button class="rv-catch-link" onclick="stopCatchUp()">${nl ? 'Toch alles tonen' : 'Show everything anyway'}</button>`;
+  }
+  const offer = courseDue >= CATCH_FROM ? `<button class="rv-catch-btn" onclick="startCatchUp()">🗓️ ${nl ? `Veel ineens? Verdeel ${courseDue} over ${CATCH_DAYS} dagen (${Math.ceil(courseDue / CATCH_DAYS)} per dag)` : `A lot at once? Spread ${courseDue} over ${CATCH_DAYS} days (${Math.ceil(courseDue / CATCH_DAYS)} a day)`}</button>` : '';
+  return `<button class="rv-all-btn" onclick="startReviewAll()">
+      <span class="rv-all-title">🔄 ${nl ? `Herhaal alles: ${courseDue} aan de beurt` : `Review everything: ${courseDue} due`}</span>
+      <span class="rv-all-sub">${nl ? 'Alles wat aan de beurt is, door elkaar, in één ronde' : 'Everything that is due, mixed, in one round'}</span>
+    </button>${offer}`;
+}
 
 export function openReviewScreen() {
   showScreen('reviewScreen');
@@ -114,10 +163,7 @@ export function openReviewScreen() {
         <div class="lesson-subtitle">${nl ? 'Wat vandaag aan de beurt is' : 'What is due today'}</div>
       </div>
     </div>
-    <button class="rv-all-btn" ${courseDue ? 'onclick="startReviewAll()"' : 'disabled'}>
-      <span class="rv-all-title">🔄 ${courseDue ? (nl ? `Herhaal alles: ${courseDue} aan de beurt` : `Review everything: ${courseDue} due`) : (nl ? 'Niets aan de beurt' : 'Nothing due right now')}</span>
-      <span class="rv-all-sub">${nl ? 'Alles wat aan de beurt is, door elkaar, in één ronde' : 'Everything that is due, mixed, in one round'}</span>
-    </button>
+    ${catchUpHtml(courseDue, nl)}
     <div class="rv-hub">
       ${activeCourses().map(courseRow).join('')}
       ${!courseDue && words === 0 && activeCourses().every(c => c.stats().seen === 0) ? `

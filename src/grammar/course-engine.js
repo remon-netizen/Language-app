@@ -16,7 +16,7 @@ import { state } from '../state.js';
 import { escHtml } from '../utils.js';
 import { speakText } from '../voice.js';
 import { setupRecognition } from '../speech.js';
-import { L, resultLine, appendNext, missedListHtml, wireSpeakButtons, scoreMessage, scoreEmoji } from './drill-core.js';
+import { L, shuffle, resultLine, appendNext, missedListHtml, wireSpeakButtons, scoreMessage, scoreEmoji } from './drill-core.js';
 
 // ── Sessions ─────────────────────────────────────────────────────────────────
 // A card:
@@ -40,8 +40,25 @@ import { L, resultLine, appendNext, missedListHtml, wireSpeakButtons, scoreMessa
 
 const DEFAULT_ACCENT = { main: '#7c3aed', dark: '#5b21b6', soft: '#f5f3ff', border: '#c4b5fd' };
 
-export function runSession({ screen, icon, title, accent = DEFAULT_ACCENT, cards, mixed = false, onExit, again, scoreSubtitle }) {
+// ── Warm-up ──────────────────────────────────────────────────────────────────
+// A session that teaches something new starts with a few items that are due,
+// from every course: old material is kept alive inside what the learner wanted
+// to do anyway, without ever locking the new. review.js registers the source.
+let dueSource = null;
+export function registerDueSource(src) { dueSource = src; }   // { cards(): card[], count(): number }
+export const dueCount = () => (dueSource ? dueSource.count() : 0);
+
+function warmUpCards(n, own) {
+  if (!dueSource || n <= 0) return [];
+  const taken = new Set(own.map(c => c.key));
+  const due = dueSource.cards().filter(c => !taken.has(c.key));
+  return shuffle(due).slice(0, n).map(c => ({ ...c, warmup: true }));
+}
+
+export function runSession({ screen, icon, title, accent = DEFAULT_ACCENT, cards, mixed = false, warmUp = 0, onExit, again, scoreSubtitle }) {
   const s = screen;
+  const warm = warmUpCards(warmUp, cards);
+  if (warm.length) cards = [...warm, ...cards];
   const run = { current: 0, score: 0, answered: false, missed: [], keyHandler: null };
   s.style.setProperty('--ce-main', accent.main);
   s.style.setProperty('--ce-dark', accent.dark);
@@ -70,7 +87,8 @@ export function runSession({ screen, icon, title, accent = DEFAULT_ACCENT, cards
     s.innerHTML = `
       ${header(title, `<div class="ce-progress-wrap"><div class="ce-progress-bar" style="width:${pct}%"></div></div>
                        <div class="ce-progress-text">${run.current + 1} / ${cards.length}</div>`)}
-      ${mixed && card.course ? `<div class="ce-course-chip">${card.course.icon} ${escHtml(card.course.name)}</div>` : ''}
+      ${card.warmup ? `<div class="ce-course-chip ce-warmup-chip">🔁 ${L('Warm-up', 'Opwarmen')}${card.course ? ` · ${card.course.icon} ${escHtml(card.course.name)}` : ''}${run.current === warm.length - 1 ? ` · ${L('last one, then the new material', 'laatste, dan het nieuwe')}` : ''}</div>`
+        : mixed && card.course ? `<div class="ce-course-chip">${card.course.icon} ${escHtml(card.course.name)}</div>` : ''}
       ${card.promptHtml}
       ${isChoice ? `
         <div class="ce-options">

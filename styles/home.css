@@ -419,6 +419,8 @@
   cursor: pointer; font-family: inherit; min-height: 64px; box-shadow: 0 2px 12px rgba(124,58,237,0.25);
 }
 .rv-all-btn:hover:not(:disabled) { filter: brightness(1.08); }
+.rv-catch-btn { width: 100%; padding: 11px 14px; margin: -6px 0 12px; border: 2px solid #fdba74; border-radius: 12px; background: #fff7ed; color: #9a3412; font-size: 0.85rem; font-weight: 700; cursor: pointer; font-family: inherit; min-height: 44px; }
+.rv-catch-link { display: block; width: 100%; margin: -6px 0 12px; background: none; border: none; color: var(--gray); font-size: 0.78rem; text-decoration: underline; cursor: pointer; font-family: inherit; }
 .rv-all-btn:disabled { background: var(--card-bg); color: var(--gray); border: 2px dashed var(--border); box-shadow: none; cursor: default; }
 .rv-all-title { font-size: 1rem; font-weight: 800; }
 .rv-all-sub { font-size: 0.76rem; opacity: 0.85; }

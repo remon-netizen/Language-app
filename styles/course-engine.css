@@ -20,6 +20,7 @@
 .ce-progress-bar { height: 100%; background: rgba(255,255,255,0.85); border-radius: 4px; transition: width 0.3s ease; }
 .ce-progress-text { font-size: 0.7rem; color: rgba(255,255,255,0.75); }
 
+.ce-warmup-chip { background: #fff7ed; border-color: #fdba74; color: #9a3412; }
 .ce-course-chip {
   display: inline-block; margin: 0 0 8px 2px; padding: 3px 10px; border-radius: 999px;
   font-size: 0.74rem; font-weight: 700; color: var(--ce-dark); background: var(--ce-soft); border: 1px solid var(--ce-border);
