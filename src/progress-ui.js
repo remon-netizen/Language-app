@@ -86,6 +86,20 @@ export function openProgressScreen() {
       </div>
     </div>
 
+    <div class="pg-section">${L('Backup', 'Back-up')}</div>
+    <div class="pg-card pg-backup ${backupOld ? 'pg-backup-old' : ''}">
+      <span class="pg-row-title">💾 ${L('Your progress lives in this browser', 'Je voortgang staat in deze browser')}</span>
+      <span class="pg-row-sub" id="pgBackupSub">${last
+        ? L(`Last backup: ${fmtDate(last)}`, `Laatste back-up: ${fmtDate(last)}`)
+        : L('No backup yet. A browser reset or a new phone would lose everything.', 'Nog geen back-up. Bij een reset van de browser of een nieuwe telefoon ben je alles kwijt.')}</span>
+      <div class="pg-backup-actions">
+        <button class="pg-backup-btn pg-backup-primary" id="pgBackup" type="button">⬇️ ${L('Download backup', 'Back-up downloaden')}</button>
+        <button class="pg-backup-btn" id="pgRestore" type="button">⬆️ ${L('Restore from file', 'Terugzetten uit bestand')}</button>
+        <input type="file" id="pgRestoreFile" accept="application/json,.json" hidden>
+      </div>
+      <div class="pg-backup-note" id="pgBackupNote" hidden></div>
+    </div>
+
     <div class="pg-section">${L('Lessons', 'Lessen')}</div>
     <button class="pg-card pg-row" onclick="openLessonBrowse()">
       <span class="pg-row-icon">📖</span>
@@ -100,14 +114,14 @@ export function openProgressScreen() {
     <button class="pg-card pg-row" onclick="openReviewScreen()">
       <span class="pg-row-icon">🗣️</span>
       <span class="pg-row-text">
-        <span class="pg-row-title">${learned} ${L('phrases learned', 'zinnen geleerd')} <span class="pg-due">${duePhrases ? duePhrases + ' ' + L('due', 'aan de beurt') : ''}</span></span>
+        <span class="pg-row-title">${learned} ${L('phrases learned', 'zinnen geleerd')} ${duePhrases ? `<span class="pg-due">${duePhrases} ${L('due', 'aan de beurt')}</span>` : ''}</span>
         <span class="pg-row-sub">${L('From lessons, spoken or typed from memory', 'Uit lessen, gesproken of getypt uit je hoofd')}</span>
       </span>
     </button>
     <button class="pg-card pg-row" onclick="openWordsScreen()">
       <span class="pg-row-icon">📇</span>
       <span class="pg-row-text">
-        <span class="pg-row-title">${words} ${L('saved words', 'opgeslagen woorden')} <span class="pg-due">${dueWords ? dueWords + ' ' + L('due', 'aan de beurt') : ''}</span></span>
+        <span class="pg-row-title">${words} ${L('saved words', 'opgeslagen woorden')} ${dueWords ? `<span class="pg-due">${dueWords} ${L('due', 'aan de beurt')}</span>` : ''}</span>
         <span class="pg-row-sub">${L('From conversations', 'Uit gesprekken')}</span>
       </span>
     </button>
@@ -115,7 +129,7 @@ export function openProgressScreen() {
     <button class="pg-card pg-row" onclick="${c.open}">
       <span class="pg-row-icon">${c.icon}</span>
       <span class="pg-row-text">
-        <span class="pg-row-title">${st.learned} / ${st.total} ${c.unit[isNL ? 'nl' : 'en']} ${L('learned', 'geleerd')} <span class="pg-due">${st.due ? st.due + ' ' + L('due', 'aan de beurt') : ''}</span></span>
+        <span class="pg-row-title">${st.learned} / ${st.total} ${c.unit[isNL ? 'nl' : 'en']} ${L('learned', 'geleerd')} ${st.due ? `<span class="pg-due">${st.due} ${L('due', 'aan de beurt')}</span>` : ''}</span>
         <span class="pg-row-sub">${c.name[isNL ? 'nl' : 'en']} · ${st.seen} ${L('seen', 'gezien')}${st.weak ? ' · ' + st.weak + ' ' + L('weak', 'zwak') : ''}</span>
         ${bar(st.learned / st.total * 100, 'pg-fill-pink')}
       </span>
@@ -133,20 +147,7 @@ export function openProgressScreen() {
           ${d.m.attempts && d.m.pct != null ? bar(d.m.pct, d.m.pct >= 80 ? 'pg-fill-green' : d.m.pct >= 50 ? 'pg-fill-amber' : 'pg-fill-red') : ''}
         </span>
       </button>`).join('')}
-
-    <div class="pg-section">${L('Backup', 'Back-up')}</div>
-    <div class="pg-card pg-backup ${backupOld ? 'pg-backup-old' : ''}">
-      <span class="pg-row-title">💾 ${L('Your progress lives in this browser', 'Je voortgang staat in deze browser')}</span>
-      <span class="pg-row-sub" id="pgBackupSub">${last
-        ? L(`Last backup: ${fmtDate(last)}`, `Laatste back-up: ${fmtDate(last)}`)
-        : L('No backup yet. A browser reset or a new phone would lose everything.', 'Nog geen back-up. Bij een reset van de browser of een nieuwe telefoon ben je alles kwijt.')}</span>
-      <div class="pg-backup-actions">
-        <button class="pg-backup-btn pg-backup-primary" id="pgBackup" type="button">⬇️ ${L('Download backup', 'Back-up downloaden')}</button>
-        <button class="pg-backup-btn" id="pgRestore" type="button">⬆️ ${L('Restore from file', 'Terugzetten uit bestand')}</button>
-        <input type="file" id="pgRestoreFile" accept="application/json,.json" hidden>
-      </div>
-      <div class="pg-backup-note" id="pgBackupNote" hidden></div>
-    </div>`;
+`;
 
   wireBackup(s, fmtDate);
 }
