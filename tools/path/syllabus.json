@@ -1,0 +1,3799 @@
+{
+  "levels": {
+    "A1": {
+      "units": 23,
+      "lexicalMinimum": "800–1000"
+    },
+    "A2": {
+      "units": 26,
+      "lexicalMinimum": "≈2000"
+    },
+    "B1": {
+      "units": 30,
+      "lexicalMinimum": "3000–4000"
+    },
+    "B2": {
+      "units": 25,
+      "lexicalMinimum": "5000–6000"
+    }
+  },
+  "units": [
+    {
+      "id": "a1-01",
+      "level": "A1",
+      "icon": "👋",
+      "title": {
+        "en": "Hello, I am…",
+        "nl": "Hallo, ik ben…"
+      },
+      "grammar": {
+        "en": "Pronouns; \"to be\" is left out",
+        "nl": "Voornaamwoorden; \"zijn\" valt weg"
+      },
+      "standard": [
+        "НАЗИВНИЙ ВІДМІНОК — вказівка на особу чи предмет",
+        "НАЗИВНИЙ ВІДМІНОК — ідентифікація особи чи предмета",
+        "Просте речення — Розповідне речення",
+        "Стверджувальні й заперечні речення"
+      ],
+      "theme": {
+        "en": "The person: name, introductions",
+        "nl": "De mens: naam, kennismaken"
+      },
+      "focus": [
+        "я",
+        "ти",
+        "він",
+        "вона",
+        "ми",
+        "ви",
+        "вони",
+        "це",
+        "не"
+      ],
+      "brief": "Teach that the present tense of \"to be\" is simply absent: Я Марк, Вона студентка, Це Олена. Introduce all personal pronouns and the ти/ви distinction (Dutch jij/u; English has no equivalent, so English speakers need explicit rules for when ви is required). Show affirmative versus negative (не goes directly before the word it negates) and that a yes/no question is the same sentence with rising intonation. No articles: студентка is both \"a student\" and \"the student\"."
+    },
+    {
+      "id": "a1-02",
+      "level": "A1",
+      "icon": "🔤",
+      "title": {
+        "en": "The alphabet",
+        "nl": "Het alfabet"
+      },
+      "grammar": {
+        "en": "Cyrillic letters; hard and soft consonants",
+        "nl": "Cyrillische letters; harde en zachte medeklinkers"
+      },
+      "standard": [
+        "Український алфавіт; друковані та писані, великі і малі літери",
+        "Апостроф",
+        "М'який знак",
+        "Тверді та м'які приголосні"
+      ],
+      "theme": {
+        "en": "The person: names, countries",
+        "nl": "De mens: namen, landen"
+      },
+      "focus": [
+        "Україна",
+        "Київ",
+        "Львів",
+        "Олена",
+        "шість",
+        "п'ять",
+        "м'яч",
+        "лист – ліс"
+      ],
+      "brief": "Present the 33 letters with their sounds, flagging the false friends for a Latin-alphabet reader (в = v, н = n, р = r, с = s, у = u, х = kh; и versus і versus ї; є; ґ versus г). Explain that і, я, ю, є and ь soften the consonant before them (лист – ліс, пісня) and that the apostrophe blocks that softening (п'ять, м'яч). Use names and place names as the first reading material, both printed and handwritten forms, and capital letters for names. Note that г is a voiced h (Dutch speakers know the sound from their own g/h), not an English g."
+    },
+    {
+      "id": "a1-03",
+      "level": "A1",
+      "icon": "🔢",
+      "title": {
+        "en": "Counting to ten",
+        "nl": "Tellen tot tien"
+      },
+      "grammar": {
+        "en": "Voiced/voiceless consonants, дж/дз, stress, syllables",
+        "nl": "Stemhebbende/stemloze medeklinkers, дж/дз, klemtoon, lettergrepen"
+      },
+      "standard": [
+        "Дзвінкі та глухі приголосні",
+        "Звукосполучення дж, дз",
+        "Наголос",
+        "Склад. Перенос слів"
+      ],
+      "theme": {
+        "en": "Daily life: numbers, phone numbers",
+        "nl": "Dagelijks leven: getallen, telefoonnummers"
+      },
+      "focus": [
+        "один",
+        "два",
+        "три",
+        "чотири",
+        "п'ять",
+        "дев'ять",
+        "десять",
+        "джинси",
+        "дзеркало",
+        "голодний – холодний"
+      ],
+      "brief": "Numbers 0–10 and phone numbers as reading practice while teaching that Ukrainian keeps final and pre-consonant consonants voiced (Dutch \"hond\" ends in t, Ukrainian \"сад\" ends in a real d): голодний – холодний differ by one sound. Introduce дж and дз as single sounds (джинси, дзеркало). Stress is free and unmarked in normal text, so the learner must memorise it with every word; this unit marks stress on every new word and shows syllable division for hyphenation (у-кра-їн-ська)."
+    },
+    {
+      "id": "a1-04",
+      "level": "A1",
+      "icon": "🚻",
+      "title": {
+        "en": "Things in the home",
+        "nl": "Dingen in huis"
+      },
+      "grammar": {
+        "en": "Three genders, read off the last letter",
+        "nl": "Drie geslachten, aan de laatste letter"
+      },
+      "standard": [
+        "Загальні родові значення іменників в однині"
+      ],
+      "theme": {
+        "en": "Home, dwelling: rooms and furniture",
+        "nl": "Huis, woning: kamers en meubels"
+      },
+      "focus": [
+        "чоловік",
+        "жінка",
+        "місто",
+        "стіл",
+        "кімната",
+        "вікно",
+        "ліжко",
+        "стілець"
+      ],
+      "brief": "Gender is read off the ending: consonant = masculine, -а/-я = feminine, -о/-е = neuter, with the note that words in -ь must be learned (день m., ніч f.). Contrast with Dutch de/het, which cannot be predicted; Ukrainian gender almost always can. Use rooms and furniture, and show він/вона/воно replacing a noun of each gender (Де стіл? — Він тут). Learner knows pronouns and це from a1-01; keep adjectives for a1-06."
+    },
+    {
+      "id": "a1-05",
+      "level": "A1",
+      "icon": "👆",
+      "title": {
+        "en": "This or that?",
+        "nl": "Dit of dat?"
+      },
+      "grammar": {
+        "en": "цей/той and мій/твій agree in gender; questions with чи",
+        "nl": "цей/той en мій/твій in geslacht; vragen met чи"
+      },
+      "standard": [
+        "Утворення родових форм вказівних займенників",
+        "Утворення родових форм присвійних займенників",
+        "Питальне речення: Чи студент відповідає?",
+        "Інтонація (розповідна, питальна, оклична)"
+      ],
+      "theme": {
+        "en": "Home: pointing at things",
+        "nl": "Huis: dingen aanwijzen"
+      },
+      "focus": [
+        "цей",
+        "ця",
+        "це",
+        "ці",
+        "той",
+        "та",
+        "те",
+        "мій",
+        "моя",
+        "моє",
+        "твій",
+        "наш",
+        "ваш",
+        "Чи це…?"
+      ],
+      "brief": "Demonstratives and possessives take the gender and number of the noun: цей стіл, ця кімната, це вікно, ці книги; мій брат, моя сестра, моє місто, мої батьки; the same for твій, наш, ваш and їхній (їхня, їхнє), while його and її never change. Build Хто це? Що це? and the yes/no question with чи at the start (Чи це твоя книга?) versus plain rising intonation, and give the three intonation contours (statement, question, exclamation). Pitfall: це as \"this is\" (Це вікно = This is a window) versus це as the neuter demonstrative (це вікно = this window); only intonation and context separate them."
+    },
+    {
+      "id": "a1-06",
+      "level": "A1",
+      "icon": "🎨",
+      "title": {
+        "en": "What is it like?",
+        "nl": "Hoe is het?"
+      },
+      "grammar": {
+        "en": "Adjectives agree: -ий / -а / -е (-ій / -я / -є)",
+        "nl": "Adjectieven: -ий / -а / -е (-ій / -я / -є)"
+      },
+      "standard": [
+        "Утворення форм чоловічого, жіночого, середнього роду прикметників (закінчення –ий(ій), –а(я), –е(є))",
+        "Узгодження прикметників з іменниками в роді й числі"
+      ],
+      "theme": {
+        "en": "The person: appearance; home",
+        "nl": "De mens: uiterlijk; huis"
+      },
+      "focus": [
+        "новий",
+        "нова",
+        "нове",
+        "великий",
+        "гарний",
+        "зелений",
+        "домашній",
+        "літня",
+        "останнє",
+        "високий",
+        "молодий"
+      ],
+      "brief": "Adjective endings copy the noun's gender: новий стіл, нова кімната, нове вікно; soft stems take -ій/-я/-є (домашній одяг, літня погода, останнє питання). Unlike Dutch (een groot huis / het grote huis) nothing depends on an article, and the adjective keeps its ending as a predicate: Кімната велика. Сорочка нова. Teach colours and basic descriptions of people (високий, молодий, гарний, старий). Learner knows gender from a1-04; the plural ending -і is introduced in a1-07."
+    },
+    {
+      "id": "a1-07",
+      "level": "A1",
+      "icon": "👨‍👩‍👧‍👦",
+      "title": {
+        "en": "My family",
+        "nl": "Mijn familie"
+      },
+      "grammar": {
+        "en": "Nominative plural -и / -і",
+        "nl": "Meervoud -и / -і"
+      },
+      "standard": [
+        "Утворення форм множини у називному відмінку, закінчення –и, –і(ї)",
+        "Чергування голосних у формах однини/множини",
+        "Чергування сполучників і – й: квартира й аудиторія, будинок і кімната",
+        "Узгодження прикметників з іменниками в роді й числі"
+      ],
+      "theme": {
+        "en": "The person: family and relatives",
+        "nl": "De mens: familie"
+      },
+      "focus": [
+        "брат – брати",
+        "сестра – сестри",
+        "лікар – лікарі",
+        "музей – музеї",
+        "рік – роки",
+        "ніж – ножі",
+        "діти",
+        "батьки",
+        "мама й тато"
+      ],
+      "brief": "Hard stems take -и, soft and -й stems take -і/-ї (інститути, лікарі, музеї); feminine -а → -и, -я → -і; neuter -о → -а, -е → -я (вікна, місця). Show the і → о/е change when the ending is added (рік – роки, ніж – ножі, палець – пальці, річ – речі) and the irregular family plurals діти, люди, друзі. Adjectives in the plural end in -і for all genders (іноземні студенти, нові книги). Teach the euphonic choice between і and й when listing family (мама й тато, брат і сестра): й after a vowel, і after a consonant or at a pause."
+    },
+    {
+      "id": "a1-08",
+      "level": "A1",
+      "icon": "📖",
+      "title": {
+        "en": "A working day",
+        "nl": "Een werkdag"
+      },
+      "grammar": {
+        "en": "Present tense: читаю, працюю",
+        "nl": "Tegenwoordige tijd: читаю, працюю"
+      },
+      "standard": [
+        "ДІЙСНИЙ СПОСІБ — теперішній час, тип читаю, читаєш, читає, читаємо, читаєте, читають",
+        "Теперішній час, тип працюю, працюєш, працює…",
+        "НАЗИВНИЙ ВІДМІНОК — суб'єкт активної дії"
+      ],
+      "theme": {
+        "en": "Activity: the working day",
+        "nl": "Bezigheden: de werkdag"
+      },
+      "focus": [
+        "читати",
+        "працювати",
+        "знати",
+        "думати",
+        "розмовляти",
+        "читаю",
+        "читаєш",
+        "читає",
+        "читаємо",
+        "читаєте",
+        "читають",
+        "працюю"
+      ],
+      "brief": "First conjugation: -ю/-єш/-є/-ємо/-єте/-ють, shown with читати and with працювати (-ува- → -ую). The ending carries the person, so the pronoun can be dropped (Працюю в банку). Nominative subject: Студент читає текст. Dutch and English speakers must get used to one present form covering \"I read\" and \"I am reading\". Build daily-routine sentences with вранці, вдень, увечері and the question Що ти робиш?"
+    },
+    {
+      "id": "a1-09",
+      "level": "A1",
+      "icon": "🚶",
+      "title": {
+        "en": "Around town",
+        "nl": "In de stad"
+      },
+      "grammar": {
+        "en": "Present tense: сиджу, дивлюся, можу, іду, їду",
+        "nl": "Tegenwoordige tijd: сиджу, дивлюся, можу, іду, їду"
+      },
+      "standard": [
+        "Теперішній час, тип можу, можеш…; іду, ідеш…; їду, їдеш…",
+        "Теперішній час, тип сиджу, сидиш, сидить…",
+        "Теперішній час, тип дивлюся, дивишся, дивиться…"
+      ],
+      "theme": {
+        "en": "City: transport and places",
+        "nl": "Stad: vervoer en plekken"
+      },
+      "focus": [
+        "сидіти",
+        "говорити",
+        "дивитися",
+        "могти",
+        "іти",
+        "їхати",
+        "сиджу",
+        "сидиш",
+        "дивлюся",
+        "дивишся",
+        "можу",
+        "можеш",
+        "іду",
+        "їду"
+      ],
+      "brief": "Second conjugation: -у(-ю)/-иш/-ить/-имо/-ите/-ать(-ять), with сидіти (сиджу — point out the д → дж change in the 1st person only as a fact to memorise), говорити, and the reflexive -ся/-сь of дивлюся, дивишся, дивиться. Add the three irregular but essential verbs можу/можеш/може, іду/ідеш, їду/їдеш and the split іти (on foot) versus їхати (by vehicle), which Dutch lopen/rijden partly mirrors and English \"go\" hides. Scenario: moving around the city by tram, bus, metro. Learner knows the first conjugation from a1-08."
+    },
+    {
+      "id": "a1-10",
+      "level": "A1",
+      "icon": "🎒",
+      "title": {
+        "en": "What I have",
+        "nl": "Wat ik heb"
+      },
+      "grammar": {
+        "en": "У мене є…; personal pronouns in cases",
+        "nl": "У мене є…; persoonlijke voornaamwoorden in naamvallen"
+      },
+      "standard": [
+        "Уживання відмінкових форм особових займенників"
+      ],
+      "theme": {
+        "en": "Shopping: everyday objects",
+        "nl": "Winkelen: dagelijkse voorwerpen"
+      },
+      "focus": [
+        "у мене є",
+        "у тебе є",
+        "у нас є",
+        "у вас є",
+        "мене",
+        "тебе",
+        "мені",
+        "тобі",
+        "нам",
+        "вам",
+        "телефон",
+        "ключ",
+        "сумка"
+      ],
+      "brief": "\"I have\" is expressed as \"at me there is\": У мене є телефон; the thing possessed stays in the nominative. Give the pronoun forms the standard lists — мене/мені, тебе/тобі, нас/нам, вас/вам — so the same forms carry over to age (a1-11) and likes (a1-14). Questions and answers: У тебе є ручка? — Так, є. / Ні, немає (treat немає as a fixed answer; the genitive after it comes at A2). English \"have\" and Dutch \"hebben\" are verbs; мати exists in Ukrainian but the є-construction is the everyday one."
+    },
+    {
+      "id": "a1-11",
+      "level": "A1",
+      "icon": "🎂",
+      "title": {
+        "en": "How old are you?",
+        "nl": "Hoe oud ben je?"
+      },
+      "grammar": {
+        "en": "Dative of age; рік / роки / років",
+        "nl": "Datief voor leeftijd; рік / роки / років"
+      },
+      "standard": [
+        "ДАВАЛЬНИЙ ВІДМІНОК (особові займенники) — вік особи",
+        "РОДОВИЙ ВІДМІНОК без прийменника — кількість з кількісними числівниками"
+      ],
+      "theme": {
+        "en": "The person: age, date of birth",
+        "nl": "De mens: leeftijd, geboortedatum"
+      },
+      "focus": [
+        "Скільки тобі років?",
+        "Мені 20 років",
+        "йому",
+        "їй",
+        "рік",
+        "роки",
+        "років",
+        "одинадцять",
+        "двадцять",
+        "тридцять",
+        "сто"
+      ],
+      "brief": "Age uses the dative of the person and no verb: Мені двадцять років. Скільки тобі років? Add йому/їй as vocabulary. Numbers 11–100, then the counting rule: 1 → рік, 2–4 → роки, 5–20 and anything ending in 5–0 → років (genitive plural); 21 behaves like 1, 22 like 2. The same rule returns with money in a1-13. Dutch and English speakers must drop \"am/ben\": there is no verb at all in Мені 20 років."
+    },
+    {
+      "id": "a1-12",
+      "level": "A1",
+      "icon": "🌍",
+      "title": {
+        "en": "Where are you from?",
+        "nl": "Waar kom je vandaan?"
+      },
+      "grammar": {
+        "en": "Genitive after з/із/зі: з України",
+        "nl": "Genitief na з/із/зі: з України"
+      },
+      "standard": [
+        "РОДОВИЙ ВІДМІНОК з прийменниками з, із, зі — походження, звідки",
+        "Варіанти прийменників з, зі, із: з Алжиру, він із Йорданії, зі школи"
+      ],
+      "theme": {
+        "en": "The person: nationality, country, mother tongue",
+        "nl": "De mens: nationaliteit, land, moedertaal"
+      },
+      "focus": [
+        "Звідки ви?",
+        "Я з Нідерландів",
+        "з України",
+        "із Йорданії",
+        "зі Львова",
+        "з Алжиру",
+        "українець",
+        "українка",
+        "рідна мова"
+      ],
+      "brief": "First genitive forms, for countries and cities only: -а → -и (Україна → з України), -ія → -ії (Італія → з Італії), masculine consonant → -у/-а (Амстердам → з Амстердама, Львів → зі Львова with і → о), Нідерланди → з Нідерландів as a fixed phrase. Teach the з/із/зі choice by the surrounding sounds (зі Львова before two consonants, із Йорданії between consonants, з Алжиру otherwise). Nationality and language words: Я голландець / голландка, моя рідна мова — нідерландська. Keep other genitive uses for later units."
+    },
+    {
+      "id": "a1-13",
+      "level": "A1",
+      "icon": "🛒",
+      "title": {
+        "en": "At the market",
+        "nl": "Op de markt"
+      },
+      "grammar": {
+        "en": "Accusative of the object: -а → -у",
+        "nl": "Accusatief van het lijdend voorwerp: -а → -у"
+      },
+      "standard": [
+        "ЗНАХІДНИЙ ВІДМІНОК без прийменника — об'єкт дії",
+        "Відмінювання у знахідному та місцевому відмінках, жін. р., тверда основа (закінчення –а)",
+        "Відмінювання у знахідному та місцевому відмінках, жін. р., м'яка основа (закінчення –я)",
+        "Відмінювання у знахідному та місцевому відмінках, жін. р., м'яка основа (–ія)"
+      ],
+      "theme": {
+        "en": "Shopping: shops, goods, money",
+        "nl": "Winkelen: winkels, waren, geld"
+      },
+      "focus": [
+        "купувати",
+        "книжку",
+        "каву",
+        "воду",
+        "бабусю",
+        "мрію",
+        "Надію",
+        "хліб",
+        "молоко",
+        "гривня / гривні / гривень",
+        "Скільки коштує?"
+      ],
+      "brief": "The direct object: feminine -а → -у, -я → -ю, -ія → -ію (книжка → книжку, бабуся → бабусю, Надія → Надію); masculine inanimate and neuter nouns look like the nominative (купую хліб, молоко). Ask Що ти купуєш? and give prices with the counting rule from a1-11 applied to гривня / гривні / гривень and копійка. Dutch and English have no object endings; stress that word order is free and the ending, not the position, shows who does what: Книжку читає Марія."
+    },
+    {
+      "id": "a1-14",
+      "level": "A1",
+      "icon": "❤️",
+      "title": {
+        "en": "Likes and dislikes",
+        "nl": "Wat ik leuk vind"
+      },
+      "grammar": {
+        "en": "Accusative of people: брата, учителя; adjectives -у/-ю",
+        "nl": "Accusatief van personen: брата, учителя; adjectieven -у/-ю"
+      },
+      "standard": [
+        "Відмінювання у знахідному та місцевому відмінках, чол. р., тверда основа",
+        "Відмінювання у знахідному та місцевому відмінках, чол. р., м'яка основа (ь, й)",
+        "Відмінювання жін. р., –а",
+        "Відмінювання жін. р., –я"
+      ],
+      "theme": {
+        "en": "Leisure: hobbies and preferences",
+        "nl": "Vrije tijd: hobby's en voorkeuren"
+      },
+      "focus": [
+        "Я люблю…",
+        "Я не люблю…",
+        "Мені подобається…",
+        "брата",
+        "сина",
+        "учителя",
+        "Василя",
+        "велику сумку",
+        "домашню їжу",
+        "музика",
+        "спорт"
+      ],
+      "brief": "Masculine animate nouns take -а/-я in the accusative (знаю брата, бачу учителя, Данила, героя), unlike the inanimate ones from a1-13; feminine adjectives take -у/-ю together with the noun (велику сумку, домашню їжу). Two ways of liking: Я люблю + accusative and Мені подобається + nominative (the liked thing is the subject, as in Dutch \"dat bevalt mij\"). Learner has dative pronouns from a1-10/11. Pitfall for English speakers: the animate/inanimate split exists only in the masculine singular at this level."
+    },
+    {
+      "id": "a1-15",
+      "level": "A1",
+      "icon": "📍",
+      "title": {
+        "en": "Where is it?",
+        "nl": "Waar is het?"
+      },
+      "grammar": {
+        "en": "Locative of place: у/в, на + -і",
+        "nl": "Locatief van plaats: у/в, на + -і"
+      },
+      "standard": [
+        "МІСЦЕВИЙ ВІДМІНОК з у, в, на — місце",
+        "Чергування прийменників у – в: був у Львові, жила в Києві",
+        "Відмінювання у знахідному та місцевому відмінках, сер. р. (закінчення -о, -е)",
+        "Відмінювання у знахідному та місцевому відмінках, чол. р., тверда основа"
+      ],
+      "theme": {
+        "en": "City: institutions and places",
+        "nl": "Stad: instellingen en plekken"
+      },
+      "focus": [
+        "у Львові",
+        "у Києві",
+        "на столі",
+        "у місті",
+        "в університеті",
+        "на пошті",
+        "у школі",
+        "в банку",
+        "тут",
+        "там"
+      ],
+      "brief": "Where something is: у/в or на + locative, ending -і for most nouns (стіл → на столі, місто → у місті, школа → у школі, Київ → у Києві, Львів → у Львові with і → о), and -у for some masculine nouns (у банку, у парку). Use на for open spaces and events (на пошті, на вокзалі, на уроці) and у/в for enclosed places. Teach the у/в choice by sound (був у Львові, жила в Києві). Contrast with a1-13: the accusative answers \"what\", the locative answers \"where\". Avoid nouns whose stem ends in к/г/х (руці, нозі) — that alternation comes at A2."
+    },
+    {
+      "id": "a1-16",
+      "level": "A1",
+      "icon": "🏡",
+      "title": {
+        "en": "In a new flat",
+        "nl": "In een nieuwe flat"
+      },
+      "grammar": {
+        "en": "Adjectives in the locative: -ому / -ій",
+        "nl": "Adjectieven in de locatief: -ому / -ій"
+      },
+      "standard": [
+        "Відмінювання у знахідному та місцевому відмінках, чол. р., –ий",
+        "Відмінювання у знахідному та місцевому відмінках, сер. р., –е",
+        "Відмінювання у знахідному та місцевому відмінках, чол. р., –ій",
+        "Відмінювання у знахідному та місцевому відмінках, сер. р., –є"
+      ],
+      "theme": {
+        "en": "Home: type of housing, rooms",
+        "nl": "Huis: soort woning, kamers"
+      },
+      "focus": [
+        "у новому будинку",
+        "у великій кімнаті",
+        "у домашньому одязі",
+        "на літньому сонці",
+        "у старому місті",
+        "квартира",
+        "будинок",
+        "поверх"
+      ],
+      "brief": "Masculine and neuter adjectives take -ому (-ьому for soft stems) and feminine -ій in the locative: у новому будинку, у великому місті, у домашньому одязі, у великій кімнаті, у літній кухні. Learner knows noun locatives (a1-15) and agreement (a1-06). Describe a flat: which floor, which rooms, what is in each. Pitfall: Dutch and English speakers tend to leave the adjective unchanged; drill that both words change together."
+    },
+    {
+      "id": "a1-17",
+      "level": "A1",
+      "icon": "🚌",
+      "title": {
+        "en": "Going somewhere",
+        "nl": "Ergens naartoe"
+      },
+      "grammar": {
+        "en": "Accusative of direction: куди? у/в, на",
+        "nl": "Accusatief van richting: куди? у/в, на"
+      },
+      "standard": [
+        "ЗНАХІДНИЙ ВІДМІНОК з прийменниками в, у, на — напрям руху",
+        "Питальне речення зі спеціальними словами де?, звідки?, куди?, що?, хто?"
+      ],
+      "theme": {
+        "en": "Travel: station, airport, moving around",
+        "nl": "Reizen: station, luchthaven, onderweg"
+      },
+      "focus": [
+        "куди",
+        "де",
+        "звідки",
+        "в університет",
+        "на вокзал",
+        "у Київ",
+        "на роботу",
+        "додому",
+        "вдома",
+        "квиток",
+        "автобус"
+      ],
+      "brief": "Same prepositions у/в and на, but the accusative for the goal of movement (Іду в університет, їду на вокзал, у Київ) versus the locative for the location (в університеті). Line up the three questions Де? Куди? Звідки? with their cases and the adverb pairs вдома/додому, тут/сюди, там/туди. Dutch \"in de stad\" covers both meanings, so work with minimal pairs: Я в школі / Я йду в школу. Learner knows іду/їду from a1-09 and з + genitive for звідки from a1-12."
+    },
+    {
+      "id": "a1-18",
+      "level": "A1",
+      "icon": "🙋",
+      "title": {
+        "en": "Excuse me, sir",
+        "nl": "Pardon, meneer"
+      },
+      "grammar": {
+        "en": "Vocative: Олено! Пане!",
+        "nl": "Vocatief: Олено! Пане!"
+      },
+      "standard": [
+        "Уживання форм кличного відмінка",
+        "КЛИЧНИЙ ВІДМІНОК — адресат-об'єкт, до якого звертається мовець"
+      ],
+      "theme": {
+        "en": "City: getting attention, asking for information",
+        "nl": "Stad: aandacht vragen, informatie vragen"
+      },
+      "focus": [
+        "Пане!",
+        "Пані!",
+        "Остапе",
+        "Олено",
+        "Галю",
+        "Надіє",
+        "Вибачте",
+        "Скажіть, будь ласка",
+        "Котра година?"
+      ],
+      "brief": "Ukrainian still uses a vocative for the person addressed: -а → -о (Олена → Олено), -я → -ю (Галя → Галю), -ія → -іє (Надія → Надіє), masculine consonant → -е or -у (Остап → Остапе, пан → пане, Андрій → Андрію). Use it in the fixed openers Вибачте, пане / Скажіть, будь ласка and in greetings to friends. Pitfall: English and Dutch have no such form, so learners address people in the nominative; mark that this sounds foreign. Keep the consonant changes (друг → друже) for B1."
+    },
+    {
+      "id": "a1-19",
+      "level": "A1",
+      "icon": "🕰️",
+      "title": {
+        "en": "Yesterday",
+        "nl": "Gisteren"
+      },
+      "grammar": {
+        "en": "Past tense: -в, -ла, -ло, -ли",
+        "nl": "Verleden tijd: -в, -ла, -ло, -ли"
+      },
+      "standard": [
+        "Утворення форм минулого часу дієслова"
+      ],
+      "theme": {
+        "en": "Daily life and activity: the weekend",
+        "nl": "Dagelijks leven: het weekend"
+      },
+      "focus": [
+        "був",
+        "була",
+        "було",
+        "були",
+        "читав",
+        "читала",
+        "читали",
+        "сміявся",
+        "сміялася",
+        "вчора",
+        "сьогодні",
+        "вихідний"
+      ],
+      "brief": "One past tense for everything (I read / was reading / have read): infinitive minus -ти plus -в/-ла/-ло/-ли, agreeing with the subject's gender and number, not person: я читав (a man) / я читала (a woman). Reflexive verbs add -ся after -в and after vowels (сміявся, сміялася, сміялися). бути finally appears: був, була, було, були (Я був удома). Dutch and English speakers should not look for a perfect/imperfect split; aspect comes at A2. Tell what you did at the weekend with вчора, позавчора, вранці, увечері."
+    },
+    {
+      "id": "a1-20",
+      "level": "A1",
+      "icon": "🎉",
+      "title": {
+        "en": "Birthdays and months",
+        "nl": "Verjaardagen en maanden"
+      },
+      "grammar": {
+        "en": "Months with у + locative; ordinals перший / перша / перше",
+        "nl": "Maanden met у + locatief; rangtelwoorden перший / перша / перше"
+      },
+      "standard": [
+        "МІСЦЕВИЙ ВІДМІНОК з у, в — момент часу з назвами місяців",
+        "Уживання родових форм порядкових числівників із закінченням –ий, -а, -е",
+        "Утворення родових форм порядкових числівників"
+      ],
+      "theme": {
+        "en": "Traditions, holidays: birthday, gifts",
+        "nl": "Tradities, feesten: verjaardag, cadeaus"
+      },
+      "focus": [
+        "у травні",
+        "у січні",
+        "у лютому",
+        "народитися",
+        "Коли ти народився?",
+        "перший",
+        "перша",
+        "перше",
+        "третій",
+        "третя",
+        "третє",
+        "день народження",
+        "подарунок"
+      ],
+      "brief": "Months are masculine and go into the locative after у/в to say when: у травні, у березні, у листопаді (лютий is an adjective: у лютому — learn as a phrase). Ordinal numbers 1st–12th behave like adjectives and agree in gender: перший поверх, перша зустріч, перше місце; третій is soft (третя, третє), and give the genitive forms першого/першої as a preview of dates. Use them for floors, places in a race and \"first time\"; full dates (десятого травня) wait until A2. Learner knows the past tense (народився/народилася) from a1-19."
+    },
+    {
+      "id": "a1-21",
+      "level": "A1",
+      "icon": "🔮",
+      "title": {
+        "en": "Plans",
+        "nl": "Plannen"
+      },
+      "grammar": {
+        "en": "Future: буду + infinitive; some perfective forms; про + accusative",
+        "nl": "Toekomst: буду + infinitief; enkele perfectieve vormen; про + accusatief"
+      },
+      "standard": [
+        "Дієвідмінювання дієслова бути в майбутньому часі",
+        "Майбутній час дієслів недоконаного виду — складена форма",
+        "Форми майбутнього часу деяких дієслів доконаного виду",
+        "ЗНАХІДНИЙ ВІДМІНОК з прийменником про — з дієсловами думати, мріяти"
+      ],
+      "theme": {
+        "en": "Activity and leisure: plans for the week",
+        "nl": "Bezigheden en vrije tijd: plannen voor de week"
+      },
+      "focus": [
+        "буду",
+        "будеш",
+        "буде",
+        "будемо",
+        "будете",
+        "будуть",
+        "буду читати",
+        "зможу",
+        "скажу",
+        "прочитаю",
+        "думати про",
+        "мріяти про",
+        "відпочинок"
+      ],
+      "brief": "The future of бути (буду, будеш, буде, будемо, будете, будуть) stands alone (Завтра я буду вдома) and combines with an infinitive for future actions (буду працювати). Introduce a handful of ready-made perfective futures as vocabulary, not as a system: зможу, скажу/скажете, прочитаю/прочитають, напишу, куплю, with the note that each means one completed action; the full aspect story comes at A2. Add думати/мріяти про + accusative (думаю про відпустку, мрію про море). English \"will\" and Dutch \"zullen/gaan\" both map to буду."
+    },
+    {
+      "id": "a1-22",
+      "level": "A1",
+      "icon": "🍽️",
+      "title": {
+        "en": "At the café",
+        "nl": "In het café"
+      },
+      "grammar": {
+        "en": "Imperative: дайте, скажіть, сідайте",
+        "nl": "Gebiedende wijs: дайте, скажіть, сідайте"
+      },
+      "standard": [
+        "НАКАЗОВИЙ СПОСІБ — форми наказового способу",
+        "Спонукальне речення для вираження прохання"
+      ],
+      "theme": {
+        "en": "Restaurant, café: dishes, drinks, ordering",
+        "nl": "Restaurant, café: gerechten, drankjes, bestellen"
+      },
+      "focus": [
+        "Дайте, будь ласка",
+        "дай",
+        "скажи",
+        "скажіть",
+        "сідайте",
+        "читай",
+        "читайте",
+        "пишіть",
+        "Не курити!",
+        "меню",
+        "рахунок",
+        "борщ"
+      ],
+      "brief": "Request forms: the ти-form (дай, скажи, читай, сідай, пиши) and the polite/plural -те form (дайте, скажіть, читайте, сідайте, пишіть). Give the pattern (stem in a vowel → -й/-йте; stem in a consonant → -и/-іть or -ь/-те) with examples only; do not derive everything. Order with Дайте, будь ласка, два квитки / каву, and use the infinitive for public prohibitions (Не курити!). Learner has the accusative for what is ordered (a1-13). Pitfall: будь ласка is both \"please\" and \"you're welcome\"."
+    },
+    {
+      "id": "a1-23",
+      "level": "A1",
+      "icon": "🤒",
+      "title": {
+        "en": "I am ill, because…",
+        "nl": "Ik ben ziek, want…"
+      },
+      "grammar": {
+        "en": "і / але; тому що, бо",
+        "nl": "і / але; тому що, бо"
+      },
+      "standard": [
+        "Складне речення — складносурядні зі сполучниками і, але",
+        "Складнопідрядні з підрядною частиною причини, сполучники тому що, бо"
+      ],
+      "theme": {
+        "en": "Health: how you feel, body parts, pharmacy",
+        "nl": "Gezondheid: hoe je je voelt, lichaamsdelen, apotheek"
+      },
+      "focus": [
+        "і",
+        "але",
+        "тому що",
+        "бо",
+        "болить",
+        "хворий",
+        "хвора",
+        "температура",
+        "голова",
+        "горло",
+        "аптека",
+        "ліки"
+      ],
+      "brief": "Join clauses with і (and) and але (but), and give the reason with тому що / бо (бо is shorter and more spoken): Я вдома, бо у мене висока температура. Clause order is free; a comma always separates the clauses (Dutch also puts one, English often does not). У мене болить голова / горло reuses the у мене construction; хворий/хвора agree with the speaker's gender. Keep to simple symptoms and buying medicine at the pharmacy; the doctor's visit itself comes at A2."
+    },
+    {
+      "id": "a2-01",
+      "level": "A2",
+      "icon": "🤝",
+      "title": {
+        "en": "Pleased to meet you",
+        "nl": "Aangenaam kennis te maken"
+      },
+      "grammar": {
+        "en": "Personal pronouns in all cases: мене, мені, мною",
+        "nl": "Persoonlijke voornaamwoorden in alle naamvallen: мене, мені, мною"
+      },
+      "standard": [
+        "Відмінювання особових займенників: я (мене, мені, мною), ти, ми, ви",
+        "НАЗИВНИЙ — суб'єкт активної дії",
+        "НАЗИВНИЙ — ідентифікація особи/предмета",
+        "Загальні питання"
+      ],
+      "theme": {
+        "en": "The person: contacts, meeting people",
+        "nl": "De mens: contacten, mensen ontmoeten"
+      },
+      "focus": [
+        "Дозвольте відрекомендуватися",
+        "Будьмо знайомі",
+        "мною",
+        "тобою",
+        "нами",
+        "вами",
+        "Це місто називається Львів",
+        "Хто це?",
+        "Що це?"
+      ],
+      "brief": "Complete the table of я/ти/ми/ви in all cases, adding the instrumental (зі мною, з тобою, з нами, з вами) to the forms known from A1. Practise identification: Мене звати…, Це місто називається…, Хто це? Що це?, and formal introductions (Дозвольте відрекомендувати мого колегу; Будьмо знайомі). Nominative subjects in the plural (Президенти підписали угоду) as reading material. Note that ви takes a plural verb even for one person, like Dutch \"u hebt\"."
+    },
+    {
+      "id": "a2-02",
+      "level": "A2",
+      "icon": "👗",
+      "title": {
+        "en": "Clothes and looks",
+        "nl": "Kleding en uiterlijk"
+      },
+      "grammar": {
+        "en": "Adjectives: full hard paradigm incl. plural -і",
+        "nl": "Adjectieven: volledig hard paradigma incl. meervoud -і"
+      },
+      "standard": [
+        "Чол. р. (-ий)",
+        "Жін. р. (-а)",
+        "Сер. р. (-е): українське, високе, дешеве",
+        "Множина (-і)"
+      ],
+      "theme": {
+        "en": "The person: appearance, clothing, character",
+        "nl": "De mens: uiterlijk, kleding, karakter"
+      },
+      "focus": [
+        "український",
+        "висока",
+        "дешеве",
+        "дешеві",
+        "сорочка",
+        "штани",
+        "сукня",
+        "пальто",
+        "веселий",
+        "спокійний",
+        "добрий"
+      ],
+      "brief": "Consolidate -ий/-а/-е/-і in the nominative and accusative and lay out the whole hard paradigm of український as a lookup table (genitive -ого/-ої, dative -ому/-ій, instrumental -им/-ою, locative -ому/-ій), which the following case units will fill in with practice. Plural -і for all genders (високі люди, дешеві речі). Describe clothes and basic character traits, agreeing adjective and noun in the accusative when buying (купую дешеву сорочку). Learner has nominative/accusative/locative adjective forms from A1."
+    },
+    {
+      "id": "a2-03",
+      "level": "A2",
+      "icon": "🔑",
+      "title": {
+        "en": "Whose flat is this?",
+        "nl": "Van wie is deze flat?"
+      },
+      "grammar": {
+        "en": "Genitive of possession: книга мого брата",
+        "nl": "Genitief van bezit: книга мого брата"
+      },
+      "standard": [
+        "Відмінювання присвійних займенників чол./сер. роду",
+        "Присвійний займенник їхній (чол./сер. р.); незмінне його",
+        "Присвійний займенник їхня (жін. р.); незмінне її",
+        "Чоловічого роду тверда основа: чоловік, студент, батько, сусід, магазин, Львів"
+      ],
+      "theme": {
+        "en": "Home: renting a flat or house",
+        "nl": "Huis: een flat of huis huren"
+      },
+      "focus": [
+        "кімната брата",
+        "ключ сусіда",
+        "мого",
+        "твого",
+        "нашого",
+        "вашого",
+        "його",
+        "її",
+        "їхній",
+        "їхня",
+        "орендувати",
+        "власник"
+      ],
+      "brief": "Possession with the genitive after the noun (кімната брата, квартира мого друга), where Dutch and English put the possessor first (\"my brother's room\"). Masculine genitive -а/-у (брата, студента, сусіда; магазину, Львова) with -у for most abstract and mass nouns. Declension of мій/твій/наш/ваш in the masculine and neuter (мого, твого, нашого, вашого), and the fact that його/її never change while їхній/їхня/їхнє does. Scenario: renting a flat and asking whose things are in it."
+    },
+    {
+      "id": "a2-04",
+      "level": "A2",
+      "icon": "🏨",
+      "title": {
+        "en": "Booking a room",
+        "nl": "Een kamer reserveren"
+      },
+      "grammar": {
+        "en": "Genitive of quantity; feminine/neuter genitive; один",
+        "nl": "Genitief van hoeveelheid; vrouwelijk/onzijdig; один"
+      },
+      "standard": [
+        "РОДОВИЙ без прийменника — кількість і міра з числівниками",
+        "Жіночого роду тверда основа (-а)",
+        "Середнього роду (-о)",
+        "Родові форми кількісного числівника один"
+      ],
+      "theme": {
+        "en": "Home: booking a hotel room",
+        "nl": "Huis: een hotelkamer reserveren"
+      },
+      "focus": [
+        "одна ніч",
+        "дві ночі",
+        "п'ять ночей",
+        "вісімдесят гривень",
+        "кімнати",
+        "вікна",
+        "одного",
+        "одному",
+        "одну",
+        "одній",
+        "бронювати",
+        "номер"
+      ],
+      "brief": "Feminine -а → -и, -я → -і and neuter -о/-е → -а/-я in the genitive singular (кімната → кімнати, вікно → вікна), and the counting rule applied to them: одна кімната, дві кімнати (nominative plural after 2–4), п'ять кімнат; вісімдесят гривень. Declension of один/одна/одне (одного, одному, одну, одній) when booking одну кімнату на одну ніч. Numbers 100–1000 for prices. Learner knows the counting rule from a1-11 (рік/роки/років)."
+    },
+    {
+      "id": "a2-05",
+      "level": "A2",
+      "icon": "📅",
+      "title": {
+        "en": "Dates",
+        "nl": "Datums"
+      },
+      "grammar": {
+        "en": "Dates in the genitive: десятого березня",
+        "nl": "Datums in de genitief: десятого березня"
+      },
+      "standard": [
+        "РОДОВИЙ без прийменника — час і дата дії",
+        "МІСЦЕВИЙ з У, В — момент часу з місяцями/роком",
+        "Родові форми порядкових числівників (-ий, -а, -е): десятий, десята, десяте",
+        "Родові форми порядкових числівників (-ій, -я, -є): третій, третя, третє"
+      ],
+      "theme": {
+        "en": "Traditions, holidays: when is the holiday?",
+        "nl": "Tradities, feesten: wanneer is het feest?"
+      },
+      "focus": [
+        "десятого березня",
+        "першого січня",
+        "двадцять четвертого серпня",
+        "у 2014-му",
+        "Якого числа?",
+        "десятий",
+        "десята",
+        "третя",
+        "третє",
+        "Різдво",
+        "Великдень"
+      ],
+      "brief": "\"On the 10th of March\" is genitive of the ordinal plus genitive of the month: десятого березня; the year goes into the locative (у 2014-му, у 2024 році) and a month alone stays у травні. Full set of ordinals 1–31 with their gender forms (десятий/десята/десяте, третій/третя/третє) and the question Якого числа? Dutch \"10 maart\" and English \"10 March\" carry no endings, so drill the two genitives together. Learner has months in the locative (a1-20) and genitive forms (a2-03/04)."
+    },
+    {
+      "id": "a2-06",
+      "level": "A2",
+      "icon": "🚫",
+      "title": {
+        "en": "I don't have it",
+        "nl": "Ik heb het niet"
+      },
+      "grammar": {
+        "en": "Genitive after negation: немає ручки, не вивчив вірша",
+        "nl": "Genitief na ontkenning: немає ручки, не вивчив вірша"
+      },
+      "standard": [
+        "РОДОВИЙ без прийменника — об'єкт дії при запереченні",
+        "Розповідне речення, стверджувальне",
+        "Розповідне речення, заперечне: Студент не відповідає",
+        "ЗНАХІДНИЙ без прийм. — прямий об'єкт дії",
+        "Інтонація (розповідна, питальна, оклична)"
+      ],
+      "theme": {
+        "en": "Studying: learning, subjects",
+        "nl": "Studeren: leren, vakken"
+      },
+      "focus": [
+        "немає",
+        "не було",
+        "не буде",
+        "У мене немає часу",
+        "не вивчив вірша",
+        "читає роман",
+        "вчити",
+        "вивчати",
+        "вчитися",
+        "домашнє завдання"
+      ],
+      "brief": "Absence takes the genitive: У мене немає ручки / часу / грошей, не було, не буде; the object of a negated verb may also go into the genitive (Не вивчив вірша). Contrast the affirmative pair Студент відповідає / не відповідає and the accusative object of an affirmative verb (читає роман) with its genitive under negation. Sort out вчити (learn or teach something), вивчати (study a subject) and вчитися (be a student, learn). Remind the learner that statement and question can differ by intonation alone."
+    },
+    {
+      "id": "a2-07",
+      "level": "A2",
+      "icon": "🚏",
+      "title": {
+        "en": "How do I get to…?",
+        "nl": "Hoe kom ik bij…?"
+      },
+      "grammar": {
+        "en": "до, біля, навпроти + genitive; з + genitive; в/на + accusative",
+        "nl": "до, біля, навпроти + genitief; з + genitief; в/на + accusatief"
+      },
+      "standard": [
+        "РОДОВИЙ з ДО — кінцевий пункт напряму дії",
+        "РОДОВИЙ з БІЛЯ, НАВПРОТИ — місце",
+        "РОДОВИЙ з З,ІЗ,ЗІ — початок руху, звідки",
+        "ЗНАХІДНИЙ з В,У,НА — напрям руху"
+      ],
+      "theme": {
+        "en": "Environment: city or village, directions",
+        "nl": "Omgeving: stad of dorp, de weg wijzen"
+      },
+      "focus": [
+        "Як добратися до готелю?",
+        "до театру",
+        "біля вокзалу",
+        "навпроти банку",
+        "прямо",
+        "ліворуч",
+        "праворуч",
+        "приїхали з ОАЕ",
+        "їдуть в Одесу",
+        "зупинка"
+      ],
+      "brief": "Three genitive prepositions for finding your way: до (up to, as far as), біля (near), навпроти (opposite), plus з/із/зі for where someone has arrived from (приїхали зі Львова, з ОАЕ). Set them beside the accusative of direction from a1-17: їду в Одесу versus доїду до Одеси. Direction words прямо, ліворуч, праворуч, назад and the imperatives йдіть, поверніть. Dutch \"tot\" = до and \"bij\" = біля; English \"to\" covers both в and до, so give minimal pairs."
+    },
+    {
+      "id": "a2-08",
+      "level": "A2",
+      "icon": "🥗",
+      "title": {
+        "en": "What is it made of?",
+        "nl": "Waar is het van gemaakt?"
+      },
+      "grammar": {
+        "en": "із + genitive (material), для + genitive (purpose); п'ю",
+        "nl": "із + genitief (materiaal), для + genitief (doel); п'ю"
+      },
+      "standard": [
+        "РОДОВИЙ з З,ІЗ,ЗІ — відношення до матеріалу",
+        "РОДОВИЙ з ДЛЯ — призначення, мета",
+        "Середнього роду (-я)",
+        "Теперішній час, тип п'ю, п'єш, п'є…"
+      ],
+      "theme": {
+        "en": "Food and drinks: dishes, ways of cooking",
+        "nl": "Eten en drinken: gerechten, bereidingswijzen"
+      },
+      "focus": [
+        "салат із крабів",
+        "суп з овочів",
+        "для здоров'я",
+        "для дітей",
+        "здоров'я",
+        "життя",
+        "п'ю",
+        "п'єш",
+        "п'ємо",
+        "варити",
+        "смажити",
+        "пекти"
+      ],
+      "brief": "Genitive after із/з for what a dish is made of (салат із крабів, суп із грибів) and after для for whom or what something is for (корисний для здоров'я, подарунок для мами). Neuter nouns in -я (здоров'я, життя, обличчя) keep -я in the genitive singular (для здоров'я, для життя) and double the consonant in other forms (життям). Conjugate п'ю, п'єш, п'є, п'ємо, п'єте, п'ють (пити) and its relatives ллю, б'ю. Cooking verbs варити, смажити, пекти in simple recipes. Learner knows genitive forms from a2-03/04."
+    },
+    {
+      "id": "a2-09",
+      "level": "A2",
+      "icon": "🎁",
+      "title": {
+        "en": "Giving presents",
+        "nl": "Cadeaus geven"
+      },
+      "grammar": {
+        "en": "Dative of the receiver: студентові, мамі, дідусеві",
+        "nl": "Datief van de ontvanger: студентові, мамі, дідусеві"
+      },
+      "standard": [
+        "ДАВАЛЬНИЙ — особа/предмет на користь/шкоду",
+        "ДАВАЛЬНИЙ — вік особи",
+        "Чоловічого роду тверда основа, кінцевий компонент –ар",
+        "Чоловічого роду м'яка основа (ь, й)"
+      ],
+      "theme": {
+        "en": "Traditions: wishes and gifts",
+        "nl": "Tradities: wensen en cadeaus"
+      },
+      "focus": [
+        "подарувати книжку студентові",
+        "мамі",
+        "Дідусеві вісімдесят років",
+        "лікареві",
+        "Андрієві",
+        "водієві",
+        "дарувати",
+        "дзвонити",
+        "допомагати",
+        "вітати"
+      ],
+      "brief": "Dative singular: masculine -ові/-еві/-єві (студентові, лікареві, Андрієві, водієві; -у/-ю also exists, mention it), feminine -і (мамі, сестрі — avoid к/г/х stems until a2-14), neuter -у. Verbs that take a dative person: дарувати, дзвонити, допомагати, казати, бажати. Age with nouns, not only pronouns: Дідусеві вісімдесят років. Note the noun types in -ар (лікар, аптекар) and in -ь/-й (дідусь, водій, Андрій) which take -еві/-єві. Dutch has no case, but \"ik geef hem\" versus \"ik zie hem\" maps onto йому versus його."
+    },
+    {
+      "id": "a2-10",
+      "level": "A2",
+      "icon": "📞",
+      "title": {
+        "en": "On the phone",
+        "nl": "Aan de telefoon"
+      },
+      "grammar": {
+        "en": "Question types; кому?; мені подобається + nominative",
+        "nl": "Vraagtypen; кому?; мені подобається + nominatief"
+      },
+      "standard": [
+        "Питальне з питальним словом",
+        "Питальне, просте інтонаційне",
+        "Питальне, просте загальне з \"чи\"",
+        "НАЗИВНИЙ — об'єкт зацікавлення"
+      ],
+      "theme": {
+        "en": "The person: contacts (calls, messages)",
+        "nl": "De mens: contacten (bellen, berichten)"
+      },
+      "focus": [
+        "Кому ви дзвоните?",
+        "Ви прочитали?",
+        "Чи ви прочитали?",
+        "Де ви були вчора ввечері?",
+        "Мені подобається Ігор",
+        "Алло",
+        "передзвонити",
+        "повідомлення",
+        "зайнято"
+      ],
+      "brief": "Systematise the three question types: intonation only (Ви прочитали цей текст?), чи (Чи ви прочитали…?), and a question word (хто, що, де, куди, звідки, коли, кому, чому, скільки). Question words take the case the answer needs: Кому ви дзвоните? — Мамі. With подобатися the liked person or thing is the grammatical subject in the nominative and the verb agrees with it: Мені подобається Ігор / подобаються ці пісні. Phone phrases for leaving a message and calling back. Learner knows dative forms from a2-09."
+    },
+    {
+      "id": "a2-11",
+      "level": "A2",
+      "icon": "👩‍🍳",
+      "title": {
+        "en": "What do you do for a living?",
+        "nl": "Wat doe je voor werk?"
+      },
+      "grammar": {
+        "en": "Instrumental: profession and tool",
+        "nl": "Instrumentalis: beroep en werktuig"
+      },
+      "standard": [
+        "ОРУДНИЙ без прийм. — характеристика за професією/статусом",
+        "ОРУДНИЙ без прийм. — засіб дії",
+        "Чоловічого роду тверда основа, кінцеві ж, ч, щ, ш",
+        "Жіночого роду м'яка основа (-я)"
+      ],
+      "theme": {
+        "en": "Work: professions, workplaces, pay",
+        "nl": "Werk: beroepen, werkplekken, salaris"
+      },
+      "focus": [
+        "працювати лікарем",
+        "буде програмістом",
+        "пише ручкою",
+        "викладачем",
+        "товаришем",
+        "бабусею",
+        "Ким ти працюєш?",
+        "зарплата",
+        "офіс",
+        "фірма"
+      ],
+      "brief": "Instrumental singular: masculine -ом/-ем (студентом; викладачем, товаришем after ж/ч/ш/щ; лікарем), feminine -ою/-ею (вчителькою, бабусею), neuter -ом/-ем. Two uses: what someone works as or will be (працює лікарем, Олег буде програмістом, Ким ти працюєш?) and the tool of an action with no preposition (пише новою ручкою, їсть ложкою). English \"as a doctor\" and Dutch \"als arts\" have a preposition; Ukrainian has none. Learner knows бути in the future (a1-21)."
+    },
+    {
+      "id": "a2-12",
+      "level": "A2",
+      "icon": "☕",
+      "title": {
+        "en": "Tea with lemon",
+        "nl": "Thee met citroen"
+      },
+      "grammar": {
+        "en": "з + instrumental: with whom, with what",
+        "nl": "з + instrumentalis: met wie, waarmee"
+      },
+      "standard": [
+        "ОРУДНИЙ з З,ІЗ,ЗІ — спільність дії",
+        "ОРУДНИЙ з З,ІЗ,ЗІ — ознака предмета",
+        "ОРУДНИЙ без прийм. — об'єкт дії",
+        "Жіночого роду м'яка основа (-ія)",
+        "Варіанти прийменників з, зі, із"
+      ],
+      "theme": {
+        "en": "Food and drinks; leisure with friends",
+        "nl": "Eten en drinken; vrije tijd met vrienden"
+      },
+      "focus": [
+        "розмовляє з Оленою",
+        "чай із лимоном",
+        "кава з молоком",
+        "зі мною",
+        "з Марією",
+        "з Вікторією",
+        "захоплюємося музикою",
+        "цікавитися",
+        "займатися спортом"
+      ],
+      "brief": "з/із/зі + instrumental for company (з Оленою, зі мною, з друзями — give the plural -ами) and for a feature of a dish (чай із лимоном, бутерброд із сиром). Verbs that take a bare instrumental: захоплюватися, цікавитися, займатися (спортом, музикою). Feminine -ія nouns take -ією (з Марією, з Вікторією, з компанією). Repeat the з/із/зі sound rule with instrumental examples. Pitfall: the same з with the genitive means \"from\" (a1-12, a2-07) — the case carries the meaning."
+    },
+    {
+      "id": "a2-13",
+      "level": "A2",
+      "icon": "🛋️",
+      "title": {
+        "en": "Where things stand",
+        "nl": "Waar de dingen staan"
+      },
+      "grammar": {
+        "en": "над, під, перед, за, між + instrumental",
+        "nl": "над, під, перед, за, між + instrumentalis"
+      },
+      "standard": [
+        "ОРУДНИЙ з НАД, ПІД, ПЕРЕД, ЗА, МІЖ — місце розташування",
+        "ОРУДНИЙ з МІЖ — об'єктні відношення",
+        "ОРУДНИЙ з ПЕРЕД — часові поняття"
+      ],
+      "theme": {
+        "en": "Home: rooms, furniture",
+        "nl": "Huis: kamers, meubels"
+      },
+      "focus": [
+        "над столом",
+        "під ліжком",
+        "перед будинком",
+        "за дверима",
+        "між вікнами",
+        "між друзями",
+        "перед обідом",
+        "полиця",
+        "лампа",
+        "килим"
+      ],
+      "brief": "Five location prepositions govern the instrumental: над (above), під (under), перед (in front of), за (behind), між (between). Describe a room: Над столом висить лампа, Під ліжком лежить кіт. Then the two non-spatial uses: між друзями (among friends, between us) and перед + time (перед обідом, перед сном). Learner knows instrumental endings (a2-11/12); add the plural -ами here (між вікнами, за дверима). Dutch \"voor\" is both \"in front of\" and \"before\" — перед covers both too."
+    },
+    {
+      "id": "a2-14",
+      "level": "A2",
+      "icon": "🩺",
+      "title": {
+        "en": "Body and symptoms",
+        "nl": "Lichaam en klachten"
+      },
+      "grammar": {
+        "en": "Locative with к→ц, г→з, х→с: у руці, на нозі",
+        "nl": "Locatief met к→ц, г→з, х→с: у руці, на нозі"
+      },
+      "standard": [
+        "Чергування приголосних к//ц, х//с, г//з",
+        "Чергування голосних: ніс – носа, річ – речі",
+        "МІСЦЕВИЙ з У, В, НА — місце знаходження",
+        "Середнього роду (-е)"
+      ],
+      "theme": {
+        "en": "Health and hygiene: illness, visiting the doctor",
+        "nl": "Gezondheid en hygiëne: ziekte, doktersbezoek"
+      },
+      "focus": [
+        "у руці",
+        "на нозі",
+        "на поверсі",
+        "у книжці",
+        "на обличчі",
+        "у серці",
+        "ніс – носа",
+        "річ – речі",
+        "болить",
+        "застуда"
+      ],
+      "brief": "Before the locative (and dative) -і, a stem-final к, г, х becomes ц, з, с: рука → у руці, нога → на нозі, поверх → на поверсі, книжка → у книжці, жінка → жінці. Also the vowel alternation і ↔ о/е inside the stem when the ending changes (ніс – носа, річ – речі, стіл – на столі), met in the plural at a1-07. Neuter -е nouns (місце, поле, серце) take -і (на місці, у серці). Scenario: telling the doctor where it hurts; learner knows болить from a1-23."
+    },
+    {
+      "id": "a2-15",
+      "level": "A2",
+      "icon": "✈️",
+      "title": {
+        "en": "Going and coming",
+        "nl": "Gaan en komen"
+      },
+      "grammar": {
+        "en": "іти–ходити, їхати–їздити, летіти–літати",
+        "nl": "іти–ходити, їхати–їздити, летіти–літати"
+      },
+      "standard": [
+        "Теперішній час, тип кажу, кажеш…; іду; їду",
+        "Теперішній час, тип кричу, кричиш…; ходжу; їжджу",
+        "Чергування приголосних д//дж, с//ш",
+        "МІСЦЕВИЙ з ПО — місце руху"
+      ],
+      "theme": {
+        "en": "Travel: trips, means of transport",
+        "nl": "Reizen: trips, vervoermiddelen"
+      },
+      "focus": [
+        "іду",
+        "ходжу",
+        "їду",
+        "їжджу",
+        "лечу",
+        "літаю",
+        "кажу",
+        "кричу",
+        "по кімнаті",
+        "по місту",
+        "щодня",
+        "зараз"
+      ],
+      "brief": "Each motion verb comes as a pair: one direction / right now (іду, їду, лечу) and multi-directional / habitual (ходжу, їжджу, літаю): Зараз я йду в парк / Щодня я ходжу в парк. Conjugate ходжу/ходиш, їжджу/їздиш, ношу/носиш with the 1st-person д → дж, с → ш change (also кажу, кричу as further present-tense types). по + locative for movement around an area (бігає по кімнаті, гуляти по місту). Dutch and English use one verb (\"go\") for both; give a decision rule (round trip or routine → ходити/їздити)."
+    },
+    {
+      "id": "a2-16",
+      "level": "A2",
+      "icon": "💭",
+      "title": {
+        "en": "Dreams and goals",
+        "nl": "Dromen en doelen"
+      },
+      "grammar": {
+        "en": "Verbs мрію, борюся; про + accusative",
+        "nl": "Werkwoorden мрію, борюся; про + accusatief"
+      },
+      "standard": [
+        "Теперішній час, тип мрію, мрієш, мріє…",
+        "Теперішній час дієслова боротися",
+        "ЗНАХІДНИЙ з ПРО — об'єктні відношення"
+      ],
+      "theme": {
+        "en": "Leisure: hobbies, sport",
+        "nl": "Vrije tijd: hobby's, sport"
+      },
+      "focus": [
+        "мрію",
+        "мрієш",
+        "мріє",
+        "борюся",
+        "борешся",
+        "бореться",
+        "думати про майбутнє",
+        "мріяти про відпустку",
+        "змагання",
+        "перемога",
+        "команда"
+      ],
+      "brief": "Two more present-tense patterns: -іяти verbs (мрію, мрієш, мріє, мріємо, мрієте, мріють; also сміюся) and боротися with its stem change and reflexive endings (борюся, борешся, бореться, боремося, боретеся, борються). про + accusative for the topic of thinking, speaking and dreaming (говорити про спорт, мріяти про перемогу, думати про майбутнє). Talk about a sport or hobby: who you train with (a2-12), what you dream of. Learner knows the reflexive -ся from a1-09."
+    },
+    {
+      "id": "a2-17",
+      "level": "A2",
+      "icon": "🔁",
+      "title": {
+        "en": "Done or doing?",
+        "nl": "Gedaan of bezig?"
+      },
+      "grammar": {
+        "en": "Aspect pairs: писати – написати",
+        "nl": "Aspectparen: писати – написати"
+      },
+      "standard": [
+        "Видові пари дієслів: писати – написати, вчити – вивчити, іти – піти, їхати – поїхати, забувати – забути",
+        "Майбутній доконаного виду: скажу…, закричите…, поборють…",
+        "Майбутній недоконаного виду, складена форма",
+        "Минулий час"
+      ],
+      "theme": {
+        "en": "Studying: exams, homework",
+        "nl": "Studeren: examens, huiswerk"
+      },
+      "focus": [
+        "писати – написати",
+        "вчити – вивчити",
+        "читати – прочитати",
+        "забувати – забути",
+        "іти – піти",
+        "буду писати",
+        "напишу",
+        "скажу",
+        "писав",
+        "написав",
+        "мріяв",
+        "пив"
+      ],
+      "brief": "Every action has two verbs: imperfective (process, repetition) and perfective (one completed result): Я писав лист (was writing) / Я написав лист (finished it). The perfective has no present: its present-looking form is the future (напишу = I will write and finish; скажу, закричите), while the imperfective future is буду писати / буду боротися. Give the common ways to form the pair: a prefix (на-, про-, по-, з-), a suffix change (вивчати – вивчити), a different stem (брати – взяти, preview). Past forms of the new verbs (мріяв, боровся, пив, пила). This replaces the Dutch/English tense distinctions; give decision questions (finished? once? result?)."
+    },
+    {
+      "id": "a2-18",
+      "level": "A2",
+      "icon": "🏦",
+      "title": {
+        "en": "At the bank and post office",
+        "nl": "Bij de bank en het postkantoor"
+      },
+      "grammar": {
+        "en": "Imperative incl. хай/нехай; order, request, advice, offer",
+        "nl": "Gebiedende wijs incl. хай/нехай; bevel, verzoek, advies, voorstel"
+      },
+      "standard": [
+        "НАКАЗОВИЙ СПОСІБ: мрій, кажіть (скажіть), пий, пийте, борися, боріться, хай/нехай бореться/борються",
+        "Спонукальне — розпорядження, прохання, порада, пропозиція",
+        "КЛИЧНИЙ — адресат-об'єкт"
+      ],
+      "theme": {
+        "en": "Services: bank, post office, library",
+        "nl": "Diensten: bank, postkantoor, bibliotheek"
+      },
+      "focus": [
+        "заповніть",
+        "підпишіть",
+        "покажіть паспорт",
+        "пийте",
+        "борися",
+        "хай / нехай",
+        "Пане викладачу",
+        "рахунок",
+        "посилка",
+        "картка",
+        "обміняти"
+      ],
+      "brief": "Imperatives for forms and counters (заповніть бланк, підпишіть тут, покажіть паспорт) and the third-person imperative with хай/нехай (Нехай він зачекає). Show the four functions the standard lists — order, request, advice, suggestion — and how будь ласка, a vocative (Пане викладачу) or давайте soften them. Vocative of masculine nouns in -ач/-ч (викладачу, читачу). Learner knows the basic forms from a1-22; here add perfective imperatives for one-off requests (напишіть) versus imperfective ones for general advice (пийте воду)."
+    },
+    {
+      "id": "a2-19",
+      "level": "A2",
+      "icon": "🏷️",
+      "title": {
+        "en": "Cheaper, bigger, better",
+        "nl": "Goedkoper, groter, beter"
+      },
+      "grammar": {
+        "en": "Comparative and superlative: -іший, най-",
+        "nl": "Vergrotende en overtreffende trap: -іший, най-"
+      },
+      "standard": [
+        "Ступені порівняння прикметників, проста форма вищого ступеня",
+        "Проста форма найвищого ступеня",
+        "Суплетивні форми: великий – більший, найбільший; малий – менший, найменший"
+      ],
+      "theme": {
+        "en": "Shopping: weights, measures, money",
+        "nl": "Winkelen: gewichten, maten, geld"
+      },
+      "focus": [
+        "дешевший",
+        "дорожчий",
+        "найдешевший",
+        "більший",
+        "менший",
+        "кращий",
+        "гірший",
+        "кілограм",
+        "літр",
+        "пів кілограма",
+        "дорого"
+      ],
+      "brief": "Simple comparative with -ший/-іший (дешевий → дешевший, важливий → важливіший), the consonant changes in the common ones (дорогий → дорожчий, високий → вищий, солодкий → солодший), and the superlative with най- (найдешевший). Suppletive pairs to memorise: великий – більший – найбільший, малий – менший – найменший, добрий – кращий, поганий – гірший. At this level compare with ніж only (Ця сумка дешевша, ніж та); за/від come at B1. Weights and measures with the genitive (кілограм яблук, літр молока). Dutch -er/-st maps closely; English learners tend to overuse більш."
+    },
+    {
+      "id": "a2-20",
+      "level": "A2",
+      "icon": "🌦️",
+      "title": {
+        "en": "Weather and seasons",
+        "nl": "Weer en seizoenen"
+      },
+      "grammar": {
+        "en": "Soft adjectives синій, осінній; compound sentences with і / та",
+        "nl": "Zachte adjectieven синій, осінній; zinnen met і / та"
+      },
+      "standard": [
+        "Чол. р. (-ій)",
+        "Жін. р. (-я)",
+        "Сер. р. (-є)",
+        "Складносурядні зі сполучниками і(й), та (=і)"
+      ],
+      "theme": {
+        "en": "Natural environment: weather, seasons",
+        "nl": "Natuur: weer, seizoenen"
+      },
+      "focus": [
+        "синій",
+        "синя",
+        "синє",
+        "сині",
+        "осінній",
+        "осіння",
+        "літній",
+        "зимовий",
+        "У січні була холодна погода і часто падав сніг",
+        "дощ",
+        "сніг",
+        "вітер",
+        "хмарно"
+      ],
+      "brief": "Soft-stem adjectives: -ій/-я/-є/-і (синій, синя, синє, сині; осінній, домашній) with their case endings (-ього, -ьому, -ім, -ьою) next to the hard paradigm from a2-02. Season adjectives and weather vocabulary; impersonal weather statements with an adverb and no subject (Сьогодні холодно, Завтра буде тепло). Compound sentences joined by і/й/та: the comma rule is \"comma between clauses with their own subjects\", with the standard's exception when both clauses share an opening time phrase (У січні була холодна погода і часто падав сніг)."
+    },
+    {
+      "id": "a2-21",
+      "level": "A2",
+      "icon": "📺",
+      "title": {
+        "en": "News and media",
+        "nl": "Nieuws en media"
+      },
+      "grammar": {
+        "en": "більш / менш + adjective; antonyms and synonyms",
+        "nl": "більш / менш + adjectief; antoniemen en synoniemen"
+      },
+      "standard": [
+        "Складена форма вищого ступеня",
+        "Складена форма найвищого ступеня",
+        "Антоніми: тут-там, весело-сумно, високий-низький, говорити-мовчати, дорогий-дешевий",
+        "Синоніми"
+      ],
+      "theme": {
+        "en": "Leisure: press, radio, TV, internet",
+        "nl": "Vrije tijd: pers, radio, tv, internet"
+      },
+      "focus": [
+        "більш цікавий",
+        "менш важливий",
+        "найбільш популярний",
+        "найменш відомий",
+        "дорогий – дешевий",
+        "говорити – мовчати",
+        "водій, шофер",
+        "казати, говорити, розповідати",
+        "новини",
+        "канал",
+        "сайт"
+      ],
+      "brief": "The compound comparison більш/менш + adjective and найбільш/найменш + adjective, used mainly with long adjectives and in writing; contrast with the simple forms from a2-19 and warn against doubling (not \"більш дешевший\"). Build vocabulary through antonym pairs (тут – там, весело – сумно, дорогий – дешевий, говорити – мовчати) and synonym sets (водій – шофер; сум – жаль; казати – говорити – розповідати, explaining when each is used). Scenario: TV, newspapers, websites and social media you follow."
+    },
+    {
+      "id": "a2-22",
+      "level": "A2",
+      "icon": "💊",
+      "title": {
+        "en": "At the doctor's",
+        "nl": "Bij de dokter"
+      },
+      "grammar": {
+        "en": "тому що / бо / через те що; але; commas",
+        "nl": "тому що / бо / через те що; але; komma's"
+      },
+      "standard": [
+        "Складнопідрядні зі сполучниками тому що, бо, через те що",
+        "Складносурядні з протиставними відношеннями (але)",
+        "Пунктуація — кома на межі частин складного речення",
+        "Пунктуація — сполучники та/і(й), але між групами слів"
+      ],
+      "theme": {
+        "en": "Health: illness, visiting the doctor, pharmacy",
+        "nl": "Gezondheid: ziekte, doktersbezoek, apotheek"
+      },
+      "focus": [
+        "тому що",
+        "бо",
+        "через те що",
+        "але",
+        "Я не прийшов, тому що був хворий",
+        "кашель",
+        "нежить",
+        "рецепт",
+        "таблетки",
+        "приймати ліки"
+      ],
+      "brief": "Expand the reason clause: тому що, бо, через те що, and the contrast clause with але (Ми телефонували додому, але ніхто не відповів). Comma rules: always before тому що/бо/але between clauses (Марія читає, Андрій пише), but no comma between two verbs or nouns joined by one та/і (Студент думає та відповідає). Scenario: explaining to the doctor what is wrong and why you did not come earlier, then receiving instructions in the imperative (a2-18). Dutch \"omdat/want\" = тому що/бо."
+    },
+    {
+      "id": "a2-23",
+      "level": "A2",
+      "icon": "🗒️",
+      "title": {
+        "en": "What the teacher said",
+        "nl": "Wat de docent zei"
+      },
+      "grammar": {
+        "en": "Clauses with що; де, куди, звідки",
+        "nl": "Bijzinnen met що; де, куди, звідки"
+      },
+      "standard": [
+        "Складнопідрядні зі сполучником що: Викладач сказав, що я маю багато працювати",
+        "Складнопідрядні зі сполучними словами де, куди, звідки",
+        "Чергування прийменників у – в",
+        "Чергування сполучників і – й"
+      ],
+      "theme": {
+        "en": "Studying: lessons, instructions from the teacher",
+        "nl": "Studeren: lessen, instructies van de docent"
+      },
+      "focus": [
+        "Викладач сказав, що…",
+        "Я знаю, що…",
+        "Ви не знаєте, де мій словник?",
+        "Скажи, куди ти йдеш",
+        "звідки",
+        "у / в",
+        "і / й",
+        "лекція",
+        "семінар"
+      ],
+      "brief": "Subordinate clauses with що (that) after verbs of saying, knowing and thinking, and indirect questions with де/куди/звідки (Ви не знаєте, де мій словник?). Always a comma before що and before the question word; unlike English, що cannot be dropped. Word order inside the clause stays normal — Dutch learners must not move the verb to the end. Use the unit to revise the у/в and і/й euphony choices inside longer sentences, since they now occur between words constantly."
+    },
+    {
+      "id": "a2-24",
+      "level": "A2",
+      "icon": "🎯",
+      "title": {
+        "en": "Why do you work?",
+        "nl": "Waarom werk je?"
+      },
+      "grammar": {
+        "en": "Purpose with щоб + infinitive",
+        "nl": "Doel met щоб + infinitief"
+      },
+      "standard": [
+        "Складнопідрядні зі сполучником щоб (мета, той самий суб'єкт)",
+        "Епітети"
+      ],
+      "theme": {
+        "en": "Work: professions, working hours, pay",
+        "nl": "Werk: beroepen, werktijden, salaris"
+      },
+      "focus": [
+        "щоб",
+        "Ми вчимо українську, щоб розмовляти з друзями",
+        "Я працюю, щоб заробляти гроші",
+        "золоті руки",
+        "висока оцінка",
+        "графік",
+        "відпустка",
+        "заробляти"
+      ],
+      "brief": "Purpose clause щоб + infinitive when the subject is the same in both parts (Я працюю, щоб заробляти); щоб with a past-tense verb for a different subject is saved for B1. Comma before щоб. English \"to / in order to\" and Dutch \"om te\" map directly. Add a few fixed epithets the standard lists (золоті руки, веселі птахи, висока оцінка) as colourful work-related vocabulary."
+    },
+    {
+      "id": "a2-25",
+      "level": "A2",
+      "icon": "🔊",
+      "title": {
+        "en": "Stress changes the word",
+        "nl": "Klemtoon verandert het woord"
+      },
+      "grammar": {
+        "en": "Stress: замо́к – за́мок, ру́ки – руки́",
+        "nl": "Klemtoon: замо́к – за́мок, ру́ки – руки́"
+      },
+      "standard": [
+        "Наголос, подвійний: по́милка – поми́лка; за́вжди – завжди́",
+        "Наголос для розрізнення слів",
+        "Наголос для розрізнення форм"
+      ],
+      "theme": {
+        "en": "Home and city: lock, castle, keys",
+        "nl": "Huis en stad: slot, kasteel, sleutels"
+      },
+      "focus": [
+        "замо́к – за́мок",
+        "ру́ки – руки́",
+        "по́милка – поми́лка",
+        "за́вжди – завжди́",
+        "доро́га – дорога́",
+        "ключ"
+      ],
+      "brief": "Three things stress does: it distinguishes words (замо́к lock – за́мок castle), distinguishes forms (ру́ки nominative plural – руки́ genitive singular), and varies freely in some words (по́милка / поми́лка, за́вжди / завжди́ — both correct). Give the learner a listening-and-marking routine for new words. Since Dutch and English stress is mostly predictable, stress that there is no shortcut: the stress is part of the word's spelling in your head."
+    },
+    {
+      "id": "a2-26",
+      "level": "A2",
+      "icon": "🎄",
+      "title": {
+        "en": "Holiday greetings",
+        "nl": "Feestwensen"
+      },
+      "grammar": {
+        "en": "Address forms, ellipsis, repetition, metaphor",
+        "nl": "Aanspreekvormen, ellips, herhaling, metafoor"
+      },
+      "standard": [
+        "Звертання: Олено Петрівно, ви успішно виступили на конференції",
+        "Еліпс",
+        "Повтор",
+        "Метафора"
+      ],
+      "theme": {
+        "en": "Traditions: holidays, wishes and gifts",
+        "nl": "Tradities: feesten, wensen en cadeaus"
+      },
+      "focus": [
+        "Олено Петрівно",
+        "Шановний пане",
+        "Вітаю з Різдвом!",
+        "Бажаю щастя",
+        "Моя країна – Україна!",
+        "У четвер – в театрі, у суботу – в цирку",
+        "Де-де?",
+        "прийшла осінь",
+        "місто спить"
+      ],
+      "brief": "Greeting cards and toasts: full vocative address with name and patronymic (Олено Петрівно, Іване Петровичу), Вітаю з + instrumental (з днем народження, з Новим роком), Бажаю + genitive (щастя, здоров'я). Stylistic devices the standard lists: ellipsis with a dash where a verb is left out (Моя країна – Україна!), repetition for emphasis (Де-де?), everyday metaphors (прийшла осінь, місто спить). Learner knows the vocative (a1-18) and the instrumental (a2-11/12)."
+    },
+    {
+      "id": "b1-01",
+      "level": "B1",
+      "icon": "👨‍👩‍👧",
+      "title": {
+        "en": "Family and life story",
+        "nl": "Familie en levensverhaal"
+      },
+      "grammar": {
+        "en": "Nominative predicate: Сестра – студентка; У мене є; Сьогодні п'ятниця",
+        "nl": "Nominatief gezegde: Сестра – студентка; У мене є; Сьогодні п'ятниця"
+      },
+      "standard": [
+        "НАЗИВНИЙ — носій характеристики (складений іменний присудок)",
+        "НАЗИВНИЙ — наявність особи/предмета",
+        "НАЗИВНИЙ — вказівка на факти, події",
+        "НАЗИВНИЙ — проміжок часу"
+      ],
+      "theme": {
+        "en": "The person: marital status, family relations, biography",
+        "nl": "De mens: burgerlijke staat, familierelaties, biografie"
+      },
+      "focus": [
+        "Сестра – студентка",
+        "Віктор – лікар",
+        "У мене є брат",
+        "Сьогодні п'ятниця",
+        "Незабаром Різдво",
+        "одружений",
+        "заміжня",
+        "розлучений",
+        "народився",
+        "виріс",
+        "переїхав"
+      ],
+      "brief": "Four nominative uses in a biography: predicate noun with a dash in writing (Моя сестра – лікарка), existence (У мене є старший брат), naming facts and events (Сьогодні вибори, Незабаром Різдво) and time spans and states (Сьогодні п'ятниця; Хвилювання студентів перед іспитом). Contrast the present nominative predicate (Він лікар) with past and future in the instrumental (був лікарем, буде лікарем) known from a2-11. Vocabulary for marital status and life events; write a short biography in the past tense choosing aspect (a2-17). The dash replaces the missing \"is\" — Dutch and English learners omit it in writing."
+    },
+    {
+      "id": "b1-02",
+      "level": "B1",
+      "icon": "🛍️",
+      "title": {
+        "en": "Which one? Whose?",
+        "nl": "Welke? Van wie?"
+      },
+      "grammar": {
+        "en": "Declension of той/цей, який, чий, котрий, хто/що",
+        "nl": "Verbuiging van той/цей, який, чий, котрий, хто/що"
+      },
+      "standard": [
+        "Відмінювання вказівних займенників той, цей",
+        "Відмінювання питально-відносних займенників хто, що, який, чий, котрий",
+        "Відмінювання особових займенників (повна форма)"
+      ],
+      "theme": {
+        "en": "Shopping: manufactured goods, choosing",
+        "nl": "Winkelen: industriële goederen, kiezen"
+      },
+      "focus": [
+        "цього",
+        "цій",
+        "цим",
+        "тому",
+        "якого",
+        "якій",
+        "чий",
+        "чия",
+        "чиє",
+        "котрий",
+        "кого",
+        "чого",
+        "кому",
+        "ким"
+      ],
+      "brief": "Full tables of цей/той (цього, цьому, цим, у цьому; ця: цієї, цій, цю, цією) and of the question words який, чий, котрий, хто, що in all cases (кого, кому, ким, про кого; чого, чому, чим). Scenario: choosing between products (Який телефон? Котрий з цих? Чия це сумка? Про що ця книжка?). Revise the personal pronoun table from a2-01 as the model. Dutch \"welke/wiens\" and English \"which/whose\" never change, so drill agreement with the noun's gender, number and case."
+    },
+    {
+      "id": "b1-03",
+      "level": "B1",
+      "icon": "💞",
+      "title": {
+        "en": "Him, her, them, oneself",
+        "nl": "Hem, haar, hen, zichzelf"
+      },
+      "grammar": {
+        "en": "Declension of він/вона/вони and себе; possessives in all cases",
+        "nl": "Verbuiging van він/вона/вони en себе; bezittelijke voornaamwoorden in alle naamvallen"
+      },
+      "standard": [
+        "Відмінювання особово-вказівних займенників він, вона, воно, вони",
+        "Відмінювання зворотного займенника себе",
+        "Відмінювання присвійних займенників чол./сер./жін. роду",
+        "Присвійний займенник їхній (чол./сер.), незмінне його; їхня (жін.), незмінне її",
+        "МІСЦЕВИЙ з ПО — характеристика об'єкта"
+      ],
+      "theme": {
+        "en": "The person: family relations, contacts",
+        "nl": "De mens: familierelaties, contacten"
+      },
+      "focus": [
+        "його / йому / ним / у нього",
+        "її / їй / нею / у неї",
+        "їх / їм / ними",
+        "себе / собі / собою",
+        "моєї / моїй / моєю",
+        "нашого / нашому",
+        "товариші по навчанню",
+        "довіряти",
+        "пишатися"
+      ],
+      "brief": "Third-person pronouns in every case, including the н-forms after prepositions (у нього, з нею, про них) and the ambiguity of його/її as \"him/her\" and as invariable \"his/her\". The reflexive себе has no nominative (собі, собою, на собі) and is used for all persons where Dutch has mij/je/zich. Complete the possessive tables for feminine and plural (моєї, моїй, моєю; моїх, моїм, моїми; наша, ваша). по + locative for relations (товариші по навчанню, колеги по роботі). Scenario: describing relationships in the family and among friends."
+    },
+    {
+      "id": "b1-04",
+      "level": "B1",
+      "icon": "📚",
+      "title": {
+        "en": "Studies and subjects",
+        "nl": "Studie en vakken"
+      },
+      "grammar": {
+        "en": "Genitive of attribute: центр міста, підручник із фізики",
+        "nl": "Genitief als bepaling: центр міста, підручник із фізики"
+      },
+      "standard": [
+        "РОДОВИЙ без прийм. — ознака предмета",
+        "РОДОВИЙ з З,ІЗ,ЗІ — галузь науки/мистецтва/техніки",
+        "РОДОВИЙ без прийм. — кількісно-іменні відношення",
+        "РОДОВИЙ без прийм. — суб'єкт дії, віддієслівний іменник",
+        "Чергування [о], [е] з фонетичним нулем"
+      ],
+      "theme": {
+        "en": "Education: institutions, specialities, the academic year",
+        "nl": "Onderwijs: instellingen, studierichtingen, het studiejaar"
+      },
+      "focus": [
+        "центр міста",
+        "день відпочинку",
+        "підручник із фізики",
+        "іспит з математики",
+        "група студентів",
+        "виступ артистів",
+        "гуртожиток – гуртожитки",
+        "учень – учні",
+        "семестр",
+        "залік",
+        "іспит"
+      ],
+      "brief": "The genitive as the noun-of-noun link: день відпочинку, центр міста, розклад занять (English \"of\", Dutch \"van\"); з/із + genitive for the field a book, exam or lecture belongs to (підручник із фізики, іспит з математики); quantity nouns + genitive plural (група студентів, багато завдань); and the subject of an action noun (виступ артистів = the artists perform). Genitive plural endings (-ів, -ей, zero) as a table, with the fleeting о/е (гуртожиток – гуртожитки, учень – учні). Scenario: describing your course, timetable, exams."
+    },
+    {
+      "id": "b1-05",
+      "level": "B1",
+      "icon": "👷",
+      "title": {
+        "en": "Getting a job",
+        "nl": "Een baan krijgen"
+      },
+      "grammar": {
+        "en": "стати / бути + instrumental; agent nouns -ач, -ак; nouns in -ар / -яр",
+        "nl": "стати / бути + instrumentalis; -ач, -ак; woorden op -ар / -яр"
+      },
+      "standard": [
+        "ОРУДНИЙ без прийм. — характеристика зі зв'язками стати, бути",
+        "Утворення назв осіб за видом діяльності: співати – співак, викладати – викладач, читати – читач",
+        "Чол. р. на –ар: пекар, комісар, узвар, гектар",
+        "Чол. р. на –яр"
+      ],
+      "theme": {
+        "en": "Work: formal employment, contracts, pay",
+        "nl": "Werk: officiële aanstelling, contracten, loon"
+      },
+      "focus": [
+        "стати вчителем",
+        "Будемо товаришами",
+        "працювати пекарем",
+        "співати – співак",
+        "викладати – викладач",
+        "читати – читач",
+        "пекар",
+        "школяр",
+        "контракт",
+        "співбесіда",
+        "посада"
+      ],
+      "brief": "The instrumental after стати, бути, працювати, залишатися for a role or status (Важко стати вчителем; Будемо товаришами), extending a2-11. Form agent nouns from verbs with -ач (викладач, слухач), -ак (співак), -ар/-яр (пекар, школяр, каменяр) and show their declension (пекаря, пекареві, пекарем; школяра, школярем). Job-interview scenario: who you want to become, what you did before (past tense + instrumental). Pitfall: English \"become a teacher\" needs no case; here the noun must change."
+    },
+    {
+      "id": "b1-06",
+      "level": "B1",
+      "icon": "🚦",
+      "title": {
+        "en": "Prefixed verbs of motion",
+        "nl": "Bewegingswerkwoorden met voorvoegsels"
+      },
+      "grammar": {
+        "en": "при-, ви-, за-, пере-, до-, від-, об- + іти / їхати",
+        "nl": "при-, ви-, за-, пере-, до-, від-, об- + іти / їхати"
+      },
+      "standard": [
+        "Утворення префіксальних дієслів руху: іти – прийти, перейти, дійти, відійти, зайти, вийти; їхати – приїхати, переїхати, доїхати, від'їхати, заїхати, виїхати, об'їхати",
+        "ЗНАХІДНИЙ з ЧЕРЕЗ — рух через простір",
+        "ЗНАХІДНИЙ з В,У,НА,ЗА — напрям руху, extended"
+      ],
+      "theme": {
+        "en": "Travel: means of transport, getting around",
+        "nl": "Reizen: vervoermiddelen, de weg vinden"
+      },
+      "focus": [
+        "прийти / приїхати",
+        "вийти / виїхати",
+        "зайти",
+        "перейти",
+        "дійти до",
+        "відійти від",
+        "об'їхати",
+        "їхати через ліс",
+        "повернути за будинок",
+        "переходити вулицю"
+      ],
+      "brief": "Prefixes turn іти/їхати into perfective verbs of arriving (при-), leaving (ви-, від-), dropping in (за-), crossing (пере-), reaching (до-) and going round (об-): прийти, вийти, перейти, дійти, відійти, зайти, об'їхати; their imperfective partners are приходити, виходити, переходити, доходити. Each prefix pairs with a preposition and case: дійти до + genitive, відійти від + genitive, зайти в / за + accusative (Автобус повернув за будинок), перейти через + accusative (їхати через ліс). Build a route description. Dutch separable verbs (aankomen, uitgaan, oversteken) are a good hook; stress that the prefix never detaches."
+    },
+    {
+      "id": "b1-07",
+      "level": "B1",
+      "icon": "🛂",
+      "title": {
+        "en": "Station and border",
+        "nl": "Station en grens"
+      },
+      "grammar": {
+        "en": "від + genitive; instrumental of transport: трамваєм; plural-only nouns",
+        "nl": "від + genitief; instrumentalis van vervoer: трамваєм; plurale tantum"
+      },
+      "standard": [
+        "ОРУДНИЙ без прийм. — засіб пересування",
+        "РОДОВИЙ з З,ІЗ,ЗІ,ВІД — початок руху, extended",
+        "РОДОВИЙ з ВІД — напрям руху від особи/предмета",
+        "Множинні іменники: Карпати, Черкаси, двері, окуляри"
+      ],
+      "theme": {
+        "en": "Travel: booking, means of transport, border crossing",
+        "nl": "Reizen: boeken, vervoer, grensovergang"
+      },
+      "focus": [
+        "їздити трамваєм",
+        "летіти літаком",
+        "відправився зі станції",
+        "прийшов від лікаря",
+        "Відійдіть від мене",
+        "Карпати",
+        "двері",
+        "окуляри",
+        "митниця",
+        "паспортний контроль",
+        "бронювання"
+      ],
+      "brief": "Bare instrumental for means of transport (їхати поїздом, автобусом, летіти літаком; на + locative is the spoken alternative). від + genitive for coming away from a person or object (прийшов від лікаря, Відійдіть від дверей) beside з/із/зі for places (зі станції, з аеропорту). Nouns that exist only in the plural (Карпати, двері, окуляри, Черкаси) and how they decline (у Карпатах, біля дверей, без окулярів). Scenario: tickets, customs questions, what you are carrying. Learner knows з for origin (a1-12) and the motion prefixes (b1-06)."
+    },
+    {
+      "id": "b1-08",
+      "level": "B1",
+      "icon": "⏳",
+      "title": {
+        "en": "When exactly?",
+        "nl": "Wanneer precies?"
+      },
+      "grammar": {
+        "en": "Accusative of time: через тиждень, за годину, весь день; о + locative",
+        "nl": "Accusatief van tijd: через тиждень, за годину, весь день; о + locatief"
+      },
+      "standard": [
+        "ЗНАХІДНИЙ без прийм. — час дії, тривалість, повторюваність",
+        "ЗНАХІДНИЙ з В,У,ЗА,ЧЕРЕЗ — час завершення дії, день тижня",
+        "ЗНАХІДНИЙ з НА,ЗА — тривалість дії",
+        "МІСЦЕВИЙ з О, ОБ — час",
+        "Скорочення порядкових числівників"
+      ],
+      "theme": {
+        "en": "Daily life: lifestyle, routine",
+        "nl": "Dagelijks leven: levensstijl, routine"
+      },
+      "focus": [
+        "через тиждень",
+        "за годину",
+        "на тиждень",
+        "весь день",
+        "у понеділок",
+        "о шостій годині",
+        "об одинадцятій",
+        "щодня",
+        "1-й",
+        "у 2018-му",
+        "об 11-й год"
+      ],
+      "brief": "Time in the accusative: duration without a preposition (весь місяць, цілий день), days of the week with у/в (у понеділок, у середу), через + period (after, \"in a week\": через тиждень), за + period (within: написали твір за годину), на + period (for: поїхати на тиждень). Clock time with о/об + locative of the ordinal (о шостій, об одинадцятій годині). Written shortcuts for ordinals (1-й, 3-тє, у 2018-му, об 11-й год). Pitfall: English \"in a week\" = через тиждень, not за; Dutch \"over een week\" = через, \"binnen een uur\" = за годину."
+    },
+    {
+      "id": "b1-09",
+      "level": "B1",
+      "icon": "💵",
+      "title": {
+        "en": "Paying: two, three, many",
+        "nl": "Betalen: twee, drie, veel"
+      },
+      "grammar": {
+        "en": "Declension of один–чотири, багато, кілька",
+        "nl": "Verbuiging van один–чотири, багато, кілька"
+      },
+      "standard": [
+        "Відмінювання кількісних числівників один, два, три, чотири",
+        "Відмінювання неозначених числівників",
+        "Родові форми порядкових числівників (-ий, -а, -е): сотий, двадцята, двохтисячне, десятимільйонний",
+        "Родові форми порядкових числівників (-ій, -я, -є): третій, третя, третє",
+        "Чергування [о] з [е] після шиплячих та [й]"
+      ],
+      "theme": {
+        "en": "Shopping: payment methods, cash and card",
+        "nl": "Winkelen: betaalwijzen, contant en kaart"
+      },
+      "focus": [
+        "двох",
+        "двом",
+        "двома",
+        "на трьох",
+        "чотирьох",
+        "чотирма",
+        "багатьох",
+        "кількох",
+        "одного",
+        "сотий",
+        "двадцята",
+        "чотири – четвертий",
+        "готівка",
+        "картка"
+      ],
+      "brief": "Oblique forms of два/три/чотири (двох, двом, двома; трьох, трьом, трьома; чотирьох, чотирьом, чотирма), of один in all genders, and of the indefinite багато/кілька/декілька (багатьох, кільком, декількома). Where they appear: столик на трьох, для двох осіб, у кількох магазинах, з багатьма друзями. Extend ordinals upward (двадцята, сотий, двохтисячний, десятимільйонний) and note the о → е change in чотири – четвертий, один – єдиний. Scenario: paying for several people, splitting the bill, cash or card."
+    },
+    {
+      "id": "b1-10",
+      "level": "B1",
+      "icon": "💳",
+      "title": {
+        "en": "Feminine nouns in full",
+        "nl": "Vrouwelijke woorden volledig"
+      },
+      "grammar": {
+        "en": "каса, стаття, сім'я, Ольга → Ользі: full feminine declension",
+        "nl": "каса, стаття, сім'я, Ольга → Ользі: volledige verbuiging"
+      },
+      "standard": [
+        "Жін. р. тверда основа (-а)",
+        "Жін. р. м'яка основа (-я)",
+        "Жін. р. на –ія",
+        "Чергування [к], [х], [г] з [ц'], [с'], [з'] у місцевому/давальному"
+      ],
+      "theme": {
+        "en": "Shopping: goods, receipts, returns",
+        "nl": "Winkelen: waren, bonnen, retouren"
+      },
+      "focus": [
+        "каса – у касі",
+        "касирка – касирці",
+        "Ольга – Ользі",
+        "стаття – статті",
+        "парасоля – парасолі",
+        "сім'я – сім'ї",
+        "записка",
+        "чек",
+        "повернути",
+        "знижка"
+      ],
+      "brief": "Complete tables for the three feminine types: hard -а (каса, касирка, жінка), soft -я (робітниця, парасоля, стаття with its double т), and -ія / -'я (Анастасія, сім'я), in singular and plural. The к/г/х → ц/з/с change in the dative and locative (Ользі, касирці, у книжці), met at a2-14, is now a rule for all such nouns. Genitive plural with zero ending and inserted о/е (жінок, касирок, записок, статей). Scenario: at the till, returning goods with the receipt, asking for a discount."
+    },
+    {
+      "id": "b1-11",
+      "level": "B1",
+      "icon": "🧾",
+      "title": {
+        "en": "Rent and bills",
+        "nl": "Huur en rekeningen"
+      },
+      "grammar": {
+        "en": "Partitive genitive; без; немає / не було / не буде; double negation",
+        "nl": "Partitieve genitief; без; немає / не було / не буде; dubbele ontkenning"
+      },
+      "standard": [
+        "РОДОВИЙ без прийм. — частина від цілого",
+        "РОДОВИЙ з БЕЗ — обмеження",
+        "Розповідне речення, заперечне зі словами немає, не було, не буде",
+        "Подвійне заперечення",
+        "Чергування голосних [о], [е] з [і]"
+      ],
+      "theme": {
+        "en": "Home: floors, balcony, rent and utilities",
+        "nl": "Huis: verdiepingen, balkon, huur en vaste lasten"
+      },
+      "focus": [
+        "склянку води",
+        "без цукру",
+        "без балкона",
+        "Завтра води не буде",
+        "Нічого не працює",
+        "ніхто не",
+        "нічим не",
+        "стіл – стола",
+        "оренда",
+        "комунальні платежі",
+        "рахунок за газ"
+      ],
+      "brief": "Partitive genitive after quantities and containers (склянка води, кілограм картоплі), без + genitive (кава без цукру, квартира без балкона), and the negative existential in three tenses with a genitive subject: немає води, не було світла, концерту не буде. Double negation is obligatory: Ніхто нічого не знає; Ти нічим не цікавишся — English \"nobody knows anything\" has only one negative. The і ↔ о/е alternation in masculine declension (стіл – стола, ніс – носа, річ – речі). Scenario: viewing a flat, discussing rent and utility bills."
+    },
+    {
+      "id": "b1-12",
+      "level": "B1",
+      "icon": "🧪",
+      "title": {
+        "en": "Tests and diagnosis",
+        "nl": "Onderzoeken en diagnose"
+      },
+      "grammar": {
+        "en": "Dative of the experiencer: мені треба, мені не спиться; захворіти на",
+        "nl": "Datief van de ervaarder: мені треба, мені не спиться; захворіти на"
+      },
+      "standard": [
+        "ДАВАЛЬНИЙ — особа, яка переживає стан",
+        "ДАВАЛЬНИЙ — особа, яка потребує чогось",
+        "ЗНАХІДНИЙ з НА — стан/ознака суб'єкта",
+        "ЗНАХІДНИЙ з ПО — мета дії"
+      ],
+      "theme": {
+        "en": "Health: diagnostics, tests, examinations",
+        "nl": "Gezondheid: diagnostiek, onderzoeken"
+      },
+      "focus": [
+        "Мені не спиться",
+        "Нам весело",
+        "Тобі треба звернутися до стоматолога",
+        "Мені потрібно",
+        "захворіти на грип",
+        "хворіти на серце",
+        "послати по лікаря",
+        "аналіз крові",
+        "обстеження",
+        "діагноз"
+      ],
+      "brief": "The dative person who experiences a state (Мені холодно, нам весело, мені не спиться with the impersonal -ся verb) and who needs something (Тобі треба / потрібно / необхідно + infinitive or noun). Illness takes на + accusative (захворіти на грип, хворіти на діабет), and sending for someone is по + accusative (послати по лікаря). Scenario: describing symptoms, having tests done, understanding the doctor's instructions. English \"I need\" has a nominative subject; here the person is dative and there is no verb."
+    },
+    {
+      "id": "b1-13",
+      "level": "B1",
+      "icon": "🥄",
+      "title": {
+        "en": "Tastes and the table",
+        "nl": "Smaken en de tafel"
+      },
+      "grammar": {
+        "en": "їсти, дати; брати – взяти, класти – покласти",
+        "nl": "їсти, дати; брати – взяти, класти – покласти"
+      },
+      "standard": [
+        "Дієвідмінювання дати, їсти",
+        "Теперішній час: беру, береш, бере…",
+        "Видові пари дієслів: пити–випити, іти–піти, ставити–поставити, класти–покласти, брати–взяти, купувати–купити, виклика́ти–ви́кликати",
+        "Форми роду і числа дієслів мин. часу недок./док. виду"
+      ],
+      "theme": {
+        "en": "Restaurant, café: taste preferences",
+        "nl": "Restaurant, café: smaakvoorkeuren"
+      },
+      "focus": [
+        "їм, їси, їсть, їмо, їсте, їдять",
+        "дам, даси, дасть, дамо, дасте, дадуть",
+        "беру, береш",
+        "брати – взяти",
+        "класти – покласти",
+        "ставити – поставити",
+        "купувати – купити",
+        "хотів – хотіла",
+        "побачив – побачила",
+        "солоний",
+        "гострий",
+        "солодкий"
+      ],
+      "brief": "The two irregular verbs їсти and дати (їм, їси, їсть, їмо, їсте, їдять; дам, даси, дасть, дамо, дасте, дадуть) and беру/береш from брати. Aspect pairs with different stems that must be memorised: брати – взяти, класти – покласти, ставити – поставити, купувати – купити, пити – випити, plus stress-only pairs like виклика́ти – ви́кликати. Past forms of both aspects with gender agreement (хотів/хотіла, побачив/побачила). Scenario: ordering, describing tastes (солоний, гострий, кислий), laying the table. Dutch \"zetten/leggen\" maps onto ставити/класти."
+    },
+    {
+      "id": "b1-14",
+      "level": "B1",
+      "icon": "💇",
+      "title": {
+        "en": "At the hairdresser",
+        "nl": "Bij de kapper"
+      },
+      "grammar": {
+        "en": "Reflexive verbs мию(ся), знайомлю(ся); до + genitive (беріться до роботи, подібний до)",
+        "nl": "Reflexieve werkwoorden мию(ся), знайомлю(ся); до + genitief"
+      },
+      "standard": [
+        "Теперішній час: запрошую…; мию(ся), миєш(ся)…",
+        "Теперішній час: знайомлю, знайомиш…",
+        "РОДОВИЙ з ДО — об'єкт дії",
+        "РОДОВИЙ з ДО — схожість об'єктів",
+        "Чергування д//дж, с//ш, к//ч, т//ч"
+      ],
+      "theme": {
+        "en": "Daily life: hairdressing and beauty services",
+        "nl": "Dagelijks leven: kapper en schoonheidsbehandelingen"
+      },
+      "focus": [
+        "мию – миюся",
+        "знайомлю – знайомлюся",
+        "запрошую",
+        "Беріться до роботи!",
+        "подібний до",
+        "платити – плачу́",
+        "плакати – пла́чу",
+        "стрижка",
+        "фарбувати",
+        "запис"
+      ],
+      "brief": "Verbs with and without -ся: мию голову / миюся, знайомлю друзів / знайомлюся з колегами, запрошую, and the inserted л in знайомлю, куплю, люблю. до + genitive as an object (братися до роботи, звикати до чогось) and for similarity (подібний до брата; compare схожий на in b1-15). The 1st-person consonant changes д → дж, с → ш, к → ч, т → ч (ходжу, ношу, плачу, плачу́), with stress separating пла́чу (I cry) from плачу́ (I pay). Scenario: booking and describing a haircut, paying at the end."
+    },
+    {
+      "id": "b1-15",
+      "level": "B1",
+      "icon": "📏",
+      "title": {
+        "en": "Taller than, like",
+        "nl": "Groter dan, zoals"
+      },
+      "grammar": {
+        "en": "Comparison: ніж / за / від / як; схожий на",
+        "nl": "Vergelijking: ніж / за / від / як; схожий на"
+      },
+      "standard": [
+        "Порівняння",
+        "НАЗИВНИЙ — об'єкт порівняння при вищому ступені",
+        "ЗНАХІДНИЙ з ЗА — порівняння при вищому ступені",
+        "РОДОВИЙ з ВІД — порівняння при вищому ступені",
+        "ЗНАХІДНИЙ з НА — подібність об'єктів"
+      ],
+      "theme": {
+        "en": "The person: fashion, appearance",
+        "nl": "De mens: mode, uiterlijk"
+      },
+      "focus": [
+        "вищий, ніж я",
+        "вищий за мене",
+        "вищий від мене",
+        "працьовитий як батько",
+        "Київ більш давній, ніж Львів",
+        "Син схожий на батька",
+        "модний",
+        "стильний",
+        "схожий"
+      ],
+      "brief": "Three equivalent ways to say \"than\": ніж + nominative, за + accusative, від + genitive (Брат вищий, ніж я / за мене / від мене), and \"as … as\" with як (працьовитий як батько). Resemblance: схожий на + accusative (Син схожий на батька). Learner has comparatives from a2-19/21; now add the comparison object in the right case, with the pronoun forms from a2-01. Dutch \"dan\" and English \"than\" never change the next word — here it changes with the construction. Scenario: comparing fashion, looks, family resemblance."
+    },
+    {
+      "id": "b1-16",
+      "level": "B1",
+      "icon": "🌡️",
+      "title": {
+        "en": "Climate",
+        "nl": "Klimaat"
+      },
+      "grammar": {
+        "en": "Comparison of adverbs: важче, найважче, краще, гірше; adverbs from adjectives",
+        "nl": "Vergelijking van bijwoorden: важче, найважче, краще, гірше; bijwoorden van adjectieven"
+      },
+      "standard": [
+        "Ступені порівняння якісних прислівників, проста форма вищого/найвищого ступеня",
+        "Складена форма вищого/найвищого ступеня прислівників",
+        "Суплетивні форми прислівників",
+        "Утворення прислівників від прикметників",
+        "Сер. р. (-е): явище, озерце, середовище"
+      ],
+      "theme": {
+        "en": "Natural environment: climate, seasons, animals",
+        "nl": "Natuur: klimaat, seizoenen, dieren"
+      },
+      "focus": [
+        "важко – важче – найважче",
+        "тепло – тепліше",
+        "більш сучасно",
+        "найменш потрібно",
+        "добре – краще",
+        "погано – гірше",
+        "швидкий – швидко",
+        "по-українськи",
+        "явище",
+        "середовище",
+        "клімат",
+        "посуха"
+      ],
+      "brief": "Adverbs are made from adjectives with -о/-е (швидкий → швидко) or по-…-ськи (по-українськи), and compare like adjectives: важче, найважче; тепліше, найтепліше; compound більш/найменш + adverb; suppletive краще, гірше. Weather and climate talk: Взимку тут холодніше, ніж у Нідерландах; найтепліше в липні. Neuter nouns in -е/-ще (явище, середовище, озерце) and their declension. Learner knows adjective comparison (a2-19/21) and ніж (b1-15)."
+    },
+    {
+      "id": "b1-17",
+      "level": "B1",
+      "icon": "🧭",
+      "title": {
+        "en": "Where exactly",
+        "nl": "Waar precies"
+      },
+      "grammar": {
+        "en": "серед, посеред, недалеко від, зліва від + genitive; між горами",
+        "nl": "серед, посеред, недалеко від, зліва від + genitief; між горами"
+      },
+      "standard": [
+        "РОДОВИЙ з БІЛЯ, СЕРЕД, НЕДАЛЕКО ВІД, СПРАВА/ЗЛІВА ВІД, НАВПРОТИ, ПОСЕРЕД — місце",
+        "ОРУДНИЙ з НАД,ПІД,ПЕРЕД,ЗА,МІЖ — місце, extended",
+        "Чол. р. м'яка основа (ь, й)",
+        "Сер. р. (-о)",
+        "Чол. р. тверда основа, розширений список"
+      ],
+      "theme": {
+        "en": "Places: type and location, landmarks",
+        "nl": "Plaatsen: soort en ligging, bezienswaardigheden"
+      },
+      "focus": [
+        "серед поля",
+        "посеред міста",
+        "недалеко від вокзалу",
+        "справа від готелю",
+        "зліва від",
+        "Між горами тече річка",
+        "кінь – коня – конем",
+        "велетень",
+        "відро",
+        "континент",
+        "Лондон – у Лондоні"
+      ],
+      "brief": "A fuller set of location prepositions with the genitive (серед, посеред, недалеко від, справа/зліва від, навпроти, біля) and the instrumental set extended to landscapes (між горами, над річкою, за містом). Masculine soft nouns (кінь – коня – конем, велетень) and the hard-stem set with place and personal names (Лондон, континент, Валентин, Лев – Лева). Neuter -о nouns (відро, гроно). Scenario: describing a town, its surroundings and how to find a landmark. Learner has біля/навпроти (a2-07) and над/під/між (a2-13)."
+    },
+    {
+      "id": "b1-18",
+      "level": "B1",
+      "icon": "🖼️",
+      "title": {
+        "en": "Museums and famous names",
+        "nl": "Musea en beroemde namen"
+      },
+      "grammar": {
+        "en": "Declining surnames: Шевченко, Коцюбинський, Драч; genitive of quality",
+        "nl": "Achternamen verbuigen: Шевченко, Коцюбинський, Драч; genitief van eigenschap"
+      },
+      "standard": [
+        "Чол. р. на –о (у т.ч. власні назви)",
+        "Чол. р. на –ий (прикметникового походження): Коцюбинський, вартовий, молодий",
+        "Чол. р. на ж, ч, щ, ш (у т.ч. власні назви)",
+        "РОДОВИЙ без прийм. — носій ознаки (+прикметник)"
+      ],
+      "theme": {
+        "en": "Leisure: museums, galleries, exhibitions",
+        "nl": "Vrije tijd: musea, galerieën, tentoonstellingen"
+      },
+      "focus": [
+        "музей Шевченка",
+        "твори Коцюбинського",
+        "вірші Драча",
+        "картина сторожа",
+        "людина похилого віку",
+        "дівчина веселої вдачі",
+        "виставка",
+        "картина",
+        "екскурсовод",
+        "вхід"
+      ],
+      "brief": "Men's surnames in -о decline like nouns (Шевченко – Шевченка – Шевченкові), surnames in -ський/-ий like adjectives (Коцюбинського, Коцюбинському; also вартовий, молодий as nouns), and surnames and nouns ending in ж/ч/ш/щ take -а/-ем (Драча, сторожем, Свища); women's surnames in -о and in a consonant do not decline. Genitive of quality with an adjective (людина похилого віку, дівчина веселої вдачі) to describe people in a painting. Scenario: a museum visit, talking about artists and their works. Pitfall: Dutch and English learners leave surnames unchanged."
+    },
+    {
+      "id": "b1-19",
+      "level": "B1",
+      "icon": "🎪",
+      "title": {
+        "en": "At the festival",
+        "nl": "Op het festival"
+      },
+      "grammar": {
+        "en": "Adjective declension in full; short forms; -ський, -ній from nouns",
+        "nl": "Volledige verbuiging van adjectieven; korte vormen; -ський, -ній"
+      },
+      "standard": [
+        "Відмінювання прикметників чол./жін./сер. р. (-ий, -а, -е): вагомий, вагома, вагоме; демократичний…",
+        "Відмінювання прикметників чол./жін./сер. р. (-ій, -я, -є): всесвітній, всесвітня, всесвітнє; сьогоднішній…",
+        "Форми прикметників чол. р. з нульовим закінченням у Н. та Зн. в.",
+        "Відмінювання прикметників у формі множини (-і)",
+        "Утворення прикметників від іменників"
+      ],
+      "theme": {
+        "en": "Leisure: theatre, cinema, festival",
+        "nl": "Vrije tijd: theater, bioscoop, festival"
+      },
+      "focus": [
+        "вагомий / вагома / вагоме",
+        "всесвітній / всесвітня / всесвітнє",
+        "європейські",
+        "зелен",
+        "молод",
+        "потрібен",
+        "Львів – львівський",
+        "осінь – осінній",
+        "вечір – вечірній",
+        "сцена",
+        "вистава",
+        "квиток"
+      ],
+      "brief": "Full declension tables for hard (вагомий, демократичний) and soft (всесвітній, сьогоднішній) adjectives in all genders and the plural (європейські, червоні), gathering the endings met case by case since a2-02. Short masculine forms used as predicates or in set phrases (потрібен, певен, зелен, молод). Make adjectives from nouns: -ський/-зький/-цький (Львів – львівський), -ній (осінь – осінній, вечір – вечірній). Scenario: a festival programme, describing performances."
+    },
+    {
+      "id": "b1-20",
+      "level": "B1",
+      "icon": "✉️",
+      "title": {
+        "en": "Letters and invitations",
+        "nl": "Brieven en uitnodigingen"
+      },
+      "grammar": {
+        "en": "Dative addressee; vocative друже / козаче; formal vs informal",
+        "nl": "Datief van de geadresseerde; vocatief друже / козаче; formeel vs informeel"
+      },
+      "standard": [
+        "ДАВАЛЬНИЙ — адресат дії",
+        "КЛИЧНИЙ — адресат-суб'єкт, що потенційно виконує волю мовця",
+        "Чергування [к], [х], [г] з [ч], [ш], [ж] у кличному відмінку",
+        "Офіційна і неофіційна тональності спілкування"
+      ],
+      "theme": {
+        "en": "The person: correspondence, contacts",
+        "nl": "De mens: correspondentie, contacten"
+      },
+      "focus": [
+        "пишу листи батькам",
+        "Максиме, напиши лист!",
+        "друже",
+        "козаче",
+        "Шановний пане директоре",
+        "Дорога Оксано",
+        "Привіт, Олю!",
+        "З повагою",
+        "Цілую",
+        "запрошення"
+      ],
+      "brief": "Dative of the addressee with писати, надсилати, відповідати (пишу батькам, відповідаю колезі — г → з before -і), and the dative plural -ам/-ям. Vocative of masculine nouns ending in г/к/х (друг – друже, козак – козаче) combined with an imperative (Максиме, напиши!). Two registers side by side: a formal letter (Шановний пане директоре, capital Ви, З повагою) versus an informal message (Привіт, Олю! Цілую). Dutch u/jij maps well; English learners must learn the capital Ви and the fixed closing formulas."
+    },
+    {
+      "id": "b1-21",
+      "level": "B1",
+      "icon": "🎊",
+      "title": {
+        "en": "Ukrainian customs",
+        "nl": "Oekraïense gebruiken"
+      },
+      "grammar": {
+        "en": "Genitive of wishes: бажаю здоров'я; diminutives with к → ч (ніжка); style figures",
+        "nl": "Genitief van wensen: бажаю здоров'я; verkleinwoorden (ніжка); stijlfiguren"
+      },
+      "standard": [
+        "РОДОВИЙ без прийм. — об'єкт бажання/очікування/вимоги",
+        "Чергування [к], [х], [г] з [ч], [ш], [ж] при словотворенні",
+        "Звертання, еліпс, повтор (review+extension)",
+        "Антоніми, синоніми, епітети, метафора (new example sets"
+      ],
+      "theme": {
+        "en": "Traditions: Ukrainian customs and holidays",
+        "nl": "Tradities: Oekraïense gebruiken en feesten"
+      },
+      "focus": [
+        "Бажаю здоров'я, щастя",
+        "попросити слова",
+        "вимагати уваги",
+        "око – очко",
+        "вухо – вушко",
+        "нога – ніжка",
+        "друг, приятель, товариш",
+        "явний – таємний",
+        "вишиванка",
+        "колядка",
+        "писанка"
+      ],
+      "brief": "Verbs of wishing, asking and demanding take the genitive (бажаю успіху, прошу слова, вимагаю пояснення), a frequent pattern in toasts and holiday wishes. Diminutives with the к/г/х → ч/ж/ш change (око – очко, нога – ніжка, вухо – вушко), common in folk songs and with children. Revisit the style figures (address, ellipsis, repetition; antonyms явний – таємний, the synonym scale друг – приятель – товариш, epithets, metaphors) through koliadky, proverbs and holiday texts. Scenario: explaining a Ukrainian custom to a Dutch friend."
+    },
+    {
+      "id": "b1-22",
+      "level": "B1",
+      "icon": "🏛️",
+      "title": {
+        "en": "Citizens and the state",
+        "nl": "Burgers en de staat"
+      },
+      "grammar": {
+        "en": "Nouns from verbs: читання, спальня; nouns in -ин, -ець; боротися за",
+        "nl": "Zelfstandige naamwoorden uit werkwoorden: читання, спальня; -ин, -ець; боротися за"
+      },
+      "standard": [
+        "Утворення іменників від дієслів",
+        "Утворення іменників-назв місць за дією: спати – спальня, приймати – приймальня, читати – читальня, вітати – вітальня",
+        "Чол. р. на –ин (-анин, -янин)",
+        "Чол. р. на –ець, –ень: хлопець, червень, українець, пень",
+        "ЗНАХІДНИЙ з ЗА,ПРО — об'єктні відношення"
+      ],
+      "theme": {
+        "en": "Social relations: institutions, state structure, war and peace",
+        "nl": "Maatschappij: instellingen, staatsinrichting, oorlog en vrede"
+      },
+      "focus": [
+        "читати – читання",
+        "голосувати – голосування",
+        "приймати – приймальня",
+        "громадянин – громадяни",
+        "киянин",
+        "українець – українця",
+        "хлопець – хлопця",
+        "Боротися за свободу",
+        "молитися за мир",
+        "вибори",
+        "уряд",
+        "парламент"
+      ],
+      "brief": "Make action nouns with -ння/-ття (читання, говоріння, бачення, голосування) and place nouns with -льня (спальня, приймальня, читальня, вітальня). Masculine nouns in -анин/-янин lose -ин in the plural (громадянин – громадяни, киянин – кияни) and nouns in -ець/-ень drop the е (українець – українця, хлопець – хлопця, червень – червня). за + accusative with боротися, молитися, голосувати (боротися за свободу, молитися за мир). Scenario: talking about elections, institutions, war and peace at B1 level of abstraction."
+    },
+    {
+      "id": "b1-23",
+      "level": "B1",
+      "icon": "📰",
+      "title": {
+        "en": "Reading the news",
+        "nl": "Het nieuws lezen"
+      },
+      "grammar": {
+        "en": "Abbreviations: ВР, Кабмін, кг; consonant simplification (чесний)",
+        "nl": "Afkortingen: ВР, Кабмін, кг; medeklinkervereenvoudiging (чесний)"
+      },
+      "standard": [
+        "Графічні засоби компресії писемного тексту — абревіатури",
+        "Скорочення іменників (частково)",
+        "Спрощення в групах приголосних",
+        "Засоби милозвучності (у-в, і-й, з/зі/із)"
+      ],
+      "theme": {
+        "en": "Social relations: socio-political events",
+        "nl": "Maatschappij: maatschappelijke en politieke gebeurtenissen"
+      },
+      "focus": [
+        "ВР України",
+        "Кабмін",
+        "ООН",
+        "ЄС",
+        "ауд.",
+        "м",
+        "кг",
+        "честь – чесний",
+        "тиждень – тижня",
+        "щастя – щасливий",
+        "виїзд – виїзний",
+        "заголовок",
+        "за даними"
+      ],
+      "brief": "How headlines compress text: initialisms read letter by letter (ВР, ООН, ЄС) or as words (Кабмін, НАТО), standard noun abbreviations (м, кг, ауд., вул.), ordinal shortcuts. Cluster simplification when suffixes are added (честь – чесний, тиждень – тижня, щастя – щасливий, виїзд – виїзний) — the spelling drops the consonant, unlike English \"castle\". Reading news aloud revises stress contrasts, euphony (у/в, і/й, з/зі/із) and sentence intonation, which the standard lists again at B1. Scenario: summarising a short news item."
+    },
+    {
+      "id": "b1-24",
+      "level": "B1",
+      "icon": "🧑‍💼",
+      "title": {
+        "en": "Career plans",
+        "nl": "Carrièreplannen"
+      },
+      "grammar": {
+        "en": "Synthetic future: читатиму, працюватимеш; nouns in -ість and осінь, любов",
+        "nl": "Synthetische toekomst: читатиму, працюватимеш; woorden op -ість en осінь, любов"
+      },
+      "standard": [
+        "Майбутній недоконаного виду, аналітична форма",
+        "Жін. р. нульове закінчення: осінь, тінь, любов, подорож",
+        "Жін. р. на –ість",
+        "Сер. р. (-я)"
+      ],
+      "theme": {
+        "en": "The person: education, career, profession",
+        "nl": "De mens: opleiding, carrière, beroep"
+      },
+      "focus": [
+        "читатиму",
+        "працюватимеш",
+        "вчитиметься",
+        "боротимуся",
+        "мріятимуть",
+        "радість – радості – радістю",
+        "молодість",
+        "осінь – осені",
+        "любов – любові – любов'ю",
+        "подорож",
+        "завдання – завдань",
+        "кар'єра",
+        "досвід"
+      ],
+      "brief": "The second imperfective future: infinitive + -му/-меш/-ме/-мемо/-мете/-муть (читатиму = буду читати), fully interchangeable with the буду-form and slightly more formal in writing. Feminine nouns ending in a consonant (осінь, подорож, любов) and in -ість (радість, молодість): -і in genitive, dative and locative, instrumental -ю with doubling or an apostrophe (радістю, подорожжю, любов'ю); neuter -я nouns (завдання, знаряддя) with genitive plural завдань. Scenario: what you will be doing in five years. Both futures are imperfective; a completed future action still needs the perfective (a2-17) — Dutch \"zullen/gaan\" is not the distinction."
+    },
+    {
+      "id": "b1-25",
+      "level": "B1",
+      "icon": "🧩",
+      "title": {
+        "en": "What, which, how much",
+        "nl": "Wat, welke, hoeveel"
+      },
+      "grammar": {
+        "en": "Object clauses (що, щоб, скільки, чому, навіщо); relative який / що; parenthetical words",
+        "nl": "Bijzinnen (що, щоб, скільки, чому, навіщо); betrekkelijk який / що; tussenwoorden"
+      },
+      "standard": [
+        "Складнопідрядні зі з'ясувальною частиною (що, щоб, куди, звідки, скільки, чому, навіщо, який)",
+        "Складнопідрядні з означальною частиною (який, що)",
+        "Просте ускладнене речення зі вставними словами",
+        "Просте ускладнене речення з однорідними членами"
+      ],
+      "theme": {
+        "en": "Education: the academic process (lecture, seminar, exam)",
+        "nl": "Onderwijs: het studieproces (college, seminar, examen)"
+      },
+      "focus": [
+        "Викладач сказав, щоб я багато працював",
+        "Я не знаю, скільки це коштує",
+        "Пані, яку ми зустріли…",
+        "студент, який…",
+        "Мабуть, …",
+        "На жаль, …",
+        "українські й зарубіжні фахівці",
+        "завдання – завдань",
+        "знаряддя",
+        "прислів'я"
+      ],
+      "brief": "Object clauses with the full set of connectors: що (fact), щоб + past tense for a wish or instruction with a different subject (сказав, щоб я працював), скільки, чому, навіщо, куди, звідки, який. Relative clauses with який agreeing in gender and number with its antecedent but taking its case from its own clause (пані, яку ми зустріли; будинок, у якому…), and colloquial що. Parenthetical words set off by commas (мабуть, на жаль, по-перше) and lists of homogeneous members with й/та (українські й зарубіжні фахівці). Neuter -я nouns (завдання, знаряддя, прислів'я) and their genitive plural (завдань). Scenario: understanding course instructions."
+    },
+    {
+      "id": "b1-26",
+      "level": "B1",
+      "icon": "⏱️",
+      "title": {
+        "en": "When… / Either… or",
+        "nl": "Toen… / Of… of"
+      },
+      "grammar": {
+        "en": "Temporal clauses with коли (aspect decides); і… теж; або… або",
+        "nl": "Tijdzinnen met коли (aspect beslist); і… теж; або… або"
+      },
+      "standard": [
+        "Складнопідрядні з темпоральною частиною (коли) — одночасність",
+        "Складнопідрядні з темпоральною частиною (коли) — різночасність",
+        "Складносурядні з приєднувальними відношеннями (і, теж)",
+        "Складносурядні з розділовими відношеннями (або…або, чи…чи)"
+      ],
+      "theme": {
+        "en": "Travel and daily life: the events of a day",
+        "nl": "Reizen en dagelijks leven: de gebeurtenissen van een dag"
+      },
+      "focus": [
+        "Коли ми йшли, ми зустріли…",
+        "Коли ми прийшли, …",
+        "і ми теж",
+        "або…, або…",
+        "чи…, чи…",
+        "як тільки",
+        "поки",
+        "поїздка",
+        "пригода"
+      ],
+      "brief": "коли-clauses where aspect carries the meaning: imperfective in the clause = simultaneous (Коли ми йшли в університет, ми зустріли викладача — while walking), perfective = sequence (Коли ми прийшли… — after arriving). Add як тільки and поки. Compound sentences with additive і … теж (Марта подивилася виставу, і ми теж подивимося) and alternative або … або / чи … чи. Dutch \"toen/als/wanneer\" all map onto коли; English learners must stop relying on \"while/when\" and watch the verb aspect instead. Scenario: narrating a trip day by day."
+    },
+    {
+      "id": "b1-27",
+      "level": "B1",
+      "icon": "🤞",
+      "title": {
+        "en": "If I were…",
+        "nl": "Als ik…"
+      },
+      "grammar": {
+        "en": "Conditional with би / б; real (якщо) and unreal (якби) conditions",
+        "nl": "Voorwaardelijke wijs met би / б; reële (якщо) en irreële (якби) voorwaarden"
+      },
+      "standard": [
+        "УМОВНИЙ СПОСІБ — утворення форм",
+        "Складнопідрядні з підрядною реальної умови (якщо)",
+        "Складнопідрядні з підрядною ірреальної умови (якби, коли б)"
+      ],
+      "theme": {
+        "en": "Work: career, choices",
+        "nl": "Werk: carrière, keuzes"
+      },
+      "focus": [
+        "говорив би",
+        "випила б",
+        "прочитали б",
+        "Якщо працюватимеш, матимеш кращі результати",
+        "Якби я мав час, я б поїхав",
+        "коли б",
+        "Я хотів би…",
+        "звільнитися",
+        "підвищення"
+      ],
+      "brief": "The conditional is simply the past tense + би (after a consonant) / б (after a vowel), movable within the clause: Я б поїхав / Я поїхав би. Real condition: якщо + future in both parts (Якщо працюватимеш, матимеш) — note the future where English and Dutch use the present. Unreal condition: якби / коли б + past, main clause with би (Якби я мав час, я б поїхав), covering both \"if I had\" and \"if I had had\" — context, not form, gives the time. Polite wishes with хотів би. Scenario: career choices and what you would do differently."
+    },
+    {
+      "id": "b1-28",
+      "level": "B1",
+      "icon": "⚖️",
+      "title": {
+        "en": "Despite, because of, in order that",
+        "nl": "Ondanks, vanwege, opdat"
+      },
+      "grammar": {
+        "en": "щоб with a different subject; через / від + cause; хоч, незважаючи на те що",
+        "nl": "щоб met ander onderwerp; через / від + oorzaak; хоч, незважаючи на те що"
+      },
+      "standard": [
+        "Складнопідрядні з підрядною мети (щоб)",
+        "Складнопідрядні з допустовою частиною (хоч, дарма що, незважаючи на те що)",
+        "ЗНАХІДНИЙ з ЧЕРЕЗ — причина дії/бездіяльності",
+        "РОДОВИЙ з ВІД, З — причина"
+      ],
+      "theme": {
+        "en": "Social relations: social problems, opinions",
+        "nl": "Maatschappij: maatschappelijke problemen, meningen"
+      },
+      "focus": [
+        "щоб краще знати історію",
+        "Я прошу, щоб ви прийшли",
+        "через хворобу",
+        "через погану погоду",
+        "почервоніти від сорому",
+        "стрибати з радості",
+        "хоч",
+        "дарма що",
+        "незважаючи на те що",
+        "на мою думку"
+      ],
+      "brief": "Purpose clauses with щоб + past tense when subjects differ (Я прошу, щоб ви прийшли) beside щоб + infinitive from a2-24 (ходимо в музеї, щоб краще знати історію). Causes expressed by prepositions: через + accusative for an obstacle or blame (через хворобу, через погану погоду) and від/з + genitive for an emotional cause (від сорому, з радості). Concessive clauses with хоч, дарма що, незважаючи на те що, always with a comma. Scenario: giving and justifying an opinion on a social problem (по-перше…, по-друге…). Dutch \"hoewel/ondanks\" and English \"although/despite\" map directly; the case after через is what learners miss."
+    },
+    {
+      "id": "b1-29",
+      "level": "B1",
+      "icon": "📎",
+      "title": {
+        "en": "Organised by, having returned",
+        "nl": "Georganiseerd door, teruggekeerd"
+      },
+      "grammar": {
+        "en": "Participle phrase (-ний, -тий) and adverbial participle phrase (-вши, -чи)",
+        "nl": "Deelwoordzin (-ний, -тий) en gerundiumzin (-вши, -чи)"
+      },
+      "standard": [
+        "Просте ускладнене речення з дієприкметниковим зворотом",
+        "Просте ускладнене речення з дієприслівниковим зворотом"
+      ],
+      "theme": {
+        "en": "Travel: excursions, tours",
+        "nl": "Reizen: excursies, rondleidingen"
+      },
+      "focus": [
+        "екскурсія, організована для учасників",
+        "лист, написаний другом",
+        "Повернувшись з екскурсії, ми пообідали",
+        "Читаючи, я…",
+        "прочитавши",
+        "організований",
+        "зачинений",
+        "відкритий"
+      ],
+      "brief": "Passive past participles in -ний/-тий behave like adjectives and agree with the noun (екскурсія, організована для учасників; лист, написаний другом; двері, зачинені), set off by commas when they follow it. Adverbial participles: imperfective -учи/-ючи/-ачи (читаючи = while reading) and perfective -вши/-ши (повернувшись = having returned), always with the same subject as the main verb — a rule English dangling participles break. Scenario: writing up an excursion. These are written-register tools; show the spoken alternatives with коли / який."
+    },
+    {
+      "id": "b1-30",
+      "level": "B1",
+      "icon": "🗨️",
+      "title": {
+        "en": "He said that…",
+        "nl": "Hij zei dat…"
+      },
+      "grammar": {
+        "en": "Direct and reported speech",
+        "nl": "Directe en indirecte rede"
+      },
+      "standard": [
+        "Складні речення з прямою мовою",
+        "Складні речення з непрямою мовою",
+        "Інтонація",
+        "Наголос, подвійний / розрізнення слів / розрізнення форм"
+      ],
+      "theme": {
+        "en": "Education and work: passing on instructions",
+        "nl": "Onderwijs en werk: instructies doorgeven"
+      },
+      "focus": [
+        "Викладач сказав: «Ви маєте прочитати»",
+        "Викладач сказав, що ми маємо прочитати",
+        "Він запитав, чи…",
+        "Вона попросила, щоб…",
+        "лапки",
+        "двокрапка",
+        "переказати"
+      ],
+      "brief": "Punctuation and intonation of direct speech (colon, Ukrainian « » quotation marks, dash in dialogue; the quoted question keeps its rising intonation and the stress contrasts that distinguish forms) and the shift to reported speech: statement → що, question without a question word → чи, request or command → щоб + past tense; pronouns and person shift (ви → ми) but there is no backshift of tenses as in English \"he said he was…\". Dutch learners keep normal word order after що. Scenario: relaying what the teacher or boss said. Learner has щоб-clauses from b1-28 and чи-questions from a2-10."
+    },
+    {
+      "id": "b2-01",
+      "level": "B2",
+      "icon": "🧬",
+      "title": {
+        "en": "Family history",
+        "nl": "Familiegeschiedenis"
+      },
+      "grammar": {
+        "en": "свій in all forms; surnames Петренко, Сковорода, Котляревський",
+        "nl": "свій in alle vormen; achternamen Петренко, Сковорода, Котляревський"
+      },
+      "standard": [
+        "Відмінювання присвійного займенника свій",
+        "Чол. р. на –о, –а, incl. proper names",
+        "Чол. р. на –ий (прикметникового походження): Котляревський, Кропивницький"
+      ],
+      "theme": {
+        "en": "The person: family history, origins",
+        "nl": "De mens: familiegeschiedenis, afkomst"
+      },
+      "focus": [
+        "свій / своя / своє / свої",
+        "свого",
+        "своїй",
+        "своїм",
+        "Він любить свою дружину / його дружину",
+        "Петренко – Петренка",
+        "Франко – Франка",
+        "Сковорода – Сковороди",
+        "Котляревський – Котляревського",
+        "предки",
+        "рід",
+        "походження"
+      ],
+      "brief": "свій refers back to the subject of its clause, in all persons: Я взяв свою книжку; Він любить свою дружину (his own) versus його дружину (someone else's) — a distinction Dutch and English do not mark. Full declension of свій (same as мій). Men's names and surnames in -о and -а decline like nouns (Петренко – Петренка – Петренком, Сковорода – Сковороди, Микола – Миколи), those in -ський like adjectives (Котляревського); women's surnames in -о and in a consonant do not decline. Scenario: telling the story of your family and its origins over several generations."
+    },
+    {
+      "id": "b2-02",
+      "level": "B2",
+      "icon": "👶",
+      "title": {
+        "en": "Little ones and nicknames",
+        "nl": "Kleintjes en koosnamen"
+      },
+      "grammar": {
+        "en": "Neuter -а/-я with -ат-/-ен- (курча, ім'я); common-gender nouns; дідуньо",
+        "nl": "Onzijdig -а/-я met -ат-/-ен- (курча, ім'я); gemeenslachtige woorden; дідуньо"
+      },
+      "standard": [
+        "Сер. р. на –а/–я (із суфіксами –ат/–ят, –ен)",
+        "Іменники спільного роду",
+        "Чол. р. м'яка основа (–ьо)"
+      ],
+      "theme": {
+        "en": "The person: family conflicts, habits",
+        "nl": "De mens: familieconflicten, gewoontes"
+      },
+      "focus": [
+        "курча – курчати – курчам",
+        "немовля – немовляти",
+        "ім'я – імені – іменем",
+        "плем'я",
+        "листоноша",
+        "плакса",
+        "базікало",
+        "дідуньо – дідуня",
+        "татуньо",
+        "сварка",
+        "образитися"
+      ],
+      "brief": "The small neuter class in -а/-я that inserts -ат-/-ят- or -ен- before endings (курча – курчати – курчам; ім'я – імені – ім'ям/іменем; плем'я – племені), used for young animals and children. Common-gender nouns in -а whose gender follows the person (цей плакса / ця плакса; листоноша, базікало as affectionate or mocking labels), and the tender masculine -ьо nouns (дідуньо, татуньо) with their declension. Scenario: a family quarrel told with affectionate and ironic names. Register warning: these forms are intimate and sometimes pejorative — give usage notes."
+    },
+    {
+      "id": "b2-03",
+      "level": "B2",
+      "icon": "🏗️",
+      "title": {
+        "en": "Renovation",
+        "nl": "Verbouwing"
+      },
+      "grammar": {
+        "en": "на + accusative of purpose; instrumental agent of a participle; nouns in -ння and zero-suffix nouns",
+        "nl": "на + accusatief van doel; instrumentalis als handelende persoon bij deelwoord; -ння en nulsuffix"
+      },
+      "standard": [
+        "ЗНАХІДНИЙ з НА — призначення предмета",
+        "ОРУДНИЙ без прийм. — суб'єкт дії, названої пасивним дієприкметником мин. часу",
+        "Утворення від дієслів іменників-назв діяльності (суфікси –нн-, –енн-, –інн-)",
+        "Утворення від дієслів іменників-назв діяльності (нульовий суфікс)"
+      ],
+      "theme": {
+        "en": "Home: renovation, replanning, restoration",
+        "nl": "Huis: renovatie, herindeling, restauratie"
+      },
+      "focus": [
+        "шафа на книжки",
+        "папка на документи",
+        "кухня, спроєктована архітектором",
+        "стіна, пофарбована майстром",
+        "креслити – креслення",
+        "навантажувати – навантаження",
+        "захищати – захист",
+        "додавати – додаток",
+        "перепланування",
+        "ремонт",
+        "підрядник"
+      ],
+      "brief": "на + accusative names what an object is for (шафа на книжки, папка на документи; compare для + genitive for a person). The agent of a passive participle goes into the instrumental with no preposition (будинок, збудований дідом; план, затверджений комісією) — English \"by\", Dutch \"door\". Two ways to make action nouns from verbs: -ння/-ення/-іння (креслення, навантаження, планування) and zero suffix (захист, прихід, ремонт, додаток), with the stylistic difference (process versus result). Scenario: planning and discussing a renovation with a contractor. Learner has participle phrases from b1-29."
+    },
+    {
+      "id": "b2-04",
+      "level": "B2",
+      "icon": "🏘️",
+      "title": {
+        "en": "Buying property",
+        "nl": "Een huis kopen"
+      },
+      "grammar": {
+        "en": "Full declension of cardinal and compound ordinal numerals",
+        "nl": "Volledige verbuiging van hoofd- en samengestelde rangtelwoorden"
+      },
+      "standard": [
+        "Відмінювання кількісних числівників 1–4, 5–20, 30, 40, 50, 60, 70, 80, 90, 100",
+        "Відмінювання складених порядкових числівників",
+        "Відмінювання родових форм порядкових числівників, extended"
+      ],
+      "theme": {
+        "en": "Home: property market, buying a home",
+        "nl": "Huis: woningmarkt, een woning kopen"
+      },
+      "focus": [
+        "двадцяти восьми",
+        "двадцятьох восьми",
+        "без сорока одного",
+        "шістдесятьома двома",
+        "п'ятьма",
+        "ста",
+        "триста вісімдесят перший",
+        "сто третій",
+        "сороковий",
+        "двохсотий",
+        "тисячний",
+        "іпотека",
+        "квадратний метр"
+      ],
+      "brief": "Numerals 5–20, 30–100 in all cases (п'яти/п'ятьох, п'ятьма/п'ятьома; сорока; ста), and compound numerals where every part declines (двадцятьома вісьмома квартирами, без сорока одного метра). Compound ordinals decline only in the last word (триста вісімдесят першого). Extended ordinals (одинадцятий, сороковий, двохсотий, тисячний). Scenario: reading property adverts and contracts with prices, areas, floors and percentages, where oblique numerals appear constantly (у двохстах метрах від метро, з трьома кімнатами). Learner has 1–4 and багато from b1-09."
+    },
+    {
+      "id": "b2-05",
+      "level": "B2",
+      "icon": "⏰",
+      "title": {
+        "en": "Business hours",
+        "nl": "Zakelijke tijden"
+      },
+      "grammar": {
+        "en": "Clock time: пів на першу, за двадцять шоста; dates: перше / першого вересня; год., р., ст.",
+        "nl": "Kloktijd: пів на першу, за двадцять шоста; datums: перше / першого вересня; afkortingen"
+      },
+      "standard": [
+        "Відмінювання числівників на позначення часу",
+        "Відмінювання числівників для позначення дати",
+        "Скорочення (частково)"
+      ],
+      "theme": {
+        "en": "Work: business negotiations, scheduling",
+        "nl": "Werk: zakelijke onderhandelingen, planning"
+      },
+      "focus": [
+        "о дванадцятій годині",
+        "пів на першу",
+        "чверть на третю",
+        "за двадцять шоста",
+        "двадцять хвилин по шостій",
+        "перше вересня",
+        "першого вересня",
+        "після двадцять восьмого лютого",
+        "год.",
+        "р.",
+        "ст.",
+        "зустріч",
+        "дедлайн"
+      ],
+      "brief": "Official time (о дванадцятій тридцять) and the colloquial system: пів на восьму = 7:30 (exactly Dutch \"half acht\"; English speakers must not read it as 8:30), чверть на третю = 2:15, за двадцять шоста = 5:40, двадцять по шостій = 6:20. Dates: nominative for naming the day (Сьогодні перше вересня), genitive for \"on\" (першого вересня) and after prepositions (після двадцять восьмого лютого, з першого до десятого травня). Standard abbreviations in business texts (год., р., ст., хв.). Scenario: setting up meetings and deadlines by email and phone."
+    },
+    {
+      "id": "b2-06",
+      "level": "B2",
+      "icon": "🖋️",
+      "title": {
+        "en": "Signing a contract",
+        "nl": "Een contract tekenen"
+      },
+      "grammar": {
+        "en": "Formal register: висловлюватиму = буду висловлювати; clarifying insertions; скільки declined",
+        "nl": "Formele stijl: висловлюватиму = буду висловлювати; verduidelijkende inlassen; скільки verbogen"
+      },
+      "standard": [
+        "Майбутній недоконаного виду: буду висловлювати = висловлюватиму, висловлюватимеш…",
+        "Уточнення (вставні конструкції)",
+        "Відмінювання питально-відносного займенника скільки"
+      ],
+      "theme": {
+        "en": "Work: negotiations, contracts and agreements",
+        "nl": "Werk: onderhandelingen, contracten en overeenkomsten"
+      },
+      "focus": [
+        "висловлюватиму",
+        "буду висловлювати",
+        "Володимир, князь Київський, …",
+        "там, де стояв перший замок, …",
+        "скількох",
+        "скільком",
+        "скількома",
+        "у зв'язку з",
+        "зважаючи на",
+        "укласти угоду",
+        "сторона договору"
+      ],
+      "brief": "In formal speech and writing the synthetic future (висловлюватиму, розглядатимемо) is preferred and alternates with the буду-form for rhythm; teach register choice, not new forms. Insertions that clarify or specify — appositions and clarifying clauses set off by commas or dashes (Володимир, князь Київський, …; там, де стояв перший замок, …) — and formal connectors (у зв'язку з, зважаючи на, відповідно до). Declension of скільки (скількох, скільком, скількома) in questions about quantities in a contract. Scenario: negotiating terms and drafting a formal agreement; contrast with how the same content is said informally."
+    },
+    {
+      "id": "b2-07",
+      "level": "B2",
+      "icon": "🕯️",
+      "title": {
+        "en": "Condolences and public address",
+        "nl": "Condoleances en openbare toespraak"
+      },
+      "grammar": {
+        "en": "Expanded vocative; sentence with an address; elevated nominative predicate",
+        "nl": "Uitgebreide vocatief; zin met aanspreking; verheven nominatief gezegde"
+      },
+      "standard": [
+        "КЛИЧНИЙ — expanded examples",
+        "Просте речення зі звертанням",
+        "НАЗИВНИЙ — носій характеристики, elevated register"
+      ],
+      "theme": {
+        "en": "Traditions: funerals, condolences, religious customs",
+        "nl": "Tradities: begrafenissen, condoleances, religieuze gebruiken"
+      },
+      "focus": [
+        "Шановна громадо!",
+        "Сестричко Оленко!",
+        "Вовчику-Братику",
+        "Прийми мою любов, народе рідний!",
+        "Ваші очі – зорі",
+        "Тарас Шевченко – світове явище",
+        "Співчуваю",
+        "Вічна пам'ять",
+        "панахида",
+        "поминки"
+      ],
+      "brief": "The vocative in its full range: collective and formal (Шановна громадо, Дорогі друзі, Високоповажний пане), diminutive and folkloric (Сестричко Оленко, Вовчику-Братику), with adjectives agreeing in the vocative (народе рідний). An address inside a sentence is set off by commas. Elevated nominative predicates with a dash in speeches and eulogies (Ваші очі – зорі; Тарас Шевченко – світове художньо-поетичне явище). Scenario: expressing condolences in person and in writing, a short speech at a memorial, basic religious customs. Register warning: these forms are solemn or literary, not everyday."
+    },
+    {
+      "id": "b2-08",
+      "level": "B2",
+      "icon": "🏅",
+      "title": {
+        "en": "Champions' portraits",
+        "nl": "Portretten van kampioenen"
+      },
+      "grammar": {
+        "en": "Possessive adjectives (братів, сестрин); compound adjectives (двадцятип'ятирічний, білолиций)",
+        "nl": "Bezittelijke adjectieven (братів, сестрин); samengestelde adjectieven (двадцятип'ятирічний, білолиций)"
+      },
+      "standard": [
+        "Прикметники чол. р. з нульовим закінченням",
+        "Складні прикметники з компонентом –лиций",
+        "Складні прикметники з першим компонентом кількісним числівником"
+      ],
+      "theme": {
+        "en": "Sport: achievements, records",
+        "nl": "Sport: prestaties, records"
+      },
+      "focus": [
+        "братів",
+        "сестрин",
+        "Андріїв",
+        "варт",
+        "білолиций",
+        "круглолиций",
+        "двадцятип'ятирічний",
+        "двох'ярусний",
+        "трикутний",
+        "рекорд",
+        "чемпіонат",
+        "медаль"
+      ],
+      "brief": "Possessive adjectives formed from names and kinship terms (братів м'яч, сестрина медаль, Андріїв рекорд) with their short masculine nominative and adjectival oblique forms, plus the short predicative варт (= вартий). Compound adjectives from a numeral + noun (двадцятип'ятирічний чемпіон, двох'ярусний стадіон, трикутний) and the -лиций type (білолиций, круглолиций) with its mixed declension. Scenario: a sports profile — age, records, appearance. Dutch \"vijfentwintigjarige\" is a direct parallel for the numeral compounds."
+    },
+    {
+      "id": "b2-09",
+      "level": "B2",
+      "icon": "🏋️",
+      "title": {
+        "en": "Training and habits",
+        "nl": "Training en gewoontes"
+      },
+      "grammar": {
+        "en": "Perfective future звикну, присвячу; aspect pairs темніти – потемніти, захищати – захистити",
+        "nl": "Perfectieve toekomst звикну, присвячу; aspectparen темніти – потемніти, захищати – захистити"
+      },
+      "standard": [
+        "Майбутній доконаного виду, extended",
+        "Утворення видових пар дієслів, extended",
+        "Змінювання дієслів недок./док. виду в мин. часі за родами і числами, extended"
+      ],
+      "theme": {
+        "en": "Sport: doing sport, facilities, equipment",
+        "nl": "Sport: sporten, accommodaties, uitrusting"
+      },
+      "focus": [
+        "звикну, звикнеш",
+        "присвячу, присвятиш",
+        "прожену, проженеш",
+        "темніти – потемніти",
+        "захищати – захистити",
+        "сполучати – сполучити",
+        "кликав – кликала",
+        "облетів – облетіла",
+        "тренування",
+        "спорядження",
+        "витривалість"
+      ],
+      "brief": "Less regular perfective futures (звикну/звикнеш from звикнути, присвячу/присвятиш with т → ч, прожену/проженеш) and aspect pairs built by prefix (темніти – потемніти) or suffix change (захищати – захистити, сполучати – сполучити). Past-tense forms of a wider verb set with gender agreement (кликав/кликала, облетів/облетіла). Scenario: a training plan — what you will get used to, what you will devote time to, how you defend a title. Learner has aspect basics from a2-17 and b1-13; here the point is recognising the pair for any new verb."
+    },
+    {
+      "id": "b2-10",
+      "level": "B2",
+      "icon": "🚵",
+      "title": {
+        "en": "Eco-tourism",
+        "nl": "Ecotoerisme"
+      },
+      "grammar": {
+        "en": "повз, під + accusative; crossing space (перейти річку); motion prefixes review",
+        "nl": "повз, під + accusatief; ruimte doorkruisen (перейти річку); herhaling voorvoegsels"
+      },
+      "standard": [
+        "ЗНАХІДНИЙ з ПОВЗ — рух повз нерухомий об'єкт",
+        "ЗНАХІДНИЙ з ПІД — просторові відношення",
+        "ЗНАХІДНИЙ без прийм. — просторові поняття",
+        "Утворення префіксальних дієслів руху, review"
+      ],
+      "theme": {
+        "en": "Travel: eco and rural tourism, downshifting",
+        "nl": "Reizen: eco- en plattelandstoerisme, downshifting"
+      },
+      "focus": [
+        "іду повз парк",
+        "проїхати повз село",
+        "підійти під будинок",
+        "перейти річку вбрід",
+        "об'їхати озеро",
+        "переплисти",
+        "зелений туризм",
+        "сковородинство",
+        "садиба",
+        "стежка"
+      ],
+      "brief": "Movement past something: повз + accusative (іду повз парк); movement up to a vertical object: під + accusative (підійти під будинок — contrast під + instrumental for position, a2-13); the bare accusative for the space crossed (перейти річку вбрід, об'їхати озеро, переплисти затоку). Revise all motion prefixes from b1-06 on a hike description. Scenario: a rural guesthouse, a hiking route, the idea of downshifting (сковородинство). Pitfall: English \"past\" and Dutch \"langs\" tempt learners into a locative; повз takes the accusative."
+    },
+    {
+      "id": "b2-11",
+      "level": "B2",
+      "icon": "🌐",
+      "title": {
+        "en": "Place names declined",
+        "nl": "Plaatsnamen verbogen"
+      },
+      "grammar": {
+        "en": "Declension of geographic names: Кривий Ріг, Саудівська Аравія, Суми, Прип'ять",
+        "nl": "Verbuiging van geografische namen: Кривий Ріг, Саудівська Аравія, Суми, Прип'ять"
+      },
+      "standard": [
+        "Чол. р. тверда основа, extended incl. proper names",
+        "Жін. р. на –а/–я, –ія",
+        "Множинні іменники: ножиці, гроші, сутінки, шахи, Суми, Чернівці",
+        "Жін. р. нульове закінчення: Прип'ять, сіль, мазь, матір"
+      ],
+      "theme": {
+        "en": "Travel and places: regions, countries, landmarks",
+        "nl": "Reizen en plaatsen: regio's, landen, bezienswaardigheden"
+      },
+      "focus": [
+        "Кривий Ріг – у Кривому Розі",
+        "Близький Схід – на Близькому Сході",
+        "Саудівська Аравія – із Саудівської Аравії",
+        "Суми – у Сумах",
+        "Чернівці – з Чернівців",
+        "Прип'ять – над Прип'яттю",
+        "сіль – сіллю",
+        "матір – матері",
+        "гроші – грошей",
+        "шахи"
+      ],
+      "brief": "Multi-word place names decline in every part (у Кривому Розі, на Близькому Сході, із Саудівської Аравії); plural-only town names (Суми, Чернівці, Карпати) take plural endings (у Сумах, із Чернівців); feminine names and nouns ending in a consonant (Прип'ять, сіль, мазь, матір) take -і and an instrumental -ю with doubling (сіллю, Прип'яттю), and матір has the stem матер-. Plural-only vocabulary (гроші – грошей – грошима, ножиці, сутінки, шахи). Scenario: an itinerary across Ukraine and abroad. Learner has b1-07 plural-only nouns and b1-24 feminine consonant nouns."
+    },
+    {
+      "id": "b2-12",
+      "level": "B2",
+      "icon": "🚔",
+      "title": {
+        "en": "Crime report",
+        "nl": "Misdaadbericht"
+      },
+      "grammar": {
+        "en": "One-part sentences: повідомили (indefinite-personal), було приємно (impersonal), іду (definite-personal)",
+        "nl": "Eendelige zinnen: повідомили, було приємно, іду"
+      },
+      "standard": [
+        "Односкладне, неозначено-особові",
+        "Односкладне, безособові",
+        "ОДНОСКЛАДНЕ РЕЧЕННЯ, означено-особові"
+      ],
+      "theme": {
+        "en": "Social relations: crime, law enforcement, rights",
+        "nl": "Maatschappij: criminaliteit, politie, rechten"
+      },
+      "focus": [
+        "По радіо повідомили…",
+        "Його затримали",
+        "Тут не курять",
+        "Було приємно…",
+        "Темніє",
+        "Треба викликати поліцію",
+        "Іду повз пам'ятник",
+        "злочин",
+        "підозрюваний",
+        "свідок"
+      ],
+      "brief": "Ukrainian often leaves out the subject on purpose: 3rd-person plural without an agent for \"they/someone\" (повідомили, затримали, кажуть — the main way to render the English passive \"he was arrested\"); impersonal sentences with a neuter past or an -о/-е predicate (було приємно, темніє, треба, можна, не можна); and 1st/2nd person sentences where the ending identifies the subject (Іду повз пам'ятник). Dutch \"men / er wordt\" and English passives both map onto the indefinite-personal type. Scenario: understanding and retelling a police report or news item, with vocabulary for rights and procedure."
+    },
+    {
+      "id": "b2-13",
+      "level": "B2",
+      "icon": "🗳️",
+      "title": {
+        "en": "Debating hard questions",
+        "nl": "Debatteren over moeilijke vragen"
+      },
+      "grammar": {
+        "en": "Literary concession (хоч), implicit cause (щоб не), relative що / котрий",
+        "nl": "Literaire toegeving (хоч), impliciete oorzaak (щоб не), betrekkelijk що / котрий"
+      },
+      "standard": [
+        "Складнопідрядні з відношеннями допусту, literary",
+        "Складнопідрядні з відношеннями причини, without explicit conjunction list (implicit)",
+        "Складнопідрядні з означальною частиною, extended relative words (який, котрий, що)"
+      ],
+      "theme": {
+        "en": "Social relations: controversial issues (death penalty, euthanasia, cloning)",
+        "nl": "Maatschappij: omstreden kwesties (doodstraf, euthanasie, klonen)"
+      },
+      "focus": [
+        "Хоч …, ми далі йшли",
+        "боялись поворухнутись, щоб не злякати",
+        "людина, що…",
+        "той, котрий…",
+        "Я переконаний, що…",
+        "Не можна погодитися з тим, що…",
+        "смертна кара",
+        "евтаназія",
+        "клонування",
+        "за і проти"
+      ],
+      "brief": "Argumentative syntax at the literary end: concession with bare хоч and inverted order (Хоч не одного там калічили ті скали, ми далі йшли), negative purpose shading into cause (щоб не злякати пташки), and relative clauses with що and котрий alongside який, including those referring to a pronoun (той, хто…; те, що…). Teach the moves of a debate — stating a position, conceding, rebutting — with the connectors from b1-28 and formal cause expressions (у зв'язку з, унаслідок, завдяки, усупереч + dative). Scenario: a structured debate on a controversial topic; flag which forms are formal and which are literary."
+    },
+    {
+      "id": "b2-14",
+      "level": "B2",
+      "icon": "💸",
+      "title": {
+        "en": "The family budget",
+        "nl": "Het gezinsbudget"
+      },
+      "grammar": {
+        "en": "Indefinite pronouns: хтось, щось, хто-небудь, якийсь, чийсь",
+        "nl": "Onbepaalde voornaamwoorden: хтось, щось, хто-небудь, якийсь, чийсь"
+      },
+      "standard": [
+        "Відмінювання неозначених займенників хтось, хто-небудь, щось, що-небудь",
+        "Відмінювання неозначених займенників якийсь, який-небудь, чийсь, чий-небудь"
+      ],
+      "theme": {
+        "en": "Economy: household budget, income and expenses, taxes",
+        "nl": "Economie: gezinsbudget, inkomsten en uitgaven, belastingen"
+      },
+      "focus": [
+        "хтось – когось – комусь",
+        "щось – чогось – чимось",
+        "хто-небудь",
+        "що-небудь",
+        "якийсь – якогось",
+        "який-небудь",
+        "чийсь – чийогось",
+        "будь-який",
+        "витрати",
+        "доходи",
+        "податок",
+        "заощадження"
+      ],
+      "brief": "Three series of indefinites: -сь (specific but unnamed: хтось дзвонив), -небудь (any one at all: купи що-небудь), будь- (any you like); they decline like хто/що/який/чий with the particle fixed (когось, комусь, чимось, якогось, чийогось). English \"some-\" versus \"any-\" and Dutch \"iemand/iets\" versus \"wie dan ook\" are the right hooks. Scenario: discussing where the money goes — someone always spends something, any extra income goes to savings; taxes and costs vocabulary. Learner has хто/що/який/чий from b1-02."
+    },
+    {
+      "id": "b2-15",
+      "level": "B2",
+      "icon": "📉",
+      "title": {
+        "en": "The labour market",
+        "nl": "De arbeidsmarkt"
+      },
+      "grammar": {
+        "en": "Agent nouns -ач, -ець, -ник; place nouns -арня; nouns in -ин and -ець / -ень",
+        "nl": "Namen van personen -ач, -ець, -ник; plaatsnamen -арня; -ин en -ець / -ень"
+      },
+      "standard": [
+        "Утворення назв осіб за видом діяльності, extended",
+        "Утворення іменників-назв місць за дією, extended",
+        "Чол. р. на –ин (–анин, –янин)",
+        "Чол. р. на –ець, –ень: день, травень, знавець"
+      ],
+      "theme": {
+        "en": "Work and economy: labour market, unemployment, pensions",
+        "nl": "Werk en economie: arbeidsmarkt, werkloosheid, pensioenen"
+      },
+      "focus": [
+        "діяти – діяч",
+        "виконувати – виконавець",
+        "просити – прохач",
+        "танцювати – танцівник",
+        "лікувати – лікарня",
+        "пекти – пекарня",
+        "освітянин – освітяни",
+        "татарин – татари",
+        "знавець – знавця",
+        "день – дня",
+        "травень – травня",
+        "безробіття",
+        "пенсія",
+        "кваліфікація"
+      ],
+      "brief": "Productive agent-noun suffixes and what they attach to: -ач (діяч, викладач), -ець (виконавець, продавець), -ник (танцівник, робітник), with their feminine counterparts (-ка, -иця) and the standard's footnote that feminitives are stylistically limited. Place nouns in -арня/-альня (лікарня, пекарня, їдальня). Nouns in -анин/-янин (освітянин, черкащанин, татарин – татари) and in -ець/-ень with the fleeting е (знавець – знавця, день – дня, травень – травня). Scenario: reading job adverts, discussing unemployment, pensions and qualifications. Learner has the B1 word-formation units (b1-05, b1-22)."
+    },
+    {
+      "id": "b2-16",
+      "level": "B2",
+      "icon": "🚑",
+      "title": {
+        "en": "Emergency",
+        "nl": "Spoedgeval"
+      },
+      "grammar": {
+        "en": "Imperative -мо (ходімо, літаймо), хай / нехай; dative of luck (їй пощастило)",
+        "nl": "Gebiedende wijs -мо (ходімо, літаймо), хай / нехай; datief van geluk (їй пощастило)"
+      },
+      "standard": [
+        "НАКАЗОВИЙ СПОСІБ, extended forms",
+        "ДАВАЛЬНИЙ — особа, яка є пасивним суб'єктом"
+      ],
+      "theme": {
+        "en": "Health: emergency care",
+        "nl": "Gezondheid: spoedeisende hulp"
+      },
+      "focus": [
+        "Викликаймо швидку!",
+        "Ходімо!",
+        "приходь / приходьте",
+        "Нехай лікар подивиться",
+        "Хай ніхто не чіпає",
+        "Їй пощастило",
+        "Йому не щастить",
+        "Дітям весело",
+        "непритомність",
+        "перша допомога",
+        "травмпункт"
+      ],
+      "brief": "The complete imperative system: 2nd person singular and plural (приходь, приходьте, літай, літайте), 1st person plural in -мо/-ймо (ходімо, викликаймо = let's), and 3rd person with хай/нехай (нехай лікар подивиться); perfective for one urgent action, imperfective for ongoing or negated commands (не рухайте його). The dative as passive experiencer of luck and states (Мирославі щастило, їй пощастило, пташкам весело літати). Scenario: an accident — calling an ambulance, giving instructions, first aid. Dutch \"laten we\" and English \"let's\" both map onto the -мо form, which learners rarely produce."
+    },
+    {
+      "id": "b2-17",
+      "level": "B2",
+      "icon": "🚭",
+      "title": {
+        "en": "Addictions and folk remedies",
+        "nl": "Verslavingen en huismiddeltjes"
+      },
+      "grammar": {
+        "en": "Conditional in full (якби закричав); огляд лікаря; comparison review",
+        "nl": "Voorwaardelijke wijs volledig (якби закричав); огляд лікаря; herhaling vergelijking"
+      },
+      "standard": [
+        "УМОВНИЙ СПОСІБ, extended",
+        "РОДОВИЙ без прийм. — suб'єкт дії, extended",
+        "Ступені порівняння прикметників, review set",
+        "Ступені порівняння прислівників, review set"
+      ],
+      "theme": {
+        "en": "Health: addictions, folk and conventional medicine",
+        "nl": "Gezondheid: verslavingen, volks- en reguliere geneeskunde"
+      },
+      "focus": [
+        "знав би",
+        "придумала б",
+        "Якби він кинув палити, …",
+        "відслужили б",
+        "огляд лікаря",
+        "декламація акторів",
+        "молодий – молодший – наймолодший",
+        "солодко – солодше – найсолодше",
+        "залежність",
+        "кинути палити",
+        "народна медицина",
+        "трави"
+      ],
+      "brief": "The conditional beyond basic if-clauses: wishes (Якби ж він кинув палити!), polite suggestions (Чи не могли б ви…), hypothetical past and present in one form, and би attaching to якби. Genitive of the agent after action nouns (огляд лікаря = the doctor examines; декламація акторів) versus the object genitive (огляд пацієнта) — point out the ambiguity. Revise adjective and adverb comparison on health advice (менше солодкого, найкраще кинути). Scenario: discussing addictions and whether folk remedies would help. Learner has conditionals from b1-27."
+    },
+    {
+      "id": "b2-18",
+      "level": "B2",
+      "icon": "🏫",
+      "title": {
+        "en": "Degrees and reforms",
+        "nl": "Graden en hervormingen"
+      },
+      "grammar": {
+        "en": "Declining acronyms (у ЦУМі, Дніпрогесу); adjectival feminine nouns (набережна, учительська)",
+        "nl": "Afkortingen verbuigen (у ЦУМі, Дніпрогесу); adjectivische vrouwelijke woorden (набережна, учительська)"
+      },
+      "standard": [
+        "Відмінювання абревіатур і складноскорочених слів",
+        "Жін. р. на –а (прикметникового походження)"
+      ],
+      "theme": {
+        "en": "Education: academic degrees and positions, education reform",
+        "nl": "Onderwijs: academische graden en functies, onderwijshervorming"
+      },
+      "focus": [
+        "ЦУМ – у ЦУМі – ЦУМом",
+        "Дніпрогес – Дніпрогесу",
+        "ВР / ЗНО / НМТ (не відмінюються)",
+        "учительська – в учительській",
+        "набережна – на набережній",
+        "наречена",
+        "Заньковецька – Заньковецької",
+        "бакалавр",
+        "магістр",
+        "доцент",
+        "професор"
+      ],
+      "brief": "Acronyms that end in a consonant and are read as a word decline like masculine nouns (ЦУМ – у ЦУМі – ЦУМом, Дніпрогес – Дніпрогесу, виш – у виші), while initialisms read letter by letter (ВР, ЗНО, НМТ, ООН) do not. Feminine nouns that are adjectives in origin keep adjective endings (учительська – в учительській, набережна – на набережній, наречена; surnames in -ська: Заньковецька – Заньковецької). Scenario: the Ukrainian degree system (бакалавр, магістр, кандидат наук, доцент), university positions and current reforms, read from official texts. Learner has abbreviations from b1-23."
+    },
+    {
+      "id": "b2-19",
+      "level": "B2",
+      "icon": "📦",
+      "title": {
+        "en": "Complaints and returns",
+        "nl": "Klachten en retouren"
+      },
+      "grammar": {
+        "en": "Direct → indirect speech rules (що, щоб, чи); від + genitive; по + locative",
+        "nl": "Directe → indirecte rede (що, щоб, чи); від + genitief; по + locatief"
+      },
+      "standard": [
+        "РОДОВИЙ з прийменниками ВІД (додатково до З,ІЗ,ЗІ) — початок руху",
+        "МІСЦЕВИЙ з ПО — означальна відносна характеристика об'єкта",
+        "Пряма і непряма мова — сполучники що, щоб, частка чи при заміні прямої мови непрямою (systematized as its own subsection at B2)"
+      ],
+      "theme": {
+        "en": "Shopping: online shopping, advertising, complaints",
+        "nl": "Winkelen: online winkelen, reclame, klachten"
+      },
+      "focus": [
+        "Я запитав, чи товар є на складі",
+        "Вона сказала, щоб я надіслав фото",
+        "Менеджер відповів, що…",
+        "лист від постачальника",
+        "повернувся від менеджера",
+        "колеги по роботі",
+        "товариші по навчанню",
+        "скарга",
+        "повернення коштів",
+        "гарантія"
+      ],
+      "brief": "Systematise reported speech: statement → що, yes/no question → чи (Я запитав, чи є товар), a question with a question word keeps it, command or request → щоб + past tense; shift pronouns and time words (сьогодні → того дня) but never tenses. від + genitive for the source of a message or a return from a person (лист від постачальника, прийшов від менеджера) beside з/із/зі for places. по + locative for relations (колеги по роботі, товариші по навчанню). Scenario: a written complaint about an online order, quoting what customer service said. Learner has b1-30."
+    },
+    {
+      "id": "b2-20",
+      "level": "B2",
+      "icon": "🍲",
+      "title": {
+        "en": "Diets and banquets",
+        "nl": "Diëten en banketten"
+      },
+      "grammar": {
+        "en": "Present tense of везу, передає, зостаємося, вимірюю; homonyms",
+        "nl": "Tegenwoordige tijd van везу, передає, зостаємося, вимірюю; homoniemen"
+      },
+      "standard": [
+        "Теперішній час недоконаного виду",
+        "Омоніми"
+      ],
+      "theme": {
+        "en": "Food: diets and types of nutrition, ordering a banquet",
+        "nl": "Eten: diëten en voedingswijzen, een banket bestellen"
+      },
+      "focus": [
+        "вимірюю",
+        "передає",
+        "зостаємося",
+        "везу, везеш, везе",
+        "несу",
+        "печу",
+        "мати (ім.) – мати (дієсл.)",
+        "замóк – зáмок",
+        "коса",
+        "дієта",
+        "вегетаріанський",
+        "бенкет",
+        "меню на замовлення"
+      ],
+      "brief": "Consonant-stem present tenses (везу/везеш/везе, несу, печу/печеш, зостаюся/зостаємося) and verbs in -ювати (вимірюю, передає) that learners avoid because the infinitive hides the stem. Homonyms by spelling (мати the noun / мати the verb; коса; ключ) and by stress (замóк – зáмок, from a2-25); show how context resolves them. Scenario: planning a banquet menu for guests with diets (vegetarian, gluten-free), weighing portions (вимірюю), who brings what (везу, несу)."
+    },
+    {
+      "id": "b2-21",
+      "level": "B2",
+      "icon": "🧵",
+      "title": {
+        "en": "Courses and complaints",
+        "nl": "Cursussen en reclamaties"
+      },
+      "grammar": {
+        "en": "ні…, ні… – ніщо (generalising word); у/в at the start of a word (влітку – улітку)",
+        "nl": "ні…, ні… – ніщо (samenvattend woord); у/в aan het woordbegin (влітку – улітку)"
+      },
+      "standard": [
+        "Просте речення з однорідними членами й узагальнювальним словом",
+        "Стилістичні засоби фонетики (засоби милозвучності), systematized as its own subsection"
+      ],
+      "theme": {
+        "en": "Services: courses (driving, sewing, cooking, dance), complaints about service",
+        "nl": "Diensten: cursussen (rijles, naaien, koken, dans), reclamaties"
+      },
+      "focus": [
+        "Ні розвага, ні прохання, ні погроза – ніщо не допомагало",
+        "і курси, і книжки – все було марно",
+        "влітку – улітку",
+        "вдень – удень",
+        "вчитель – учитель",
+        "курси водіння",
+        "кулінарні курси",
+        "рекламація",
+        "інструктор"
+      ],
+      "brief": "Lists summed up by a generalising word with a dash (Ні водіння, ні шиття, ні танці – ніщо його не захопило; Книги, курси, репетитор – усе допомогло), and the comma/dash punctuation around them. Word-initial у/в alternation as a stylistic tool (влітку/улітку, вдень/удень, вчитель/учитель) governed by the previous sound, extending the preposition rule from A1 and the і/й rule. Scenario: choosing a course, then writing a complaint about its quality with a list of grievances."
+    },
+    {
+      "id": "b2-22",
+      "level": "B2",
+      "icon": "🌿",
+      "title": {
+        "en": "Ecology",
+        "nl": "Ecologie"
+      },
+      "grammar": {
+        "en": "Compound words (науково-пізнавальний); onomatopoeia; nouns in ж/ч/ш/щ",
+        "nl": "Samengestelde woorden (науково-пізнавальний); klanknabootsing; woorden op ж/ч/ш/щ"
+      },
+      "standard": [
+        "Складні слова",
+        "Звуконаслідування",
+        "Чол. р. на ж, ч, щ, ш, incl. proper names"
+      ],
+      "theme": {
+        "en": "Natural environment: pollution, environmental protection",
+        "nl": "Natuur: vervuiling, milieubescherming"
+      },
+      "focus": [
+        "науково-пізнавальний",
+        "українсько-англійський",
+        "екологічно чистий",
+        "нявкати",
+        "гавкати",
+        "дзюрчати",
+        "вуж – вужа – вужем",
+        "хрущ",
+        "Гадяч – у Гадячі",
+        "забруднення",
+        "довкілля",
+        "переробка"
+      ],
+      "brief": "Compound adjectives with a hyphen (equal parts: науково-пізнавальний, українсько-англійський) versus one word (subordinated: сільськогосподарський), and compound nouns in environmental vocabulary. Onomatopoeic verbs for animals and nature (нявкати, гавкати, дзижчати, дзюрчати). Masculine nouns ending in ж/ч/ш/щ, including place names (вуж – вужа – вужем, хрущ, Гадяч – у Гадячі), with -ем in the instrumental. Scenario: an opinion piece on pollution and protection of nature, using the connectors from b2-13."
+    },
+    {
+      "id": "b2-23",
+      "level": "B2",
+      "icon": "🔬",
+      "title": {
+        "en": "Science and inventions",
+        "nl": "Wetenschap en uitvindingen"
+      },
+      "grammar": {
+        "en": "Adjectival neuter nouns (майбутнє, минуле, пальне, Рівне); adjective declension review",
+        "nl": "Adjectivische onzijdige woorden (майбутнє, минуле, пальне, Рівне); herhaling adjectieven"
+      },
+      "standard": [
+        "Сер. р. на –е/–є (прикметникового походження), incl. proper names",
+        "Сер. р. на –о, –е",
+        "Відмінювання прикметників чол./жін./сер. р. (-ий, -а, -е): народний, багатий, важливий",
+        "Відмінювання прикметників чол./жін./сер. р. (-ій, -я, -є): осінній, могутній"
+      ],
+      "theme": {
+        "en": "Science and technology: discoveries, inventions that changed the world",
+        "nl": "Wetenschap en techniek: ontdekkingen, uitvindingen die de wereld veranderden"
+      },
+      "focus": [
+        "майбутнє – майбутнього",
+        "минуле – у минулому",
+        "пальне",
+        "Рівне – у Рівному",
+        "скло",
+        "паливо",
+        "прізвище",
+        "народний",
+        "могутній",
+        "винахід",
+        "відкриття",
+        "дослідження"
+      ],
+      "brief": "Neuter nouns that are adjectives in form keep adjective endings (майбутнє – майбутнього – у майбутньому; минуле; пальне; the town Рівне – у Рівному), beside ordinary neuters in -о/-е (скло, паливо, прізвище). Revise the complete hard and soft adjective paradigms (народний, багатий, важливий; могутній, осінній) on scientific texts, where long noun phrases with several agreeing adjectives are the norm. Scenario: describing an invention and its effect on the past and the future."
+    },
+    {
+      "id": "b2-24",
+      "level": "B2",
+      "icon": "📱",
+      "title": {
+        "en": "Media and opinion",
+        "nl": "Media en opinie"
+      },
+      "grammar": {
+        "en": "Text-structuring words (по-перше, отже); nouns in -ар / -яр (календар, газетяр)",
+        "nl": "Tekststructurerende woorden (по-перше, отже); woorden op -ар / -яр (календар, газетяр)"
+      },
+      "standard": [
+        "Елементи структурування тексту (вставні слова)",
+        "Чол. р. на –ар/–яр, incl. proper names"
+      ],
+      "theme": {
+        "en": "Media and social networks: press, radio, TV, internet",
+        "nl": "Media en sociale netwerken: pers, radio, tv, internet"
+      },
+      "focus": [
+        "по-перше",
+        "по-друге",
+        "по-третє",
+        "отже",
+        "таким чином",
+        "з одного боку – з іншого боку",
+        "крім того",
+        "нарешті",
+        "газетяр – газетяра",
+        "парламентар",
+        "календар – календаря",
+        "Катар – у Катарі",
+        "стрічка новин",
+        "дезінформація"
+      ],
+      "brief": "Discourse markers for a structured argument (по-перше…, по-друге…, крім того, з одного боку… з іншого боку, отже, таким чином, нарешті), their punctuation and their informal substitutes. Masculine nouns in -ар/-яр and the hard/soft split in their declension (календар – календаря, газетяр – газетяра, парламентар, ліхтар; place names Катар – у Катарі). Scenario: writing a structured opinion piece or a long comment on social media about the role of the press, fake news and influencers. Learner has the argument connectors of b1-28 and b2-13."
+    },
+    {
+      "id": "b2-25",
+      "level": "B2",
+      "icon": "🌄",
+      "title": {
+        "en": "Life outside the city",
+        "nl": "Leven buiten de stad"
+      },
+      "grammar": {
+        "en": "Nominative sentences (Вечір. Спокій.); diminutives (вуличка, річка, матуся)",
+        "nl": "Nominatiefzinnen (Вечір. Спокій.); verkleinwoorden (вуличка, річка, матуся)"
+      },
+      "standard": [
+        "Односкладне з головним членом-іменником, номінативні",
+        "Зменшувально-пестливі форми"
+      ],
+      "theme": {
+        "en": "Places: suburbs, village, dachas, urban planning problems",
+        "nl": "Plaatsen: buitenwijken, dorp, datsja's, stadsplanningsproblemen"
+      },
+      "focus": [
+        "Вечір. Омріяна прохолода. Спокій…",
+        "Ранок. Туман над річкою.",
+        "вулиця – вуличка",
+        "ріка – річка",
+        "мама – матуся",
+        "хата – хатинка",
+        "сонце – сонечко",
+        "дача",
+        "передмістя",
+        "забудова",
+        "селище"
+      ],
+      "brief": "Nominative (naming) sentences used for scene-setting in description and literature (Вечір. Омріяна прохолода. Спокій…), and how to mix them with full sentences in a sketch. Diminutive and endearing suffixes (-к-, -очк-/-ечк-, -инк-, -ус-: вуличка, річка, сонечко, хатинка, матуся) with the к/г/х → ч/ж/ш change from b1-21 and their emotional register — affectionate, ironic or childish; Dutch -je is the obvious parallel, but Ukrainian uses them more widely with adults. Scenario: a weekend at the dacha versus planning problems in the suburbs."
+    }
+  ]
+}
