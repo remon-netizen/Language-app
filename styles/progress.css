@@ -23,4 +23,15 @@
 .pg-pct { font-size: 0.78rem; font-weight: 800; color: var(--gray); margin-left: 6px; }
 .pg-bar { height: 6px; background: var(--border); border-radius: 4px; overflow: hidden; margin-top: 4px; }
 .pg-bar-fill { height: 100%; background: var(--blue); border-radius: 4px; }
+.pg-backup { display: flex; flex-direction: column; gap: 4px; }
+.pg-backup-old { border-color: #fcd34d; background: #fffbeb; }
+.pg-backup-old .pg-row-sub { color: #92400e; font-weight: 600; }
+.pg-backup-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+.pg-backup-btn { padding: 11px 8px; border: 2px solid var(--border); border-radius: 10px; background: var(--card-bg); color: var(--text); font-size: 0.85rem; font-weight: 700; cursor: pointer; font-family: inherit; min-height: 44px; }
+.pg-backup-btn:hover { border-color: var(--blue); color: var(--blue); }
+.pg-backup-primary { background: var(--blue); border-color: var(--blue); color: white; }
+.pg-backup-primary:hover { color: white; opacity: 0.92; }
+.pg-backup-note { margin-top: 8px; font-size: 0.8rem; color: #15803d; background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; padding: 8px 10px; }
+.pg-backup-note.pg-backup-bad { color: #991b1b; background: #fee2e2; border-color: #fca5a5; }
+@media (max-width: 400px) { .pg-backup-actions { grid-template-columns: 1fr; } }
 .pg-fill-pink { background: #db2777; } .pg-fill-green { background: #22c55e; } .pg-fill-amber { background: #f59e0b; } .pg-fill-red { background: #ef4444; }

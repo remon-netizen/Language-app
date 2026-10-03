@@ -11,6 +11,7 @@ import { tracker as sentenceTracker } from './grammar/sentence-build-ui.js';
 import { tracker as dialogueTracker } from './grammar/dialogue-ui.js';
 import { DIALOGUES } from './data/dialogues-uk.js';
 import { currentStreak, lastDays, totalAnswers, activeDays } from './data/activity.js';
+import { downloadBackup, lastBackup, parseBackup, restoreBackup } from './backup.js';
 
 // ── One screen with every number the app keeps ───────────────────────────────
 
@@ -59,6 +60,11 @@ export function openProgressScreen() {
   const days = lastDays(14);
   const maxDay = Math.max(1, ...days.map(d => d.count));
   const weekday = d => d.toLocaleDateString(nl ? 'nl-NL' : 'en-GB', { weekday: 'narrow' });
+
+  // Backup: when the last one was, and whether it is time for another
+  const fmtDate = t => new Date(t).toLocaleDateString(nl ? 'nl-NL' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  const last = lastBackup();
+  const backupOld = totalAnswers() > 0 && (!last || Date.now() - last > 14 * 86400_000);
 
   s.innerHTML = `
     <div class="lesson-header">
@@ -126,5 +132,52 @@ export function openProgressScreen() {
             : L('Not started', 'Nog niet begonnen')}</span>
           ${d.m.attempts && d.m.pct != null ? bar(d.m.pct, d.m.pct >= 80 ? 'pg-fill-green' : d.m.pct >= 50 ? 'pg-fill-amber' : 'pg-fill-red') : ''}
         </span>
-      </button>`).join('')}`;
+      </button>`).join('')}
+
+    <div class="pg-section">${L('Backup', 'Back-up')}</div>
+    <div class="pg-card pg-backup ${backupOld ? 'pg-backup-old' : ''}">
+      <span class="pg-row-title">💾 ${L('Your progress lives in this browser', 'Je voortgang staat in deze browser')}</span>
+      <span class="pg-row-sub" id="pgBackupSub">${last
+        ? L(`Last backup: ${fmtDate(last)}`, `Laatste back-up: ${fmtDate(last)}`)
+        : L('No backup yet. A browser reset or a new phone would lose everything.', 'Nog geen back-up. Bij een reset van de browser of een nieuwe telefoon ben je alles kwijt.')}</span>
+      <div class="pg-backup-actions">
+        <button class="pg-backup-btn pg-backup-primary" id="pgBackup" type="button">⬇️ ${L('Download backup', 'Back-up downloaden')}</button>
+        <button class="pg-backup-btn" id="pgRestore" type="button">⬆️ ${L('Restore from file', 'Terugzetten uit bestand')}</button>
+        <input type="file" id="pgRestoreFile" accept="application/json,.json" hidden>
+      </div>
+      <div class="pg-backup-note" id="pgBackupNote" hidden></div>
+    </div>`;
+
+  wireBackup(s, fmtDate);
+}
+
+// ── Backup buttons ───────────────────────────────────────────────────────────
+
+function wireBackup(s, fmtDate) {
+  const note = (text, bad = false) => { const n = s.querySelector('#pgBackupNote'); n.textContent = text; n.hidden = false; n.classList.toggle('pg-backup-bad', bad); };
+  s.querySelector('#pgBackup').addEventListener('click', () => {
+    const b = downloadBackup();
+    s.querySelector('#pgBackupSub').textContent = L(`Last backup: ${fmtDate(Date.now())}`, `Laatste back-up: ${fmtDate(Date.now())}`);
+    s.querySelector('.pg-backup').classList.remove('pg-backup-old');
+    note(L(`Saved ${b.keys} items. Keep the file somewhere safe (cloud drive, mail to yourself).`, `${b.keys} items opgeslagen. Bewaar het bestand op een veilige plek (cloud, mail naar jezelf).`));
+  });
+  const file = s.querySelector('#pgRestoreFile');
+  s.querySelector('#pgRestore').addEventListener('click', () => { file.value = ''; file.click(); });
+  file.addEventListener('change', async () => {
+    const f = file.files[0];
+    if (!f) return;
+    let b;
+    try { b = parseBackup(await f.text()); }
+    catch (e) {
+      note(e.message === 'not-json' ? L('That file is not readable as JSON.', 'Dat bestand is niet leesbaar als JSON.') : L('That is not a backup of this app.', 'Dat is geen back-up van deze app.'), true);
+      return;
+    }
+    const when = b.exported ? fmtDate(Date.parse(b.exported)) : '?';
+    const ok = window.confirm(L(`Replace everything on this device with the backup of ${when} (${b.keys ?? Object.keys(b.data).length} items)? Current progress here will be lost.`,
+                                `Alles op dit apparaat vervangen door de back-up van ${when} (${b.keys ?? Object.keys(b.data).length} items)? De huidige voortgang hier gaat verloren.`));
+    if (!ok) return;
+    restoreBackup(b);
+    note(L('Restored. Reloading…', 'Teruggezet. Herladen…'));
+    setTimeout(() => window.location.reload(), 400);
+  });
 }
