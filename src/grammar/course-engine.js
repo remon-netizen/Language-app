@@ -53,7 +53,8 @@ function warmUpCards(n, own, source) {
   if (!src || n <= 0) return [];
   const taken = new Set(own.map(c => c.key));
   const due = src().filter(c => !taken.has(c.key));
-  return shuffle(due).slice(0, n).map(c => ({ ...c, warmup: true }));
+  // A course's own source hands over its cards in its own order (due first).
+  return (source ? due : shuffle(due)).slice(0, n).map(c => ({ ...c, warmup: true }));
 }
 
 // warmUp: how many due items open the session; warmUpSource: where they come from
@@ -93,7 +94,7 @@ export function runSession({ screen, icon, title, accent = DEFAULT_ACCENT, cards
       ${header(title, `<div class="ce-progress-wrap"><div class="ce-progress-bar" style="width:${pct}%"></div></div>
                        <div class="ce-progress-text">${inWarm ? L('Warm-up', 'Opwarmen') + ' · ' : ''}${pos + 1} / ${total}</div>`)}
       ${inWarm ? `<div class="ce-warmup-banner">
-          <span class="ce-warmup-title">🔁 ${L('Warm-up', 'Opwarmen')} ${pos + 1}/${warm.length}: ${L('something you learned before', 'iets wat je al geleerd hebt')}${card.course ? ` · ${card.course.icon} ${escHtml(card.course.name)}` : ''}</span>
+          <span class="ce-warmup-title">🔁 ${L('Warm-up', 'Opwarmen')} ${pos + 1}/${warm.length}: ${card.practice ? L('extra practice, not due yet', 'extra oefening, nog niet aan de beurt') : L('something you learned before', 'iets wat je al geleerd hebt')}${card.course ? ` · ${card.course.icon} ${escHtml(card.course.name)}` : ''}</span>
           <span class="ce-warmup-sub">${L(`Then the new material (${own} cards).`, `Daarna het nieuwe (${own} kaarten).`)} <button class="ce-warmup-skip" id="ceSkipWarm" type="button">${L('Skip warm-up →', 'Opwarmen overslaan →')}</button></span>
         </div>`
         : mixed && card.course ? `<div class="ce-course-chip">${card.course.icon} ${escHtml(card.course.name)}</div>` : ''}

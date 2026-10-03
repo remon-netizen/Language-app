@@ -12,7 +12,7 @@ import { speakText } from '../voice.js';
 import { showScreen } from '../router.js';
 import { POS_LABEL } from '../data/vocab-uk.js';
 import { LEVELS, UNITS, unitsOf, getUnit, unitIndex, nextUnit } from '../data/path/index.js';
-import { unitItems, entryOf, recordItem, regradeItem, dueItems, learnedDueItems, pathStats, unitProgress, unitState, markUnitStep, unitDone, unitStarted, nextOpenUnit, STEPS } from '../data/path-progress.js';
+import { unitItems, entryOf, recordItem, regradeItem, dueItems, learnedDueItems, learnedSoonItems, pathStats, unitProgress, unitState, markUnitStep, unitDone, unitStarted, nextOpenUnit, STEPS } from '../data/path-progress.js';
 import { meaning, gradeMeaning } from './vocab-drill-ui.js';
 import { runSession } from './course-engine.js';
 import { L, loc, shuffle, grade, normalise, wireSpeakButtons } from './drill-core.js';
@@ -380,7 +380,7 @@ function startStep(unit, step) {
   if (!cards.length) { showUnit(unit); return; }
   const done = step === 'all' ? STEPS : [step];
   runSession({
-    screen: getScreen(), icon: unit.icon, title: `${unit.level} · ${unitIndex(unit)} · ${stepName(step)}`, accent: ACCENT, cards, warmUp: 8, warmUpSource: learnedDueCards,
+    screen: getScreen(), icon: unit.icon, title: `${unit.level} · ${unitIndex(unit)} · ${stepName(step)}`, accent: ACCENT, cards, warmUp: 8, warmUpSource,
     onExit: () => showUnit(unit),
     scoreSubtitle: () => unitName(unit),
     // The step is done once the round ends; offer the next step, or the next unit.
@@ -398,7 +398,14 @@ function startStep(unit, step) {
 // ── The path's own review ───────────────────────────────────────────────────
 // Due words and sentences from the units already done, core words included:
 // the warm-up of every step, and a full round from the unit page.
-const learnedDueCards = () => learnedDueItems().map(i => (i.kind === 'sentence' ? sentenceCard(i) : wordCard(i, { dir: Math.random() < 0.5 ? 'produce' : 'translate' })));
+const anyCard = i => (i.kind === 'sentence' ? sentenceCard(i) : wordCard(i, { dir: Math.random() < 0.5 ? 'produce' : 'translate' }));
+const learnedDueCards = () => learnedDueItems().map(anyCard);
+// Warm-up material: what is due, then what comes up soonest as practice only
+// (nothing recorded), so a step always opens with a few familiar items.
+const warmUpSource = () => [
+  ...shuffle(learnedDueCards()),
+  ...learnedSoonItems().slice(0, 8).map(i => ({ ...anyCard(i), practice: true, record: () => null, override: null })),
+];
 function startLearnedReview(unit) {
   runSession({
     screen: getScreen(), icon: '🔁', title: L('Review from earlier units', 'Herhalen uit eerdere units'), accent: ACCENT,

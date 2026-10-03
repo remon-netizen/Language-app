@@ -66,6 +66,17 @@ export function learnedDueItems() {
   }).filter(i => { const e = entryOf(i); return e && e.nextReview <= now; });
 }
 
+// The same material that is not due yet, soonest first: fills a warm-up when
+// little or nothing is due, as practice that leaves the schedule alone.
+export function learnedSoonItems() {
+  const now = Date.now();
+  return UNITS.flatMap(u => {
+    const st = unitState(u.id), it = unitItems(u);
+    return [...(st.words ? it.words : []), ...(st.sentences ? it.sentences : [])];
+  }).map(i => ({ i, e: entryOf(i) })).filter(x => x.e && x.e.nextReview > now)
+    .sort((a, b) => a.e.nextReview - b.e.nextReview).map(x => x.i);
+}
+
 // How far a unit is: the share of its items that were met at least once.
 export function unitProgress(unit) {
   const items = unitItems(unit).all;
