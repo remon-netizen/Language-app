@@ -106,7 +106,7 @@ function showMenu() {
       ${units.length ? units.map(unitRow).join('') : `<div class="pt-empty">${L('The units of this level are still being written.', 'De units van dit niveau worden nog geschreven.')}</div>`}
     </div>`;
 
-  s.querySelector('#ptBack').addEventListener('click', () => window.openExercisesScreen());
+  s.querySelector('#ptBack').addEventListener('click', () => showScreen('homeScreen'));
   s.querySelectorAll('[data-level]').forEach(b => b.addEventListener('click', () => { pt.level = b.dataset.level; savePrefs(); showMenu(); }));
   s.querySelectorAll('[data-unit]').forEach(b => b.addEventListener('click', () => showUnit(getUnit(b.dataset.unit))));
   s.querySelector('#ptContinue')?.addEventListener('click', () => { pt.level = cont.level; savePrefs(); showUnit(cont); });
