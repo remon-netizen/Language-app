@@ -196,6 +196,8 @@ function applyStaticI18n() {
   if (talkInput) talkInput.placeholder = t('chat.placeholder');
   const sendBtn = document.querySelector('.send-btn');
   if (sendBtn) sendBtn.textContent = t('chat.send');
+  const micBtn = document.getElementById('talkMicBtn');
+  if (micBtn) micBtn.title = t('lesson.speak');
   const suggestionsTitle = document.querySelector('#suggestionsCard .sidebar-title');
   if (suggestionsTitle) suggestionsTitle.textContent = t('chat.suggestions');
   const suggestionsEmpty = document.querySelector('#suggestionsList .suggestions-empty');
@@ -228,7 +230,7 @@ function updateReviewCount() {
 // How many weak items the offline drills are tracking for the current target.
 function weakSpotCount() {
   if (state.currentLanguage !== 'uk') return 0;
-  try { return weakVerbs() + weakNouns() + weakPrefixVerbs() + weakNumberKeys().length + weakVocab().length + sentenceTracker.weakKeys().length + dialogueTracker.weakKeys().length; }
+  try { return weakVerbs() + weakNouns() + weakPrefixVerbs() + weakNumberKeys().length + weakVocab().length + pathStats().ownWeak + sentenceTracker.weakKeys().length + dialogueTracker.weakKeys().length; }
   catch { return 0; }
 }
 
@@ -323,6 +325,7 @@ function switchNativeLanguage(native) {
   // Re-apply all static strings in the new native language
   applyStaticI18n();
   // Refresh dynamic bits that depend on either native or target
+  loadVoices();
   updateHeaderAndChat();
   updateTranslatorLabel();
 }

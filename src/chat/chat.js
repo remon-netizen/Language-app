@@ -1,4 +1,4 @@
-import { state, getTTSLang, getTutorFirstName } from '../state.js';
+import { state, getTTSLang, getTutorFirstName, getTutorNameInTarget } from '../state.js';
 import { showScreen } from '../router.js';
 import { loadApiKey, saveProgress, getApiKey } from '../storage.js';
 import { setupRecognition } from '../speech.js';
@@ -27,7 +27,8 @@ export function openFreeChat() {
 // avoid touching every consumer); `en` is the translation in the user's
 // native language.
 
-function buildOpeners(target, native, n) {
+// n: the tutor's name in Latin letters, nt: as written in the target language.
+function buildOpeners(target, native, n, nt = n) {
   const data = {
     nl: {
       en: [
@@ -38,14 +39,14 @@ function buildOpeners(target, native, n) {
     },
     uk: {
       en: [
-        { uk: `Привіт! Я ${n}, твій помічник з української мови. Як тебе звати?`, en: `Hi! I'm ${n}, your Ukrainian language helper. What's your name?` },
-        { uk: `Вітаю! Я ${n}. Давай поговоримо по-українськи. Звідки ти?`, en: `Welcome! I'm ${n}. Let's chat in Ukrainian. Where are you from?` },
-        { uk: `Привіт! Я ${n}. Як справи сьогодні? Що ти хочеш вивчити?`, en: `Hello! I'm ${n}. How are you today? What would you like to learn?` },
+        { uk: `Привіт! Я ${nt}, твій помічник з української мови. Як тебе звати?`, en: `Hi! I'm ${n}, your Ukrainian language helper. What's your name?` },
+        { uk: `Вітаю! Я ${nt}. Давай поговоримо по-українськи. Звідки ти?`, en: `Welcome! I'm ${n}. Let's chat in Ukrainian. Where are you from?` },
+        { uk: `Привіт! Я ${nt}. Як справи сьогодні? Що ти хочеш вивчити?`, en: `Hello! I'm ${n}. How are you today? What would you like to learn?` },
       ],
       nl: [
-        { uk: `Привіт! Я ${n}, твій помічник з української мови. Як тебе звати?`, en: `Hallo! Ik ben ${n}, jouw hulp bij het Oekraïens. Hoe heet jij?` },
-        { uk: `Вітаю! Я ${n}. Давай поговоримо по-українськи. Звідки ти?`, en: `Welkom! Ik ben ${n}. Laten we Oekraïens oefenen. Waar kom jij vandaan?` },
-        { uk: `Привіт! Я ${n}. Як справи сьогодні? Що ти хочеш вивчити?`, en: `Hoi! Ik ben ${n}. Hoe gaat het vandaag? Wat wil jij leren?` },
+        { uk: `Привіт! Я ${nt}, твій помічник з української мови. Як тебе звати?`, en: `Hallo! Ik ben ${n}, jouw hulp bij het Oekraïens. Hoe heet jij?` },
+        { uk: `Вітаю! Я ${nt}. Давай поговоримо по-українськи. Звідки ти?`, en: `Welkom! Ik ben ${n}. Laten we Oekraïens oefenen. Waar kom jij vandaan?` },
+        { uk: `Привіт! Я ${nt}. Як справи сьогодні? Що ти хочеш вивчити?`, en: `Hoi! Ik ben ${n}. Hoe gaat het vandaag? Wat wil jij leren?` },
       ],
     },
     en: {
@@ -245,7 +246,7 @@ export function startConversation() {
   const target  = state.currentLanguage;
   const native  = state.nativeLanguage;
   const n       = getTutorFirstName();
-  const openers = buildOpeners(target, native, n);
+  const openers = buildOpeners(target, native, n, getTutorNameInTarget());
 
   const opener = openers[Math.floor(Math.random() * openers.length)];
   state.conversationHistory.push({ role: 'assistant', content: opener.uk });
@@ -458,44 +459,50 @@ export function getFallbackResponse(userText) {
     };
   }
 
+  // Ukrainian: each line carries its translation in both interface languages.
+  const tr = x => (state.nativeLanguage === 'nl' ? x.nl : x.en);
+  const sug = list => list.map(x => ({ uk: x.uk, en: tr(x) }));
   const responses = [
-    { keys: ['привіт','hello','hi','hey','вітаю'], uk: 'Привіт! Як справи?', en: 'Hello! How are you?' },
-    { keys: ['добре','fine','good','great','чудово'], uk: 'Чудово! Я теж добре, дякую!', en: 'Wonderful! I\'m also well, thanks!' },
-    { keys: ['дякую','thanks','thank'], uk: 'Будь ласка! Ти молодець!', en: 'You\'re welcome! Well done!' },
-    { keys: ['люблю','love','подобається','like'], uk: 'Мені теж це дуже подобається!', en: 'I really like that too!' },
-    { keys: ['борщ','borscht','їжа','food','їсти','eat'], uk: 'Борщ — це дуже смачно! Ти їв борщ?', en: 'Borscht is very delicious! Have you had borscht?' },
-    { keys: ['bye','до побачення','бувай','goodbye'], uk: 'До побачення! Гарного дня!', en: 'Goodbye! Have a great day!' },
-    { keys: ['learn','вчити','вчуся','studying'], uk: 'Молодець! Вивчення мови — це чудово! Продовжуй!', en: 'Well done! Learning a language is wonderful! Keep going!' },
-    { keys: ['ukraine','україна','ukrainian','українська'], uk: 'Україна — прекрасна країна з багатою культурою!', en: 'Ukraine is a beautiful country with a rich culture!' },
-    { keys: ['name','звати','зовуть','називаюся'], uk: 'Приємно познайомитися! А як тебе звати?', en: 'Nice to meet you! And what\'s your name?' },
+    { keys: ['привіт','hello','hi','hey','hallo','hoi','goedemorgen','goedemiddag','goedenavond','вітаю','добрий день'], uk: 'Привіт! Як справи?', en: 'Hello! How are you?', nl: 'Hallo! Hoe gaat het?' },
+    { keys: ['добре','fine','good','great','goed','prima','чудово'], uk: 'Чудово! Я теж добре, дякую!', en: 'Wonderful! I\'m also well, thanks!', nl: 'Mooi zo! Met mij gaat het ook goed, dank je!' },
+    { keys: ['дякую','thanks','thank','dank','bedankt'], uk: 'Будь ласка! Ти молодець!', en: 'You\'re welcome! Well done!', nl: 'Graag gedaan! Goed gedaan!' },
+    { keys: ['люблю','love','подобається','like','leuk','houd van'], uk: 'Мені теж це дуже подобається!', en: 'I really like that too!', nl: 'Dat vind ik ook heel leuk!' },
+    { keys: ['борщ','borscht','borsjt','їжа','food','eten','їсти','eat'], uk: 'Борщ — це дуже смачно! Ти їв борщ?', en: 'Borscht is very delicious! Have you had borscht?', nl: 'Borsjt is heel lekker! Heb je weleens borsjt gegeten?' },
+    { keys: ['bye','до побачення','бувай','goodbye','tot ziens','doei'], uk: 'До побачення! Гарного дня!', en: 'Goodbye! Have a great day!', nl: 'Tot ziens! Fijne dag!' },
+    { keys: ['learn','leren','вчити','вчуся','studying'], uk: 'Молодець! Вивчення мови — це чудово! Продовжуй!', en: 'Well done! Learning a language is wonderful! Keep going!', nl: 'Goed zo! Een taal leren is geweldig! Ga zo door!' },
+    { keys: ['ukraine','oekraïne','україна','ukrainian','oekraïens','українська'], uk: 'Україна — прекрасна країна з багатою культурою!', en: 'Ukraine is a beautiful country with a rich culture!', nl: 'Oekraïne is een prachtig land met een rijke cultuur!' },
+    { keys: ['name','naam','heet','звати','зовуть','називаюся'], uk: 'Приємно познайомитися! А як тебе звати?', en: 'Nice to meet you! And what\'s your name?', nl: 'Leuk je te ontmoeten! En hoe heet jij?' },
   ];
-  const matched = responses.find(r => r.keys.some(k => lower.includes(k)));
+  // A key counts at the start of a word, a short one only as a whole word:
+  // "hi" must not fire on "this", nor "eten" on "vergeten".
+  const hit = k => new RegExp(`(^|[^\\p{L}])${k}${k.length <= 3 ? '($|[^\\p{L}])' : ''}`, 'u').test(lower);
+  const matched = responses.find(r => r.keys.some(hit));
   if (matched) {
     return {
-      response_uk: matched.uk, response_en: matched.en, grammar_feedback: null,
-      suggestions: [
-        { uk: 'Дуже добре!', en: 'Very good!' },
-        { uk: 'Розкажи більше', en: 'Tell me more' },
-        { uk: 'Я не розумію', en: 'I don\'t understand' },
-        { uk: 'Дякую за допомогу', en: 'Thank you for the help' },
-      ]
+      response_uk: matched.uk, response_en: tr(matched), grammar_feedback: null,
+      suggestions: sug([
+        { uk: 'Дуже добре!', en: 'Very good!', nl: 'Heel goed!' },
+        { uk: 'Розкажи більше', en: 'Tell me more', nl: 'Vertel meer' },
+        { uk: 'Я не розумію', en: 'I don\'t understand', nl: 'Ik begrijp het niet' },
+        { uk: 'Дякую за допомогу', en: 'Thank you for the help', nl: 'Bedankt voor de hulp' },
+      ])
     };
   }
   const fallbacks = [
-    { uk: 'Цікаво! Продовжуй, ти добре справляєшся!', en: 'Interesting! Keep going, you\'re doing well!' },
-    { uk: 'Чудово! Твоя українська стає кращою!', en: 'Wonderful! Your Ukrainian is getting better!' },
-    { uk: 'Я розумію. Що ще ти хочеш сказати?', en: 'I understand. What else would you like to say?' },
-    { uk: 'Молодець! Ти робиш гарний прогрес!', en: 'Well done! You\'re making great progress!' },
+    { uk: 'Цікаво! Продовжуй, ти добре справляєшся!', en: 'Interesting! Keep going, you\'re doing well!', nl: 'Interessant! Ga door, je doet het goed!' },
+    { uk: 'Чудово! Твоя українська стає кращою!', en: 'Wonderful! Your Ukrainian is getting better!', nl: 'Geweldig! Je Oekraïens wordt steeds beter!' },
+    { uk: 'Я розумію. Що ще ти хочеш сказати?', en: 'I understand. What else would you like to say?', nl: 'Ik begrijp het. Wat wil je nog meer zeggen?' },
+    { uk: 'Молодець! Ти робиш гарний прогрес!', en: 'Well done! You\'re making great progress!', nl: 'Goed gedaan! Je gaat mooi vooruit!' },
   ];
   const f = fallbacks[Math.floor(Math.random() * fallbacks.length)];
   return {
-    response_uk: f.uk, response_en: f.en, grammar_feedback: null,
-    suggestions: [
-      { uk: 'Як сказати "..." по-українськи?', en: 'How do you say "..." in Ukrainian?' },
-      { uk: 'Ще раз, будь ласка', en: 'Once more, please' },
-      { uk: 'Дякую!', en: 'Thank you!' },
-      { uk: 'Це дуже цікаво', en: 'That\'s very interesting' },
-    ]
+    response_uk: f.uk, response_en: tr(f), grammar_feedback: null,
+    suggestions: sug([
+      { uk: 'Як сказати "..." по-українськи?', en: 'How do you say "..." in Ukrainian?', nl: 'Hoe zeg je "..." in het Oekraïens?' },
+      { uk: 'Ще раз, будь ласка', en: 'Once more, please', nl: 'Nog een keer, alsjeblieft' },
+      { uk: 'Дякую!', en: 'Thank you!', nl: 'Dank je!' },
+      { uk: 'Це дуже цікаво', en: 'That\'s very interesting', nl: 'Dat is heel interessant' },
+    ])
   };
 }
 
@@ -569,11 +576,12 @@ export async function showConversationSummary() {
   const card = document.getElementById('summaryCard');
   const body = document.getElementById('summaryContent');
   if (!card || !body) return;
+  const nl = state.nativeLanguage === 'nl';
 
   btn.disabled = true;
   btn.textContent = t('chat.generating');
   card.style.display = 'block';
-  body.innerHTML = '<div style="color:var(--gray);font-size:0.85rem;text-align:center;padding:12px">Analysing conversation…</div>';
+  body.innerHTML = `<div style="color:var(--gray);font-size:0.85rem;text-align:center;padding:12px">${nl ? 'Gesprek analyseren…' : 'Analysing conversation…'}</div>`;
 
   try {
     const s = await generateConversationSummary();
@@ -582,12 +590,12 @@ export async function showConversationSummary() {
       <div class="sum-overall">${escHtml(s.overall_assessment)}</div>
 
       ${s.what_went_well?.length ? `
-        <div class="sum-section-title">✅ What went well</div>
+        <div class="sum-section-title">✅ ${nl ? 'Wat goed ging' : 'What went well'}</div>
         <ul class="sum-list">${s.what_went_well.map(x => `<li>${escHtml(x)}</li>`).join('')}</ul>
       ` : ''}
 
       ${s.mistakes_made?.length ? `
-        <div class="sum-section-title">⚠️ Grammar to review</div>
+        <div class="sum-section-title">⚠️ ${nl ? 'Grammatica om te herhalen' : 'Grammar to review'}</div>
         ${s.mistakes_made.map(m => `
           <div class="sum-mistake">
             <div class="sum-mistake-orig">${escHtml(m.original)}</div>
@@ -597,7 +605,7 @@ export async function showConversationSummary() {
       ` : ''}
 
       ${s.vocabulary_used?.length ? `
-        <div class="sum-section-title">📝 Vocabulary used</div>
+        <div class="sum-section-title">📝 ${nl ? 'Gebruikte woorden' : 'Vocabulary used'}</div>
         <div class="sum-vocab">
           ${s.vocabulary_used.map(v => `
             <div class="sum-vocab-item">
@@ -609,7 +617,7 @@ export async function showConversationSummary() {
       ` : ''}
 
       ${s.suggested_focus?.length ? `
-        <div class="sum-section-title">🎯 Focus next time</div>
+        <div class="sum-section-title">🎯 ${nl ? 'Aandachtspunten voor de volgende keer' : 'Focus next time'}</div>
         <ul class="sum-list">${s.suggested_focus.map(x => `<li>${escHtml(x)}</li>`).join('')}</ul>
       ` : ''}
 

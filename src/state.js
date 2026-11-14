@@ -136,6 +136,13 @@ export function getTutorFirstName() {
   return DEFAULT_TUTOR[state.currentLanguage] || 'Sasha';
 }
 
+// The tutor's name as it is written in the target language, for sentences in that
+// language ("Я Саша"); the Latin spelling stays for the label and the translations.
+const TUTOR_IN_TARGET = { uk: 'Саша' };
+export function getTutorNameInTarget() {
+  return TUTOR_IN_TARGET[state.currentLanguage] || getTutorFirstName();
+}
+
 export function getTutorName() {
   return `${getTutorFirstName()} ${getTargetFlag()}`;
 }

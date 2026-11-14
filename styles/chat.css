@@ -226,7 +226,8 @@
   border-top: 1px solid var(--border);
 }
 .talk-input {
-  flex: 1; padding: 10px 14px; border: 2px solid var(--border);
+  flex: 1; min-width: 0; /* a text field's own minimum pushed Send off a 320px screen */
+  padding: 10px 14px; border: 2px solid var(--border);
   border-radius: 10px; font-size: 0.9rem; outline: none; transition: border-color 0.2s;
 }
 .talk-input:focus { border-color: var(--blue); }
@@ -234,6 +235,7 @@
   padding: 10px 14px; border: none; border-radius: 10px;
   font-size: 1rem; cursor: pointer; transition: all 0.2s; font-weight: 600;
 }
+.mic-btn, .send-btn { flex-shrink: 0; white-space: nowrap; }
 .mic-btn { background: var(--yellow); color: var(--dark); }
 .mic-btn.recording { background: var(--danger); color: white; animation: pulse 1s infinite; }
 .send-btn { background: var(--blue); color: white; font-size: 0.85rem; }

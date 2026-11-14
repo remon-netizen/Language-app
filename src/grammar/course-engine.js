@@ -34,7 +34,8 @@ import { L, shuffle, resultLine, appendNext, missedListHtml, wireSpeakButtons, s
 //   override(t)  optional: undo a miss ("my answer was right too")
 //   compareOnClose  show "your answer / correct" for a near miss too
 //   correctText  the right answer, as text
-//   detailHtml   shown under the verdict: the item itself, notes
+//   detailHtml   shown under the verdict: the item itself, notes. A string, or
+//                ({ res, compare }) => string when it depends on what is already on screen
 //   say          text behind the Listen button; with sayAfter it is also played once answered
 //   missed       { left, right, extra, say } row for the end-of-round list
 
@@ -220,7 +221,7 @@ export function runSession({ screen, icon, title, accent = DEFAULT_ACCENT, cards
     // A typed answer can be right without being on the list (a synonym, another turn of phrase).
     const canOverride = !card.intro && !res.isCorrect && card.override;
     if (canOverride) html += `<button class="ce-override-btn" id="ceOverride" type="button">✓ ${L('My answer was right too', 'Mijn antwoord was ook goed')}</button>`;
-    html += card.detailHtml || '';
+    html += (typeof card.detailHtml === 'function' ? card.detailHtml({ res, compare }) : card.detailHtml) || '';
     if (card.say) html += `<button class="ce-listen-btn" id="ceListen" type="button">🔊 ${L('Listen', 'Luister')}</button>`;
     fb.innerHTML = html;
     wireSpeakButtons(fb);

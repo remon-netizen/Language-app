@@ -1,8 +1,12 @@
 import { escHtml, calcSimilarity } from '../utils.js';
 import { speakText, speakTextCb, speakSlow } from '../voice.js';
-import { getTutorName, getTTSLang } from '../state.js';
+import { state, getTutorName, getTTSLang } from '../state.js';
 import { setupRecognition } from '../speech.js';
 import { openWordLookup } from '../words.js';
+
+// Interface text in the learner's own language.
+const L = (en, nl) => (state.nativeLanguage === 'nl' ? nl : en);
+const practiseLabel = () => '🎙️ ' + L('Practise saying it', 'Uitspraak oefenen');
 
 function wrapWordsInSpans(rawText) {
   const parts = rawText.split(/([\p{L}'ʼ]+)/gu);
@@ -21,11 +25,11 @@ export function addUserMessage(text) {
   div.className = 'chat-msg user';
   const hasCyrillic = /[\u0400-\u04FF]/.test(text);
   div.innerHTML = `
-    <div class="msg-label">You</div>
+    <div class="msg-label">${L('You', 'Jij')}</div>
     <div class="msg-bubble">${escHtml(text)}</div>
     <div class="user-msg-actions">
-      ${hasCyrillic ? `<button class="user-pronounce-btn pronounce-btn" data-text="${escHtml(text)}">🎙️ Practice</button>` : ''}
-      <button class="redo-btn" title="Mic got it wrong? Try again">🔄 Redo</button>
+      ${hasCyrillic ? `<button class="user-pronounce-btn pronounce-btn" data-text="${escHtml(text)}">${practiseLabel()}</button>` : ''}
+      <button class="redo-btn" title="${L('Mic got it wrong? Try again', 'Verstond de microfoon je verkeerd? Probeer het opnieuw')}">🔄 ${L('Redo', 'Opnieuw')}</button>
     </div>`;
 
   if (hasCyrillic) {
@@ -50,8 +54,8 @@ export function addBotMessage(ukText, enText) {
       ${enText ? `<div class="msg-translation">${escHtml(enText)}</div>` : ''}
     </div>
     <div class="bot-msg-actions">
-      <button class="pronounce-btn" data-text="${escHtml(ukText)}">🎙️ Practice</button>
-      <button class="slow-btn">🐢 Slow</button>
+      <button class="pronounce-btn" data-text="${escHtml(ukText)}">${practiseLabel()}</button>
+      <button class="slow-btn">🐢 ${L('Slow', 'Langzaam')}</button>
     </div>`;
 
   div.querySelector('.pronounce-btn').addEventListener('click', function() {
@@ -79,59 +83,59 @@ export function practicePronunciation(btn) {
   if (existing && existing.classList.contains('pronounce-panel')) {
     existing.remove();
     btn.classList.remove('pronounce-active');
-    btn.textContent = '🎙️ Practice pronunciation';
+    btn.textContent = practiseLabel();
     return;
   }
 
   btn.classList.add('pronounce-active');
   btn.disabled = true;
-  btn.textContent = '🔊 Playing...';
+  btn.textContent = '🔊 ' + L('Playing…', 'Speelt af…');
 
   // Create status panel
   const panel = document.createElement('div');
   panel.className = 'pronounce-panel';
-  panel.innerHTML = '<div class="pronounce-status">🔊 Listen carefully...</div>';
+  panel.innerHTML = `<div class="pronounce-status">🔊 ${L('Listen carefully…', 'Luister goed…')}</div>`;
   btn.parentNode.insertBefore(panel, btn.nextSibling);
 
   // Speak the phrase — start recording when TTS finishes
   speakTextCb(text, getTTSLang(), () => {
     btn.disabled = false;
-    btn.textContent = '⏹ Recording...';
-    panel.innerHTML = '<div class="pronounce-status recording">🎙️ Say it now!</div>';
+    btn.textContent = '⏹ ' + L('Recording…', 'Opname loopt…');
+    panel.innerHTML = `<div class="pronounce-status recording">🎙️ ${L('Say it now!', 'Zeg het nu!')}</div>`;
 
     const rec = setupRecognition(getTTSLang(), (event) => {
       const heard = event.results[0][0].transcript.trim();
       const score = calcSimilarity(text.toLowerCase().trim(), heard.toLowerCase());
 
       let cls, emoji, msg;
-      if (score >= 85)      { cls = 'excellent'; emoji = '🎉'; msg = 'Excellent!'; }
-      else if (score >= 60) { cls = 'good';      emoji = '👍'; msg = 'Good effort!'; }
-      else if (score > 0)   { cls = 'try-again'; emoji = '🔄'; msg = 'Keep trying!'; }
-      else                  { cls = 'no-speech'; emoji = '🎙️'; msg = 'Nothing detected.'; }
+      if (score >= 85)      { cls = 'excellent'; emoji = '🎉'; msg = L('Excellent!', 'Uitstekend!'); }
+      else if (score >= 60) { cls = 'good';      emoji = '👍'; msg = L('Good effort!', 'Goed bezig!'); }
+      else if (score > 0)   { cls = 'try-again'; emoji = '🔄'; msg = L('Keep trying!', 'Blijf proberen!'); }
+      else                  { cls = 'no-speech'; emoji = '🎙️'; msg = L('Nothing detected.', 'Niets gehoord.'); }
 
       panel.innerHTML = `
         <div class="pronounce-score ${cls}">${emoji} ${score > 0 ? score + '%' : ''} ${msg}</div>
-        ${heard ? `<div class="pronounce-heard">I heard: "${escHtml(heard)}"</div>` : ''}
-        <button class="pronounce-retry-btn">🔄 Try again</button>`;
+        ${heard ? `<div class="pronounce-heard">${L('I heard', 'Ik hoorde')}: "${escHtml(heard)}"</div>` : ''}
+        <button class="pronounce-retry-btn">🔄 ${L('Try again', 'Nog een keer')}</button>`;
 
       panel.querySelector('.pronounce-retry-btn').addEventListener('click', () => {
         panel.remove();
         btn.classList.remove('pronounce-active');
-        btn.textContent = '🎙️ Practice pronunciation';
+        btn.textContent = practiseLabel();
         practicePronunciation(btn);
       });
 
       btn.classList.remove('pronounce-active');
-      btn.textContent = '🎙️ Practice pronunciation';
+      btn.textContent = practiseLabel();
     }, () => {
       // Recording ended with no result
       btn.classList.remove('pronounce-active');
-      btn.textContent = '🎙️ Practice pronunciation';
+      btn.textContent = practiseLabel();
       if (panel.querySelector('.pronounce-status')) {
-        panel.innerHTML = '<div class="pronounce-status">Nothing detected. <button class="pronounce-retry-btn">Try again</button></div>';
+        panel.innerHTML = `<div class="pronounce-status">${L('Nothing detected.', 'Niets gehoord.')} <button class="pronounce-retry-btn">${L('Try again', 'Nog een keer')}</button></div>`;
         panel.querySelector('.pronounce-retry-btn').addEventListener('click', () => {
           panel.remove();
-          btn.textContent = '🎙️ Practice pronunciation';
+          btn.textContent = practiseLabel();
           practicePronunciation(btn);
         });
       }
@@ -150,13 +154,13 @@ export function addGrammarFeedback(fb, original) {
     div.style.background = '#f0fdf4';
     div.style.borderColor = '#86efac';
     div.innerHTML = `
-      <div class="grammar-header" style="color:#16a34a">✓ No spelling/grammar rule errors</div>
+      <div class="grammar-header" style="color:#16a34a">✓ ${L('No spelling or grammar errors found', 'Geen spel- of grammaticafouten gevonden')}</div>
       <div class="explanation" style="color:#555;font-size:0.78rem">${escHtml(fb.explanation)}</div>`;
   } else {
     div.innerHTML = `
-      <div class="grammar-header">⚠️ Grammar note</div>
-      ${original ? `<div style="margin-bottom:4px;color:var(--gray);font-size:0.8rem">You said: <em>${escHtml(original)}</em></div>` : ''}
-      ${fb.corrected ? `<div style="margin-bottom:4px">Better: <span class="corrected">${escHtml(fb.corrected)}</span></div>` : ''}
+      <div class="grammar-header">⚠️ ${L('Grammar note', 'Grammatica')}</div>
+      ${original ? `<div style="margin-bottom:4px;color:var(--gray);font-size:0.8rem">${L('You said', 'Jij zei')}: <em>${escHtml(original)}</em></div>` : ''}
+      ${fb.corrected ? `<div style="margin-bottom:4px">${L('Better', 'Beter')}: <span class="corrected">${escHtml(fb.corrected)}</span></div>` : ''}
       ${fb.explanation ? `<div class="explanation">${escHtml(fb.explanation)}</div>` : ''}`;
   }
 
@@ -168,12 +172,15 @@ export function addErrorMessage(msg) {
   const chatArea = document.getElementById('chatArea');
   const div = document.createElement('div');
   div.className = 'chat-msg bot';
-  div.innerHTML = `<div class="msg-bubble" style="background:#fee2e2;color:#dc2626">
-    ⚠️ ${msg.includes('401') ? 'Invalid API key. Please check your Anthropic API key above.' :
-         msg.includes('429') ? 'Rate limit reached. Please wait a moment and try again.' :
-         msg.includes('Failed to fetch') ? 'Network error. Check your internet connection.' :
-         'Error: ' + escHtml(msg)}
-  </div>`;
+  // The providers word a rejected key differently: Anthropic "invalid x-api-key",
+  // Gemini "API key not valid", either one a bare 401 / 403.
+  const provider = state.currentProvider === 'anthropic' ? 'Anthropic' : 'Gemini';
+  const badKey = /\b40[13]\b|api[ _-]?key|authentication|permission/i.test(msg);
+  const text = badKey ? L(`The ${provider} API key was not accepted. Check it in Settings (⚙️).`, `De ${provider}-API-sleutel is niet geaccepteerd. Controleer hem bij Instellingen (⚙️).`)
+    : /\b429\b|rate limit|quota|overloaded/i.test(msg) ? L('The AI service is busy or your limit is reached. Wait a moment and try again.', 'De AI-dienst is druk of je limiet is bereikt. Wacht even en probeer het opnieuw.')
+    : /Failed to fetch|NetworkError|Load failed/i.test(msg) ? L('Network error. Check your internet connection.', 'Netwerkfout. Controleer je internetverbinding.')
+    : L('Error: ', 'Fout: ') + escHtml(msg);
+  div.innerHTML = `<div class="msg-bubble" style="background:#fee2e2;color:#b91c1c">⚠️ ${text}</div>`;
   chatArea.appendChild(div);
   chatArea.scrollTop = chatArea.scrollHeight;
 }

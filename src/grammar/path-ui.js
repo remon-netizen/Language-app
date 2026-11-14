@@ -56,6 +56,7 @@ function showMenu() {
   const doneCount = UNITS.filter(u => unitDone(u.id)).length;
   const cont = firstOpen();
   const dueAll = learnedDueItems().length;
+  const practiseCount = Math.min(PRACTISE_ROUND, practisePool().length);
   const level = LEVELS.find(l => l.id === pt.level);
   const units = unitsOf(pt.level);
 
@@ -88,7 +89,7 @@ function showMenu() {
     <div class="pt-stats-bar">
       <span class="pt-stat">📘 ${doneCount} / ${UNITS.length} ${L('units done', 'units klaar')}</span>
       <span class="pt-stat">🧠 ${st.learned} / ${st.total} ${L('learned', 'geleerd')}</span>
-      <span class="pt-stat ${st.due ? 'pt-stat-due' : ''}">🔄 ${st.due} ${L('due', 'aan de beurt')}</span>
+      <span class="pt-stat ${dueAll ? 'pt-stat-due' : ''}">🔄 ${dueAll} ${L('due', 'aan de beurt')}</span>
     </div>
 
     ${cont ? `<button class="pt-continue" id="ptContinue">
@@ -96,7 +97,7 @@ function showMenu() {
       <span><span class="pt-continue-title">▶ ${unitStarted(cont.id) ? L('Continue', 'Verder') : L('Start', 'Start')}: ${escHtml(unitName(cont))}</span><br>
       <span class="pt-continue-sub">${escHtml(loc(cont.grammar))}${dueAll ? ` · 🔁 ${dueAll} ${L('due from earlier units', 'aan de beurt uit eerdere units')}` : ''}</span></span>
     </button>` : `<div class="pt-empty">🎉 ${L('Every unit is done.', 'Alle units zijn klaar.')}</div>`}
-    ${practisePool().length ? `<button class="vc-browse-btn pt-practise" id="ptPractise">✍️ ${L('Practise what you learned', 'Oefen wat je geleerd hebt')} · ${L('20 exercises from finished units', '20 oefeningen uit afgeronde units')}</button>` : ''}
+    ${practiseCount ? `<button class="vc-browse-btn pt-practise" id="ptPractise">✍️ ${L('Practise what you learned', 'Oefen wat je geleerd hebt')} · ${L(`${practiseCount} exercises from finished units`, `${practiseCount} oefeningen uit afgeronde units`)}</button>` : ''}
 
     <div class="pt-section-label">${L('Level', 'Niveau')}</div>
     <div class="pt-level-row">${LEVELS.map(levelBtn).join('')}</div>
@@ -116,14 +117,18 @@ function showMenu() {
 
 // ── Unit page ────────────────────────────────────────────────────────────────
 
-const inline = t => escHtml(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/`(.+?)`/g, '<code>$1</code>');
+// `code`, **bold**, *italic*. A single asterisk in front of a form stays as it is:
+// that is how the texts mark a wrong form (never *скажите).
+const INLINE = /`(.+?)`|\*\*(.+?)\*\*|\*(\S(?:[^*\n]*?\S)?)\*(?![\p{L}\p{N}*])/gu;
+const markup = t => t.replace(INLINE, (m, code, bold, ital) => (code !== undefined ? `<code>${code}</code>` : bold !== undefined ? `<b>${markup(bold)}</b>` : `<i>${markup(ital)}</i>`));
+const inline = t => markup(escHtml(t));
 function exampleLine(t) {
   const i = t.indexOf(' — ');
   if (i === -1) return `<div class="pt-ex-line"><span class="pt-ex-uk">${inline(t)}</span> ${say(t)}</div>`;
   const uk = t.slice(0, i), gloss = t.slice(i + 3);
   return `<div class="pt-ex-line"><span class="pt-ex-uk">${inline(uk)}</span> ${say(uk)} <span class="pt-ex-gloss">${inline(gloss)}</span></div>`;
 }
-// markdown-lite: paragraphs, "- " bullets, "> uk — gloss" example lines, "### " headings, **bold**, `code`
+// markdown-lite: paragraphs, "- " bullets, "> uk — gloss" example lines, "### " headings, **bold**, *italic*, `code`
 // A block may mix kinds (a sentence, then two example lines): consecutive lines
 // of one kind form a run, and each run is rendered on its own.
 const kindOf = l => (l.startsWith('- ') ? 'ul' : l.startsWith('> ') ? 'ex' : /^#{1,4} /.test(l) ? 'h' : 'p');
@@ -197,7 +202,7 @@ function showUnit(unit) {
         <div class="pt-sentence">
           <div class="pt-sentence-uk"><span class="pt-word-dot ${dotClass(x)}"></span>${escHtml(x.uk)} ${say(x.uk)}</div>
           <div class="pt-sentence-native">${escHtml(native(x))}</div>
-          ${x.note ? `<div class="pt-sentence-note">💡 ${escHtml(loc(x.note))}</div>` : ''}
+          ${x.note ? `<div class="pt-sentence-note">💡 ${inline(loc(x.note))}</div>` : ''}
         </div>`).join('')}
     </div>
 
@@ -291,7 +296,7 @@ const sentenceVerdict = (answer, target) => {
 
 // A sentence: shown with its note first (intro, copied), then typed from the translation.
 function sentenceCard(x, { intro = false } = {}) {
-  const note = x.note ? `<div class="pt-detail-note">💡 ${escHtml(loc(x.note))}</div>` : '';
+  const note = x.note ? `<div class="pt-detail-note">💡 ${inline(loc(x.note))}</div>` : '';
   return {
     key: x.key, course: COURSE, intro,
     promptHtml: `
@@ -299,7 +304,7 @@ function sentenceCard(x, { intro = false } = {}) {
         ${intro ? `<div class="pt-q-badge">✨ ${L('New sentence', 'Nieuwe zin')}</div>` : `<div class="pt-q-label">${L('Say this in Ukrainian', 'Zeg dit in het Oekraïens')}</div>`}
         <div class="pt-q-main">${escHtml(native(x))}</div>
         ${intro ? `<div class="pt-q-sentence">${escHtml(x.uk)} ${say(x.uk)}</div>
-                   ${x.note ? `<div class="pt-q-note">💡 ${escHtml(loc(x.note))}</div>` : ''}
+                   ${x.note ? `<div class="pt-q-note">💡 ${inline(loc(x.note))}</div>` : ''}
                    <div class="pt-q-hint">${L('Read it, say it, then type it', 'Lees het, zeg het, typ het dan')}</div>`
                 : `<div class="pt-hint-row">${x.hint.map(h => `<span class="pt-hint-chip">${escHtml(h)}</span>`).join('')}</div>`}
       </div>`,
@@ -310,7 +315,8 @@ function sentenceCard(x, { intro = false } = {}) {
     override: before => regradeItem(x, before, 4),
     compareOnClose: true,
     correctText: x.uk,
-    detailHtml: intro ? '' : `<div class="pt-detail-full">${escHtml(x.uk)}</div>${note}`,
+    // The sentence itself is shown once: in the comparison after a miss, here after a hit.
+    detailHtml: intro ? '' : ({ compare }) => (compare ? '' : `<div class="pt-detail-full">${escHtml(x.uk)}</div>`) + note,
     say: x.uk, sayAfter: !intro,
     missed: { left: native(x), right: x.uk, extra: '' },
   };
@@ -318,7 +324,7 @@ function sentenceCard(x, { intro = false } = {}) {
 
 // Exercises are practice, not scheduled: record is a no-op.
 function exerciseCard(x) {
-  const note = x.note ? `<div class="pt-detail-note">💡 ${escHtml(loc(x.note))}</div>` : '';
+  const note = x.note ? `<div class="pt-detail-note">💡 ${inline(loc(x.note))}</div>` : '';
   const shownUk = escHtml(x.uk).replace(/___/g, '<span class="pt-q-gap">&nbsp;</span>');
   const common = { key: `ex:${x.uk}`, course: COURSE, intro: false, record: () => null, override: null, detailHtml: note };
   if (x.type === 'choose') {
@@ -418,11 +424,12 @@ function startLearnedReview(unit) {
 // ── Practise what you learned ────────────────────────────────────────────────
 // The exercises of units whose exercise step is done, as a mixed round. They are
 // not scheduled (the words and sentences are), so this is the free practice.
+const PRACTISE_ROUND = 20;
 const practisePool = () => UNITS.filter(u => unitState(u.id).exercises).flatMap(u => u.exercises.map(x => ({ x, unit: u })));
 function startPractise() {
   const pool = practisePool();
   if (!pool.length) { showMenu(); return; }
-  const cards = shuffle(pool).slice(0, 20).map(({ x, unit }) => ({ ...exerciseCard(x), course: { icon: unit.icon, name: unitName(unit) } }));
+  const cards = shuffle(pool).slice(0, PRACTISE_ROUND).map(({ x, unit }) => ({ ...exerciseCard(x), course: { icon: unit.icon, name: unitName(unit) } }));
   runSession({
     screen: getScreen(), icon: '✍️', title: L('Practise what you learned', 'Oefen wat je geleerd hebt'), accent: ACCENT, cards, mixed: true,
     onExit: showMenu,

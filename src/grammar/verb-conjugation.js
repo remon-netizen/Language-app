@@ -2,29 +2,32 @@ import { state, flagImg } from '../state.js';
 import { showScreen } from '../router.js';
 import { conjugateVerb } from '../api/grammar.js';
 import { escHtml } from '../utils.js';
+import { languageName } from '../i18n.js';
+
+const L = (en, nl) => (state.nativeLanguage === 'nl' ? nl : en);
 
 const COMMON_VERBS = {
   uk: [
-    { verb: 'бути',     en: 'to be' },
-    { verb: 'мати',     en: 'to have' },
-    { verb: 'робити',   en: 'to do' },
-    { verb: 'іти',      en: 'to go' },
-    { verb: 'говорити', en: 'to speak' },
-    { verb: 'знати',    en: 'to know' },
-    { verb: 'хотіти',   en: 'to want' },
-    { verb: 'могти',    en: 'can' },
-    { verb: 'любити',   en: 'to love' },
-    { verb: 'думати',   en: 'to think' },
-    { verb: 'бачити',   en: 'to see' },
-    { verb: 'казати',   en: 'to say' },
-    { verb: 'дати',     en: 'to give' },
-    { verb: 'взяти',    en: 'to take' },
-    { verb: 'читати',   en: 'to read' },
-    { verb: 'писати',   en: 'to write' },
-    { verb: 'їсти',     en: 'to eat' },
-    { verb: 'пити',     en: 'to drink' },
-    { verb: 'жити',     en: 'to live' },
-    { verb: 'розуміти', en: 'to understand' },
+    { verb: 'бути',     en: 'to be',         nl: 'zijn' },
+    { verb: 'мати',     en: 'to have',       nl: 'hebben' },
+    { verb: 'робити',   en: 'to do',         nl: 'doen' },
+    { verb: 'іти',      en: 'to go',         nl: 'gaan' },
+    { verb: 'говорити', en: 'to speak',      nl: 'spreken' },
+    { verb: 'знати',    en: 'to know',       nl: 'weten' },
+    { verb: 'хотіти',   en: 'to want',       nl: 'willen' },
+    { verb: 'могти',    en: 'can',           nl: 'kunnen' },
+    { verb: 'любити',   en: 'to love',       nl: 'houden van' },
+    { verb: 'думати',   en: 'to think',      nl: 'denken' },
+    { verb: 'бачити',   en: 'to see',        nl: 'zien' },
+    { verb: 'казати',   en: 'to say',        nl: 'zeggen' },
+    { verb: 'дати',     en: 'to give',       nl: 'geven' },
+    { verb: 'взяти',    en: 'to take',       nl: 'nemen' },
+    { verb: 'читати',   en: 'to read',       nl: 'lezen' },
+    { verb: 'писати',   en: 'to write',      nl: 'schrijven' },
+    { verb: 'їсти',     en: 'to eat',        nl: 'eten' },
+    { verb: 'пити',     en: 'to drink',      nl: 'drinken' },
+    { verb: 'жити',     en: 'to live',       nl: 'leven / wonen' },
+    { verb: 'розуміти', en: 'to understand', nl: 'begrijpen' },
   ],
   nl: [
     { verb: 'zijn',      en: 'to be' },
@@ -99,12 +102,12 @@ function renderCommonVerbs() {
   if (!container) return;
   const verbs = COMMON_VERBS[state.currentLanguage] || COMMON_VERBS.uk;
   container.innerHTML = `
-    <div class="common-verbs-label">Common verbs — tap to look up</div>
+    <div class="common-verbs-label">${L('Common verbs — tap to look up', 'Veelgebruikte werkwoorden — tik om op te zoeken')}</div>
     <div class="common-verb-chips">
       ${verbs.map(v => `
         <button class="common-verb-chip" data-verb="${escHtml(v.verb)}">
           <span class="cv-verb">${escHtml(v.verb)}</span>
-          <span class="cv-en">${escHtml(v.en)}</span>
+          <span class="cv-en">${escHtml(state.nativeLanguage === 'nl' && v.nl ? v.nl : v.en)}</span>
         </button>`).join('')}
     </div>`;
 
@@ -123,10 +126,7 @@ export function openVerbScreen() {
   if (input) { input.value = ''; input.focus(); }
   document.getElementById('verbResult').innerHTML = '';
   const sub = document.getElementById('verbScreenSub');
-  if (sub) {
-    const meta = { uk: 'Ukrainian', nl: 'Dutch', en: 'English', fr: 'French' };
-    sub.innerHTML = `${flagImg(state.currentLanguage, 16)} ${meta[state.currentLanguage] || meta.uk}`;
-  }
+  if (sub) sub.innerHTML = `${flagImg(state.currentLanguage, 16)} ${languageName(state.currentLanguage)}`;
   renderCommonVerbs();
 }
 
@@ -136,7 +136,7 @@ export async function submitVerb() {
   if (!verb) return;
 
   const resultEl = document.getElementById('verbResult');
-  resultEl.innerHTML = `<div class="grammar-loading">⏳ Looking up conjugation…</div>`;
+  resultEl.innerHTML = `<div class="grammar-loading">⏳ ${L('Looking up the conjugation…', 'Vervoeging opzoeken…')}</div>`;
 
   const btn = document.getElementById('verbSubmitBtn');
   if (btn) btn.disabled = true;

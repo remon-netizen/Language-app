@@ -1,4 +1,4 @@
-import { getLTLang } from '../state.js';
+import { state, getLTLang } from '../state.js';
 
 export async function checkGrammarLanguageTool(text) {
   try {
@@ -12,7 +12,9 @@ export async function checkGrammarLanguageTool(text) {
     const matches = data.matches || [];
 
     if (matches.length === 0) {
-      return { has_errors: false, corrected: text, explanation: 'No spelling or grammar rule errors detected. (For tense, case & context feedback, add a Gemini API key.)' };
+      return { has_errors: false, corrected: text, explanation: state.nativeLanguage === 'nl'
+        ? 'De spellingcontrole vond niets. Die kijkt niet naar naamvallen, tijden of context: daarvoor is een API-sleutel nodig (Instellingen ⚙️).'
+        : 'The spell checker found nothing. It does not look at cases, tenses or context: that needs an API key (Settings ⚙️).' };
     }
 
     // Apply all replacements to build corrected text

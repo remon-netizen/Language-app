@@ -52,6 +52,8 @@ export function pathStats() {
     learned: entries.filter(e => e && e.c >= 2).length,
     due: items.filter((i, k) => !i.core && entries[k] && entries[k].nextReview <= now).length,
     weak: entries.filter(e => e && e.a > 0 && e.c / e.a < 0.5).length,
+    // The same without the core words: those are counted as weak by the vocabulary course.
+    ownWeak: items.filter((i, k) => !i.core && entries[k] && entries[k].a > 0 && entries[k].c / entries[k].a < 0.5).length,
   };
 }
 

@@ -71,7 +71,13 @@
 .pt-ex-line { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; padding: 3px 0; }
 .pt-ex-uk { font-weight: 800; color: #115e59; }
 .pt-ex-gloss { color: var(--gray); font-size: 0.86rem; }
-.pt-say { background: none; border: none; font-size: 0.95rem; cursor: pointer; padding: 0 2px; line-height: 1; }
+.pt-say { position: relative; background: none; border: none; font-size: 1rem; cursor: pointer; padding: 0 3px; line-height: 1; font-family: inherit; }
+/* The icon stays small enough to sit in a line of text; the touch target around it
+   is 44px wide. It is 32px high where lines follow each other closely (the example
+   lines of an explanation), so one line's target never covers the next line's icon. */
+.pt-say::after { content: ''; position: absolute; left: 50%; top: 50%; width: 44px; height: 32px; transform: translate(-50%, -50%); }
+.pt-word .pt-say::after, .pt-sentence .pt-say::after, .pt-q-card .pt-say::after { height: 44px; }
+.pt-q-card .pt-say { font-size: 1.25rem; vertical-align: middle; }
 
 .pt-words { display: flex; flex-direction: column; }
 .pt-word { display: grid; grid-template-columns: 1fr 1fr 30px; gap: 8px; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; }

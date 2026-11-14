@@ -2,7 +2,7 @@
 import { ALPHABET } from './data/alphabet.js';
 import { speakText } from './voice.js';
 import { showScreen } from './router.js';
-import { L } from './grammar/drill-core.js';
+import { L, isNL } from './grammar/drill-core.js';
 
 export function openAlphabetScreen() {
   showScreen('alphabetScreen');
@@ -18,8 +18,9 @@ export function openAlphabetScreen() {
     <div class="alphabet-grid">
       ${ALPHABET.map(l => {
         const lower = l.c.split(' ')[1] || l.c;
+        const hint = isNL() ? l.nl : l;
         return `<button class="letter-card" type="button" data-letter="${lower}">
-          <div class="cyrillic">${l.c}</div><div class="latin">${l.l}</div><div class="sound">${l.s}</div>
+          <div class="cyrillic">${l.c}</div><div class="latin">${hint.l}</div><div class="sound">${hint.s}</div>
         </button>`;
       }).join('')}
     </div>`;

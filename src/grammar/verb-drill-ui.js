@@ -3,7 +3,7 @@ import { escHtml } from '../utils.js';
 import { CONJUGATIONS, buildDrillSet, findVerb } from '../data/verb-conjugations.js';
 import { VERB_PAIRS } from '../data/verb-aspects.js';
 import { ASPECT_TIPS } from '../data/aspect-tips.js';
-import { L, loc, shuffle, grade } from './drill-core.js';
+import { L, loc, shuffle, grade, aspectShort } from './drill-core.js';
 import { runSession } from './course-engine.js';
 import { verbProgress, verbStats, tenseKey, aspectKey, TENSES } from '../data/verb-progress.js';
 import { recordAnswer, getVerbMastery, getAllMastery, getWeakItems, hasWeaknessData, getWeakVerbCount } from '../data/verb-weakness.js';
@@ -770,9 +770,7 @@ function renderExamples(imp, perf) {
     <div class="vd-examples-title">${nl ? 'In zinnen' : 'In sentences'}</div>`;
 
   for (const verb of groups) {
-    const tag = verb.aspect === 'imperfective'
-      ? `<span class="vd-aspect-tag vd-imp">IMP</span>`
-      : `<span class="vd-aspect-tag vd-perf">PERF</span>`;
+    const tag = aspectTag(verb.aspect);
     html += `<div class="vd-example-group">
       <div class="vd-example-verb">${tag} ${escHtml(verb.infinitive)}</div>`;
     for (const sent of verb.sentences) {
@@ -859,9 +857,7 @@ function startLearnPractice(imp, perf) {
 // What the course engine needs to ask one verb form, one gapped sentence or one
 // aspect choice. The Review queue uses the same cards between those of other courses.
 
-const aspectTag = aspect => (aspect === 'imperfective'
-  ? '<span class="vd-aspect-tag vd-imp">IMP</span>'
-  : '<span class="vd-aspect-tag vd-perf">PERF</span>');
+const aspectTag = aspect => `<span class="vd-aspect-tag ${aspect === 'imperfective' ? 'vd-imp' : 'vd-perf'}">${aspectShort(aspect)}</span>`;
 
 function formQuestion(verb, tense, pronoun, form) {
   return { infinitive: verb.infinitive, aspect: verb.aspect, partner: verb.partner, meaning: verb.meaning,

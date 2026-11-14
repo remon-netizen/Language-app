@@ -7,7 +7,7 @@ export async function generateConversationSummary() {
   const langName   = TARGET_NAMES[state.currentLanguage] || 'Ukrainian';
   const nativeName = NATIVE_NAMES[state.nativeLanguage] || 'English';
 
-  if (state.conversationHistory.length < 2) throw new Error('Not enough conversation to summarise');
+  if (state.conversationHistory.length < 2) throw new Error(state.nativeLanguage === 'nl' ? 'Nog te weinig gesprek om samen te vatten' : 'Not enough conversation to summarise');
 
   const conversationText = state.conversationHistory
     .map(m => `${m.role === 'user' ? 'Student' : 'Tutor'}: ${m.content}`)

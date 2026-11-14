@@ -3,7 +3,7 @@ import { escHtml } from '../utils.js';
 import { CASES, CASE_LABELS, NOUNS, CASE_SENTENCES, ADJECTIVE_NOUNS, buildCaseDrillSet, findNoun } from '../data/case-declensions.js';
 import { PERSONAL, POSSESSIVE, PRON_CASES, GENDER_LABELS, INDECLINABLE_NOTE } from '../data/pronouns-uk.js';
 import { recordAnswer, getNounMastery, getAllMastery, getWeakItems, hasWeaknessData, getWeakNounCount } from '../data/case-weakness.js';
-import { L, loc, shuffle, grade } from './drill-core.js';
+import { L, loc, shuffle, grade, genderShort } from './drill-core.js';
 import { runSession } from './course-engine.js';
 import { caseProgress, caseStats, nounKey, NUMBERS } from '../data/case-progress.js';
 
@@ -34,9 +34,7 @@ function getNounsForLevel(level) {
   return NOUNS.filter(n => allowed.includes(n.level || 'A1'));
 }
 
-function genderLabel(g) {
-  return { m: 'MASC', f: 'FEM', n: 'NEUT' }[g] || g;
-}
+const genderLabel = genderShort;
 function genderClass(g) {
   return { m: 'cd-gender-m', f: 'cd-gender-f', n: 'cd-gender-n' }[g] || '';
 }

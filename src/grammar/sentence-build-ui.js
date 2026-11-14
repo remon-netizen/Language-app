@@ -4,7 +4,7 @@ import { speakText } from '../voice.js';
 import { SENTENCES } from '../data/sentences-uk.js';
 import { VERB_PAIRS } from '../data/verb-aspects.js';
 import { makeTracker } from '../data/flat-weakness.js';
-import { L, loc, shuffle, normalise, appendNext, missedListHtml, wireSpeakButtons, scoreMessage, scoreEmoji } from './drill-core.js';
+import { L, loc, shuffle, normalise, appendNext, missedListHtml, wireSpeakButtons, scoreMessage, scoreEmoji, aspectShort } from './drill-core.js';
 
 // ── Sentence builder ─────────────────────────────────────────────────────────
 // The learner sees a sentence in their own language plus the Ukrainian words
@@ -37,7 +37,7 @@ function aspectItems() {
   const out = [];
   VERB_PAIRS.forEach(pair => pair.sentences.forEach((s, i) => out.push({
     key: `aspect:${pair.id}:${i}`, uk: s.uk, prompt: state.nativeLanguage === 'nl' ? s.nl : s.en,
-    hint: [`${pair.imperfective} / ${pair.perfective}`, s.aspect === 'imperfective' ? 'IMP' : 'PERF'], note: s.why,
+    hint: [`${pair.imperfective} / ${pair.perfective}`, aspectShort(s.aspect)], aspectHint: aspectShort(s.aspect), note: s.why,
   })));
   return out;
 }
@@ -175,7 +175,7 @@ function renderQuestion() {
       <div class="sb-q-label">${L('Say this in Ukrainian', 'Zeg dit in het Oekraïens')}</div>
       <div class="sb-q-prompt">${escHtml(it.prompt)}</div>
       <div class="sb-hint-row">
-        ${it.hint.map(h => `<span class="sb-hint-chip ${h === 'IMP' || h === 'PERF' ? 'sb-hint-aspect' : ''}">${escHtml(h)}</span>`).join('')}
+        ${it.hint.map(h => `<span class="sb-hint-chip ${h === it.aspectHint ? 'sb-hint-aspect' : ''}">${escHtml(h)}</span>`).join('')}
       </div>
     </div>
 

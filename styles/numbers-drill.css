@@ -30,7 +30,8 @@
 }
 
 /* Category cards (multi-select) */
-.nd-cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 18px; }
+/* minmax(0, …): a column may get narrower than its longest card wants (320px phones). */
+.nd-cat-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; margin-bottom: 18px; }
 .nd-cat-card {
   display: flex; align-items: center; gap: 10px;
   padding: 10px 12px; border: 2px solid var(--border); border-radius: 12px;
@@ -47,7 +48,7 @@
 .nd-cat-card.active .nd-cat-check { background: #ea580c; border-color: #ea580c; }
 .nd-cat-icon { font-size: 1.4rem; line-height: 1; flex-shrink: 0; }
 .nd-cat-text { display: flex; flex-direction: column; min-width: 0; flex: 1; }
-.nd-cat-title { font-size: 0.88rem; font-weight: 700; color: var(--text); }
+.nd-cat-title { font-size: 0.88rem; font-weight: 700; color: var(--text); overflow-wrap: anywhere; }
 .nd-cat-sub { font-size: 0.72rem; color: var(--gray); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .nd-cat-study {
   background: none; border: 1px solid var(--border); border-radius: 8px;
@@ -187,7 +188,7 @@
 
 /* Mobile */
 @media (max-width: 500px) {
-  .nd-cat-grid { grid-template-columns: 1fr; }
+  .nd-cat-grid { grid-template-columns: minmax(0, 1fr); }
   .nd-mode-row { gap: 6px; }
   .nd-mode-btn { padding: 10px 4px; }
   .nd-mode-sub { display: none; }

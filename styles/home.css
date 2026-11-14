@@ -138,12 +138,12 @@
 .api-notice-icon { font-size: 1.2rem; flex-shrink: 0; }
 .api-notice-text { flex: 1; }
 .api-notice-btn {
-  background: #f59e0b; color: white; border: none;
+  background: #b45309; color: white; border: none;
   border-radius: 6px; padding: 5px 10px; font-size: 0.78rem;
   font-weight: 600; cursor: pointer; white-space: nowrap; flex-shrink: 0;
 }
 .api-notice-btn { min-height: 36px; }
-.api-notice-btn:hover { background: #d97706; }
+.api-notice-btn:hover { background: #92400e; }
 
 /* ── Home tools grid (2-column) ── */
 .home-tools-grid {
@@ -412,6 +412,21 @@
 }
 
 /* ── Review hub ── */
+/* The hub's own header, in the purple of a review round. A round running on this
+   screen brings its own header (.ce-header) in the colour of its course. */
+#reviewScreen .lesson-header:not(.ce-header) {
+  display: flex; align-items: center; gap: 14px;
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+  border-radius: 16px; padding: 14px 18px; margin-bottom: 16px;
+  box-shadow: 0 2px 12px rgba(124,58,237,0.22);
+}
+#reviewScreen .lesson-header:not(.ce-header) .back-btn {
+  background: rgba(255,255,255,0.18); border: none; border-radius: 10px;
+  color: white; font-size: 1.2rem; width: 36px; height: 36px; padding: 0; flex-shrink: 0;
+}
+#reviewScreen .lesson-header:not(.ce-header) .back-btn:hover { background: rgba(255,255,255,0.32); }
+#reviewScreen .lesson-header:not(.ce-header) .lesson-title { font-size: 1.05rem; font-weight: 700; color: white; }
+#reviewScreen .lesson-header:not(.ce-header) .lesson-subtitle { font-size: 0.75rem; color: rgba(255,255,255,0.78); margin-top: 2px; }
 .rv-hub { display: flex; flex-direction: column; gap: 10px; }
 .rv-all-btn {
   width: 100%; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 16px 14px; margin-bottom: 12px;

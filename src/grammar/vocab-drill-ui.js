@@ -154,6 +154,10 @@ function showMenu() {
   if (vc.theme !== 'all' && !themes()[vc.theme]) vc.theme = 'all';
   const verbCount = wordsOf('verbs').length;
   const mineCount = myWords().length;
+  // The work themes are specialist words, dealt out only when chosen: counted apart,
+  // so the header adds up with "x left in All themes" below.
+  const workCount = deck().filter(w => WORK_THEMES.has(w.theme)).length;
+  const coreCount = st.total - mineCount - workCount;
   const nat = isNL() ? 'NL' : 'EN';
   const target = targetCode();
   const unseenHere = unseenVocab().filter(inTheme).length;
@@ -174,7 +178,7 @@ function showMenu() {
       <div>
         <div class="lesson-title">🧠 ${L('Vocabulary', 'Woordenschat')}</div>
         <div class="lesson-subtitle">${isUK()
-          ? L(`${st.total - mineCount} core words, ${verbCount} of them verbs${mineCount ? ` · ${mineCount} of your own` : ''}`, `${st.total - mineCount} kernwoorden, waarvan ${verbCount} werkwoorden${mineCount ? ` · ${mineCount} van jezelf` : ''}`)
+          ? L(`${coreCount} core words, ${verbCount} of them verbs${workCount ? ` · ${workCount} specialist words` : ''}${mineCount ? ` · ${mineCount} of your own` : ''}`, `${coreCount} kernwoorden, waarvan ${verbCount} werkwoorden${workCount ? ` · ${workCount} vakwoorden` : ''}${mineCount ? ` · ${mineCount} van jezelf` : ''}`)
           : L(`${mineCount} words you saved from conversations · typed both ways`, `${mineCount} woorden die je uit gesprekken hebt opgeslagen · in beide richtingen typen`)}</div>
       </div>
     </div>

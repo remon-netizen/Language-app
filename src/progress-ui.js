@@ -15,6 +15,8 @@ import { downloadBackup, lastBackup, parseBackup, restoreBackup } from './backup
 // ── One screen with every number the app keeps ───────────────────────────────
 
 const L = (en, nl) => (state.nativeLanguage === 'nl' ? nl : en);
+// "1 day" / "3 days"
+const count = (n, one, many) => `${n} ${n === 1 ? one : many}`;
 
 function sumMastery(m) {
   let attempts = 0, correct = 0, weak = 0, items = 0;
@@ -70,8 +72,8 @@ export function openProgressScreen() {
     <div class="pg-card pg-streak">
       <div class="pg-streak-num">${streak > 0 ? '🔥 ' + streak : '💤'}</div>
       <div class="pg-streak-text">
-        <div class="pg-streak-title">${streak > 0 ? L(`${streak}-day streak`, `${streak} dagen op rij`) : L('No streak yet', 'Nog geen reeks')}</div>
-        <div class="pg-streak-sub">${totalAnswers()} ${L('answers over', 'antwoorden op')} ${activeDays()} ${L('days', 'dagen')}</div>
+        <div class="pg-streak-title">${streak > 0 ? L(`${streak}-day streak`, `${count(streak, 'dag', 'dagen')} op rij`) : L('No streak yet', 'Nog geen reeks')}</div>
+        <div class="pg-streak-sub">${L(`${count(totalAnswers(), 'answer', 'answers')} over ${count(activeDays(), 'day', 'days')}`, `${count(totalAnswers(), 'antwoord', 'antwoorden')} op ${count(activeDays(), 'dag', 'dagen')}`)}</div>
       </div>
       <div class="pg-days">
         ${days.map(d => `<div class="pg-day" title="${d.key}: ${d.count}"><div class="pg-day-bar" style="height:${Math.round(d.count / maxDay * 100)}%"></div><div class="pg-day-label">${weekday(d.date)}</div></div>`).join('')}

@@ -438,7 +438,7 @@
   flex-shrink: 0;
 }
 .vd-weak-toggle.active .vd-weak-check {
-  background: #f59e0b;
+  background: #d97706;
   color: white;
 }
 
@@ -757,7 +757,8 @@
 /* Five menu cards: aspect joined the verb drill */
 .vd-menu-grid-5 { grid-template-columns: repeat(5, 1fr); }
 @media (max-width: 700px) { .vd-menu-grid-5 { grid-template-columns: repeat(3, 1fr); } }
-@media (max-width: 500px) { .vd-menu-grid-5 { grid-template-columns: 1fr 1fr; } }
+/* On a phone the cards lie down (icon, title, sub in a row), so they need the full width. */
+@media (max-width: 500px) { .vd-menu-grid-5 { grid-template-columns: 1fr; } }
 
 /* Dictation */
 .vd-dict-play {

@@ -11,12 +11,14 @@ function scoreVoice(v) {
   return score;
 }
 
+// label: the language as an adjective, in the learner's own language ("Ukrainian voice", "Oekraïense stem").
 const TARGET_META = {
-  uk: { prefix: 'uk', label: 'Ukrainian', listKey: 'availableUkVoices', selKey: 'selectedVoice',   savedKey: 'ukVoiceName' },
-  nl: { prefix: 'nl', label: 'Dutch',     listKey: 'availableNlVoices', selKey: 'selectedNlVoice', savedKey: 'nlVoiceName' },
-  en: { prefix: 'en', label: 'English',   listKey: 'availableEnVoices', selKey: 'selectedEnVoice', savedKey: 'enVoiceName' },
-  fr: { prefix: 'fr', label: 'French',    listKey: 'availableFrVoices', selKey: 'selectedFrVoice', savedKey: 'frVoiceName' },
+  uk: { prefix: 'uk', label: { en: 'Ukrainian', nl: 'Oekraïense' },  listKey: 'availableUkVoices', selKey: 'selectedVoice',   savedKey: 'ukVoiceName' },
+  nl: { prefix: 'nl', label: { en: 'Dutch',     nl: 'Nederlandse' }, listKey: 'availableNlVoices', selKey: 'selectedNlVoice', savedKey: 'nlVoiceName' },
+  en: { prefix: 'en', label: { en: 'English',   nl: 'Engelse' },     listKey: 'availableEnVoices', selKey: 'selectedEnVoice', savedKey: 'enVoiceName' },
+  fr: { prefix: 'fr', label: { en: 'French',    nl: 'Franse' },      listKey: 'availableFrVoices', selKey: 'selectedFrVoice', savedKey: 'frVoiceName' },
 };
+const L = (en, nl) => (state.nativeLanguage === 'nl' ? nl : en);
 
 function meta() {
   return TARGET_META[state.currentLanguage] || TARGET_META.uk;
@@ -24,43 +26,64 @@ function meta() {
 function getVoices()    { return state[meta().listKey] || []; }
 function getSavedKey()  { return meta().savedKey; }
 function getLangPrefix(){ return meta().prefix; }
-function getLangLabel() { return meta().label; }
+function getLangLabel() { return meta().label[state.nativeLanguage] || meta().label.en; }
 
+// Fills the voice picker in Settings. `settled` = the browser has had its chance
+// to hand over its voices, so an empty list means there really are none.
+let voicesSettled = false;
+function populate(settled = true) {
+  if (settled) voicesSettled = true;
+  const all = state.synth.getVoices();
+  const filtered = all
+    .filter(v => v.lang.startsWith(getLangPrefix()))
+    .sort((a, b) => scoreVoice(b) - scoreVoice(a));
+
+  state[meta().listKey] = filtered;
+
+  const sel     = document.getElementById('voiceSelect');
+  const vcLabel = document.getElementById('vcLabel');
+  if (!sel) return;
+
+  const label = getLangLabel();
+  if (vcLabel) vcLabel.textContent = L(`${label} voice`, `${label} stem`);
+
+  if (filtered.length === 0) {
+    const none = settled ? L(`No ${label} voice on this device`, `Geen ${label} stem op dit apparaat`) : L('Loading voices…', 'Stemmen laden…');
+    sel.innerHTML = `<option>${none}</option>`;
+    document.getElementById('vcName').textContent    = none;
+    document.getElementById('vcQuality').textContent = settled
+      ? L(`The 🔊 buttons stay silent without one. On a computer, Microsoft Edge has ${label} voices built in. On a phone or tablet, add the language under text-to-speech in the system settings.`,
+          `Zonder stem blijven de 🔊-knoppen stil. Op een computer heeft Microsoft Edge ${label} stemmen ingebouwd. Op een telefoon of tablet voeg je de taal toe bij tekst-naar-spraak in de systeeminstellingen.`)
+      : '';
+    document.getElementById('vcQuality').className   = 'vc-quality standard';
+    return;
+  }
+
+  sel.innerHTML = filtered.map((v, i) => `<option value="${i}">${v.name}</option>`).join('');
+
+  const saved    = localStorage.getItem(getSavedKey());
+  const savedIdx = saved ? filtered.findIndex(v => v.name === saved) : -1;
+  const idx      = savedIdx >= 0 ? savedIdx : 0;
+  sel.value = idx;
+  applyVoice(idx);
+}
+
+// Called at start-up and again whenever the target or the interface language changes.
+let listening = false;
 export function loadVoices() {
-  const populate = () => {
-    const all = state.synth.getVoices();
-    const filtered = all
-      .filter(v => v.lang.startsWith(getLangPrefix()))
-      .sort((a, b) => scoreVoice(b) - scoreVoice(a));
+  const ready = state.synth.getVoices().length > 0;
+  populate(ready || voicesSettled);
+  if (listening) return;
+  listening = true;
+  // Most browsers hand over their voices a moment after load, through this event.
+  state.synth.addEventListener('voiceschanged', () => populate(true));
+  // Some never fire it: after a few seconds an empty list is final.
+  if (!ready) setTimeout(() => populate(true), 3000);
+}
 
-    state[meta().listKey] = filtered;
-
-    const sel     = document.getElementById('voiceSelect');
-    const vcLabel = document.getElementById('vcLabel');
-    if (!sel) return;
-
-    if (vcLabel) vcLabel.textContent = `${getLangLabel()} voice`;
-
-    if (filtered.length === 0) {
-      sel.innerHTML = `<option>No ${getLangLabel()} voices found</option>`;
-      document.getElementById('vcName').textContent    = `No ${getLangLabel()} voices found`;
-      document.getElementById('vcQuality').textContent = 'Try Microsoft Edge for best results';
-      document.getElementById('vcQuality').className   = 'vc-quality standard';
-      return;
-    }
-
-    sel.innerHTML = filtered.map((v, i) => `<option value="${i}">${v.name}</option>`).join('');
-
-    const saved    = localStorage.getItem(getSavedKey());
-    const savedIdx = saved ? filtered.findIndex(v => v.name === saved) : -1;
-    const idx      = savedIdx >= 0 ? savedIdx : 0;
-    sel.value = idx;
-    applyVoice(idx);
-  };
-
-  if (state.synth.getVoices().length) populate();
-  // voiceschanged fires once on load; re-populate whenever language switches
-  state.synth.addEventListener('voiceschanged', populate);
+// True once the browser has handed over its voices and none of them speaks the target language.
+export function hasNoVoice() {
+  return voicesSettled && getVoices().length === 0;
 }
 
 export function applyVoice(idx) {
@@ -75,7 +98,7 @@ export function applyVoice(idx) {
   if (nameEl) nameEl.textContent = v.name;
   const neural = /natural|online|neural/i.test(v.name);
   if (qualityEl) {
-    qualityEl.textContent = neural ? '✓ Neural voice — high quality' : '⚡ Standard voice';
+    qualityEl.textContent = neural ? L('✓ Neural voice — high quality', '✓ Neurale stem — hoge kwaliteit') : L('⚡ Standard voice', '⚡ Standaardstem');
     qualityEl.className   = 'vc-quality ' + (neural ? 'neural' : 'standard');
   }
 }
@@ -86,7 +109,7 @@ export function changeVoice() {
 
 export function testVoice() {
   const samples = {
-    uk: 'Привіт! Як справи? Мене звати Sasha.',
+    uk: 'Привіт! Як справи? Мене звати Саша.',
     nl: 'Hallo! Hoe gaat het? Mijn naam is Emma.',
     en: 'Hello! How are you? My name is Oliver.',
     fr: 'Bonjour ! Comment allez-vous ? Je m\'appelle Pierre.',
@@ -134,11 +157,15 @@ export function speakTextCb(text, lang, onEnd) {
   state.synth.speak(utt);
 }
 
+// Edge's neural voices are a desktop matter: on a phone or tablet every browser
+// speaks with the system's own voices, so the advice would only mislead there.
 export function showBrowserBanner() {
   const dismissed = localStorage.getItem('browserBannerDismissed');
-  const isEdge = /Edg\//.test(navigator.userAgent);
+  const ua = navigator.userAgent;
+  const isEdge = /Edg\//.test(ua);
+  const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
   const banner = document.getElementById('browserBanner');
-  if (dismissed || isEdge) {
+  if (dismissed || isEdge || isMobile) {
     banner.classList.add('hidden');
   }
 }

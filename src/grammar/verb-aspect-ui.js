@@ -1,7 +1,7 @@
 import { state } from '../state.js';
 import { escHtml } from '../utils.js';
 import { VERB_PAIRS } from '../data/verb-aspects.js';
-import { loc } from './drill-core.js';
+import { loc, aspectShort } from './drill-core.js';
 
 // Aspect explained: how the two aspects differ, and every pair's sentences with
 // the reason behind each choice. Reference only. Aspect is practised where the
@@ -70,9 +70,7 @@ function showReference(index) {
   const total = VERB_PAIRS.length;
 
   const examplesHtml = pair.sentences.map(sent => {
-    const aspectLabel = sent.aspect === 'imperfective'
-      ? `<span class="va-aspect-tag va-imp">IMP</span>`
-      : `<span class="va-aspect-tag va-perf">PERF</span>`;
+    const aspectLabel = `<span class="va-aspect-tag ${sent.aspect === 'imperfective' ? 'va-imp' : 'va-perf'}">${aspectShort(sent.aspect)}</span>`;
     return `
       <div class="va-ref-example">
         <div class="va-ref-uk">${aspectLabel} ${escHtml(sent.uk)}</div>

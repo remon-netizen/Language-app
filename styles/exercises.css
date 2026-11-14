@@ -506,11 +506,11 @@
   padding: 10px 14px; margin-bottom: 10px; font-size: 0.82rem; color: #92400e;
 }
 .ex-nokey-btn {
-  background: #f59e0b; color: white; border: none; border-radius: 8px;
+  background: #b45309; color: white; border: none; border-radius: 8px;
   padding: 8px 12px; font-size: 0.8rem; font-weight: 700; cursor: pointer; font-family: inherit;
   min-height: 36px;
 }
-.ex-nokey-btn:hover { background: #d97706; }
+.ex-nokey-btn:hover { background: #92400e; }
 
 /* ── Shared "missed this round" list (drill-core.js) ── */
 .dc-missed {

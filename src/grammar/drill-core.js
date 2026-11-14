@@ -16,6 +16,10 @@ export const L = (en, nl) => (isNL() ? nl : en);
 // reads as the United Kingdom, so the learner sees UKR.
 export const targetCode = () => ({ uk: 'UKR' })[state.currentLanguage] || state.currentLanguage.toUpperCase();
 
+// Short tags on cards and tables, in the learner's own language.
+export const aspectShort = aspect => (aspect === 'imperfective' ? L('IMP', 'ONV') : L('PERF', 'VOLT'));
+export const genderShort = g => ({ m: L('MASC', 'MANN'), f: L('FEM', 'VR'), n: L('NEUT', 'ONZ') })[g] || g;
+
 // Picks the native-language variant of a { en, nl } field, or passes strings through.
 export function loc(field) {
   if (!field) return '';
