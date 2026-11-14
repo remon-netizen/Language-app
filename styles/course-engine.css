@@ -79,3 +79,6 @@
 
 /* A round's own line on the score card (the typing course reports speed there). */
 .ce-score-note { font-size: 0.95rem; font-weight: 700; color: var(--text); margin: 0 0 14px; line-height: 1.5; }
+
+/* The keyboard changes at this card (Ukrainian answers, then the learner's own language). */
+.ce-kb-switch { margin: 0 0 10px; padding: 9px 12px; border-radius: 12px; background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; font-size: 0.84rem; font-weight: 700; line-height: 1.35; }

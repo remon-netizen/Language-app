@@ -20,7 +20,7 @@ import { caseDueCards } from './grammar/case-drill-ui.js';
 import { prefixDueCards } from './grammar/prefix-drill-ui.js';
 import { pathDueCards } from './grammar/path-ui.js';
 import { runSession, registerDueSource } from './grammar/course-engine.js';
-import { L, shuffle } from './grammar/drill-core.js';
+import { L, shuffle, byKeyboard } from './grammar/drill-core.js';
 import { COURSE_ICON, courseName } from './course-names.js';
 
 function getScreen() { return document.getElementById('reviewScreen'); }
@@ -95,7 +95,7 @@ const REVIEW_ROUND = 30;
 
 export function startReviewAll() {
   showScreen('reviewScreen');
-  const cards = shuffle(activeCourses().flatMap(c => c.dueCards())).slice(0, roundSize());
+  const cards = byKeyboard(shuffle(activeCourses().flatMap(c => c.dueCards())).slice(0, roundSize()));
   runSession({
     screen: getScreen(), icon: '🔄', title: L('Review', 'Herhalen'), mixed: true,
     cards,

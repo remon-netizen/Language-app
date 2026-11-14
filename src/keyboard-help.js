@@ -97,6 +97,14 @@ export function keyboardHelpFirstTime() {
   return true;
 }
 
+// The other way round: Cyrillic letters where an answer in the learner's own
+// language is expected, typically right after a block of Ukrainian answers.
+export function cyrillicTypedNote(answer, expected) {
+  if (!/[\u0400-\u04FF]/.test(answer) || /[a-z]/i.test(answer) || /[\u0400-\u04FF]/.test(expected || '')) return null;
+  return L('Those are Cyrillic letters. This answer is typed in English: switch your keyboard back and try again.',
+           'Dat zijn cyrillische letters. Dit antwoord typ je in het Nederlands: zet je toetsenbord terug en probeer het opnieuw.');
+}
+
 // Latin letters where a Ukrainian answer is expected: not a wrong answer, a
 // keyboard that is still set to another language. Returns a note, or null.
 // The Latin a, c, e, i, o, p, x, y look exactly like Cyrillic letters, so a single

@@ -9,9 +9,10 @@
 // It runs on the course engine like every other course, with one difference: a
 // card here reacts while the learner types (the engine's `mount` hook). Each
 // letter of the line turns green or red as it is typed, the key to press next
-// lights up on a picture of the keyboard, and a finished line checks itself.
-// The picture is for a keyboard with Latin letters printed on it; on a phone
-// the letters are on the keys already, so it is off there by default.
+// lights up on a picture of the keyboard (keyboard-picture.js), and a finished
+// line checks itself. The picture is for a keyboard with Latin letters printed
+// on it; on a phone the letters are on the keys already, so it is off there by
+// default.
 //
 // Typing is practice, not memory work: nothing is put on the review schedule.
 // What is kept is which steps were done and the best speed (typing-progress.js).
@@ -22,21 +23,18 @@ import { showScreen } from '../router.js';
 import { VOCAB, WORK_THEMES } from '../data/vocab-uk.js';
 import { UNITS } from '../data/path/index.js';
 import { ALPHABET } from '../data/alphabet.js';
-import { STAGES, EXTRA_WORDS, NAMES, KEY_ROWS } from '../data/typing.js';
+import { STAGES, EXTRA_WORDS, NAMES } from '../data/typing.js';
 import { stageRecord, recordRound, noteKey, noteAnswer, flush, troubleLetters, typingStats, nextStage } from '../data/typing-progress.js';
 import { runSession } from './course-engine.js';
 import { L, isNL, loc, shuffle } from './drill-core.js';
 import { openKeyboardHelp } from '../keyboard-help.js';
 import { courseName } from '../course-names.js';
+import { keyboardPicture, isMac, isTouch } from '../keyboard-picture.js';
 
 const COURSE = { icon: '⌨️', get name() { return courseName('typing'); } };
 const ACCENT = { main: '#475569', dark: '#1e293b', soft: '#f1f5f9', border: '#cbd5e1' };
 const PREFS_KEY = 'typingPrefs';
 const FREE = 'free';   // the practice round keeps its best speed under this id
-
-const isMac = /Mac/.test(navigator.platform || '') || /Macintosh/.test(navigator.userAgent);
-// A phone or tablet: the on-screen keyboard shows the letters, a physical one does not.
-const isTouch = () => window.matchMedia('(hover: none), (pointer: coarse)').matches;
 
 let prefs = null;
 function loadPrefs() {
@@ -64,54 +62,6 @@ function verdict(answer, target, caseless, { slip = true } = {}) {
   return { isExact, isClose, isCorrect: isExact || isClose, quality: isExact ? 5 : isClose ? 3 : 1 };
 }
 
-// ── The keyboard on screen ───────────────────────────────────────────────────
-
-const LATIN = Object.fromEntries(KEY_ROWS.flat());   // { й: 'Q', … }
-
-// Which keys to light for a character, and how to say it in words.
-function whereIs(ch) {
-  const low = ch.toLowerCase(), upper = ch !== low;
-  const key = k => L(`the ${k} key`, `toets ${k}`);
-  if (ch === ' ') return { keys: [' '], text: L('space bar', 'spatiebalk') };
-  if (low === 'ґ') return { keys: upper ? ['shift', 'г'] : ['г'], text: `${ch} = ${upper ? 'Shift + ' : ''}${isMac ? 'Option' : L('right Alt', 'rechter Alt')} + г` };
-  if (ch === "'") return { keys: [], text: isMac ? L('apostrophe = the \\ key', 'apostrof = de \\-toets') : L('apostrophe = the key left of the 1', 'apostrof = de toets links van de 1') };
-  if (ch === ',') return { keys: ['shift', '.'], text: `, = Shift + ${key('/')}` };
-  if (ch === '?') return { keys: ['shift'], text: '? = Shift + 7' };
-  if (ch === '!') return { keys: ['shift'], text: '! = Shift + 1' };
-  if (LATIN[low]) return { keys: upper ? ['shift', low] : [low], text: `${ch} = ${upper ? 'Shift + ' : ''}${key(LATIN[low])}` };
-  return { keys: [], text: '' };
-}
-
-function keyboardHtml() {
-  const key = ([ch, latin]) => `<span class="ty-key" data-k="${escHtml(ch)}"><b>${escHtml(ch)}</b><i>${escHtml(latin)}</i></span>`;
-  return `
-    <div class="ty-kb" aria-hidden="true">
-      <div class="ty-kb-row">${KEY_ROWS[0].map(key).join('')}</div>
-      <div class="ty-kb-row ty-kb-r2">${KEY_ROWS[1].map(key).join('')}</div>
-      <div class="ty-kb-row ty-kb-r3"><span class="ty-key ty-key-shift" data-k="shift"><b>⇧</b></span>${KEY_ROWS[2].map(key).join('')}</div>
-      <div class="ty-kb-row"><span class="ty-key ty-key-space" data-k=" "></span></div>
-      <div class="ty-kb-cap"></div>
-    </div>`;
-}
-
-// Puts the picture under the answer field; returns point(ch): light the key for ch.
-function mountKeyboard(root) {
-  const area = root.querySelector('.ce-input-area');
-  if (!area) return null;
-  area.insertAdjacentHTML('afterend', keyboardHtml());
-  const kb = root.querySelector('.ty-kb'), cap = kb.querySelector('.ty-kb-cap');
-  const keys = [...kb.querySelectorAll('.ty-key')];
-  return {
-    point(ch) {
-      keys.forEach(el => el.classList.remove('on'));
-      if (ch == null) { cap.textContent = ''; return; }
-      const w = whereIs(ch);
-      w.keys.forEach(k => keys.find(el => el.dataset.k === k)?.classList.add('on'));
-      cap.textContent = w.text;
-    },
-  };
-}
-
 // ── A card that reacts while it is typed ─────────────────────────────────────
 // text: what is to be typed · st: this card's own counters { started, errs }
 // point: light the next key (off for "which letter is this?", where it would be the answer)
@@ -120,7 +70,7 @@ function live(text, st, { point = true, auto = 'complete', caseless = true } = {
   return ({ root, input, submit }) => {
     const chars = [...text];
     const spans = [...root.querySelectorAll('.ty-ch')];
-    const kb = loadPrefs().kb ? mountKeyboard(root) : null;
+    const kb = loadPrefs().kb ? keyboardPicture(root.querySelector('.ce-input-area')) : null;
     const same = (a, b) => fold(a, caseless) === fold(b, caseless);
     let before = 0;
     const paint = () => {

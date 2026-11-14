@@ -16,8 +16,9 @@ import { state } from '../state.js';
 import { escHtml } from '../utils.js';
 import { speakText } from '../voice.js';
 import { setupRecognition } from '../speech.js';
-import { L, shuffle, resultLine, appendNext, missedListHtml, wireSpeakButtons, scoreMessage, scoreEmoji } from './drill-core.js';
-import { keyboardHelpFirstTime, openKeyboardHelp, latinTypedNote } from '../keyboard-help.js';
+import { L, shuffle, byKeyboard, keyboardOf, resultLine, appendNext, missedListHtml, wireSpeakButtons, scoreMessage, scoreEmoji } from './drill-core.js';
+import { keyboardHelpFirstTime, openKeyboardHelp, latinTypedNote, cyrillicTypedNote } from '../keyboard-help.js';
+import { keyboardAid } from '../keyboard-picture.js';
 
 // ── Sessions ─────────────────────────────────────────────────────────────────
 // A card:
@@ -44,6 +45,8 @@ import { keyboardHelpFirstTime, openKeyboardHelp, latinTypedNote } from '../keyb
 //                each letter and submits by itself when the line is complete)
 
 const DEFAULT_ACCENT = { main: '#7c3aed', dark: '#5b21b6', soft: '#f5f3ff', border: '#c4b5fd' };
+// An answer that is one plain Ukrainian text (no "a / b" alternatives): its keys can be pointed out one by one.
+const COPYABLE = /^[\u0400-\u04FF' .,?!-]+$/;
 
 // ── Warm-up ──────────────────────────────────────────────────────────────────
 // A session that teaches something new starts with a few items that are due,
@@ -59,7 +62,8 @@ function warmUpCards(n, own, source) {
   const taken = new Set(own.map(c => c.key));
   const due = src().filter(c => !taken.has(c.key));
   // A course's own source hands over its cards in its own order (due first).
-  return (source ? due : shuffle(due)).slice(0, n).map(c => ({ ...c, warmup: true }));
+  // The warm-up's Ukrainian answers come last: what follows it is typed in Ukrainian too.
+  return byKeyboard((source ? due : shuffle(due)).slice(0, n), 'own').map(c => ({ ...c, warmup: true }));
 }
 
 // warmUp: how many due items open the session; warmUpSource: where they come from
@@ -102,6 +106,11 @@ export function runSession({ screen, icon, title, accent = DEFAULT_ACCENT, cards
     const pos = inWarm ? run.current : run.current - warm.length, total = inWarm ? warm.length : own;
     const pct = Math.round((pos / total) * 100);
     const isChoice = card.input.type === 'choice';
+    // The answer moves to another keyboard than the last typed card used: say so
+    // once, at the card where it changes.
+    const kb = keyboardOf(card);
+    const kbSwitch = kb && run.kb && kb !== run.kb;
+    if (kb) run.kb = kb;
 
     s.innerHTML = `
       ${header(title, `<div class="ce-progress-wrap"><div class="ce-progress-bar" style="width:${pct}%"></div></div>
@@ -111,6 +120,9 @@ export function runSession({ screen, icon, title, accent = DEFAULT_ACCENT, cards
           <span class="ce-warmup-sub">${L(`Then the new material (${own} cards).`, `Daarna het nieuwe (${own} kaarten).`)} <button class="ce-warmup-skip" id="ceSkipWarm" type="button">${L('Skip warm-up →', 'Opwarmen overslaan →')}</button></span>
         </div>`
         : mixed && card.course ? `<div class="ce-course-chip">${card.course.icon} ${escHtml(card.course.name)}</div>` : ''}
+      ${kbSwitch ? `<div class="ce-kb-switch">⌨️ ${kb === 'uk'
+        ? L('From here the answers are in Ukrainian: switch your keyboard.', 'Vanaf hier zijn de antwoorden in het Oekraïens: wissel je toetsenbord.')
+        : L('From here the answers are in English: switch your keyboard back.', 'Vanaf hier zijn de antwoorden in het Nederlands: zet je toetsenbord terug.')}</div>` : ''}
       ${card.promptHtml}
       ${isChoice ? `
         <div class="ce-options">
@@ -156,6 +168,13 @@ export function runSession({ screen, icon, title, accent = DEFAULT_ACCENT, cards
         input.focus(); input.select();
         return;
       }
+      // And the same the other way round, for an answer in the learner's own language.
+      const cyrillic = card.input.lang !== 'uk' ? cyrillicTypedNote(answer, card.correctText) : null;
+      if (cyrillic) {
+        note.textContent = cyrillic; note.hidden = false;
+        input.focus(); input.select();
+        return;
+      }
       const res = card.check(answer);
       if (res.retry) {
         note.textContent = res.retry; note.hidden = false;
@@ -172,6 +191,11 @@ export function runSession({ screen, icon, title, accent = DEFAULT_ACCENT, cards
     input.focus();
     if (card.input.speak) wireSpeak(card, input, check);
     if (card.mount) card.mount({ root: s, input, submit });
+    // Where the letters are, for whoever types Ukrainian on a keyboard with Latin
+    // keycaps. On a card that shows its answer (a new word being copied) the next
+    // key is lit; where the answer must come from memory it is reference only.
+    // (A card with its own mount, the typing course, brings its own.)
+    else if (card.input.lang === 'uk') keyboardAid({ root: s, input, text: card.intro && COPYABLE.test(card.correctText || '') ? card.correctText : null });
   }
 
   // The microphone is a second way to give the same answer: what was heard is
@@ -235,6 +259,7 @@ export function runSession({ screen, icon, title, accent = DEFAULT_ACCENT, cards
       if (!res.isCorrect) run.missed.push(card.missed);
     }
 
+    s.querySelectorAll('.ty-kb, .ty-kb-toggle').forEach(el => el.remove());   // the answer is in: make way for the feedback
     const fb = s.querySelector('#ceFeedback');
     let html = res.headline ? `<div class="ex-feedback-result correct">✓ ${escHtml(res.headline)}</div>` : resultLine(res);
     if (compare) {

@@ -3,7 +3,7 @@ import { escHtml, levenshtein } from '../utils.js';
 import { speakText } from '../voice.js';
 import { THEMES as CORE_THEMES, WORK_THEMES, POS_LABEL } from '../data/vocab-uk.js';
 import { deck, myWords, recordVocab, regradeVocab, dueVocab, unseenVocab, weakVocab, vocabStats, getVocabProgress } from '../data/vocab-progress.js';
-import { L, loc, isNL, targetCode, shuffle, grade, normalise, wireSpeakButtons } from './drill-core.js';
+import { L, loc, isNL, targetCode, shuffle, byKeyboard, grade, normalise, wireSpeakButtons } from './drill-core.js';
 import { runSession } from './course-engine.js';
 
 // ── State ────────────────────────────────────────────────────────────────────
@@ -334,7 +334,8 @@ function startSession(kind) {
       ...passes.flatMap(dir => shuffle(words).map(w => card(w, dir))),
     ];
   } else {
-    cards = words.map(w => card(w, dirOf()));
+    // Both ways mixed: the two directions in two blocks, one keyboard each.
+    cards = byKeyboard(words.map(w => card(w, dirOf())));
   }
 
   runSession({

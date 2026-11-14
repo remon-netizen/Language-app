@@ -15,7 +15,7 @@ import { LEVELS, UNITS, unitsOf, getUnit, unitIndex, nextUnit } from '../data/pa
 import { unitItems, entryOf, recordItem, regradeItem, dueItems, learnedDueItems, learnedSoonItems, pathStats, unitProgress, unitState, markUnitStep, unitDone, unitStarted, nextOpenUnit, STEPS, getResume, saveResume, clearResume } from '../data/path-progress.js';
 import { meaning, gradeMeaning } from './vocab-drill-ui.js';
 import { runSession } from './course-engine.js';
-import { L, loc, shuffle, grade, normalise, wireSpeakButtons } from './drill-core.js';
+import { L, loc, shuffle, byKeyboard, grade, normalise, wireSpeakButtons } from './drill-core.js';
 
 const COURSE = { icon: '🗺️', get name() { return L('Course path', 'Leerpad'); } };
 const ACCENT = { main: '#0d9488', dark: '#115e59', soft: '#f0fdfa', border: '#99f6e4' };
@@ -486,7 +486,7 @@ const warmUpSource = () => [
 function startLearnedReview(unit) {
   runSession({
     screen: getScreen(), icon: '🔁', title: L('Review from earlier units', 'Herhalen uit eerdere units'), accent: ACCENT,
-    cards: shuffle(learnedDueCards()).slice(0, 30),
+    cards: byKeyboard(shuffle(learnedDueCards()).slice(0, 30)),
     onExit: () => showUnit(unit),
     again: () => { const left = learnedDueItems().length; return left ? { label: L(`🔄 Keep going: ${left} left`, `🔄 Verder: nog ${left}`), run: () => startLearnedReview(unit) } : null; },
   });
@@ -501,7 +501,7 @@ export function startPathWeak() {
   if (!weak.length) { showMenu(); return; }
   runSession({
     screen: getScreen(), icon: '🎯', title: L('Weak spots', 'Zwakke plekken'), accent: ACCENT,
-    cards: shuffle(weak).slice(0, 25).map(anyCard),
+    cards: byKeyboard(shuffle(weak).slice(0, 25).map(anyCard)),
     onExit: showMenu,
     again: () => null,
   });
@@ -533,7 +533,7 @@ export function startPathReview() {
   showScreen('reviewScreen');
   runSession({
     screen: document.getElementById('reviewScreen'), icon: COURSE.icon, title: COURSE.name, accent: ACCENT,
-    cards: shuffle(pathDueCards()).slice(0, 30),
+    cards: byKeyboard(shuffle(pathDueCards()).slice(0, 30)),
     onExit: () => window.openReviewScreen(),
     again: () => { const left = dueItems().length; return left ? { label: L(`🔄 Keep going: ${left} left`, `🔄 Verder: nog ${left}`), run: startPathReview } : null; },
   });

@@ -27,6 +27,25 @@ export function loc(field) {
   return field[state.nativeLanguage] || field.en || '';
 }
 
+// Which keyboard a card is answered on: 'uk', the learner's 'own', or none (a
+// choice, or digits, which every keyboard has).
+export function keyboardOf(card) {
+  const i = card.input;
+  if (i.type !== 'text' || i.inputmode === 'numeric') return null;
+  return i.lang === 'uk' ? 'uk' : 'own';
+}
+
+// The cards of a mixed round in blocks per keyboard: Ukrainian answers first,
+// then the ones in the learner's own language, then the rest. A round that asks
+// both directions would otherwise have the learner switch keyboards at every
+// other card. The order inside a block is kept. first: the block that opens the
+// round ('own' for a warm-up, which is followed by new material typed in Ukrainian).
+export function byKeyboard(cards, first = 'uk') {
+  const order = first === 'own' ? { own: 0, uk: 1 } : { uk: 0, own: 1 };
+  const rank = c => order[keyboardOf(c)] ?? 2;
+  return cards.map((c, i) => [c, i]).sort((a, b) => rank(a[0]) - rank(b[0]) || a[1] - b[1]).map(x => x[0]);
+}
+
 export function shuffle(arr) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
