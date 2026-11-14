@@ -4,6 +4,12 @@
 // Lviv University standard it grew from: per level, their grammar lists and
 // communicative themes, in their order. One unit = one grammar point in one theme.
 //
+// The order of the units is the order in a1.js … b2.js (which follows
+// tools/path/syllabus.json), not the number in the id: the alphabet, id a1-02, is
+// the first unit since 2026-11 and "Hello, I am…", id a1-01, the second. Ids are
+// never changed, because progress is stored under them; the number a learner sees
+// is the unit's place in its level (unitIndex).
+//
 // A unit (one entry in a1.js … b2.js):
 //   id        'a1-04'                      level 'A1' · icon an emoji
 //   track     'ew' on the work units (electronic warfare), interleaved with the others

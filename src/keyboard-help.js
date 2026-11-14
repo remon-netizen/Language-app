@@ -68,7 +68,7 @@ function helpHtml() {
     <p class="kb-note">${L('Do not know the letters yet? You do not have to: the first units show every word and you copy it, letter by letter. The alphabet table lists all 33; the typing course lets you practise them a few at a time.',
                            'Ken je de letters nog niet? Dat hoeft niet: de eerste units laten elk woord zien en jij typt het na, letter voor letter. De alfabettabel toont ze alle 33; in de typcursus oefen je ze met een paar tegelijk.')}</p>
     <div class="kb-actions">
-      <button class="kb-btn" id="kbAlphabet" type="button">🔤 ${L('The alphabet', 'Het alfabet')}</button>
+      <button class="kb-btn" id="kbAlphabet" type="button">🔤 ${L('Alphabet table', 'Alfabettabel')}</button>
       <button class="kb-btn" id="kbTyping" type="button">⌨️ ${L('Typing course', 'Typcursus')}</button>
       <button class="kb-btn kb-btn-primary" id="kbDone" type="button">${L('Got it', 'Begrepen')} →</button>
     </div>`;

@@ -161,6 +161,9 @@ const dotClass = item => {
 function resumeOf(unit) {
   const rec = getResume(unit.id);
   if (!rec || !Array.isArray(rec.plan) || !stepName(rec.step)) return null;
+  // The unit was changed since the round was left (a word moved to another unit):
+  // the plan no longer fits, so there is nothing to pick up.
+  if (!planCards(unit, rec.plan)) { clearResume(unit.id); return null; }
   if (rec.at >= rec.plan.length) {
     // Every card was answered, only the score card was not seen: the round counts.
     (rec.step === 'all' ? STEPS : [rec.step]).forEach(x => markUnitStep(unit.id, x));
@@ -170,7 +173,8 @@ function resumeOf(unit) {
   return rec;
 }
 
-// The first units are typed in Cyrillic by someone who is still learning the letters.
+// The first three units are typed by someone who is still learning the letters: the
+// alphabet (id a1-02, the first unit since 2026-11), "Hello, I am…" and the sounds.
 const ALPHABET_UNITS = ['a1-01', 'a1-02', 'a1-03'];
 
 // The page opens on what to do: pick up a round, or start the next step. What
@@ -208,7 +212,7 @@ function showUnit(unit) {
 
     ${ALPHABET_UNITS.includes(unit.id) ? `
     <div class="pt-aid-row">
-      <button class="pt-aid" id="ptAlphabet" type="button">🔤 ${L('The alphabet', 'Het alfabet')}</button>
+      <button class="pt-aid" id="ptAlphabet" type="button">🔤 ${L('Alphabet table', 'Alfabettabel')}</button>
       <button class="pt-aid" id="ptTyping" type="button">⌨️ ${L('Learn to type', 'Leren typen')}</button>
     </div>` : ''}
 

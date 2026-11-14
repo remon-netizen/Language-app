@@ -19,6 +19,40 @@
   },
   "units": [
     {
+      "id": "a1-02",
+      "level": "A1",
+      "icon": "🔤",
+      "title": {
+        "en": "The alphabet",
+        "nl": "Het alfabet"
+      },
+      "grammar": {
+        "en": "Cyrillic letters; hard and soft consonants",
+        "nl": "Cyrillische letters; harde en zachte medeklinkers"
+      },
+      "standard": [
+        "Український алфавіт; друковані та писані, великі і малі літери",
+        "Апостроф",
+        "М'який знак",
+        "Тверді та м'які приголосні"
+      ],
+      "theme": {
+        "en": "The person: names, countries",
+        "nl": "De mens: namen, landen"
+      },
+      "focus": [
+        "Україна",
+        "Київ",
+        "Львів",
+        "Олена",
+        "шість",
+        "п'ять",
+        "м'яч",
+        "лист – ліс"
+      ],
+      "brief": "Present the 33 letters with their sounds, flagging the false friends for a Latin-alphabet reader (в = v, н = n, р = r, с = s, у = u, х = kh; и versus і versus ї; є; ґ versus г). Explain that і, я, ю, є and ь soften the consonant before them (лист – ліс, пісня) and that the apostrophe blocks that softening (п'ять, м'яч). Use names and place names as the first reading material, both printed and handwritten forms, and capital letters for names. Note that г is a voiced h (Dutch speakers know the sound from their own g/h), not an English g."
+    },
+    {
       "id": "a1-01",
       "level": "A1",
       "icon": "👋",
@@ -52,40 +86,6 @@
         "не"
       ],
       "brief": "Teach that the present tense of \"to be\" is simply absent: Я Марк, Вона студентка, Це Олена. Introduce all personal pronouns and the ти/ви distinction (Dutch jij/u; English has no equivalent, so English speakers need explicit rules for when ви is required). Show affirmative versus negative (не goes directly before the word it negates) and that a yes/no question is the same sentence with rising intonation. No articles: студентка is both \"a student\" and \"the student\"."
-    },
-    {
-      "id": "a1-02",
-      "level": "A1",
-      "icon": "🔤",
-      "title": {
-        "en": "The alphabet",
-        "nl": "Het alfabet"
-      },
-      "grammar": {
-        "en": "Cyrillic letters; hard and soft consonants",
-        "nl": "Cyrillische letters; harde en zachte medeklinkers"
-      },
-      "standard": [
-        "Український алфавіт; друковані та писані, великі і малі літери",
-        "Апостроф",
-        "М'який знак",
-        "Тверді та м'які приголосні"
-      ],
-      "theme": {
-        "en": "The person: names, countries",
-        "nl": "De mens: namen, landen"
-      },
-      "focus": [
-        "Україна",
-        "Київ",
-        "Львів",
-        "Олена",
-        "шість",
-        "п'ять",
-        "м'яч",
-        "лист – ліс"
-      ],
-      "brief": "Present the 33 letters with their sounds, flagging the false friends for a Latin-alphabet reader (в = v, н = n, р = r, с = s, у = u, х = kh; и versus і versus ї; є; ґ versus г). Explain that і, я, ю, є and ь soften the consonant before them (лист – ліс, пісня) and that the apostrophe blocks that softening (п'ять, м'яч). Use names and place names as the first reading material, both printed and handwritten forms, and capital letters for names. Note that г is a voiced h (Dutch speakers know the sound from their own g/h), not an English g."
     },
     {
       "id": "a1-03",

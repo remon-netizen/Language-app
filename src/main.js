@@ -220,10 +220,10 @@ function renderTodayCard() {
     rows.push({ icon: next.icon, title: started ? (nl ? 'Ga verder' : 'Continue') : !anyProgress ? (nl ? 'Begin hier' : 'Start here') : (nl ? 'Volgende unit' : 'Next unit'),
       sub: `${next.level} · ${unitIndex(next)} — ${loc(next.title)}`, onclick: `openPathScreen('${next.id}')`, hot: !anyProgress });
   }
-  // The first units are typed in Cyrillic before the alphabet unit has been done:
-  // until then the letters are one tap away.
+  // Until the alphabet unit (the first unit; its id is a1-02) is done, the table of
+  // all letters is one tap away.
   if (!unitDone('a1-02') && rows.length < 3) {
-    rows.push({ icon: '🔤', title: nl ? 'Het cyrillische alfabet' : 'The Cyrillic alphabet', sub: nl ? 'De 33 letters en hoe ze klinken' : 'The 33 letters and how they sound', onclick: 'openAlphabetScreen()' });
+    rows.push({ icon: '🔤', title: nl ? 'De alfabettabel' : 'The alphabet table', sub: nl ? 'Alle 33 letters: tik er een aan om hem te horen' : 'All 33 letters: tap one to hear it', onclick: 'openAlphabetScreen()' });
   }
   // And so is the typing course, until its letter steps are done.
   if (!unitDone('a1-02') && typingStats().done < 6 && rows.length < 3) {
