@@ -77,6 +77,9 @@
 .api-status { font-size: 0.75rem; margin-top: 3px; }
 .api-status.ok { color: var(--success); }
 .api-status.missing { color: var(--danger); }
+.api-status.none { color: var(--gray); }
+.api-key-input { min-width: 0; }
+.api-save-btn { flex-shrink: 0; }
 
 /* Language toggle */
 .lang-toggle {

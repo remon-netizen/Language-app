@@ -318,7 +318,7 @@ export function runSession({ screen, icon, title, accent = DEFAULT_ACCENT, cards
         ${scoreNote ? `<div class="ce-score-note">${scoreNote()}</div>` : ''}
         <div class="ex-score-actions">
           ${more ? `<button class="ex-next-btn" id="ceAgain" type="button">${escHtml(more.label)}</button>` : ''}
-          <button class="ex-back-btn" id="ceMenu" type="button">← Menu</button>
+          <button class="ex-back-btn" id="ceMenu" type="button">← ${L('Back', 'Terug')}</button>
         </div>
       </div>
       ${missedListHtml(run.missed, { cls: 'course' })}`;

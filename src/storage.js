@@ -53,8 +53,9 @@ export function updateApiStatus(key, provider) {
     el.textContent = nl ? `⚠ Sleutel opgeslagen, maar lijkt ongeldig (moet beginnen met ${validPrefix})` : `⚠ Key saved but may be invalid (should start with ${validPrefix})`;
     el.className = 'api-status missing';
   } else {
-    el.textContent = nl ? 'Geen sleutel — chat gebruikt standaardantwoorden, AI-oefeningen staan uit' : 'No key — chat uses canned replies, AI exercises are off';
-    el.className = 'api-status missing';
+    // Not having a key is a choice, not an error: the courses do not need one.
+    el.textContent = nl ? 'Geen sleutel: het gesprek geeft standaardantwoorden en de AI-onderdelen staan uit. De cursussen werken zonder.' : 'No key: the conversation gives canned replies and the AI parts are off. The courses work without one.';
+    el.className = 'api-status none';
   }
 }
 

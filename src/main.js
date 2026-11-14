@@ -69,6 +69,9 @@ function toggleSettingsDrawer() {
 function dressHeaders() {
   document.querySelectorAll('.screen .lesson-header').forEach(h => {
     if (h.querySelector('.lesson-settings')) return;
+    // The back button shows only an arrow: give it a name for a screen reader.
+    const back = h.querySelector('.back-btn');
+    if (back && !back.getAttribute('aria-label')) back.setAttribute('aria-label', state.nativeLanguage === 'nl' ? 'Terug' : 'Back');
     const b = document.createElement('button');
     b.type = 'button';
     b.className = 'lesson-settings';
