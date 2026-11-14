@@ -79,7 +79,22 @@ function splitAlts(text) {
   out.push(cur);
   return out;
 }
-const GLOSS = /\s+\([^)]*\)/g;
+// What stands in brackets may be typed or left out: "(aan) haar" is haar and aan
+// haar, "potato(es)" both spellings, "laat (hem / haar) maar" also laat hem maar
+// and laat haar maar, "to wake (someone) up" with and without someone. The form
+// without anything from the brackets comes first.
+function bracketForms(alt) {
+  let forms = [''];
+  for (const part of alt.split(/(\([^)]*\))/)) {
+    if (/^\(.*\)$/.test(part)) {
+      const inside = part.slice(1, -1).split(' / ').map(x => x.trim()).filter(Boolean);
+      forms = forms.flatMap(f => [f, ...inside.map(x => f + x)]).slice(0, 48);
+    } else {
+      forms = forms.map(f => f + part);
+    }
+  }
+  return forms.map(f => f.replace(/\s+/g, ' ').trim());
+}
 
 // plainOnly keeps the answers that carry no gloss: "to lie (tell lies)" and
 // "to lie (down)" share a spelling in English, not a meaning.
@@ -87,15 +102,12 @@ function meaningForms(text, { plainOnly = false } = {}) {
   const out = [];
   for (const alt of splitAlts(text)) {
     if (plainOnly && /\s\(/.test(alt)) continue;
-    const bare = alt.replace(GLOSS, '').trim();
-    if (!bare) continue;
-    if (bare.includes('(')) out.push(bare.replace(/\([^)]*\)/g, ''), bare.replace(/[()]/g, ''));
-    else out.push(bare);
+    for (const form of bracketForms(alt.trim())) if (form && !out.includes(form)) out.push(form);
   }
   return out;
 }
 const LEAD = /^(to|a|an|the|de|het|een|om te|te)\s+/;
-const core = s => normalise(s).replace(/[.!?,;:]+$/, '').trim().replace(LEAD, '');
+const core = s => normalise(s).replace(/[.!?,;:…]+$/, '').trim().replace(LEAD, '');
 const meaningCores = w => meaningForms(meaning(w)).map(core);
 
 let allCores = null, allCoresLang = null;
@@ -114,21 +126,28 @@ function everyMeaning() {
 export function gradeMeaning(answer, w) {
   const a = core(answer);
   const forms = meaningCores(w);
-  const isExact = forms.includes(a);
+  // A meaning is shown as "(aan) haar" or "aardappel(en)". Typed with its brackets,
+  // it is read both ways: with what is in them, and without.
+  const typed = /[()]/.test(answer) ? [a, core(answer.replace(/[()]/g, '')), core(answer.replace(/\([^)]*\)/g, ' '))] : [a];
+  const isExact = typed.some(t => forms.includes(t));
   const isClose = !isExact && !everyMeaning().has(a) && forms.some(f => f.length >= 6 && levenshtein(f, a) <= 1);
   return { isExact, isClose, isCorrect: isExact || isClose };
 }
 
-// Another word of the deck that fits the same prompt (теж / також, обирати / вибирати).
-// Only unglossed meanings count as shared.
-function synonymTyped(answer, w) {
+// Another word that fits the same prompt (теж / також, обирати / вибирати), among
+// `words`. A meaning is shared when it is given without a gloss in both, or with
+// the very same gloss: "to ask (a question)" twice is one meaning, "to lie (down)"
+// and "to lie (tell lies)" are two.
+export function synonymIn(words, answer, w) {
   const a = normalise(answer);
   const plain = x => meaningForms(meaning(x), { plainOnly: true }).map(core);
-  const mine = new Set(plain(w));
-  return deck().find(o => o.key !== w.key && o.pos === w.pos
+  const whole = x => splitAlts(meaning(x)).map(s => normalise(s));
+  const mine = new Set(plain(w)), mineWhole = new Set(whole(w));
+  return words.find(o => o.key !== w.key && o.pos === w.pos && normalise(o.uk) !== normalise(w.uk)
     && (normalise(o.uk) === a || (o.perfective && normalise(o.perfective) === a))
-    && plain(o).some(m => mine.has(m)));
+    && (plain(o).some(m => mine.has(m)) || whole(o).some(m => mineWhole.has(m))));
 }
+const synonymTyped = (answer, w) => synonymIn(deck(), answer, w);
 
 // ── Public entry ─────────────────────────────────────────────────────────────
 

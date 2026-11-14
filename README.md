@@ -357,3 +357,10 @@ The chat, word lookup, verb lookup, sentence dissection and AI quiz were walked 
 - **AI quiz**: an open answer that is word for word the answer on the card counts without asking "did you get it right?"; an answer in the wrong alphabet gets the keyboard note instead of being judged.
 - **Numbers**: the four year items say how a year is spoken (`yearOrdinal()` in `numbers-time.js`): the last word is an ordinal.
 - The Anthropic model is still `claude-haiku-4-5`, called with plain `fetch` (the app has no build step and no dependencies). Moving to a newer model changes the request (no `temperature`, thinking on by default), so it is a decision for the owner, not a rename.
+
+## Every card of the course path against its own answer (2026-11)
+
+All 122 units were played as whole rounds, every card answered with the answer from the data (9,921 cards, a few seconds in a headless browser), in Dutch and in English.
+
+- **Two course words for one meaning** (книга and книжка, поїзд and потяг, магазин and крамниця, теж and також): typing the other one on a "meaning → word" card is not a mistake. `synonymIn()` in `vocab-drill-ui.js` finds it among the course's words and the vocabulary deck, and the card asks again without a penalty, as the vocabulary deck already did. The same word in its other spelling (увечері / ввечері, учитель / вчитель: у- and в- alternate) simply counts as right. A meaning with the very same gloss twice ("to ask (a question)") counts as shared.
+- **Brackets in a meaning are optional parts** (`bracketForms()`): "(aan) haar" is *haar* and *aan haar*, "laat (hem / haar / ze) maar" also *laat hem maar*, "to wake (someone) up" with and without *someone*. A meaning typed with its brackets is read both ways.

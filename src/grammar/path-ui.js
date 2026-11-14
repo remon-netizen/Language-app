@@ -13,7 +13,8 @@ import { showScreen } from '../router.js';
 import { POS_LABEL } from '../data/vocab-uk.js';
 import { LEVELS, UNITS, unitsOf, getUnit, unitIndex, nextUnit } from '../data/path/index.js';
 import { unitItems, entryOf, recordItem, regradeItem, dueItems, learnedDueItems, learnedSoonItems, pathStats, unitProgress, unitState, markUnitStep, unitDone, unitStarted, nextOpenUnit, STEPS, getResume, saveResume, clearResume } from '../data/path-progress.js';
-import { meaning, gradeMeaning } from './vocab-drill-ui.js';
+import { meaning, gradeMeaning, synonymIn } from './vocab-drill-ui.js';
+import { deck } from '../data/vocab-progress.js';
 import { runSession } from './course-engine.js';
 import { L, loc, shuffle, byKeyboard, grade, normalise, wireSpeakButtons } from './drill-core.js';
 
@@ -284,6 +285,13 @@ function showUnit(unit) {
 
 const q = (isExact, isClose) => (isExact ? 5 : isClose ? 3 : 1);
 
+// Every word the learner can know: the course's own and the vocabulary deck's.
+let everyWord = null;
+const knownWords = () => [...(everyWord ||= UNITS.flatMap(u => unitItems(u).words)), ...deck()];
+// The same word in its other spelling: у- and в- at the start follow the sound
+// before them (увечері / ввечері, учитель / вчитель).
+const sameWordUV = (a, b) => { const x = normalise(a), y = normalise(b); return x !== y && /^[ув]/.test(x) && /^[ув]/.test(y) && x.slice(1) === y.slice(1); };
+
 // A word: shown first (intro), then meaning → word, then word → meaning.
 function wordCard(w, { intro = false, dir = 'produce' } = {}) {
   const base = {
@@ -306,6 +314,12 @@ function wordCard(w, { intro = false, dir = 'produce' } = {}) {
       check(answer) {
         const g = grade(answer, [w.uk], { minTypoLen: 5 });
         if (intro) return { ...g, quality: 0 };
+        // The course teaches more than one word for some meanings (книга and книжка,
+        // поїзд and потяг). The other one is not a mistake: its second spelling is
+        // simply right, another word gets a second try without a penalty.
+        const other = !g.isExact && synonymIn(knownWords(), answer, w);
+        if (other && sameWordUV(other.uk, w.uk)) return { isExact: true, isClose: false, isCorrect: true, quality: 5 };
+        if (other && !g.isCorrect) return { retry: L(`${other.uk} fits too, but here it is another word. Try again.`, `${other.uk} past ook, maar hier is het een ander woord. Probeer opnieuw.`) };
         if (!g.isExact && w.perfective && normalise(answer) === normalise(w.perfective)) {
           return { isExact: false, isClose: true, isCorrect: true, quality: 4, headline: L('Right verb, but that is the perfective', 'Juiste werkwoord, maar dat is de voltooide vorm') };
         }
