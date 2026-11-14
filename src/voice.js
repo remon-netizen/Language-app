@@ -1,4 +1,5 @@
 import { state, getTTSLang } from './state.js';
+import { showToast } from './toast.js';
 
 function scoreVoice(v) {
   let score = 0;
@@ -126,7 +127,20 @@ function getSelectedVoice(lang) {
   return null;
 }
 
+// Without a voice for the language a tap on 🔊 does nothing at all. Say so, once
+// per visit, with the way to Settings where it is explained.
+let warnedSilent = false;
+function warnIfSilent(lang) {
+  if (warnedSilent || !hasNoVoice() || !(lang || getTTSLang()).startsWith(getLangPrefix())) return;
+  if (document.querySelector('.wl-overlay.open')) return;   // a sheet covers the screen: wait for the next time
+  warnedSilent = true;
+  const label = getLangLabel();
+  showToast(L(`This device has no ${label} voice: the 🔊 buttons do not work here.`, `Dit apparaat heeft geen ${label} stem: de 🔊-knoppen werken hier niet.`),
+    { action: L('What now?', 'Wat nu?'), onAction: () => window.toggleSettingsDrawer() });
+}
+
 export function speakText(text, lang) {
+  warnIfSilent(lang);
   state.synth.cancel();
   const utt = new SpeechSynthesisUtterance(text);
   utt.lang = lang || getTTSLang();
@@ -137,6 +151,7 @@ export function speakText(text, lang) {
 }
 
 export function speakSlow(text, lang) {
+  warnIfSilent(lang);
   state.synth.cancel();
   const utt = new SpeechSynthesisUtterance(text);
   utt.lang = lang || getTTSLang();
@@ -147,6 +162,7 @@ export function speakSlow(text, lang) {
 }
 
 export function speakTextCb(text, lang, onEnd) {
+  warnIfSilent(lang);
   state.synth.cancel();
   const utt = new SpeechSynthesisUtterance(text);
   utt.lang = lang || getTTSLang();

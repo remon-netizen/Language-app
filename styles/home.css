@@ -4,14 +4,7 @@
   margin: 0 auto;
 }
 
-/* ── Language picker ── */
-.lang-picker-card {
-  background: var(--card-bg);
-  border-radius: 14px;
-  padding: 16px 20px;
-  box-shadow: 0 1px 8px rgba(0,0,0,0.07);
-  margin-bottom: 16px;
-}
+/* ── Language buttons (Settings) ── */
 .lang-options {
   display: flex;
   gap: 10px;
@@ -101,49 +94,6 @@
 .vc-quality { font-size: 0.75rem; margin-top: 2px; }
 .vc-quality.neural { color: var(--success); }
 .vc-quality.standard { color: var(--warning); }
-
-/* ── Compact language display ── */
-.lang-compact {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 10px 16px;
-  background: var(--card-bg);
-  border: 2px solid var(--border);
-  border-radius: 10px;
-  margin-bottom: 10px;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--text);
-}
-.lang-compact:hover { border-color: var(--blue); }
-.lang-compact-edit { font-size: 0.8rem; opacity: 0.5; }
-
-/* ── API key notice ── */
-.api-notice {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 16px;
-  background: #fef3c7;
-  border: 2px solid #fcd34d;
-  border-radius: 12px;
-  margin-bottom: 12px;
-  font-size: 0.82rem;
-  color: #92400e;
-}
-.api-notice-icon { font-size: 1.2rem; flex-shrink: 0; }
-.api-notice-text { flex: 1; }
-.api-notice-btn {
-  background: #b45309; color: white; border: none;
-  border-radius: 6px; padding: 5px 10px; font-size: 0.78rem;
-  font-weight: 600; cursor: pointer; white-space: nowrap; flex-shrink: 0;
-}
-.api-notice-btn { min-height: 36px; }
-.api-notice-btn:hover { background: #92400e; }
 
 /* ── Home tools grid (2-column) ── */
 .home-tools-grid {

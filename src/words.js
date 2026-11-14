@@ -1,6 +1,7 @@
 import { lookupWord } from './api/word-lookup.js';
 import { escHtml } from './utils.js';
 import { state } from './state.js';
+import { sheetOpened, sheetClosed } from './router.js';
 
 const STORAGE_KEY = 'savedWords';
 let _currentLookup = null;
@@ -118,6 +119,7 @@ export async function openWordLookup(rawWord) {
   wordEl.textContent = word;
   content.innerHTML = `<div class="wl-loading">${L('Looking up…', 'Opzoeken…')}</div>`;
   overlay.classList.add('open');
+  sheetOpened(closeWordLookup);
 
   try {
     const data = await lookupWord(word);
@@ -150,6 +152,7 @@ export async function openWordLookup(rawWord) {
 export function closeWordLookup() {
   const overlay = document.getElementById('wordLookupOverlay');
   if (overlay) overlay.classList.remove('open');
+  sheetClosed(closeWordLookup);
 }
 
 // ── My Words Screen ───────────────────────────────────────────────────────────

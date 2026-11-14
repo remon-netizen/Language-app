@@ -10,9 +10,23 @@ export const TARGET_LANGUAGES = ['uk'];
 const DEFAULT_NATIVE = 'nl';
 const DEFAULT_TARGET = 'uk';
 
+// The interface language before the learner has chosen one. An install that has
+// been used keeps Dutch, the default it always had. A new one follows the device:
+// Dutch on a Dutch device, English on any other. Either way it can be changed in
+// Settings.
+function firstNativeLanguage() {
+  const usedBefore = ['aiProvider', 'activityDays', 'pathUnits', 'vocabProgress', 'ukProgress', 'langPickerSetup'].some(k => localStorage.getItem(k) !== null);
+  if (usedBefore) return DEFAULT_NATIVE;
+  const device = (navigator.languages && navigator.languages[0]) || navigator.language || '';
+  return device.toLowerCase().startsWith('nl') ? 'nl' : 'en';
+}
+
 function loadInitialLanguages() {
-  let native = localStorage.getItem('appNativeLanguage') || DEFAULT_NATIVE;
-  if (!NATIVE_LANGUAGES.includes(native)) native = DEFAULT_NATIVE;
+  let native = localStorage.getItem('appNativeLanguage');
+  if (!NATIVE_LANGUAGES.includes(native)) {
+    native = firstNativeLanguage();
+    localStorage.setItem('appNativeLanguage', native);
+  }
 
   let target = localStorage.getItem('appLanguage') || DEFAULT_TARGET;
   if (!TARGET_LANGUAGES.includes(target)) target = DEFAULT_TARGET;

@@ -17,6 +17,7 @@ import { escHtml } from '../utils.js';
 import { speakText } from '../voice.js';
 import { setupRecognition } from '../speech.js';
 import { L, shuffle, resultLine, appendNext, missedListHtml, wireSpeakButtons, scoreMessage, scoreEmoji } from './drill-core.js';
+import { keyboardHelpFirstTime, openKeyboardHelp, latinTypedNote } from '../keyboard-help.js';
 
 // ── Sessions ─────────────────────────────────────────────────────────────────
 // A card:
@@ -60,11 +61,18 @@ function warmUpCards(n, own, source) {
 
 // warmUp: how many due items open the session; warmUpSource: where they come from
 // (a course's own due cards), default every course.
-export function runSession({ screen, icon, title, accent = DEFAULT_ACCENT, cards, mixed = false, warmUp = 0, warmUpSource = null, onExit, again, scoreSubtitle }) {
+// resume: { at, score, missed } picks a round up where it was left: it starts at
+// own card number `at` (the warm-up is skipped) with the score so far.
+// onProgress({ at, score, missed }) reports after every answered card of the
+// round itself, so the caller can keep that position.
+export function runSession({ screen, icon, title, accent = DEFAULT_ACCENT, cards, mixed = false, warmUp = 0, warmUpSource = null, resume = null, onProgress = null, onExit, again, scoreSubtitle }) {
   const s = screen;
-  const warm = warmUpCards(warmUp, cards, warmUpSource);
+  const startAt = resume ? Math.max(0, Math.min(resume.at || 0, cards.length - 1)) : 0;
+  const warm = startAt ? [] : warmUpCards(warmUp, cards, warmUpSource);
   if (warm.length) cards = [...warm, ...cards];
-  const run = { current: 0, score: 0, answered: false, missed: [], keyHandler: null };
+  const run = { current: startAt, score: resume?.score || 0, answered: false, missed: [...(resume?.missed || [])], keyHandler: null };
+  // How far the round itself is, for the caller to remember.
+  const report = () => { const at = run.current + 1 - warm.length; if (onProgress && at > 0) onProgress({ at, score: run.score, missed: run.missed }); };
   s.style.setProperty('--ce-main', accent.main);
   s.style.setProperty('--ce-dark', accent.dark);
   s.style.setProperty('--ce-soft', accent.soft);
@@ -122,6 +130,8 @@ export function runSession({ screen, icon, title, accent = DEFAULT_ACCENT, cards
     if (card.autoSay) setTimeout(() => speakText(card.autoSay, state.currentLanguage), card.intro ? 200 : 0);
 
     if (isChoice) wireChoice(card); else wireText(card);
+    // A new learner's first typed Ukrainian answer: say how to get the letters, once.
+    if (!isChoice && card.input.lang === 'uk' && keyboardHelpFirstTime()) s.querySelector('#ceInput')?.blur();
   }
 
   function wireText(card) {
@@ -131,9 +141,19 @@ export function runSession({ screen, icon, title, accent = DEFAULT_ACCENT, cards
       if (run.answered) return;
       const answer = input.value.trim();
       if (!answer) { input.focus(); return; }
+      const note = s.querySelector('#ceRetry');
+      // Latin letters in a Ukrainian answer are a keyboard setting, not a mistake:
+      // nothing is graded, the learner switches and tries again.
+      const latin = card.input.lang === 'uk' ? latinTypedNote(answer, card.correctText) : null;
+      if (latin) {
+        note.innerHTML = `${escHtml(latin)} <button class="ce-retry-link" id="ceKbHelp" type="button">⌨️ ${L('How?', 'Hoe?')}</button>`;
+        note.hidden = false;
+        note.querySelector('#ceKbHelp').addEventListener('click', openKeyboardHelp);
+        input.focus(); input.select();
+        return;
+      }
       const res = card.check(answer);
       if (res.retry) {
-        const note = s.querySelector('#ceRetry');
         note.textContent = res.retry; note.hidden = false;
         input.value = ''; input.focus();
         return;
@@ -228,12 +248,15 @@ export function runSession({ screen, icon, title, accent = DEFAULT_ACCENT, cards
     fb.querySelector('#ceListen')?.addEventListener('click', () => speakText(card.say, state.currentLanguage));
     if (card.sayAfter && card.say) setTimeout(() => speakText(card.say, state.currentLanguage), 400);
 
+    report();
+
     if (canOverride) {
       const btn = fb.querySelector('#ceOverride');
       btn.addEventListener('click', () => {
         card.override(token);
         run.score++;
         run.missed.pop();
+        report();
         fb.querySelector('.ex-feedback-result').outerHTML = `<div class="ex-feedback-result correct">✓ ${L('Counted as correct', 'Goed gerekend')}</div>`;
         btn.remove();
         const input = s.querySelector('#ceInput');

@@ -12,10 +12,11 @@ import { speakText } from '../voice.js';
 import { showScreen } from '../router.js';
 import { POS_LABEL } from '../data/vocab-uk.js';
 import { LEVELS, UNITS, unitsOf, getUnit, unitIndex, nextUnit } from '../data/path/index.js';
-import { unitItems, entryOf, recordItem, regradeItem, dueItems, learnedDueItems, learnedSoonItems, pathStats, unitProgress, unitState, markUnitStep, unitDone, unitStarted, nextOpenUnit, STEPS } from '../data/path-progress.js';
+import { unitItems, entryOf, recordItem, regradeItem, dueItems, learnedDueItems, learnedSoonItems, pathStats, unitProgress, unitState, markUnitStep, unitDone, unitStarted, nextOpenUnit, STEPS, getResume, saveResume, clearResume } from '../data/path-progress.js';
 import { meaning, gradeMeaning } from './vocab-drill-ui.js';
 import { runSession } from './course-engine.js';
 import { L, loc, shuffle, grade, normalise, wireSpeakButtons } from './drill-core.js';
+import { openKeyboardHelp } from '../keyboard-help.js';
 
 const COURSE = { icon: '🗺️', get name() { return L('Course path', 'Leerpad'); } };
 const ACCENT = { main: '#0d9488', dark: '#115e59', soft: '#f0fdfa', border: '#99f6e4' };
@@ -157,18 +158,45 @@ const dotClass = item => {
   return r >= 0.8 ? 'pt-dot-green' : r >= 0.5 ? 'pt-dot-yellow' : 'pt-dot-red';
 };
 
+// A round of this unit that was left half-way, if there is one worth picking up.
+function resumeOf(unit) {
+  const rec = getResume(unit.id);
+  if (!rec || !Array.isArray(rec.plan) || !stepName(rec.step)) return null;
+  if (rec.at >= rec.plan.length) {
+    // Every card was answered, only the score card was not seen: the round counts.
+    (rec.step === 'all' ? STEPS : [rec.step]).forEach(x => markUnitStep(unit.id, x));
+    clearResume(unit.id);
+    return null;
+  }
+  return rec;
+}
+
+// The first units are typed in Cyrillic by someone who is still learning the letters.
+const ALPHABET_UNITS = ['a1-01', 'a1-02', 'a1-03'];
+
+// The page opens on what to do: pick up a round, or start the next step. What
+// there is to read comes after it. The explanation lies open on a first visit and
+// folds away once the unit is under way; the lists of words and sentences are
+// reference and stay folded until asked for.
 function showUnit(unit) {
   const s = getScreen();
   const items = unitItems(unit);
+  const resume = resumeOf(unit);
   const st = unitState(unit.id);
   const next = nextUnit(unit);
   const due = learnedDueItems().length;
-  const action = (id, icon, title, sub, step, primary = false) => `
-    <button class="pt-action ${primary ? 'pt-action-primary' : ''} ${step && st[step] ? 'done' : ''}" id="${id}">
+  const todo = STEPS.find(x => !st[x]);
+  const fresh = !unitStarted(unit.id) && unitProgress(unit) === 0 && !resume;
+  const cardCount = items.words.length * 3 + items.sentences.length * 2 + unit.exercises.length;
+  const action = (id, icon, title, sub, step) => {
+    const isNext = !resume && step && step === todo;
+    return `
+    <button class="pt-action ${isNext ? 'pt-action-next' : ''} ${step && st[step] ? 'done' : ''}" id="${id}">
       <span class="pt-action-icon">${icon}</span>
-      <span class="pt-action-title">${step && st[step] ? '✓ ' : ''}${title}</span>
+      <span class="pt-action-title">${step && st[step] ? '✓ ' : isNext ? '▶ ' : ''}${title}</span>
       <span class="pt-action-sub">${sub}</span>
     </button>`;
+  };
 
   s.innerHTML = `
     <div class="lesson-header">
@@ -179,13 +207,38 @@ function showUnit(unit) {
       </div>
     </div>
 
-    <div class="pt-card">
-      <div class="pt-card-title">📖 ${L('Grammar', 'Grammatica')} · ${escHtml(loc(unit.grammar))}</div>
-      <div class="pt-explain">${renderExplain(loc(unit.explain))}</div>
-    </div>
+    ${ALPHABET_UNITS.includes(unit.id) ? `
+    <div class="pt-aid-row">
+      <button class="pt-aid" id="ptAlphabet" type="button">🔤 ${L('The alphabet', 'Het alfabet')}</button>
+      <button class="pt-aid" id="ptKeyboard" type="button">⌨️ ${L('Ukrainian keyboard', 'Oekraïens toetsenbord')}</button>
+    </div>` : ''}
 
-    <div class="pt-card">
-      <div class="pt-card-title">🧠 ${L('Words', 'Woorden')} · ${items.words.length}</div>
+    ${resume ? `<button class="pt-resume" id="ptResume">
+      <span class="pt-resume-title">▶ ${L('Pick up where you left off', 'Verder waar je was')}</span>
+      <span class="pt-resume-sub">${stepName(resume.step)} · ${L(`card ${resume.at + 1} of ${resume.plan.length}`, `kaart ${resume.at + 1} van ${resume.plan.length}`)}</span>
+    </button>` : ''}
+
+    <div class="pt-section-label">${L('Practise', 'Oefenen')}</div>
+    <div class="pt-actions">
+      ${action('ptWords', '🧠', L('Learn the words', 'Leer de woorden'), `${items.words.length} ${L('words · shown, then typed both ways', 'woorden · eerst zien, dan beide kanten typen')}`, 'words')}
+      ${action('ptSentences', '💬', L('Practise the sentences', 'Oefen de zinnen'), `${items.sentences.length} ${L('sentences · typed from your language', 'zinnen · typen vanuit jouw taal')}`, 'sentences')}
+      ${action('ptExercises', '✍️', L('Exercises', 'Oefeningen'), `${unit.exercises.length} ${L('gaps and choices', 'gaten en keuzes')}`, 'exercises')}
+      ${action('ptAll', '⏩', L('Whole unit', 'Hele unit'), L(`all three in one go · ${cardCount} cards`, `alle drie achter elkaar · ${cardCount} kaarten`), null)}
+    </div>
+    ${fresh ? `<div class="pt-hint">${L('New to this? Read the explanation below first, or just start: every card shows its answer before it asks for it.', 'Nieuw hiermee? Lees eerst de uitleg hieronder, of begin meteen: elke kaart laat het antwoord zien voordat hij ernaar vraagt.')}</div>` : ''}
+    ${due ? `<button class="pt-due-row" id="ptDue">
+      <span>🔁 ${due} ${L('due from earlier units', 'aan de beurt uit eerdere units')}</span>
+      <span class="pt-due-hint">${L('Each step starts with a warm-up of up to 8 of them · tap for a full round', 'Elke stap begint met een opwarmer van max. 8 ervan · tik voor een hele ronde')}</span>
+    </button>` : ''}
+    ${!todo && next ? `<button class="vc-browse-btn pt-next-top" id="ptNextTop">✓ ${L('Unit done', 'Unit klaar')} · ${L('Next unit', 'Volgende unit')}: ${escHtml(unitName(next))} →</button>` : ''}
+
+    <details class="pt-card pt-fold" ${fresh ? 'open' : ''}>
+      <summary class="pt-card-title">📖 ${L('Explanation', 'Uitleg')} · ${escHtml(loc(unit.grammar))}</summary>
+      <div class="pt-explain">${renderExplain(loc(unit.explain))}</div>
+    </details>
+
+    <details class="pt-card pt-fold">
+      <summary class="pt-card-title">🧠 ${L('Words', 'Woorden')} · ${items.words.length}</summary>
       <div class="pt-words">
         ${items.words.map(w => `
           <div class="pt-word">
@@ -194,40 +247,34 @@ function showUnit(unit) {
             ${say(w.uk)}
           </div>`).join('')}
       </div>
-    </div>
+    </details>
 
-    <div class="pt-card">
-      <div class="pt-card-title">💬 ${L('Sentences', 'Zinnen')} · ${items.sentences.length}</div>
+    <details class="pt-card pt-fold">
+      <summary class="pt-card-title">💬 ${L('Sentences', 'Zinnen')} · ${items.sentences.length}</summary>
       ${items.sentences.map(x => `
         <div class="pt-sentence">
           <div class="pt-sentence-uk"><span class="pt-word-dot ${dotClass(x)}"></span>${escHtml(x.uk)} ${say(x.uk)}</div>
           <div class="pt-sentence-native">${escHtml(native(x))}</div>
           ${x.note ? `<div class="pt-sentence-note">💡 ${inline(loc(x.note))}</div>` : ''}
         </div>`).join('')}
-    </div>
+    </details>
 
-    ${due ? `<button class="pt-due-row" id="ptDue">
-      <span>🔁 ${due} ${L('due from earlier units', 'aan de beurt uit eerdere units')}</span>
-      <span class="pt-due-hint">${L('Each step starts with a warm-up of up to 8 of them · tap for a full round', 'Elke stap begint met een opwarmer van max. 8 ervan · tik voor een hele ronde')}</span>
-    </button>` : ''}
-    <div class="pt-section-label">${L('Practise', 'Oefenen')}</div>
-    <div class="pt-actions">
-      ${action('ptWords', '🧠', L('Learn the words', 'Leer de woorden'), `${items.words.length} ${L('words · shown, then typed both ways', 'woorden · eerst zien, dan beide kanten typen')}`, 'words')}
-      ${action('ptSentences', '💬', L('Practise the sentences', 'Oefen de zinnen'), `${items.sentences.length} ${L('sentences · typed from your language', 'zinnen · typen vanuit jouw taal')}`, 'sentences')}
-      ${action('ptExercises', '✍️', L('Exercises', 'Oefeningen'), `${unit.exercises.length} ${L('gaps and choices', 'gaten en keuzes')}`, 'exercises')}
-      ${action('ptAll', '▶', L('Whole unit', 'Hele unit'), L('words, sentences and exercises in one go', 'woorden, zinnen en oefeningen achter elkaar'), null, true)}
-    </div>
     ${next ? `<button class="vc-browse-btn" id="ptNext">${L('Next unit', 'Volgende unit')}: ${escHtml(unitName(next))} →</button>` : ''}`;
 
   wireSpeakButtons(s);
   s.querySelector('#ptUnitBack').addEventListener('click', () => { pt.level = unit.level; savePrefs(); showMenu(); });
+  s.querySelector('#ptAlphabet')?.addEventListener('click', () => window.openAlphabetScreen());
+  s.querySelector('#ptKeyboard')?.addEventListener('click', openKeyboardHelp);
+  s.querySelector('#ptResume')?.addEventListener('click', () => startStep(unit, resume.step, resume));
   s.querySelector('#ptWords').addEventListener('click', () => startStep(unit, 'words'));
   s.querySelector('#ptSentences').addEventListener('click', () => startStep(unit, 'sentences'));
   s.querySelector('#ptExercises').addEventListener('click', () => startStep(unit, 'exercises'));
   s.querySelector('#ptAll').addEventListener('click', () => startStep(unit, 'all'));
   s.querySelector('#ptNext')?.addEventListener('click', () => showUnit(next));
+  s.querySelector('#ptNextTop')?.addEventListener('click', () => showUnit(next));
   s.querySelector('#ptDue')?.addEventListener('click', () => startLearnedReview(unit));
   s.scrollTo({ top: 0 });
+  window.scrollTo({ top: 0 });
 }
 
 // ── Cards ────────────────────────────────────────────────────────────────────
@@ -363,34 +410,59 @@ function exerciseCard(x) {
 
 // ── Sessions ─────────────────────────────────────────────────────────────────
 
-function stepCards(unit, step) {
+// A step is planned as a list of [kind, ref] pairs and its cards are made from
+// that plan. The plan is what is kept when a round is left half-way: the same
+// cards in the same order can be made again, and the round picked up where it stopped.
+//   wi / wp / wt   a word: introduced, produced, translated   (ref = the word's key)
+//   si / s         a sentence: introduced, typed               (ref = the sentence's key)
+//   x              an exercise                                 (ref = its place in the unit)
+function stepPlan(unit, step) {
   const items = unitItems(unit);
+  const keys = list => list.map(i => i.key);
   if (step === 'words') {
     return [
-      ...items.words.map(w => wordCard(w, { intro: true })),
-      ...shuffle(items.words).map(w => wordCard(w, { dir: 'produce' })),
-      ...shuffle(items.words).map(w => wordCard(w, { dir: 'translate' })),
+      ...keys(items.words).map(k => ['wi', k]),
+      ...shuffle(keys(items.words)).map(k => ['wp', k]),
+      ...shuffle(keys(items.words)).map(k => ['wt', k]),
     ];
   }
-  if (step === 'sentences') {
-    return [...items.sentences.map(x => sentenceCard(x, { intro: true })), ...shuffle(items.sentences).map(x => sentenceCard(x))];
-  }
-  if (step === 'exercises') return shuffle(unit.exercises).map(exerciseCard);
-  return [...stepCards(unit, 'words'), ...stepCards(unit, 'sentences'), ...stepCards(unit, 'exercises')];
+  if (step === 'sentences') return [...keys(items.sentences).map(k => ['si', k]), ...shuffle(keys(items.sentences)).map(k => ['s', k])];
+  if (step === 'exercises') return shuffle(unit.exercises.map((_, i) => i)).map(i => ['x', i]);
+  return [...stepPlan(unit, 'words'), ...stepPlan(unit, 'sentences'), ...stepPlan(unit, 'exercises')];
+}
+// The cards of a plan, or null when the unit no longer has what the plan names.
+function planCards(unit, plan) {
+  const items = unitItems(unit);
+  const make = ([kind, ref]) => {
+    if (kind === 'x') return unit.exercises[ref] ? exerciseCard(unit.exercises[ref]) : null;
+    if (kind === 'si' || kind === 's') { const x = items.sentences.find(i => i.key === ref); return x ? sentenceCard(x, { intro: kind === 'si' }) : null; }
+    const w = items.words.find(i => i.key === ref);
+    if (!w || !['wi', 'wp', 'wt'].includes(kind)) return null;
+    return wordCard(w, kind === 'wi' ? { intro: true } : { dir: kind === 'wp' ? 'produce' : 'translate' });
+  };
+  const cards = plan.map(make);
+  return cards.every(Boolean) ? cards : null;
 }
 
 const stepName = step => ({ words: L('Words', 'Woorden'), sentences: L('Sentences', 'Zinnen'), exercises: L('Exercises', 'Oefeningen'), all: L('Whole unit', 'Hele unit') })[step];
 
-function startStep(unit, step) {
-  const cards = stepCards(unit, step);
-  if (!cards.length) { showUnit(unit); return; }
+// rec: a round of this unit that was left half-way; its plan and position are used again.
+function startStep(unit, step, rec = null) {
+  let plan = rec ? rec.plan : stepPlan(unit, step);
+  let cards = planCards(unit, plan);
+  if (!cards) { clearResume(unit.id); rec = null; plan = stepPlan(unit, step); cards = planCards(unit, plan); }
+  if (!cards || !cards.length) { showUnit(unit); return; }
   const done = step === 'all' ? STEPS : [step];
   runSession({
     screen: getScreen(), icon: unit.icon, title: `${unit.level} · ${unitIndex(unit)} · ${stepName(step)}`, accent: ACCENT, cards, warmUp: 8, warmUpSource,
+    resume: rec ? { at: rec.at, score: rec.score, missed: rec.missed } : null,
+    // Kept after every answer: leaving a long round costs nothing.
+    onProgress: ({ at, score, missed }) => saveResume(unit.id, { step, plan, at, score, missed }),
     onExit: () => showUnit(unit),
     scoreSubtitle: () => unitName(unit),
     // The step is done once the round ends; offer the next step, or the next unit.
     again: () => {
+      clearResume(unit.id);
       done.forEach(s => markUnitStep(unit.id, s));
       const st = unitState(unit.id);
       const todo = STEPS.find(s => !st[s]);

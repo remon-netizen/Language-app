@@ -103,3 +103,23 @@ export const unitDone = id => STEPS.every(s => unitState(id)[s]);
 // The unit to continue with: the first one not finished.
 export const nextOpenUnit = () => UNITS.find(u => !unitDone(u.id)) || null;
 export const unitStarted = id => Object.keys(unitState(id)).length > 0;
+
+// ── A round left half-way ────────────────────────────────────────────────────
+// { [unitId]: { step, plan, at, score, missed, t } } under 'pathResume': the cards
+// of the round in their order (see stepPlan in path-ui.js) and how many of them
+// were answered. Written after every answer, removed when the round reaches its
+// score card, so leaving a long round costs nothing.
+const RESUME_KEY = 'pathResume';
+const loadResume = () => { try { return JSON.parse(localStorage.getItem(RESUME_KEY)) || {}; } catch { return {}; } };
+export const getResume = id => loadResume()[id] || null;
+export function saveResume(id, rec) {
+  const d = loadResume();
+  d[id] = { ...rec, t: Date.now() };
+  localStorage.setItem(RESUME_KEY, JSON.stringify(d));
+}
+export function clearResume(id) {
+  const d = loadResume();
+  if (!d[id]) return;
+  delete d[id];
+  localStorage.setItem(RESUME_KEY, JSON.stringify(d));
+}

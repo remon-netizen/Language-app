@@ -5,6 +5,10 @@ import { showScreen } from './router.js';
 import { L, isNL } from './grammar/drill-core.js';
 
 export function openAlphabetScreen() {
+  // The table is looked at from Home, from a unit page, from the middle of a round:
+  // ← returns to that place as it was left.
+  const from = document.querySelector('.screen.active')?.id;
+  const fromScroll = window.scrollY;
   showScreen('alphabetScreen');
   const s = document.getElementById('alphabetScreen');
   s.innerHTML = `
@@ -24,7 +28,11 @@ export function openAlphabetScreen() {
         </button>`;
       }).join('')}
     </div>`;
-  s.querySelector('#abBack').addEventListener('click', () => window.openExercisesScreen());
+  s.querySelector('#abBack').addEventListener('click', () => {
+    if (!from || from === 'alphabetScreen') { window.openExercisesScreen(); return; }
+    showScreen(from);
+    window.scrollTo(0, fromScroll);
+  });
   s.querySelectorAll('.letter-card').forEach(c => c.addEventListener('click', () => {
     speakText(c.dataset.letter, 'uk-UA');
     c.classList.add('playing');

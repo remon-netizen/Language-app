@@ -42,6 +42,7 @@
 .ce-check-btn:hover:not(:disabled) { background: var(--ce-dark); }
 .ce-check-btn:disabled { opacity: 0.5; }
 .ce-retry-note { padding: 10px 12px; margin-bottom: 12px; background: #fffbeb; border: 1px solid #fcd34d; border-radius: 10px; color: #92400e; font-size: 0.88rem; font-weight: 600; text-align: center; }
+.ce-retry-link { background: none; border: none; padding: 6px 4px; color: #92400e; font: inherit; font-weight: 800; text-decoration: underline; cursor: pointer; white-space: nowrap; }
 
 .ce-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
 .ce-option-btn { padding: 14px; border: 2px solid var(--border); border-radius: 12px; background: var(--card-bg); font-size: 0.95rem; font-weight: 700; cursor: pointer; font-family: inherit; color: var(--text); min-height: 52px; }

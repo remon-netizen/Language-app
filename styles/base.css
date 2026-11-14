@@ -98,6 +98,13 @@ header p { font-size: 0.8rem; opacity: 0.8; }
   border-bottom: 1px solid var(--border);
   display: flex; flex-direction: column; gap: 10px;
 }
+/* A plain action inside the drawer: opens a help sheet, downloads a file. */
+.drawer-link-btn {
+  width: 100%; padding: 11px 12px; border: 2px solid var(--border); border-radius: 10px;
+  background: var(--bg); color: var(--text); font-size: 0.9rem; font-weight: 600;
+  font-family: inherit; text-align: left; cursor: pointer; min-height: 44px;
+}
+.drawer-link-btn:hover { border-color: var(--blue); color: var(--blue); }
 .drawer-voice-row {
   display: flex; gap: 8px; align-items: center;
 }
@@ -168,7 +175,7 @@ body.drawer-open { overflow: hidden; }
 }
 
 /* ── Update toast (new service worker took over while something was in progress) ── */
-.update-toast {
+.update-toast, .app-toast {
   position: fixed; left: 50%; transform: translateX(-50%);
   bottom: calc(16px + env(safe-area-inset-bottom, 0px));
   display: flex; align-items: center; gap: 12px;
@@ -176,7 +183,10 @@ body.drawer-open { overflow: hidden; }
   border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.3); z-index: 200;
   font-size: 0.85rem; max-width: calc(100vw - 32px);
 }
-.update-toast button {
+/* A general toast holds a sentence: it may use the full width instead of half of it. */
+.app-toast { left: 16px; right: 16px; transform: none; margin: 0 auto; width: fit-content; max-width: min(480px, calc(100vw - 32px)); line-height: 1.35; }
+.app-toast button { flex-shrink: 0; white-space: nowrap; }
+.update-toast button, .app-toast button {
   background: var(--yellow); color: var(--dark); border: none; border-radius: 8px;
   padding: 8px 12px; font-weight: 800; cursor: pointer; font-family: inherit; min-height: 36px;
 }

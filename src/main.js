@@ -1,10 +1,10 @@
 // ── Imports ───────────────────────────────────────────────────────────────────
-import { state, validTargetsFor, getTargetFlag, getTutorFirstName, flagImg } from './state.js';
+import { state, validTargetsFor, getTargetFlag } from './state.js';
 import { t, languageName } from './i18n.js';
 import { escHtml } from './utils.js';
 import { loadProgress, loadApiKey, saveApiKey, switchProvider } from './storage.js';
 import { loadVoices, showBrowserBanner, dismissBanner, changeVoice, testVoice, speakText } from './voice.js';
-import { showScreen } from './router.js';
+import { showScreen, sheetOpened, sheetClosed } from './router.js';
 import { openFreeChat, setDifficulty, sendText, toggleFreeSpeak, redoFromMessage, showConversationSummary } from './chat/chat.js';
 import { useSuggestion } from './chat/suggestions.js';
 import { translateText, copyTranslation, updateTranslatorLabel } from './chat/translator.js';
@@ -28,65 +28,14 @@ import { openPathScreen, startPathReview } from './grammar/path-ui.js';
 import { weakVocab } from './data/vocab-progress.js';
 import { openReviewScreen, startReviewAll, getDueTotal } from './review.js';
 import { openAlphabetScreen } from './alphabet-ui.js';
-import { nextOpenUnit, pathStats, unitStarted } from './data/path-progress.js';
+import { nextOpenUnit, pathStats, unitStarted, unitDone } from './data/path-progress.js';
+import { openKeyboardHelp } from './keyboard-help.js';
 import { unitIndex } from './data/path/index.js';
 import { loc } from './grammar/drill-core.js';
 import { getWeakVerbCount as weakVerbs } from './data/verb-weakness.js';
 import { getWeakNounCount as weakNouns } from './data/case-weakness.js';
 import { getWeakVerbCount as weakPrefixVerbs } from './data/prefix-weakness.js';
 import { weakKeys as weakNumberKeys } from './data/numbers-weakness.js';
-
-// ── Collapsible language picker ────────────────────────────────────────────────
-function collapseLangPicker() {
-  const hasSetup = localStorage.getItem('langPickerSetup');
-  const full    = document.getElementById('langPickerFull');
-  const compact = document.getElementById('langCompact');
-  if (!full || !compact) return;
-
-  if (hasSetup) {
-    // Show compact, hide full
-    full.style.display    = 'none';
-    compact.style.display = '';
-    updateCompactLabel();
-  } else {
-    // First visit — show full picker
-    full.style.display    = '';
-    compact.style.display = 'none';
-  }
-}
-
-function updateCompactLabel() {
-  const el = document.getElementById('langCompactText');
-  if (!el) return;
-  const nativeFlag = flagImg(state.nativeLanguage, 16);
-  const targetFlag = flagImg(state.currentLanguage, 16);
-  const targetName = languageName(state.currentLanguage);
-  el.innerHTML = `${nativeFlag} → ${targetFlag} ${targetName}`;
-}
-
-function expandLangPicker() {
-  const full    = document.getElementById('langPickerFull');
-  const compact = document.getElementById('langCompact');
-  if (full)    full.style.display    = '';
-  if (compact) compact.style.display = 'none';
-}
-
-// Called after a language switch to collapse the picker and save the flag.
-function markLangPickerSetup() {
-  localStorage.setItem('langPickerSetup', '1');
-  updateCompactLabel();
-  // Collapse after a short delay so the user sees their choice take effect.
-  setTimeout(collapseLangPicker, 400);
-}
-
-// ── API key notice ────────────────────────────────────────────────────────────
-function updateApiNotice() {
-  const notice = document.getElementById('apiNotice');
-  if (!notice) return;
-  const hasKey = !!(localStorage.getItem('geminiKey') || localStorage.getItem('anthropicKey'));
-  notice.style.display = hasKey ? 'none' : '';
-}
-
 
 // ── Speech speed ──────────────────────────────────────────────────────────────
 function setSpeechRate(rate) {
@@ -98,12 +47,16 @@ function setSpeechRate(rate) {
 }
 
 // ── Settings drawer ───────────────────────────────────────────────────────────
-function toggleSettingsDrawer() {
-  const drawer  = document.getElementById('settingsDrawer');
-  const overlay = document.getElementById('drawerOverlay');
-  const open    = drawer.classList.toggle('open');
-  overlay.classList.toggle('open', open);
+function setSettingsDrawer(open) {
+  document.getElementById('settingsDrawer').classList.toggle('open', open);
+  document.getElementById('drawerOverlay').classList.toggle('open', open);
   document.body.classList.toggle('drawer-open', open);
+  // The back gesture closes an open drawer instead of leaving the screen behind it.
+  if (open) sheetOpened(closeSettingsDrawer); else sheetClosed(closeSettingsDrawer);
+}
+function closeSettingsDrawer() { setSettingsDrawer(false); }
+function toggleSettingsDrawer() {
+  setSettingsDrawer(!document.getElementById('settingsDrawer').classList.contains('open'));
 }
 
 // ── i18n re-render of static strings ──────────────────────────────────────────
@@ -140,8 +93,6 @@ function applyStaticI18n() {
   // Home screen
   setText('progressLinkLabel', 'home.progress');
   setText('progressLinkSub', 'home.progressSub');
-  setText('apiNoticeText', 'home.apiNotice');
-  setText('apiNoticeBtn', 'home.apiNoticeBtn');
   setText('grammarSub', 'home.grammarSub');
   setText('autoPlayLabel', 'settings.autoPlay');
   setText('geminiFreeLabel', 'settings.geminiFree');
@@ -155,8 +106,8 @@ function applyStaticI18n() {
   setText('dissectSubmitBtn', 'grammar.dissectBtn');
   const di = document.getElementById('dissectInput'); if (di) di.placeholder = t('grammar.dissectPlaceholder');
   setText('summaryTitle', 'chat.summaryTitle');
-  setText('iSpeakLabel', 'home.iSpeak');
-  setText('iLearnLabel', 'home.iLearn');
+  setText('langLabel', 'settings.language');
+  setText('kbHelpBtn', 'settings.keyboard');
   setText('grammarLabel', 'home.grammarTitle');
   setText('myWordsLabel', 'home.myWords');
   setText('myWordsSub', 'home.myWordsSub');
@@ -175,13 +126,6 @@ function applyStaticI18n() {
   // sub-line follows native language for the English-speaking learner.
   setText('ibTitle', 'home.inburgering');
   setText('ibSub', 'home.inburgeringSub');
-
-  // Language picker labels — show each target language name in the user's
-  // native language.
-  document.querySelectorAll('[data-langname]').forEach(span => {
-    const code = span.dataset.langname;
-    span.textContent = languageName(code);
-  });
 
   // Settings button title
   const settingsBtn = document.getElementById('settingsToggleBtn');
@@ -254,8 +198,13 @@ function renderTodayCard() {
   }
   if (next) {
     const started = unitStarted(next.id);
-    rows.push({ icon: next.icon, title: started ? (nl ? 'Ga verder' : 'Continue') : (nl ? 'Volgende unit' : 'Next unit'),
+    rows.push({ icon: next.icon, title: started ? (nl ? 'Ga verder' : 'Continue') : !anyProgress ? (nl ? 'Begin hier' : 'Start here') : (nl ? 'Volgende unit' : 'Next unit'),
       sub: `${next.level} · ${unitIndex(next)} — ${loc(next.title)}`, onclick: `openPathScreen('${next.id}')`, hot: !anyProgress });
+  }
+  // The first units are typed in Cyrillic before the alphabet unit has been done:
+  // until then the letters are one tap away.
+  if (!unitDone('a1-02') && rows.length < 3) {
+    rows.push({ icon: '🔤', title: nl ? 'Het cyrillische alfabet' : 'The Cyrillic alphabet', sub: nl ? 'De 33 letters en hoe ze klinken' : 'The 33 letters and how they sound', onclick: 'openAlphabetScreen()' });
   }
   if (!rows.length) { card.style.display = 'none'; return; }
 
@@ -320,7 +269,6 @@ function switchNativeLanguage(native) {
   }
 
   refreshNativePicker();
-  markLangPickerSetup();
 
   // Re-apply all static strings in the new native language
   applyStaticI18n();
@@ -354,7 +302,6 @@ function switchLanguage(lang) {
 
   // Update review badge for the new target language
   updateReviewCount();
-  markLangPickerSetup();
 }
 
 function updateHeaderAndChat() {
@@ -402,9 +349,6 @@ function init() {
   showBrowserBanner();
   setSpeechRate(state.speechRate);
   updateWordsCount();
-  collapseLangPicker();
-  updateApiNotice();
-  document.addEventListener('apiKeyChanged', updateApiNotice);
 }
 
 init();
@@ -448,6 +392,8 @@ if ('serviceWorker' in navigator) {
 
 // ── Expose functions to HTML onclick/onchange attributes ──────────────────────
 window.toggleSettingsDrawer  = toggleSettingsDrawer;
+window.closeSettingsDrawer   = closeSettingsDrawer;
+window.openKeyboardHelp      = openKeyboardHelp;
 window.showScreen            = showScreen;
 window.openFreeChat          = openFreeChat;
 window.setDifficulty         = setDifficulty;
@@ -481,7 +427,6 @@ window.setDhLevel            = setDhLevel;
 window.startDeHetDrill       = startDeHetDrill;
 window.answerDeHet           = answerDeHet;
 window.showConversationSummary = showConversationSummary;
-window.expandLangPicker    = expandLangPicker;
 window.openAlphabetScreen  = openAlphabetScreen;
 window.openReviewScreen    = openReviewScreen;
 window.openVerbAspectScreen = openVerbAspectScreen;

@@ -18,8 +18,6 @@ const dict = {
     'header.settings':    'Settings',
 
     // Home screen
-    'home.iSpeak':        'I speak',
-    'home.iLearn':        'I want to learn',
     'home.start':         'Conversation',
     'home.startSub':      'Talk with your AI tutor',
     'home.progressSub':   'Streak & what you know',
@@ -92,6 +90,8 @@ const dict = {
 
     // Settings drawer
     'settings.title':     'Settings',
+    'settings.language':  'I speak (app language)',
+    'settings.keyboard':  '⌨️ How do I type Ukrainian?',
     'settings.voice':     'Voice',
     'settings.speed':     'Speech speed',
     'settings.speedSlow': '🐢 Slow',
@@ -103,8 +103,6 @@ const dict = {
     // My Words
     'words.title':        '📚 My Words',
     'words.subtitle':     'Words saved from conversations',
-    'home.apiNotice':     'Add an API key in Settings for AI conversations and exercises',
-    'home.apiNoticeBtn':  'Settings →',
     'home.grammarSub':    'Vocabulary, verbs, cases, drills',
     'home.progress':      'Progress',
     'settings.autoPlay':  'Auto-play phrases in lessons',
@@ -133,8 +131,6 @@ const dict = {
     'header.settings':    'Instellingen',
 
     // Home screen
-    'home.iSpeak':        'Ik spreek',
-    'home.iLearn':        'Ik wil leren',
     'home.start':         'Gesprek',
     'home.startSub':      'Praat met je AI-tutor',
     'home.progressSub':   'Reeks & wat je al kent',
@@ -207,6 +203,8 @@ const dict = {
 
     // Settings drawer
     'settings.title':     'Instellingen',
+    'settings.language':  'Ik spreek (taal van de app)',
+    'settings.keyboard':  '⌨️ Hoe typ ik Oekraïens?',
     'settings.voice':     'Stem',
     'settings.speed':     'Spreeksnelheid',
     'settings.speedSlow': '🐢 Langzaam',
@@ -218,8 +216,6 @@ const dict = {
     // My Words
     'words.title':        '📚 Mijn woorden',
     'words.subtitle':     'Opgeslagen woorden uit gesprekken',
-    'home.apiNotice':     'Voeg een API-sleutel toe bij Instellingen voor AI-gesprekken en -oefeningen',
-    'home.apiNoticeBtn':  'Instellingen →',
     'home.grammarSub':    'Woordenschat, werkwoorden, naamvallen, drills',
     'home.progress':      'Voortgang',
     'settings.autoPlay':  'Zinnen automatisch afspelen in lessen',
