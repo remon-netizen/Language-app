@@ -429,11 +429,32 @@ function translateCard(w) {
   };
 }
 
+// The three wrong options of a "choose" card. Words of the same kind first (the
+// card says "noun": a verb among the options would be ruled out unread), a work
+// word among its own theme, no work words for a general one, and never a word
+// that means the same as the one asked (теж / також).
+function distractors(w) {
+  const work = WORK_THEMES.has(w.theme);
+  const mine = new Set(meaningCores(w));
+  const pool = shuffle(deck().filter(o => o.key !== w.key
+    && (o.theme === w.theme || !WORK_THEMES.has(o.theme))
+    && !meaningCores(o).some(m => mine.has(m))));
+  const rank = o => (o.pos !== w.pos ? 2 : work && o.theme !== w.theme ? 1 : 0);
+  pool.sort((a, b) => rank(a) - rank(b));   // the shuffle holds inside a rank
+  const out = [], texts = new Set([meaning(w)]);
+  for (const o of pool) {
+    if (texts.has(meaning(o))) continue;    // two words, one text: one option
+    texts.add(meaning(o));
+    out.push(o);
+    if (out.length === 3) break;
+  }
+  return out;
+}
+
 // Word → meaning, four options. Recognition only, so a right answer counts as
 // "hard" on the schedule and a wrong one as "again".
 function chooseCard(w) {
-  const pool = deck().filter(o => o.key !== w.key && (o.pos === w.pos || Math.random() < 0.3));
-  const options = shuffle([w, ...shuffle(pool).slice(0, 3)]);
+  const options = shuffle([w, ...distractors(w)]);
   return {
     ...base(w), intro: false,
     promptHtml: `

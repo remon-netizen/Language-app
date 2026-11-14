@@ -2,7 +2,7 @@ import { state } from '../state.js';
 import { escHtml } from '../utils.js';
 import { PREFIXES, BASE_VERBS, buildPrefixDrillSet, getDistractorPrefixes, getDistractorMeanings } from '../data/prefix-verbs.js';
 import { recordAnswer, hasWeaknessData, getWeakVerbCount, getWeakItems } from '../data/prefix-weakness.js';
-import { L, loc, shuffle, grade } from './drill-core.js';
+import { L, loc, shuffle, grade, alsoFineHtml } from './drill-core.js';
 import { runSession } from './course-engine.js';
 import { prefixProgress, prefixStats, prefixKey } from '../data/prefix-progress.js';
 
@@ -20,6 +20,13 @@ const COURSE = { icon: '🔗', get name() { return L('Prefixes', 'Voorvoegsels')
 const ACCENT = { main: '#7c3aed', dark: '#4c1d95', soft: '#f5f3ff', border: '#ddd6fe' };
 
 function getScreen() { return document.getElementById('prefixDrillScreen'); }
+
+// A prefixed verb's own entry and its family, by the verb.
+const ENTRY = new Map(BASE_VERBS.flatMap(bv => bv.prefixed.map(pv => [pv.verb, { bv, pv }])));
+// A family's base as it is shown. A root that is no word on its own (-дягати:
+// only вдягати, одягати… exist) gets a hyphen, so nobody learns it as a verb.
+const baseLabel = base => (BASE_VERBS.find(bv => bv.base === base)?.bound ? '-' + base : base);
+const boundNote = base => (BASE_VERBS.find(bv => bv.base === base)?.bound ? ` · ${L('only with a prefix', 'alleen met een voorvoegsel')}` : '');
 
 // Count total prefixed entries
 function totalEntries() {
@@ -83,7 +90,7 @@ function showMenu() {
     <div class="pd-course-grid">
       <button class="pd-course-card pd-course-primary" id="pdLearnBtn" ${family ? '' : 'disabled'}>
         <span class="pd-menu-icon">🎓</span>
-        <span class="pd-menu-title">${family ? `${nl ? 'Leer' : 'Learn'}: ${escHtml(family.bv.base)}` : (nl ? 'Alles gezien' : 'Everything seen')}</span>
+        <span class="pd-menu-title">${family ? `${nl ? 'Leer' : 'Learn'}: ${escHtml(baseLabel(family.bv.base))}` : (nl ? 'Alles gezien' : 'Everything seen')}</span>
         <span class="pd-menu-sub">${family ? `${family.fresh.length} ${nl ? 'nieuwe werkwoorden' : 'new verbs'} · ${nl ? 'familie' : 'family'} ${family.index + 1}/${BASE_VERBS.length}` : ''}</span>
       </button>
       <button class="pd-course-card" id="pdDueBtn" ${st.due ? '' : 'disabled'}>
@@ -157,7 +164,7 @@ function showRefByPrefix(index) {
   let listHtml = entries.map(e =>
     `<div class="pd-ref-entry">
       <span class="pd-ref-verb">${escHtml(e.verb)}</span>
-      <span class="pd-ref-meaning">${escHtml(e.base)} → ${escHtml(loc(e.meaning))}</span>
+      <span class="pd-ref-meaning">${escHtml(baseLabel(e.base))} → ${escHtml(loc(e.meaning))}</span>
     </div>`
   ).join('');
 
@@ -208,8 +215,8 @@ function showRefByVerb(index) {
     <div class="lesson-header">
       <button class="back-btn" id="pdRefBack">←</button>
       <div>
-        <div class="lesson-title">🌳 ${escHtml(bv.base)}</div>
-        <div class="lesson-subtitle">${escHtml(loc(bv.meaning))} — ${index + 1}/${BASE_VERBS.length}</div>
+        <div class="lesson-title">🌳 ${escHtml(baseLabel(bv.base))}</div>
+        <div class="lesson-subtitle">${escHtml(loc(bv.meaning))}${boundNote(bv.base)} — ${index + 1}/${BASE_VERBS.length}</div>
       </div>
     </div>
 
@@ -234,38 +241,28 @@ function showRefByVerb(index) {
 
 function startDrill() {
   pd.mode = 'drill';
-  let questions = buildPrefixDrillSet(pd.total);
-
-  if (pd.prefixFilter !== 'all') {
-    questions = questions.filter(q => (q.correctPrefix || q.prefix) === pd.prefixFilter);
-    if (questions.length === 0) {
-      // Rebuild with only this prefix
-      const filtered = [];
-      for (const bv of BASE_VERBS) {
-        for (const pv of bv.prefixed) {
-          if (pv.prefix !== pd.prefixFilter) continue;
-          filtered.push(pv);
-        }
-      }
-      if (filtered.length === 0) { showEmptyState(); return; }
-      questions = buildPrefixDrillSet(999).filter(q => (q.correctPrefix || q.prefix) === pd.prefixFilter);
-    }
+  // Every question there is, in random order, for the chosen prefix if one is
+  // set. (Drawing 25 first and filtering after left a one-prefix round with a
+  // card or two, and a weak verb came back only when it happened to be drawn.)
+  let questions = buildPrefixDrillSet(9999);
+  if (pd.prefixFilter !== 'all') questions = questions.filter(q => (q.correctPrefix || q.prefix) === pd.prefixFilter);
+  // Typed mode turns both multiple-choice types into production: write the
+  // prefixed verb. Both would ask the same thing, so each verb is asked that way once.
+  if (pd.qMode === 'type') {
+    const asked = new Set();
+    questions = questions.map(q => {
+      if (q.type === 'choose_prefix') return { ...q, type: 'type_verb', prefix: q.correctPrefix };
+      if (q.type === 'identify_meaning') return { ...q, type: 'type_verb', meaning: q.correctMeaning };
+      return q;
+    }).filter(q => { const k = `${q.verb}|${q.type}`; if (asked.has(k)) return false; asked.add(k); return true; });
   }
+  if (questions.length === 0) { showEmptyState(); return; }
 
   // Verbs answered wrong before fill up to half the round, so they keep coming back.
   const weak = new Set(getWeakItems(999).map(i => i.verb));
   const weakQs = questions.filter(q => weak.has(q.verb)).slice(0, Math.ceil(pd.total / 2));
   const restQs = questions.filter(q => !weakQs.includes(q));
   pd.questions = shuffle([...weakQs, ...restQs.slice(0, pd.total - weakQs.length)]);
-  // Typed mode turns both multiple-choice types into production: write the prefixed verb.
-  if (pd.qMode === 'type') {
-    pd.questions = pd.questions.map(q => {
-      if (q.type === 'choose_prefix') return { ...q, type: 'type_verb', prefix: q.correctPrefix };
-      if (q.type === 'identify_meaning') return { ...q, type: 'type_verb', meaning: q.correctMeaning };
-      return q;
-    });
-  }
-  if (pd.questions.length === 0) { showEmptyState(); return; }
   // The free drill only moves the schedule of verbs already learned family by family.
   const units = makeUnits({ onlySeen: true });
   runSession({
@@ -325,10 +322,10 @@ function startLearnFamily(index, { all = false } = {}) {
     ...shuffle(verbs.filter(pv => pv.sentence)).map(pv => prefixCard(question(bv, pv, 'fill_blank'), { units })),
   ];
   runSession({
-    screen: getScreen(), icon: '🎓', title: `${bv.base} · ${loc(bv.meaning)}`, accent: ACCENT, cards,
+    screen: getScreen(), icon: '🎓', title: `${baseLabel(bv.base)} · ${loc(bv.meaning)}`, accent: ACCENT, cards,
     onExit: showMenu,
     scoreSubtitle: () => { const st = prefixStats(); return `${st.learned}/${st.total} ${L('learned', 'geleerd')} · ${st.due} ${L('due', 'aan de beurt')}`; },
-    again: () => { const f = nextFamily(); return f ? { label: `📥 ${L('Next', 'Volgende')}: ${f.bv.base}`, run: () => startLearnFamily(f.index) } : null; },
+    again: () => { const f = nextFamily(); return f ? { label: `📥 ${L('Next', 'Volgende')}: ${baseLabel(f.bv.base)}`, run: () => startLearnFamily(f.index) } : null; },
   });
 }
 
@@ -351,35 +348,48 @@ function makeUnits({ onlySeen = false } = {}) {
   };
 }
 
+// у- and в- are one prefix in two spellings, chosen by the sound before it:
+// увійти and ввійти, внести and унести. A typed answer may be either.
+function bothSpellings(word, prefix) {
+  const w = word.toLowerCase();
+  if (prefix !== 'у-/в-') return [word];
+  const other = /^у[^аеєиіїоуюя']/.test(w) ? 'в' + w.slice(1) : /^в[^аеєиіїоуюя']/.test(w) ? 'у' + w.slice(1) : null;
+  return other ? [word, other] : [word];
+}
+
 // q.type: 'type_verb' (meaning → verb, typed) · 'fill_blank' (verb form in a sentence, typed)
 //         'choose_prefix' · 'identify_meaning' (four options each)
 function prefixCard(q, { intro = false, units = null } = {}) {
   const unit = prefixKey(q.verb);
   if (units && !intro) units.expect(unit);
   const wordLine = `<div class="pd-context"><span class="pd-prefix-tag">${escHtml(q.prefix || q.correctPrefix)}</span> ${escHtml(q.verb)} = ${escHtml(loc(q.meaning || q.correctMeaning))}</div>`;
+  const spellings = word => bothSpellings(word, q.prefix || q.correctPrefix);
+  // "Which verb means …?" names no aspect. In a family that mixes the two (давати
+  // gives віддати, пускати gives випустити) the verb's partner is as good an answer.
+  const verbAnswers = [...spellings(q.verb), ...(ENTRY.get(q.verb)?.pv.also || [])];
   const card = {
     key: `${unit}|${q.type}`, course: COURSE, intro,
     record(res) { recordAnswer(q.verb, q.type, res.isCorrect); units?.answer(unit, res); },
     detailHtml: wordLine, say: q.verb, correctText: q.verb,
-    missed: { left: loc(q.meaning || q.correctMeaning), right: q.verb, extra: q.base },
+    missed: { left: loc(q.meaning || q.correctMeaning), right: q.verb, extra: baseLabel(q.base) },
   };
 
   if (q.type === 'choose_prefix') {
     return { ...card,
       promptHtml: `
         <div class="pd-q-card">
-          <div class="pd-q-base">${escHtml(q.base)}</div>
-          <div class="pd-q-meaning">${escHtml(loc(q.baseMeaning))}</div>
+          <div class="pd-q-base">${escHtml(baseLabel(q.base))}</div>
+          <div class="pd-q-meaning">${escHtml(loc(q.baseMeaning))}${boundNote(q.base)}</div>
           <div class="pd-q-target">${L('Which prefix makes', 'Welk voorvoegsel maakt')}: ${escHtml(loc(q.meaning))}?</div>
         </div>`,
       input: { type: 'choice', options: shuffle([q.correctPrefix, ...getDistractorPrefixes(q.correctPrefix, 3)]).map(o => ({ label: `${o}${q.base}`, correct: o === q.correctPrefix })) } };
   }
   if (q.type === 'identify_meaning') {
-    return { ...card, missed: { left: q.verb, right: loc(q.correctMeaning), extra: q.base, say: q.verb },
+    return { ...card, missed: { left: q.verb, right: loc(q.correctMeaning), extra: baseLabel(q.base), say: q.verb },
       promptHtml: `
         <div class="pd-q-card">
           <div class="pd-q-base"><span class="pd-prefix-tag">${escHtml(q.prefix)}</span>${escHtml(q.verb)}</div>
-          <div class="pd-q-meaning">${L('Base verb', 'Basiswerkwoord')}: ${escHtml(q.base)} — ${escHtml(loc(q.baseMeaning))}</div>
+          <div class="pd-q-meaning">${L('Base verb', 'Basiswerkwoord')}: ${escHtml(baseLabel(q.base))} — ${escHtml(loc(q.baseMeaning))}${boundNote(q.base)}</div>
           <div class="pd-q-target">${L('What does this verb mean?', 'Wat betekent dit werkwoord?')}</div>
         </div>`,
       input: { type: 'choice', options: shuffle([q.correctMeaning, ...getDistractorMeanings(q.correctMeaning, 3)]).map(o => ({ label: loc(o), correct: o.en === q.correctMeaning.en })) },
@@ -395,25 +405,26 @@ function prefixCard(q, { intro = false, units = null } = {}) {
           <div class="pd-sentence-hint"><span class="pd-prefix-tag">${escHtml(q.prefix)}</span> ${escHtml(q.verb)} — ${escHtml(loc(q.meaning))}</div>
         </div>`,
       input: { type: 'text', lang: 'uk', placeholder: L('Type the answer…', 'Typ het antwoord…') },
-      check(answer) { const g = grade(answer, [q.answer], { minTypoLen: 5 }); return { ...g, quality: g.isExact ? 5 : g.isClose ? 3 : 1 }; },
+      check(answer) { const g = grade(answer, spellings(q.answer), { minTypoLen: 5 }); return { ...g, quality: g.isExact ? 5 : g.isClose ? 3 : 1 }; },
       compareOnClose: true,
-      detailHtml: `<div class="pd-context">${escHtml(q.fullSentence)}</div>${wordLine}` };
+      detailHtml: verdict => `<div class="pd-context">${escHtml(q.fullSentence)}</div>${alsoFineHtml(spellings(q.answer), verdict, 'pd-context')}${wordLine}` };
   }
   // type_verb, and the introduction card that shows the verb to copy
   return { ...card,
     promptHtml: `
       <div class="pd-q-card ${intro ? 'pd-q-intro' : ''}">
         ${intro ? `<div class="pd-q-badge">✨ ${L('New verb', 'Nieuw werkwoord')}</div>` : ''}
-        <div class="pd-q-base">${escHtml(q.base)}</div>
-        <div class="pd-q-meaning">${escHtml(loc(q.baseMeaning))}</div>
+        <div class="pd-q-base">${escHtml(baseLabel(q.base))}</div>
+        <div class="pd-q-meaning">${escHtml(loc(q.baseMeaning))}${boundNote(q.base)}</div>
         <div class="pd-q-target">${L('Which verb means', 'Welk werkwoord betekent')}: ${escHtml(loc(q.meaning))}?</div>
         ${intro ? `<div class="pd-q-word"><span class="pd-prefix-tag">${escHtml(q.prefix)}</span>${escHtml(q.verb)} <button class="pd-say-inline" type="button" data-say="${escHtml(q.verb)}">🔊</button></div>
                    <div class="pd-q-hint">${L('Say it, then type it', 'Zeg het, typ het dan')}</div>` : ''}
       </div>`,
     autoSay: intro ? q.verb : null,
     input: { type: 'text', lang: 'uk', placeholder: L('Type the prefixed verb…', 'Typ het werkwoord met voorvoegsel…') },
-    check(answer) { const g = grade(answer, [q.verb], { minTypoLen: 5 }); return { ...g, quality: g.isExact ? 5 : g.isClose ? 3 : 1 }; },
-    compareOnClose: true };
+    check(answer) { const g = grade(answer, verbAnswers, { minTypoLen: 5 }); return { ...g, quality: g.isExact ? 5 : g.isClose ? 3 : 1 }; },
+    compareOnClose: true,
+    detailHtml: verdict => alsoFineHtml(verbAnswers, verdict, 'pd-context') + wordLine };
 }
 
 // For the Review queue: every due verb as one card, typed: from its meaning, or

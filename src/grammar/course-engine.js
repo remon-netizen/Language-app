@@ -17,7 +17,7 @@ import { escHtml } from '../utils.js';
 import { speakText } from '../voice.js';
 import { setupRecognition } from '../speech.js';
 import { L, shuffle, byKeyboard, keyboardOf, resultLine, appendNext, missedListHtml, wireSpeakButtons, scoreMessage, scoreEmoji } from './drill-core.js';
-import { keyboardHelpFirstTime, openKeyboardHelp, latinTypedNote, cyrillicTypedNote } from '../keyboard-help.js';
+import { keyboardHelpFirstTime, wrongKeyboard } from '../keyboard-help.js';
 import { keyboardAid } from '../keyboard-picture.js';
 
 // ── Sessions ─────────────────────────────────────────────────────────────────
@@ -37,7 +37,8 @@ import { keyboardAid } from '../keyboard-picture.js';
 //   compareOnClose  show "your answer / correct" for a near miss too
 //   correctText  the right answer, as text
 //   detailHtml   shown under the verdict: the item itself, notes. A string, or
-//                ({ res, compare }) => string when it depends on what is already on screen
+//                ({ res, compare, answer }) => string when it depends on the answer
+//                or on what is already on screen
 //   say          text behind the Listen button; with sayAfter it is also played once answered
 //   missed       { left, right, extra, say } row for the end-of-round list
 //   mount({ root, input, submit })  optional, called once the card is on screen: for a
@@ -158,29 +159,17 @@ export function runSession({ screen, icon, title, accent = DEFAULT_ACCENT, cards
       const answer = input.value.trim();
       if (!answer) { input.focus(); return; }
       const note = s.querySelector('#ceRetry');
-      // Latin letters in a Ukrainian answer are a keyboard setting, not a mistake:
-      // nothing is graded, the learner switches and tries again.
-      const latin = card.input.lang === 'uk' ? latinTypedNote(answer, card.correctText) : null;
-      if (latin) {
-        note.innerHTML = `${escHtml(latin)} <button class="ce-retry-link" id="ceKbHelp" type="button">⌨️ ${L('How?', 'Hoe?')}</button>`;
-        note.hidden = false;
-        note.querySelector('#ceKbHelp').addEventListener('click', openKeyboardHelp);
-        input.focus(); input.select();
-        return;
-      }
-      // And the same the other way round, for an answer in the learner's own language.
-      const cyrillic = card.input.lang !== 'uk' ? cyrillicTypedNote(answer, card.correctText) : null;
-      if (cyrillic) {
-        note.textContent = cyrillic; note.hidden = false;
-        input.focus(); input.select();
-        return;
-      }
+      // Letters from the wrong keyboard (Latin in a Ukrainian answer, Cyrillic in one
+      // in the learner's own language) are a keyboard setting, not a mistake: nothing
+      // is graded, the learner switches and tries again.
+      if (wrongKeyboard({ answer, expected: card.correctText, lang: card.input.lang, note, input })) return;
       const res = card.check(answer);
       if (res.retry) {
         note.textContent = res.retry; note.hidden = false;
         input.value = ''; input.focus();
         return;
       }
+      note.hidden = true;
       run.answered = true;
       input.disabled = true; check.disabled = true;
       input.classList.add(res.isExact ? 'correct' : res.isClose ? 'close' : 'wrong');
@@ -271,7 +260,7 @@ export function runSession({ screen, icon, title, accent = DEFAULT_ACCENT, cards
     // A typed answer can be right without being on the list (a synonym, another turn of phrase).
     const canOverride = !card.intro && !res.isCorrect && card.override;
     if (canOverride) html += `<button class="ce-override-btn" id="ceOverride" type="button">✓ ${L('My answer was right too', 'Mijn antwoord was ook goed')}</button>`;
-    html += (typeof card.detailHtml === 'function' ? card.detailHtml({ res, compare }) : card.detailHtml) || '';
+    html += (typeof card.detailHtml === 'function' ? card.detailHtml({ res, compare, answer }) : card.detailHtml) || '';
     if (card.say) html += `<button class="ce-listen-btn" id="ceListen" type="button">🔊 ${L('Listen', 'Luister')}</button>`;
     fb.innerHTML = html;
     wireSpeakButtons(fb);

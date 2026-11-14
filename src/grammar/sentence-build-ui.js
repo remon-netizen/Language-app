@@ -4,7 +4,9 @@ import { speakText } from '../voice.js';
 import { SENTENCES } from '../data/sentences-uk.js';
 import { VERB_PAIRS } from '../data/verb-aspects.js';
 import { makeTracker } from '../data/flat-weakness.js';
-import { L, loc, shuffle, normalise, appendNext, missedListHtml, wireSpeakButtons, scoreMessage, scoreEmoji, aspectShort } from './drill-core.js';
+import { keyboardHelpFirstTime, wrongKeyboard } from '../keyboard-help.js';
+import { keyboardAid } from '../keyboard-picture.js';
+import { L, loc, normalise, appendNext, missedListHtml, wireSpeakButtons, scoreMessage, scoreEmoji, aspectShort } from './drill-core.js';
 
 // ── Sentence builder ─────────────────────────────────────────────────────────
 // The learner sees a sentence in their own language plus the Ukrainian words
@@ -185,22 +187,31 @@ function renderQuestion() {
         autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
       <button class="sb-check-btn" id="sbCheck" type="button">${L('Check', 'Controleer')} ✓</button>
     </div>
+    <div class="ce-retry-note" id="sbKbNote" hidden></div>
     <div id="sbFeedback"></div>`;
 
   s.querySelector('#sbQBack').addEventListener('click', showMenu);
   const input = s.querySelector('#sbInput');
   const check = s.querySelector('#sbCheck');
+  const note = s.querySelector('#sbKbNote');
   const submit = () => {
     if (sb.answered) return;
     const answer = input.value.trim();
     if (!answer) { input.focus(); return; }
+    // Latin letters are a keyboard that is still set to another language, not a
+    // wrong sentence: nothing is graded, the learner switches and tries again.
+    if (wrongKeyboard({ answer, expected: it.uk, lang: 'uk', note, input })) return;
+    note.hidden = true;
     sb.answered = true;
     input.disabled = true; check.disabled = true;
+    s.querySelectorAll('.ty-kb, .ty-kb-toggle').forEach(el => el.remove());   // make way for the feedback
     handleAnswer(it, answer, input);
   };
   check.addEventListener('click', submit);
   input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit(); } });
   input.focus();
+  keyboardAid({ root: s, input });
+  if (keyboardHelpFirstTime()) input.blur();
 }
 
 // Sentence-level grading: strip punctuation and case, then character
@@ -213,11 +224,15 @@ function similarity(a, b) {
   return Math.round((1 - levenshtein(x, y) / maxLen) * 100);
 }
 
-// Word-by-word view of the target: green if the learner used that exact word,
-// red if it is missing or has a different ending.
+// Word-by-word view of the target, as it is written: green if the learner used
+// that exact word, red if it is missing or has a different ending.
 function wordDiff(target, answer) {
   const got = new Set(clean(answer).split(' '));
-  return clean(target).split(' ').map(w => `<span class="sb-w ${got.has(w) ? 'sb-w-ok' : 'sb-w-bad'}">${escHtml(w)}</span>`).join(' ');
+  return target.trim().split(/\s+/).map(w => {
+    const bare = clean(w);
+    if (!bare) return escHtml(w);   // a dash on its own
+    return `<span class="sb-w ${got.has(bare) ? 'sb-w-ok' : 'sb-w-bad'}">${escHtml(w)}</span>`;
+  }).join(' ');
 }
 
 function handleAnswer(it, answer, input) {
@@ -232,17 +247,30 @@ function handleAnswer(it, answer, input) {
   const resultText = isExact ? '✓ ' + L('Perfect!', 'Perfect!')
     : isClose ? '✓ ' + L(`Almost! (${sim}% match)`, `Bijna! (${sim}% overeenkomst)`)
     : '✗ ' + L(`Not quite (${sim}% match)`, `Niet helemaal (${sim}% overeenkomst)`);
+  // The sentence is shown once: on its own when it was exactly right, and
+  // otherwise as the word-by-word comparison with what was typed.
   fb.innerHTML = `
     <div class="ex-feedback-result ${isCorrect ? 'correct' : 'wrong'}">${resultText}</div>
-    ${isExact ? '' : `
+    ${isExact ? `<div class="sb-full">${escHtml(it.uk)}</div>` : `
       <div class="sb-compare">
         <div class="sb-your"><b>${L('You wrote:', 'Jij schreef:')}</b> ${escHtml(answer)}</div>
         <div class="sb-target"><b>${L('Target:', 'Doel:')}</b> ${wordDiff(it.uk, answer)}</div>
       </div>`}
-    <div class="sb-full">${escHtml(it.uk)}</div>
+    ${isCorrect ? '' : `<button class="ce-override-btn" id="sbOverride" type="button">✓ ${L('My answer was right too', 'Mijn antwoord was ook goed')}</button>`}
     ${it.note ? `<div class="sb-note">💡 ${escHtml(loc(it.note))}</div>` : ''}
     <button class="sb-listen-btn" id="sbListen" type="button">🔊 ${L('Listen', 'Luister')}</button>`;
   fb.querySelector('#sbListen').addEventListener('click', () => speakText(it.uk, state.currentLanguage));
+  // One sentence can be said in more ways than the one on the card (another word
+  // order, a synonym): the learner may count such an answer as right.
+  fb.querySelector('#sbOverride')?.addEventListener('click', e => {
+    tracker.amend(it.key);
+    sb.score++;
+    sb.missed.pop();
+    fb.querySelector('.ex-feedback-result').outerHTML = `<div class="ex-feedback-result correct">✓ ${L('Counted as correct', 'Goed gerekend')}</div>`;
+    e.currentTarget.remove();
+    input.classList.remove('wrong'); input.classList.add('close');
+    fb.querySelector('.sb-next-btn')?.focus({ preventScroll: true });
+  });
 
   const isLast = sb.current + 1 >= sb.items.length;
   appendNext(fb, { isLast, className: 'sb-next-btn', onNext: () => {

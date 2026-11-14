@@ -77,6 +77,17 @@ export function resultLine({ isExact, isCorrect }) {
   return `<div class="ex-feedback-result ${isCorrect ? 'correct' : 'wrong'}">${text}</div>`;
 }
 
+// "Also fine: …" under a verdict, for an answer that has more than one right form
+// (брату / братові, буду готувати / готуватиму). It names the forms the learner
+// has not just seen: all but the one typed, or all but the one shown as correct.
+//   forms    every right form, the one the card shows as the answer first
+//   verdict  what the engine hands a card's detailHtml: { res, answer }
+export function alsoFineHtml(forms, { res, answer }, cls) {
+  const seen = normalise(res.isExact ? answer : forms[0]);
+  const rest = forms.filter(f => normalise(f) !== seen);
+  return rest.length ? `<div class="${cls}">${L('Also fine', 'Ook goed')}: ${rest.map(escHtml).join(' · ')}</div>` : '';
+}
+
 // Append a Next / See results button and focus it, so Enter advances.
 export function appendNext(container, { isLast, className, onNext }) {
   const btn = document.createElement('button');

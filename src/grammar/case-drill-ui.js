@@ -1,9 +1,9 @@
 import { state } from '../state.js';
 import { escHtml } from '../utils.js';
-import { CASES, CASE_LABELS, NOUNS, CASE_SENTENCES, ADJECTIVE_NOUNS, buildCaseDrillSet, findNoun } from '../data/case-declensions.js';
+import { CASES, CASE_LABELS, NOUNS, CASE_SENTENCES, ADJECTIVE_NOUNS, buildCaseDrillSet, findNoun, nounForms } from '../data/case-declensions.js';
 import { PERSONAL, POSSESSIVE, PRON_CASES, GENDER_LABELS, INDECLINABLE_NOTE } from '../data/pronouns-uk.js';
 import { recordAnswer, getNounMastery, getAllMastery, getWeakItems, hasWeaknessData, getWeakNounCount } from '../data/case-weakness.js';
-import { L, loc, shuffle, grade, genderShort } from './drill-core.js';
+import { L, loc, shuffle, grade, normalise, genderShort, alsoFineHtml } from './drill-core.js';
 import { runSession } from './course-engine.js';
 import { caseProgress, caseStats, nounKey, NUMBERS } from '../data/case-progress.js';
 
@@ -63,7 +63,8 @@ function showMenu() {
   const s = getScreen();
   const nl = state.nativeLanguage === 'nl';
   const nouns = getNounsForLevel(cd.level);
-  const formCount = nouns.length * 14; // 7 cases × 2 numbers
+  // 7 cases × 2 numbers, less for a noun that has no plural
+  const formCount = nouns.reduce((n, noun) => n + NUMBERS.reduce((k, num) => k + CASES.filter(c => noun[num]?.[c]).length, 0), 0);
   const weakCount = getWeakNounCount();
   const hasWeak = hasWeaknessData();
   const st = caseStats();
@@ -122,27 +123,27 @@ function showMenu() {
         <button class="cd-filter-btn ${cd.genderFilter === 'n' ? 'active' : ''}" data-gen="n">${nl ? 'Onz.' : 'Neut'}</button>
       </div>
 
-      <div class="cd-weak-toggle cd-adj-toggle ${cd.dictation ? 'active' : ''}" id="cdDictToggle">
+      <button type="button" class="cd-weak-toggle cd-adj-toggle ${cd.dictation ? 'active' : ''}" id="cdDictToggle" aria-pressed="${!!cd.dictation}">
         <span class="cd-weak-check">${cd.dictation ? '✓' : ''}</span>
         <span>👂 ${nl ? 'Dictee: hoor de vorm, typ wat je hoort' : 'Dictation: hear the form, type what you hear'}</span>
-      </div>
+      </button>
       <div class="cd-filter-label" style="margin-top:12px">${nl ? 'Wat:' : 'What:'}</div>
-      <div class="cd-weak-toggle cd-adj-toggle ${!cd.adjMode && !cd.pronMode ? 'active' : ''}" id="cdNounToggle">
+      <button type="button" class="cd-weak-toggle cd-adj-toggle ${!cd.adjMode && !cd.pronMode ? 'active' : ''}" id="cdNounToggle" aria-pressed="${!cd.adjMode && !cd.pronMode}">
         <span class="cd-weak-check">${!cd.adjMode && !cd.pronMode ? '✓' : ''}</span>
         <span>📌 ${nl ? `Zelfstandige naamwoorden (${nouns.length})` : `Nouns (${nouns.length})`}</span>
-      </div>
-      <div class="cd-weak-toggle cd-adj-toggle ${cd.adjMode ? 'active' : ''}" id="cdAdjToggle">
+      </button>
+      <button type="button" class="cd-weak-toggle cd-adj-toggle ${cd.adjMode ? 'active' : ''}" id="cdAdjToggle" aria-pressed="${!!cd.adjMode}">
         <span class="cd-weak-check">${cd.adjMode ? '✓' : ''}</span>
         <span>📐 ${nl ? `Bijvoeglijk naamwoord + zelfstandig naamwoord (${ADJECTIVE_NOUNS.length} paren)` : `Adjective + noun agreement (${ADJECTIVE_NOUNS.length} pairs)`}</span>
-      </div>
-      <div class="cd-weak-toggle cd-adj-toggle ${cd.pronMode ? 'active' : ''}" id="cdPronToggle">
+      </button>
+      <button type="button" class="cd-weak-toggle cd-adj-toggle ${cd.pronMode ? 'active' : ''}" id="cdPronToggle" aria-pressed="${!!cd.pronMode}">
         <span class="cd-weak-check">${cd.pronMode ? '✓' : ''}</span>
         <span>👤 ${nl ? `Voornaamwoorden: я, ти, він… + мій, наш… (${PERSONAL.length + POSSESSIVE.length})` : `Pronouns: я, ти, він… + мій, наш… (${PERSONAL.length + POSSESSIVE.length})`}</span>
-      </div>
-      ${hasWeak ? `<div class="cd-weak-toggle ${cd.focusWeak ? 'active' : ''}" id="cdWeakToggle">
+      </button>
+      ${hasWeak ? `<button type="button" class="cd-weak-toggle ${cd.focusWeak ? 'active' : ''}" id="cdWeakToggle" aria-pressed="${!!cd.focusWeak}">
         <span class="cd-weak-check">${cd.focusWeak ? '✓' : ''}</span>
         <span>🎯 ${nl ? 'Focus op zwakke woorden' : 'Focus on weak nouns'} (${weakCount})</span>
-      </div>` : ''}
+      </button>` : ''}
     </div>
 
     <div class="cd-menu-grid">
@@ -187,7 +188,7 @@ function showMenu() {
   });
   // Dictation toggle
   const dt = s.querySelector('#cdDictToggle');
-  dt.addEventListener('click', () => { cd.dictation = !cd.dictation; localStorage.setItem('caseDrillDictation', cd.dictation ? '1' : '0'); dt.classList.toggle('active', cd.dictation); dt.querySelector('.cd-weak-check').textContent = cd.dictation ? '✓' : ''; });
+  dt.addEventListener('click', () => { cd.dictation = !cd.dictation; localStorage.setItem('caseDrillDictation', cd.dictation ? '1' : '0'); dt.classList.toggle('active', cd.dictation); dt.setAttribute('aria-pressed', cd.dictation); dt.querySelector('.cd-weak-check').textContent = cd.dictation ? '✓' : ''; });
   // What to drill: nouns / adjective+noun / pronouns (one at a time)
   const setWhat = what => { cd.adjMode = what === 'adj'; cd.pronMode = what === 'pron'; showMenu(); };
   s.querySelector('#cdNounToggle').addEventListener('click', () => setWhat('noun'));
@@ -195,7 +196,7 @@ function showMenu() {
   s.querySelector('#cdPronToggle').addEventListener('click', () => setWhat('pron'));
   // Weak toggle
   const wt = s.querySelector('#cdWeakToggle');
-  if (wt) wt.addEventListener('click', () => { cd.focusWeak = !cd.focusWeak; wt.classList.toggle('active', cd.focusWeak); wt.querySelector('.cd-weak-check').textContent = cd.focusWeak ? '✓' : ''; });
+  if (wt) wt.addEventListener('click', () => { cd.focusWeak = !cd.focusWeak; wt.classList.toggle('active', cd.focusWeak); wt.setAttribute('aria-pressed', cd.focusWeak); wt.querySelector('.cd-weak-check').textContent = cd.focusWeak ? '✓' : ''; });
 }
 
 // ── Reference ────────────────────────────────────────────────────────────────
@@ -216,12 +217,10 @@ function showReference(index) {
     </div>`;
 
   for (const c of CASES) {
-    const sg = noun.singular?.[c] || '—';
-    const pl = noun.plural?.[c] || '—';
     tableHtml += `<div class="cd-decl-row">
       <span class="cd-decl-case">${escHtml(loc(CASE_LABELS[c]))}</span>
-      <span class="cd-decl-sg">${escHtml(sg)}</span>
-      <span class="cd-decl-pl">${escHtml(pl)}</span>
+      <span class="cd-decl-sg">${declCell(noun, c, 'singular')}</span>
+      <span class="cd-decl-pl">${declCell(noun, c, 'plural')}</span>
     </div>`;
   }
   tableHtml += '</div>';
@@ -297,7 +296,7 @@ function buildPronounQuestions() {
         if (cd.genderFilter !== 'all' && g !== 'p' && g !== cd.genderFilter) continue;
         const forms = entry.forms[caseName][g];
         out.push({ type: 'pron', entry, caseName, number: g === 'p' ? 'plural' : 'singular', gender: g === 'p' ? null : g,
-          tag: g === 'p' ? 'PL' : null, nom_s: entry.word, meaning: entry.meaning, pronGender: g,
+          tag: g === 'p' ? L('PL', 'MV') : null, nom_s: entry.word, meaning: entry.meaning, pronGender: g,
           correctForm: forms[0], alts: forms.slice(1) });
       }
     }
@@ -327,6 +326,7 @@ function startDrill() {
   let sentenceQs = CASE_SENTENCES.filter(sq => levelNouns.has(sq.noun));
   if (cd.caseFilter !== 'all') sentenceQs = sentenceQs.filter(sq => sq.targetCase === cd.caseFilter);
   if (cd.numberFilter !== 'all') sentenceQs = sentenceQs.filter(sq => sq.number === cd.numberFilter);
+  if (cd.genderFilter !== 'all') sentenceQs = sentenceQs.filter(sq => findNoun(sq.noun)?.gender === cd.genderFilter);
   sentenceQs = shuffle(sentenceQs).slice(0, Math.ceil(cd.total / 4)).map(sq => ({ ...sq, type: 'sentence' }));
 
   // Focus on weak nouns: half the form questions come from forms answered wrong before.
@@ -372,16 +372,26 @@ function showEmptyState() {
   s.querySelector('#cdEmptyBack').addEventListener('click', showMenu);
 }
 
+// "singular / plural" as a column heading and as a tag
+const SG_PL = () => L('sg / pl', 'ev / mv');
+const numberShort = number => (number === 'singular' ? L('sg', 'ev') : L('pl', 'mv'));
+
+// One cell of a noun table: the form, and under it any other form that is just
+// as right (брату, with братові below it). A noun without a plural gets a dash.
+function declCell(noun, caseName, number) {
+  const [main, ...also] = nounForms(noun, caseName, number);
+  if (!main) return '—';
+  return escHtml(main) + also.map(f => `<span class="cd-decl-also">${escHtml(f)}</span>`).join('');
+}
+
 function renderDeclTable(noun, highlightCase, highlightNumber) {
-  let html = `<div class="cd-decl-table"><div class="cd-decl-header"><span>${escHtml(noun.nom_s)}</span><span>sg / pl</span></div>`;
+  let html = `<div class="cd-decl-table"><div class="cd-decl-header"><span>${escHtml(noun.nom_s)}</span><span>${SG_PL()}</span></div>`;
   for (const c of CASES) {
-    const sg = noun.singular?.[c] || '—';
-    const pl = noun.plural?.[c] || '—';
     const isHL = c === highlightCase;
     html += `<div class="cd-decl-row ${isHL ? 'cd-highlight-row' : ''}">
       <span class="cd-decl-case">${escHtml(loc(CASE_LABELS[c]))}</span>
-      <span class="cd-decl-sg">${escHtml(sg)}</span>
-      <span class="cd-decl-pl">${escHtml(pl)}</span>
+      <span class="cd-decl-sg">${declCell(noun, c, 'singular')}</span>
+      <span class="cd-decl-pl">${declCell(noun, c, 'plural')}</span>
     </div>`;
   }
   return html + '</div>';
@@ -402,7 +412,7 @@ function renderPronTable(entry, highlightCase, gender) {
     }
     return html + '</div>';
   }
-  let html = `<div class="cd-decl-table cd-pron-table"><div class="cd-decl-header"><span>${escHtml(entry.word)} — ${escHtml(loc(entry.meaning))}</span><span>m · f · n · pl</span></div>`;
+  let html = `<div class="cd-decl-table cd-pron-table"><div class="cd-decl-header"><span>${escHtml(entry.word)} — ${escHtml(loc(entry.meaning))}</span><span>${L('m · f · n · pl', 'm · v · o · mv')}</span></div>`;
   for (const c of PRON_CASES) {
     const isHL = c === highlightCase;
     const cell = g => `<span class="${isHL && g === gender ? 'cd-hl-cell' : ''}">${escHtml(entry.forms[c][g][0])}</span>`;
@@ -415,7 +425,7 @@ function renderPronTable(entry, highlightCase, gender) {
 }
 
 function renderAdjTable(entry, highlightCase, highlightNumber) {
-  let html = `<div class="cd-decl-table"><div class="cd-decl-header"><span>${escHtml(entry.adjective)} + ${escHtml(entry.noun)}</span><span>sg / pl</span></div>`;
+  let html = `<div class="cd-decl-table"><div class="cd-decl-header"><span>${escHtml(entry.adjective)} + ${escHtml(entry.noun)}</span><span>${SG_PL()}</span></div>`;
   for (const c of CASES) {
     const f = entry.forms[c] || {};
     const isHL = c === highlightCase;
@@ -444,14 +454,14 @@ function showNounPicker() {
     listHtml += `<div class="cd-level-group"><div class="cd-level-group-title">${level} — ${nouns.length} ${nl ? 'woorden' : 'nouns'}</div>`;
     for (const n of nouns) {
       const color = getMasteryColor(n.nom_s);
-      listHtml += `<div class="cd-noun-row" data-noun="${escHtml(n.nom_s)}">
+      listHtml += `<button type="button" class="cd-noun-row" data-noun="${escHtml(n.nom_s)}">
         <span class="cd-gender-tag ${genderClass(n.gender)}">${genderLabel(n.gender)}</span>
-        <div class="cd-noun-text">
-          <div class="cd-noun-word">${escHtml(n.nom_s)}</div>
-          <div class="cd-noun-meaning">${escHtml(loc(n.meaning))}</div>
-        </div>
-        <div class="cd-mastery-dot ${color}"></div>
-      </div>`;
+        <span class="cd-noun-text">
+          <span class="cd-noun-word">${escHtml(n.nom_s)}</span>
+          <span class="cd-noun-meaning">${escHtml(loc(n.meaning))}</span>
+        </span>
+        <span class="cd-mastery-dot ${color}"></span>
+      </button>`;
     }
     listHtml += '</div>';
   }
@@ -505,7 +515,7 @@ function showLearnNoun(noun) {
     <div class="cd-ref-tables">${table}</div>
     <div class="cd-learn-actions">
       <button id="cdLearnBackBtn">← ${nl ? 'Terug' : 'Back'}</button>
-      <button class="cd-learn-primary" id="cdLearnStart">${nl ? 'Test me ✍️' : 'Test me ✍️'}</button>
+      <button class="cd-learn-primary" id="cdLearnStart">${nl ? 'Overhoor mij ✍️' : 'Test me ✍️'}</button>
     </div>`;
 
   s.querySelector('#cdLearnBack').addEventListener('click', showNounPicker);
@@ -558,6 +568,15 @@ function makeUnits({ onlySeen = false } = {}) {
   };
 }
 
+// Adjective + noun: where the noun has a second form, the pair has one too
+// (доброму другу and доброму другові).
+function adjAlts(entry, caseName, number, phrase) {
+  const [main, ...also] = nounForms(findNoun(entry.noun), caseName, number);
+  const words = phrase.split(' ');
+  if (!main || normalise(words[words.length - 1]) !== normalise(main)) return [];
+  return also.map(f => [...words.slice(0, -1), f].join(' '));
+}
+
 // q: a noun, adjective + noun or pronoun form, or with type 'sentence' a noun form inside a sentence.
 function formCard(q, { dictation = false, units = null } = {}) {
   const isSentence = q.type === 'sentence';
@@ -576,7 +595,7 @@ function formCard(q, { dictation = false, units = null } = {}) {
     <div class="cd-sentence-card">
       <div class="cd-sentence-translation">${escHtml(loc(q))}</div>
       <div class="cd-sentence-text">${escHtml(q.uk).replace('___', '<span class="cd-sentence-blank"></span>')}</div>
-      <div class="cd-sentence-hint">${escHtml(q.noun)} → ${escHtml(loc(CASE_LABELS[q.targetCase]))} ${q.number === 'singular' ? '(sg)' : '(pl)'}</div>
+      <div class="cd-sentence-hint">${escHtml(q.noun)} → ${escHtml(loc(CASE_LABELS[q.targetCase]))} (${numberShort(q.number)})</div>
     </div>` : `
     <div class="cd-q-card">
       <div class="cd-q-noun">
@@ -591,30 +610,38 @@ function formCard(q, { dictation = false, units = null } = {}) {
       </div>
     </div>`;
 
-  let detail = isSentence && q.full ? `<div class="cd-context">${escHtml(q.full)}</div>` : '';
   const noun = q.type === 'adj' || q.type === 'pron' ? null : findNoun(name);
-  if (noun) detail += renderDeclTable(noun, caseName, q.number);
-  else if (q.type === 'adj') detail += renderAdjTable(q.entry, q.caseName, q.number);
-  else if (q.type === 'pron') {
-    detail += renderPronTable(q.entry, q.caseName, q.pronGender);
-    if (q.alts && q.alts.length) detail += `<div class="cd-context">${L('Also fine', 'Ook goed')}: ${q.alts.map(escHtml).join(' · ')}</div>`;
-    if (q.entry.kind === 'possessive') detail += `<div class="cd-context">💡 ${escHtml(loc(INDECLINABLE_NOTE))}</div>`;
-  }
+  // Other forms that are just as right: listed with the pronoun, and for a noun
+  // every form of its cell (брату and братові; a sentence takes either).
+  const alts = q.alts
+    || (noun ? nounForms(noun, caseName, q.number).filter(f => normalise(f) !== normalise(correct))
+      : q.type === 'adj' ? adjAlts(q.entry, caseName, q.number, correct) : []);
+  const alsoFine = verdict => alsoFineHtml([correct, ...alts], verdict, 'cd-context');
+  const detail = verdict => {
+    let html = isSentence && q.full ? `<div class="cd-context">${escHtml(q.full)}</div>` : '';
+    if (noun) html += alsoFine(verdict) + renderDeclTable(noun, caseName, q.number);
+    else if (q.type === 'adj') html += alsoFine(verdict) + renderAdjTable(q.entry, q.caseName, q.number);
+    else if (q.type === 'pron') {
+      html += renderPronTable(q.entry, q.caseName, q.pronGender) + alsoFine(verdict);
+      if (q.entry.kind === 'possessive') html += `<div class="cd-context">💡 ${escHtml(loc(INDECLINABLE_NOTE))}</div>`;
+    }
+    return html;
+  };
 
   return {
     key: `${name}|${caseName}|${q.number}|${q.pronGender || ''}`, course: COURSE, intro: false,
     promptHtml, autoSay: heard ? correct : null,
     input: { type: 'text', lang: 'uk', placeholder: isSentence ? L('Type the answer…', 'Typ het antwoord…') : L('Type the form…', 'Typ de vorm…') },
-    check(answer) { const g = grade(answer, [correct, ...(q.alts || [])], { minTypoLen: 5 }); return { ...g, quality: g.isExact ? 5 : g.isClose ? 3 : 1 }; },
+    check(answer) { const g = grade(answer, [correct, ...alts], { minTypoLen: 5 }); return { ...g, quality: g.isExact ? 5 : g.isClose ? 3 : 1 }; },
     record(res) {
       recordAnswer(q.type === 'pron' ? `${q.nom_s}${q.pronGender ? ' (' + q.pronGender + ')' : ''}` : name, caseName, q.number, res.isCorrect);
       if (isNoun) units?.answer(unit, res);
     },
     compareOnClose: true,
     correctText: correct,
-    detailHtml: detail,
+    detailHtml: detail,   // a function: it names the forms other than the one typed
     say: isSentence && q.full ? q.full : correct,
-    missed: { left: name, right: correct, extra: `${loc(CASE_LABELS[caseName]).split(' — ')[0]} · ${q.number === 'singular' ? 'sg' : 'pl'}`,
+    missed: { left: name, right: correct, extra: `${loc(CASE_LABELS[caseName]).split(' — ')[0]} · ${numberShort(q.number)}`,
               say: isSentence && q.full ? q.full : correct },
   };
 }

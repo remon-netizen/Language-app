@@ -22,6 +22,13 @@ export function makeTracker(storageKey) {
       save();
       markActivity();
     },
+    // "My answer was right too": the last answer for this key counts as right after all.
+    amend(key) {
+      const e = load()[key];
+      if (!e || e.c >= e.a) return;
+      e.c++;
+      save();
+    },
     attempts(key) { return load()[key]?.a || 0; },
     errorRate(key) { const e = load()[key]; return e && e.a ? 1 - e.c / e.a : 0; },
     // Unseen items get a small boost, repeatedly missed ones a big one.

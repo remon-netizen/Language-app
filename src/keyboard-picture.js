@@ -81,9 +81,11 @@ function aidOn() {
 
 // text: the answer, when it is on the card anyway (a new word being copied): the
 // next key is lit. Without it the picture is reference only.
-export function keyboardAid({ root, input, text = null }) {
-  const area = root.querySelector('.ce-input-area');
-  if (!area || isTouch()) return;
+// under: the element the picture goes below. That is the retry note, which sits
+// under the answer field and its Check button: what the note says ("those are
+// Latin letters") then stays next to the field, not below the keyboard.
+export function keyboardAid({ root, input, text = null, under = root.querySelector('.ce-retry-note') }) {
+  if (!under || isTouch()) return;
   const chars = text ? [...text] : null;
   let pic = null;
   const point = () => { if (!pic) return; const n = [...input.value].length; pic.point(chars && n < chars.length ? chars[n] : null); };
@@ -93,11 +95,11 @@ export function keyboardAid({ root, input, text = null }) {
   const render = () => {
     const on = aidOn();
     btn.textContent = '⌨️ ' + (on ? L('Hide the keyboard', 'Verberg het toetsenbord') : L('Where are the letters?', 'Waar zitten de letters?'));
-    if (on && !pic) { pic = keyboardPicture(area); point(); }
+    if (on && !pic) { pic = keyboardPicture(under); point(); }
     if (!on && pic) { pic.remove(); pic = null; }
   };
   btn.addEventListener('click', () => { localStorage.setItem(AID_KEY, aidOn() ? '0' : '1'); render(); input.focus(); });
   input.addEventListener('input', point);
-  area.insertAdjacentElement('afterend', btn);
+  under.insertAdjacentElement('afterend', btn);
   render();
 }

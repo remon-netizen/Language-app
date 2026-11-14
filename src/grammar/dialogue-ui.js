@@ -3,6 +3,8 @@ import { escHtml } from '../utils.js';
 import { speakText, speakTextCb } from '../voice.js';
 import { DIALOGUES } from '../data/dialogues-uk.js';
 import { makeTracker } from '../data/flat-weakness.js';
+import { keyboardHelpFirstTime, wrongKeyboard } from '../keyboard-help.js';
+import { keyboardAid } from '../keyboard-picture.js';
 import { L, loc, shuffle, grade, resultLine, appendNext } from './drill-core.js';
 
 // ── Dialogues: listen first, then prove you understood ───────────────────────
@@ -148,7 +150,6 @@ function renderTask() {
   if (t.kind === 'gap') {
     const l = d.lines[t.line];
     // Blank the word (any inflection/punctuation around it stays).
-    const re = new RegExp(t.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
     const gapped = escHtml(l.uk).replace(new RegExp(escHtml(t.word).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'), '<span class="dg-blank">____</span>');
     s.innerHTML = `
       ${header}
@@ -162,16 +163,22 @@ function renderTask() {
         <input type="text" class="dg-text-input" id="dgInput" lang="uk" placeholder="${L('Type the missing word…', 'Typ het ontbrekende woord…')}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
         <button class="dg-check-btn" id="dgCheck" type="button">${L('Check', 'Controleer')} ✓</button>
       </div>
+      <div class="ce-retry-note" id="dgRetry" hidden></div>
       <div id="dgFeedback"></div>`;
     s.querySelector('#dgTBack').addEventListener('click', showMenu);
     s.querySelector('#dgReplay').addEventListener('click', () => speakText(l.uk, getTTSLang()));
     const input = s.querySelector('#dgInput');
+    const note = s.querySelector('#dgRetry');
     const submit = () => {
       if (dg.answered) return;
       const a = input.value.trim();
       if (!a) { input.focus(); return; }
+      // Latin letters: the keyboard is still set to another language. Not graded.
+      if (wrongKeyboard({ answer: a, expected: t.word, lang: 'uk', note, input })) return;
+      note.hidden = true;
       dg.answered = true;
       input.disabled = true; s.querySelector('#dgCheck').disabled = true;
+      s.querySelectorAll('.ty-kb, .ty-kb-toggle').forEach(el => el.remove());   // make way for the feedback
       const g = grade(a, [t.word, ...(t.alts || [])]);
       input.classList.add(g.isExact ? 'correct' : g.isClose ? 'close' : 'wrong');
       finishTask(t, g.isCorrect, resultLine(g) + (g.isExact ? '' : `<div class="dg-correct">${L('The word was', 'Het woord was')}: <b>${escHtml(t.word)}</b></div>`) + `<div class="dg-full-line">${escHtml(l.uk)}</div>`);
@@ -180,7 +187,8 @@ function renderTask() {
     input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); submit(); } });
     speakText(l.uk, getTTSLang());
     input.focus();
-    void re;
+    keyboardAid({ root: s, input });
+    if (keyboardHelpFirstTime()) input.blur();
     return;
   }
 

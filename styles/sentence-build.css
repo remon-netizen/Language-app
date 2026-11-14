@@ -45,7 +45,7 @@
 .sb-text-input.close { border-color: #f59e0b; background: #fffbeb; }
 .sb-text-input.wrong { border-color: #dc2626; background: #fee2e2; }
 .sb-check-btn { padding: 12px; background: #4f46e5; color: white; border: none; border-radius: 11px; font-size: 0.95rem; font-weight: 700; cursor: pointer; font-family: inherit; }
-.sb-check-btn:disabled { opacity: 0.5; }
+.sb-check-btn:disabled { display: none; }   /* answered: the verdict takes its place */
 .sb-compare { margin-bottom: 10px; font-size: 0.9rem; line-height: 1.6; }
 .sb-your { padding: 8px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 6px; }
 .sb-target { padding: 8px 12px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; }

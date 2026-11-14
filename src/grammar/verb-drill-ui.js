@@ -1,9 +1,9 @@
 import { state } from '../state.js';
 import { escHtml } from '../utils.js';
-import { CONJUGATIONS, buildDrillSet, findVerb } from '../data/verb-conjugations.js';
+import { CONJUGATIONS, buildDrillSet, findVerb, verbForms, syntheticFuture } from '../data/verb-conjugations.js';
 import { VERB_PAIRS } from '../data/verb-aspects.js';
 import { ASPECT_TIPS } from '../data/aspect-tips.js';
-import { L, loc, shuffle, grade, aspectShort } from './drill-core.js';
+import { L, loc, shuffle, grade, normalise, aspectShort, alsoFineHtml } from './drill-core.js';
 import { runSession } from './course-engine.js';
 import { verbProgress, verbStats, tenseKey, aspectKey, TENSES } from '../data/verb-progress.js';
 import { recordAnswer, getVerbMastery, getAllMastery, getWeakItems, hasWeaknessData, getWeakVerbCount } from '../data/verb-weakness.js';
@@ -160,12 +160,12 @@ function showMenu() {
 
     <div class="vd-filter-section">
       ${vd.selection.size ? `
-        <div class="vd-weak-toggle vd-list-toggle ${vd.useSelection ? 'active' : ''}" id="vdSelToggle">
+        <button type="button" class="vd-weak-toggle vd-list-toggle ${vd.useSelection ? 'active' : ''}" id="vdSelToggle" aria-pressed="${!!vd.useSelection}">
           <span class="vd-weak-check">${vd.useSelection ? '✓' : ''}</span>
           <span>📝 ${nl
             ? `Alleen mijn lijst (${vd.selection.size} werkwoorden)`
             : `Only my list (${vd.selection.size} verbs)`}</span>
-        </div>` : ''}
+        </button>` : ''}
 
       <div class="vd-filter-label">${nl ? 'Niveau:' : 'Level:'}${selOn
         ? ` <span class="vd-label-hint">${nl ? '— niet gebruikt bij mijn lijst' : '— not used with my list'}</span>`
@@ -191,15 +191,15 @@ function showMenu() {
         <button class="vd-filter-btn ${vd.tenseFilter === 'imperative' ? 'active' : ''} ${!allowedTenses.includes('imperative') ? 'disabled' : ''}" data-tense="imperative">${nl ? 'Gebiedend' : 'Imperative'}</button>
       </div>
 
-      <div class="vd-weak-toggle vd-dictation-toggle ${vd.dictation ? 'active' : ''}" id="vdDictToggle">
+      <button type="button" class="vd-weak-toggle vd-dictation-toggle ${vd.dictation ? 'active' : ''}" id="vdDictToggle" aria-pressed="${!!vd.dictation}">
         <span class="vd-weak-check">${vd.dictation ? '✓' : ''}</span>
         <span>👂 ${nl ? 'Dictee: hoor de vorm, typ wat je hoort' : 'Dictation: hear the form, type what you hear'}</span>
-      </div>
+      </button>
       ${hasWeak ? `
-        <div class="vd-weak-toggle ${vd.focusWeak ? 'active' : ''}" id="vdWeakToggle">
+        <button type="button" class="vd-weak-toggle ${vd.focusWeak ? 'active' : ''}" id="vdWeakToggle" aria-pressed="${!!vd.focusWeak}">
           <span class="vd-weak-check">${vd.focusWeak ? '✓' : ''}</span>
           <span>🎯 ${nl ? `Focus op zwakke werkwoorden (${weakCount})` : `Focus on weak verbs (${weakCount})`}</span>
-        </div>` : ''}
+        </button>` : ''}
     </div>
 
     <div class="vd-menu-grid-4 vd-menu-grid-5">
@@ -290,6 +290,7 @@ function showMenu() {
     vd.dictation = !vd.dictation;
     localStorage.setItem('verbDrillDictation', vd.dictation ? '1' : '0');
     dictToggle.classList.toggle('active', vd.dictation);
+    dictToggle.setAttribute('aria-pressed', vd.dictation);
     dictToggle.querySelector('.vd-weak-check').textContent = vd.dictation ? '✓' : '';
   });
   // Weakness toggle
@@ -298,6 +299,7 @@ function showMenu() {
     weakToggle.addEventListener('click', () => {
       vd.focusWeak = !vd.focusWeak;
       weakToggle.classList.toggle('active', vd.focusWeak);
+      weakToggle.setAttribute('aria-pressed', vd.focusWeak);
       weakToggle.querySelector('.vd-weak-check').textContent = vd.focusWeak ? '✓' : '';
     });
   }
@@ -329,6 +331,14 @@ function pairTip(verb) {
   return ASPECT_TIPS[impInf] ? loc(ASPECT_TIPS[impInf]) : '';
 }
 
+// The imperfective future has a second shape, one word: буду готувати is also
+// готуватиму. The tables show the two-word one; this line lists the other.
+function oneWordFuture(verb, tense) {
+  if (tense !== 'future' || verb.aspect !== 'imperfective') return '';
+  const forms = Object.keys(verb.future).map(p => syntheticFuture(verb.infinitive, p)).filter(Boolean);
+  return forms.length ? `<div class="vd-also-forms"><b>${L('Or in one word', 'Of in één woord')}:</b> ${forms.map(escHtml).join(', ')}</div>` : '';
+}
+
 function renderAnswerTable(verb, tense, highlightPronoun) {
   if (!verb || !verb[tense]) return '';
   const note = aspectNote(verb, tense) || pairTip(verb);
@@ -337,13 +347,15 @@ function renderAnswerTable(verb, tense, highlightPronoun) {
   if (note) html += `<div class="vd-full-note">${escHtml(note)}</div>`;
   for (const [pronoun, form] of Object.entries(verb[tense])) {
     const gloss = englishGloss(verb, tense, pronoun);
-    html += `<div class="vd-full-row ${pronoun === highlightPronoun ? 'vd-highlight-row' : ''}">`
+    // a sentence says він or вона where the table has one row for both
+    const isHL = pronoun === highlightPronoun || (pronoun === 'він/вона' && ['він', 'вона', 'воно'].includes(highlightPronoun));
+    html += `<div class="vd-full-row ${isHL ? 'vd-highlight-row' : ''}">`
       + `<span class="vd-full-pronoun">${escHtml(pronoun)}</span>`
       + `<span class="vd-full-form">${escHtml(form)}</span>`
       + (gloss ? `<span class="vd-full-gloss">${escHtml(gloss)}</span>` : '')
       + `</div>`;
   }
-  return html + `</div>`;
+  return html + oneWordFuture(verb, tense) + `</div>`;
 }
 
 /**
@@ -378,7 +390,7 @@ function renderTable(verb, label, showNotes) {
         + (gloss ? `<span class="vd-conj-gloss">${escHtml(gloss)}</span>` : '')
         + `</div>`;
     }
-    html += '</div>';
+    html += '</div>' + oneWordFuture(verb, t.key);
   }
   return html;
 }
@@ -438,18 +450,26 @@ function startDrill() {
   const allowedTenses = useSel ? ALL_TENSES : getAllowedTenses(vd.level);
   const levelVerbs = useSel ? getSelectedVerbs() : getVerbsForLevel(vd.level);
   const levelInfinitives = new Set(levelVerbs.map(v => v.infinitive));
+  // The aspect and tense chosen on the menu hold for every card of the round:
+  // forms, weak forms and sentences alike.
+  const tenses = vd.tenseFilter !== 'all' ? [vd.tenseFilter] : allowedTenses;
+  const fits = q => levelInfinitives.has(q.infinitive) && (vd.filter === 'all' || q.aspect === vd.filter) && tenses.includes(q.tense);
+
+  // A quarter of the round is sentences, the rest single forms.
+  const sentenceQs = buildSentenceQuestions(levelVerbs.filter(v => vd.filter === 'all' || v.aspect === vd.filter), tenses, Math.ceil(vd.total / 4));
+  const formCount = vd.total - sentenceQs.length;
 
   let questions;
 
   if (vd.focusWeak && hasWeaknessData()) {
-    // Build weakness-focused drill: 50% weak items, 50% random
-    const weakItems = getWeakItems(Math.ceil(vd.total / 2));
+    // Half of the forms are ones answered wrong before, the other half random
+    const weakItems = getWeakItems(999);
     const weakQs = [];
     for (const w of weakItems) {
-      if (!levelInfinitives.has(w.infinitive)) continue;
-      if (!allowedTenses.includes(w.tense)) continue;
+      if (weakQs.length >= Math.ceil(formCount / 2)) break;
       const verb = findVerb(w.infinitive);
       if (!verb || !verb[w.tense] || !verb[w.tense][w.pronoun]) continue;
+      if (!fits({ infinitive: verb.infinitive, aspect: verb.aspect, tense: w.tense })) continue;
       weakQs.push({
         infinitive: verb.infinitive,
         aspect: verb.aspect,
@@ -462,26 +482,13 @@ function startDrill() {
       });
     }
     // Fill remaining with random
-    let allQs = buildDrillSet(9999);
-    allQs = allQs.filter(q => levelInfinitives.has(q.infinitive) && allowedTenses.includes(q.tense));
+    const allQs = buildDrillSet(9999).filter(fits);
     const remaining = allQs.filter(q => !weakQs.find(w => w.infinitive === q.infinitive && w.tense === q.tense && w.pronoun === q.pronoun));
-    const randomFill = remaining.slice(0, vd.total - weakQs.length);
+    const randomFill = remaining.slice(0, formCount - weakQs.length);
     questions = shuffle([...weakQs, ...randomFill]);
   } else {
-    questions = buildDrillSet(9999);
-    questions = questions.filter(q => levelInfinitives.has(q.infinitive));
-    if (vd.filter !== 'all') {
-      questions = questions.filter(q => q.aspect === vd.filter);
-    }
-    if (vd.tenseFilter !== 'all') {
-      questions = questions.filter(q => q.tense === vd.tenseFilter);
-    } else {
-      questions = questions.filter(q => allowedTenses.includes(q.tense));
-    }
+    questions = buildDrillSet(9999).filter(fits);
   }
-
-  // Also mix in sentence exercises if available
-  const sentenceQs = buildSentenceQuestions(levelVerbs, allowedTenses, Math.ceil(vd.total / 4));
 
   if (questions.length === 0 && sentenceQs.length === 0) {
     showEmptyState();
@@ -489,7 +496,7 @@ function startDrill() {
   }
 
   // Mix: take conjugation questions and intersperse sentence questions
-  let drillQs = questions.slice(0, vd.total - sentenceQs.length);
+  const drillQs = questions.slice(0, formCount);
   const mixed = [];
   let sIdx = 0;
   for (let i = 0; i < drillQs.length; i++) {
@@ -598,13 +605,13 @@ function showVerbPicker() {
     for (const p of pairs) {
       const color = getMasteryColor(p.imp.infinitive, p.perf.infinitive);
       listHtml += `
-        <div class="vd-verb-row" data-pair="${p.imp.infinitive}|${p.perf.infinitive}">
-          <div class="vd-verb-pair-text">
-            <div class="vd-verb-pair-inf">${escHtml(p.imp.infinitive)} / ${escHtml(p.perf.infinitive)}</div>
-            <div class="vd-verb-pair-meaning">${escHtml(loc(p.imp.meaning))}</div>
-          </div>
-          <div class="vd-mastery-dot ${color}"></div>
-        </div>`;
+        <button type="button" class="vd-verb-row" data-pair="${escHtml(p.imp.infinitive)}|${escHtml(p.perf.infinitive)}">
+          <span class="vd-verb-pair-text">
+            <span class="vd-verb-pair-inf">${escHtml(p.imp.infinitive)} / ${escHtml(p.perf.infinitive)}</span>
+            <span class="vd-verb-pair-meaning">${escHtml(loc(p.imp.meaning))}</span>
+          </span>
+          <span class="vd-mastery-dot ${color}"></span>
+        </button>`;
     }
     listHtml += '</div>';
   }
@@ -675,14 +682,14 @@ function showSelectionPicker() {
       const on = vd.selection.has(p.imp.infinitive);
       const color = getMasteryColor(p.imp.infinitive, p.perf.infinitive);
       listHtml += `
-        <div class="vd-verb-row vd-pick-row ${on ? 'picked' : ''}" data-inf="${escHtml(p.imp.infinitive)}">
+        <button type="button" class="vd-verb-row vd-pick-row ${on ? 'picked' : ''}" data-inf="${escHtml(p.imp.infinitive)}" aria-pressed="${on}">
           <span class="vd-pick-box">${on ? '✓' : ''}</span>
-          <div class="vd-verb-pair-text">
-            <div class="vd-verb-pair-inf">${escHtml(p.imp.infinitive)} / ${escHtml(p.perf.infinitive)}</div>
-            <div class="vd-verb-pair-meaning">${escHtml(loc(p.imp.meaning))}</div>
-          </div>
-          <div class="vd-mastery-dot ${color}"></div>
-        </div>`;
+          <span class="vd-verb-pair-text">
+            <span class="vd-verb-pair-inf">${escHtml(p.imp.infinitive)} / ${escHtml(p.perf.infinitive)}</span>
+            <span class="vd-verb-pair-meaning">${escHtml(loc(p.imp.meaning))}</span>
+          </span>
+          <span class="vd-mastery-dot ${color}"></span>
+        </button>`;
     }
     listHtml += '</div>';
   }
@@ -732,6 +739,7 @@ function showSelectionPicker() {
       else vd.selection.add(inf);
       const on = vd.selection.has(inf);
       row.classList.toggle('picked', on);
+      row.setAttribute('aria-pressed', on);
       row.querySelector('.vd-pick-box').textContent = on ? '✓' : '';
       saveSelection();
       refreshBar();
@@ -789,7 +797,7 @@ function renderExamples(imp, perf) {
         .replace('___', `<strong class="vd-example-form">${escHtml(sent.answer)}</strong>`);
       html += `<div class="vd-example">
         <div class="vd-example-uk">${filled}</div>
-        <div class="vd-example-en">${escHtml(sent.en)}</div>
+        <div class="vd-example-en">${escHtml(loc(sent))}</div>
       </div>`;
     }
     html += `</div>`;
@@ -829,7 +837,7 @@ function renderLearnStudy(imp, perf) {
 
     <div class="vd-learn-actions">
       <button id="vdLearnBackBtn">← ${nl ? 'Terug' : 'Back'}</button>
-      <button class="vd-learn-primary" id="vdLearnStart">${nl ? 'Test me ✍️' : 'Test me ✍️'}</button>
+      <button class="vd-learn-primary" id="vdLearnStart">${nl ? 'Overhoor mij ✍️' : 'Test me ✍️'}</button>
     </div>`;
 
   s.querySelector('#vdLearnBack').addEventListener('click', showVerbPicker);
@@ -902,6 +910,11 @@ function formCard(q, { dictation = false, divider = '', units = null } = {}) {
   const spoken = isSentence && q.fullSentence ? q.fullSentence
     : q.tense === 'imperative' ? q.correctForm : `${q.pronoun} ${q.correctForm}`;
   const heard = dictation && !isSentence;
+  // Every form that is right here: the one in the table, and any other the
+  // language has for it (готуватиму for буду готувати, зустрічаюсь, йду).
+  const verb = findVerb(q.infinitive);
+  const forms = verb ? verbForms(verb, q.tense, q.pronoun, q.correctForm) : [normalise(q.correctForm)];
+  const alsoFine = verdict => alsoFineHtml(forms, verdict, 'vd-context');
 
   const promptHtml = isSentence ? `
     <div class="vd-sentence-card">
@@ -929,12 +942,12 @@ function formCard(q, { dictation = false, divider = '', units = null } = {}) {
     promptHtml, autoSay: heard ? spoken : null,
     input: { type: 'text', lang: 'uk', placeholder: L('Type the verb form…', 'Typ de werkwoordsvorm…') },
     // One slip passes only on forms of five letters and up: їм / їж is a real mistake.
-    check(answer) { const g = grade(answer, [q.correctForm], { minTypoLen: 5 }); return { ...g, quality: g.isExact ? 5 : g.isClose ? 3 : 1 }; },
+    check(answer) { const g = grade(answer, forms, { minTypoLen: 5 }); return { ...g, quality: g.isExact ? 5 : g.isClose ? 3 : 1 }; },
     record(res) { recordAnswer(q.infinitive, q.tense, q.pronoun, res.isCorrect); if (!isSentence) units?.answer(unit, res); },
     compareOnClose: true,
     correctText: q.correctForm,
-    detailHtml: (isSentence && q.fullSentence ? `<div class="vd-context">${escHtml(q.fullSentence)}</div>` : '')
-      + renderAnswerTable(findVerb(q.infinitive), q.tense, q.pronoun),
+    detailHtml: verdict => (isSentence && q.fullSentence ? `<div class="vd-context">${escHtml(q.fullSentence)}</div>` : '')
+      + alsoFine(verdict) + renderAnswerTable(verb, q.tense, q.pronoun),
     say: spoken,
     missed: { left: q.infinitive, right: q.correctForm,
               extra: `${q.tense === 'imperative' ? '' : q.pronoun + ' · '}${loc(q.tenseLabel)}`, say: spoken },

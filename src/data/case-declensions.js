@@ -1,5 +1,7 @@
 // Ukrainian noun declension data for case practice drill
 // 60 nouns (30 A1, 20 A2, 10 B1) with all 7 cases in singular and plural
+// (two have no plural: молоко, здоров'я). One form per cell; where the language
+// has a second one that is just as right, it is in PARALLEL_FORMS below.
 
 export const CASES = ['nominative','accusative','genitive','dative','instrumental','locative','vocative'];
 
@@ -342,10 +344,7 @@ export const NOUNS = [
       nominative: 'молоко', accusative: 'молоко', genitive: 'молока',
       dative: 'молоку', instrumental: 'молоком', locative: 'молоці', vocative: 'молоко',
     },
-    plural: {
-      nominative: 'молока', accusative: 'молока', genitive: 'молок',
-      dative: 'молокам', instrumental: 'молоками', locative: 'молоках', vocative: 'молока',
-    },
+    // no plural: milk is not counted
   },
   {
     nom_s: 'море',
@@ -642,7 +641,7 @@ export const NOUNS = [
     meaning: { en: 'answer', nl: 'antwoord' },
     singular: {
       nominative: 'відповідь', accusative: 'відповідь', genitive: 'відповіді',
-      dative: 'відповіді', instrumental: 'відповіддю', locative: 'відповіді', vocative: 'відповіді',
+      dative: 'відповіді', instrumental: 'відповіддю', locative: 'відповіді', vocative: 'відповіде',
     },
     plural: {
       nominative: 'відповіді', accusative: 'відповіді', genitive: 'відповідей',
@@ -884,10 +883,7 @@ export const NOUNS = [
       nominative: 'здоров\'я', accusative: 'здоров\'я', genitive: 'здоров\'я',
       dative: 'здоров\'ю', instrumental: 'здоров\'ям', locative: 'здоров\'ї', vocative: 'здоров\'я',
     },
-    plural: {
-      nominative: 'здоров\'я', accusative: 'здоров\'я', genitive: 'здоров\'їв',
-      dative: 'здоров\'ям', instrumental: 'здоров\'ями', locative: 'здоров\'ях', vocative: 'здоров\'я',
-    },
+    // no plural: health is not counted
   },
 ];
 
@@ -1406,8 +1402,8 @@ export const CASE_SENTENCES = [
     targetCase: 'dative', noun: 'друг', number: 'singular', level: 'A1',
   },
   {
-    uk: 'Вчитель пояснив ___ .', answer: 'учителю', full: 'Вчитель пояснив учителю.',
-    en: 'The teacher explained to the teacher.', nl: 'De leraar legde uit aan de leraar.',
+    uk: 'Учні подарували квіти ___ .', answer: 'учителю', full: 'Учні подарували квіти учителю.',
+    en: 'The pupils gave flowers to the teacher.', nl: 'De leerlingen gaven bloemen aan de leraar.',
     targetCase: 'dative', noun: 'учитель', number: 'singular', level: 'A1',
   },
   {
@@ -1433,8 +1429,8 @@ export const CASE_SENTENCES = [
 
   // ─── INSTRUMENTAL (10) ───
   {
-    uk: 'Я пишу ___ .', answer: 'ручкою', full: 'Я пишу ручкою.',
-    en: 'I write with a pen.', nl: 'Ik schrijf met een pen.',
+    uk: 'Вона махає ___ .', answer: 'рукою', full: 'Вона махає рукою.',
+    en: 'She waves her hand.', nl: 'Ze zwaait met haar hand.',
     targetCase: 'instrumental', noun: 'рука', number: 'singular', level: 'A1',
   },
   {
@@ -1464,7 +1460,7 @@ export const CASE_SENTENCES = [
   },
   {
     uk: 'Я цікавлюся ___ .', answer: 'морем', full: 'Я цікавлюся морем.',
-    en: 'I am interested in the sea.', nl: 'Ik ben geinteresseerd in de zee.',
+    en: 'I am interested in the sea.', nl: 'Ik ben geïnteresseerd in de zee.',
     targetCase: 'instrumental', noun: 'море', number: 'singular', level: 'A1',
   },
   {
@@ -1515,7 +1511,7 @@ export const CASE_SENTENCES = [
     targetCase: 'locative', noun: 'вулиця', number: 'singular', level: 'A1',
   },
   {
-    uk: 'Я живу в ___ .', answer: 'квартирі', full: 'Я живу в квартирі.',
+    uk: 'Я живу у ___ .', answer: 'квартирі', full: 'Я живу у квартирі.',
     en: 'I live in an apartment.', nl: 'Ik woon in een appartement.',
     targetCase: 'locative', noun: 'квартира', number: 'singular', level: 'A2',
   },
@@ -1567,8 +1563,8 @@ export const CASE_SENTENCES = [
     targetCase: 'vocative', noun: 'подруга', number: 'singular', level: 'A2',
   },
   {
-    uk: '___ , коли прийом?', answer: 'лікарю', full: 'Лікарю, коли прийом?',
-    en: 'Doctor, when is the appointment?', nl: 'Dokter, wanneer is het spreekuur?',
+    uk: '___ , коли ви приймаєте?', answer: 'лікарю', full: 'Лікарю, коли ви приймаєте?',
+    en: 'Doctor, when are your consulting hours?', nl: 'Dokter, wanneer is het spreekuur?',
     targetCase: 'vocative', noun: 'лікар', number: 'singular', level: 'A2',
   },
   {
@@ -1591,6 +1587,48 @@ export const CASE_SENTENCES = [
 // ═══════════════════════════════════════════════════════════════
 // BUILDER FUNCTIONS
 // ═══════════════════════════════════════════════════════════════
+
+// ── Parallel forms ───────────────────────────────────────────────────────────
+// Ukrainian often has two endings for one cell, both correct: брату and братові,
+// на столі but у домі / у дому, стола and столу. The tables above hold one; these
+// are the others. A typed answer is right when it is any of them, and the tables
+// show them under the main form.
+//   dative of masculine nouns: -у/-ю and -ові/-еві (the second is preferred for people)
+//   locative of masculine nouns for people: -ові/-еві, -і, -у/-ю
+const sg = forms => ({ singular: forms });
+export const PARALLEL_FORMS = {
+  'друг':        sg({ dative: ['другові'], locative: ['другові'] }),
+  'стіл':        sg({ genitive: ['столу'], dative: ['столові'] }),
+  'дім':         sg({ dative: ['домові'], locative: ['дому'] }),
+  'брат':        sg({ dative: ['братові'], locative: ['браті'] }),
+  'хліб':        sg({ dative: ['хлібові'] }),
+  'лист':        sg({ accusative: ['листа'], dative: ['листові'] }),
+  'місяць':      sg({ dative: ['місяцеві'], locative: ['місяцю'] }),
+  'учитель':     sg({ dative: ['учителеві'], locative: ['учителеві', 'учителю'] }),
+  'телефон':     sg({ dative: ['телефонові'] }),
+  'автобус':     sg({ dative: ['автобусові'] }),
+  'молоко':      sg({ locative: ['молоку'] }),
+  'ім\'я':        sg({ genitive: ['ім\'я'], instrumental: ['ім\'ям'] }),
+  'серце':       { plural: { genitive: ['серць'] } },
+  'яблуко':      sg({ locative: ['яблуку'] }),
+  'лікар':       sg({ dative: ['лікареві'], locative: ['лікареві', 'лікарю'] }),
+  'сусід':       sg({ dative: ['сусідові'], locative: ['сусіді'] }),
+  'ключ':        sg({ dative: ['ключеві'] }),
+  'подарунок':   sg({ dative: ['подарункові'] }),
+  'комп\'ютер':   sg({ dative: ['комп\'ютерові'] }),
+  'магазин':     sg({ dative: ['магазинові'] }),
+  'вечір':       sg({ dative: ['вечорові'] }),
+  'письменник':  sg({ dative: ['письменникові'], locative: ['письменнику'] }),
+  'уряд':        sg({ dative: ['урядові'] }),
+  'розвиток':    sg({ dative: ['розвиткові'] }),
+};
+
+// Every right form of one cell: the one in the table first, then its parallels.
+export function nounForms(noun, caseName, number) {
+  const main = noun?.[number]?.[caseName];
+  if (!main) return [];
+  return [main, ...(PARALLEL_FORMS[noun.nom_s]?.[number]?.[caseName] || [])];
+}
 
 export function buildCaseDrillSet(count = 25) {
   const questions = [];

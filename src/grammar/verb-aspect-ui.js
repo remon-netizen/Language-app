@@ -24,8 +24,8 @@ function showMenu() {
   const native = state.nativeLanguage;
   const lblTitle    = native === 'nl' ? '🔀 Aspect uitgelegd' : '🔀 Aspect explained';
   const lblSub      = native === 'nl' ? 'Voltooid vs onvoltooid' : 'Perfective vs Imperfective';
-  const lblRef      = native === 'nl' ? '📖 Werkwoord-overzicht' : '📖 Verb Reference Cards';
-  const lblRefSub   = native === 'nl' ? 'Bekijk alle 20 werkwoordparen' : 'Browse all 20 verb pairs';
+  const lblRef      = native === 'nl' ? 'Werkwoord-overzicht' : 'Verb Reference Cards';   // the card has the 📖 itself
+  const lblRefSub   = native === 'nl' ? `Bekijk alle ${VERB_PAIRS.length} werkwoordparen` : `Browse all ${VERB_PAIRS.length} verb pairs`;
   const lblWhere    = native === 'nl'
     ? 'Oefenen doe je bij het werkwoord zelf: kies het bij “Leer één” in de Werkwoord Drill. De laatste stap vraagt welk aspect een zin nodig heeft.'
     : 'You practise this with the verb itself: pick it under “Learn One” in the Verb Drill. The last step asks which aspect a sentence needs.';

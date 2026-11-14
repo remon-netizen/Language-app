@@ -360,6 +360,9 @@
   line-height: 1.25;
 }
 .vd-highlight-row .vd-full-gloss { color: #15803d; }
+/* The one-word future, under the rows of the two-word one. */
+.vd-also-forms { font-size: 0.8rem; line-height: 1.45; color: var(--text); margin: 6px 0 2px; padding: 6px 8px; background: var(--bg); border-radius: 8px; overflow-wrap: anywhere; }
+.vd-also-forms b { color: var(--gray); font-weight: 600; }
 /* Usage note under the feedback table header. */
 .vd-full-note {
   font-size: 0.75rem;
@@ -411,19 +414,22 @@
 }
 
 /* Weakness toggle */
-.vd-weak-toggle {
+.vd-weak-toggle {   /* a button */
   display: flex;
   align-items: center;
   gap: 10px;
+  width: 100%;
   margin-top: 12px;
   padding: 10px 14px;
   background: #fef3c7;
   border: 2px solid #fcd34d;
   border-radius: 10px;
   cursor: pointer;
+  font: inherit;
   font-size: 0.82rem;
   font-weight: 700;
   color: #92400e;
+  text-align: left;
   transition: all 0.15s;
 }
 .vd-weak-toggle:hover { background: #fde68a; }
@@ -571,10 +577,11 @@
   padding: 4px 0;
   border-bottom: 2px solid #e0f2fe;
 }
-.vd-verb-row {
+.vd-verb-row {   /* a button: reachable with Tab, pressed with Enter */
   display: flex;
   align-items: center;
   gap: 10px;
+  width: 100%;
   padding: 12px 14px;
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -582,6 +589,9 @@
   cursor: pointer;
   background: var(--card-bg);
   transition: all 0.15s;
+  font: inherit;
+  color: inherit;
+  text-align: left;
 }
 .vd-verb-row:hover {
   border-color: #0891b2;
@@ -593,11 +603,13 @@
   min-width: 0;
 }
 .vd-verb-pair-inf {
+  display: block;
   font-size: 0.9rem;
   font-weight: 700;
   color: var(--text);
 }
 .vd-verb-pair-meaning {
+  display: block;
   font-size: 0.75rem;
   color: var(--gray);
   white-space: nowrap;

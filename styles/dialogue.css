@@ -37,7 +37,7 @@
 .dg-text-input:focus { border-color: #0f766e; }
 .dg-text-input.correct { border-color: #16a34a; background: #dcfce7; } .dg-text-input.close { border-color: #f59e0b; background: #fffbeb; } .dg-text-input.wrong { border-color: #dc2626; background: #fee2e2; }
 .dg-check-btn { padding: 12px; background: #0f766e; color: white; border: none; border-radius: 11px; font-weight: 700; cursor: pointer; font-family: inherit; }
-.dg-check-btn:disabled { opacity: 0.5; }
+.dg-check-btn:disabled { display: none; }   /* answered: the verdict takes its place */
 .dg-correct { font-size: 0.9rem; margin-bottom: 8px; }
 .dg-full-line { font-size: 1rem; font-weight: 700; color: #134e4a; padding: 10px 14px; background: #f0fdfa; border: 1px solid #99f6e4; border-radius: 10px; margin-bottom: 10px; }
 .dg-mc-q { font-size: 1.15rem; font-weight: 800; color: var(--text); }

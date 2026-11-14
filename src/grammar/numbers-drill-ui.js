@@ -133,14 +133,14 @@ function showMenu() {
   const stage = nextStage();
 
   const catCards = CATEGORIES.map(c => `
-    <div class="nd-cat-card ${nd.cats.includes(c.id) ? 'active' : ''}" data-cat="${c.id}">
+    <div class="nd-cat-card ${nd.cats.includes(c.id) ? 'active' : ''}" data-cat="${c.id}" role="checkbox" aria-checked="${nd.cats.includes(c.id)}" tabindex="0">
       <span class="nd-cat-check">${nd.cats.includes(c.id) ? '✓' : ''}</span>
       <span class="nd-cat-icon">${c.icon}</span>
       <span class="nd-cat-text">
         <span class="nd-cat-title">${escHtml(loc(c.title))}</span>
         <span class="nd-cat-sub">${escHtml(loc(c.sub))}</span>
       </span>
-      <button class="nd-cat-study" data-study="${c.id}" title="${nl ? 'Bekijk de tabel' : 'Study the table'}">📖</button>
+      <button class="nd-cat-study" type="button" data-study="${c.id}" title="${nl ? 'Bekijk de tabel' : 'Study the table'}" aria-label="${nl ? 'Bekijk de tabel' : 'Study the table'}: ${escHtml(loc(c.title))}">📖</button>
     </div>`).join('');
 
   const modeBtn = (id, icon, label, sub) => `
@@ -218,7 +218,14 @@ function showMenu() {
       }
       savePrefs();
       card.classList.toggle('active', nd.cats.includes(id));
+      card.setAttribute('aria-checked', nd.cats.includes(id));
       card.querySelector('.nd-cat-check').textContent = nd.cats.includes(id) ? '✓' : '';
+    });
+    // Not a <button> (it holds one): space and Enter tick it all the same.
+    card.addEventListener('keydown', e => {
+      if (e.target !== card || (e.key !== ' ' && e.key !== 'Enter')) return;
+      e.preventDefault();
+      card.click();
     });
   });
   s.querySelectorAll('[data-study]').forEach(btn => {

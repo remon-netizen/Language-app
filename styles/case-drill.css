@@ -104,14 +104,18 @@
   padding-bottom: 6px; border-bottom: 1px solid var(--border);
   display: flex; justify-content: space-between;
 }
+/* A table: the case, then the singular and the plural, each in its own column
+   so the endings line up from row to row. */
 .cd-decl-row {
-  display: flex; justify-content: space-between; padding: 6px 8px;
-  border-radius: 8px; font-size: 0.85rem; transition: background 0.15s; gap: 8px;
+  display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr) minmax(0, 1fr); column-gap: 10px;
+  padding: 6px 8px; border: 2px solid transparent;
+  border-radius: 8px; font-size: 0.85rem; transition: background 0.15s;
 }
-.cd-decl-row.cd-highlight-row { background: #dcfce7; border: 2px solid #86efac; font-weight: 700; }
-.cd-decl-case { color: var(--gray); font-weight: 500; min-width: 90px; }
-.cd-decl-sg { font-weight: 600; color: var(--text); flex: 1; }
-.cd-decl-pl { font-weight: 600; color: var(--text); flex: 1; text-align: right; }
+.cd-decl-row.cd-highlight-row { background: #dcfce7; border-color: #86efac; font-weight: 700; }
+.cd-decl-case { color: var(--gray); font-weight: 500; }
+.cd-decl-sg, .cd-decl-pl { font-weight: 600; color: var(--text); overflow-wrap: anywhere; }
+.cd-decl-also { display: block; font-size: 0.75rem; font-weight: 500; color: var(--gray); }   /* a second form, just as right */
+.cd-highlight-row .cd-decl-also { color: #166534; }
 .cd-highlight-row .cd-decl-case { color: #15803d; }
 .cd-highlight-row .cd-decl-sg,
 .cd-highlight-row .cd-decl-pl { color: #14532d; }
@@ -146,15 +150,16 @@
   text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;
   padding: 4px 0; border-bottom: 2px solid #d1fae5;
 }
-.cd-noun-row {
-  display: flex; align-items: center; gap: 10px;
+.cd-noun-row {   /* a button: reachable with Tab, pressed with Enter */
+  display: flex; align-items: center; gap: 10px; width: 100%;
   padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px;
   margin-bottom: 6px; cursor: pointer; background: var(--card-bg); transition: all 0.15s;
+  font: inherit; color: inherit; text-align: left;
 }
 .cd-noun-row:hover { border-color: #059669; background: #ecfdf5; transform: translateX(2px); }
 .cd-noun-text { flex: 1; min-width: 0; }
-.cd-noun-word { font-size: 0.9rem; font-weight: 700; color: var(--text); }
-.cd-noun-meaning { font-size: 0.75rem; color: var(--gray); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cd-noun-word { display: block; font-size: 0.9rem; font-weight: 700; color: var(--text); }
+.cd-noun-meaning { display: block; font-size: 0.75rem; color: var(--gray); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .cd-mastery-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
 .cd-mastery-dot.gray { background: #d1d5db; }
 .cd-mastery-dot.red { background: #ef4444; }
@@ -193,10 +198,10 @@
 /* Summary rows */
 
 /* Weak toggle */
-.cd-weak-toggle {
-  display: flex; align-items: center; gap: 10px; margin-top: 12px;
+.cd-weak-toggle {   /* a button */
+  display: flex; align-items: center; gap: 10px; margin-top: 12px; width: 100%;
   padding: 10px 14px; background: #fef3c7; border: 2px solid #fcd34d; border-radius: 10px;
-  cursor: pointer; font-size: 0.82rem; font-weight: 700; color: #92400e; transition: all 0.15s;
+  cursor: pointer; font: inherit; font-size: 0.82rem; font-weight: 700; color: #92400e; text-align: left; transition: all 0.15s;
 }
 .cd-weak-toggle:hover { background: #fde68a; }
 .cd-weak-toggle.active { border-color: #f59e0b; background: #fde68a; }
@@ -216,8 +221,10 @@
   .cd-level-row { flex-wrap: wrap; }
   .cd-filter-btn { padding: 5px 8px; font-size: 0.75rem; }
   .cd-filter-row { gap: 4px; }
-  .cd-decl-row { font-size: 0.75rem; gap: 4px; padding: 4px 4px; }
-  .cd-decl-case { min-width: 60px; font-size: 0.75rem; }
+  /* narrow: the case on a line of its own, the two forms side by side under it */
+  .cd-decl-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); padding: 4px 6px; }
+  .cd-decl-case { grid-column: 1 / -1; font-size: 0.75rem; }
+  .cd-pron-row .cd-decl-case { grid-column: auto; }
   .cd-q-card { padding: 14px; }
   .cd-sentence-card { padding: 14px; }
   .cd-q-case { font-size: 0.9rem; }

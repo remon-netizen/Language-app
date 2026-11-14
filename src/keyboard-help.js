@@ -6,6 +6,7 @@
 // Latin letters are typed where Cyrillic is expected, and from Settings.
 
 import { state } from './state.js';
+import { escHtml } from './utils.js';
 import { openSheet, closeSheet } from './sheet.js';
 import { totalAnswers } from './data/activity.js';
 
@@ -119,4 +120,24 @@ export function latinTypedNote(answer, expected) {
   const which = [...new Set(latin.map(c => c.toLowerCase()))].join(', ');
   return L(`There is a Latin letter in your answer (${which}). It may look the same, but it is another letter: type the whole answer with the Ukrainian keyboard.`,
            `Er staat een Latijnse letter in je antwoord (${which}). Hij ziet er misschien hetzelfde uit, maar het is een andere letter: typ het hele antwoord met het Oekraïense toetsenbord.`);
+}
+
+// An answer typed on the wrong keyboard is not graded: the learner switches and
+// tries again. Shows the reason in `note` and returns true when that is the case.
+//   lang      what the answer should be typed in: 'uk', or the learner's own language
+//   expected  the right answer (an answer that itself holds the other alphabet is let through)
+export function wrongKeyboard({ answer, expected, lang, note, input }) {
+  const uk = lang === 'uk';
+  const text = uk ? latinTypedNote(answer, expected) : cyrillicTypedNote(answer, expected);
+  if (!text) return false;
+  if (uk) {
+    note.innerHTML = `${escHtml(text)} <button class="ce-retry-link" type="button">⌨️ ${L('How?', 'Hoe?')}</button>`;
+    note.querySelector('button').addEventListener('click', openKeyboardHelp);
+  } else {
+    note.textContent = text;
+  }
+  note.hidden = false;
+  input.focus();
+  input.select();
+  return true;
 }
