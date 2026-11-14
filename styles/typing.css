@@ -1,0 +1,97 @@
+/* ── Typing course ─────────────────────────────────────────────────────────── */
+
+#typingScreen .lesson-header {
+  display: flex; align-items: center; gap: 14px;
+  background: linear-gradient(135deg, #475569 0%, #1e293b 100%);
+  border-radius: 16px; padding: 14px 18px; margin-bottom: 16px;
+  box-shadow: 0 2px 12px rgba(30,41,59,0.22);
+}
+#typingScreen .lesson-header .back-btn {
+  background: rgba(255,255,255,0.18); border: none; border-radius: 10px;
+  color: white; font-size: 1.2rem; width: 36px; height: 36px; padding: 0; flex-shrink: 0;
+}
+#typingScreen .lesson-header .back-btn:hover { background: rgba(255,255,255,0.32); }
+#typingScreen .lesson-header .lesson-title { font-size: 1.05rem; font-weight: 700; color: white; }
+#typingScreen .lesson-header .lesson-subtitle { font-size: 0.75rem; color: rgba(255,255,255,0.78); margin-top: 2px; }
+.ex-tool-typing:hover { border-color: #475569; background: #f1f5f9; color: #1e293b; }
+
+/* Menu */
+.ty-stats-bar { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 12px; }
+.ty-stat { font-size: 0.78rem; font-weight: 600; color: var(--gray); background: var(--card-bg); padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border); }
+.ty-link {
+  display: block; width: 100%; padding: 11px 12px; margin-bottom: 8px; border: 2px solid var(--border); border-radius: 12px;
+  background: var(--card-bg); color: var(--text); font-size: 0.86rem; font-weight: 600; text-align: left; cursor: pointer; font-family: inherit; min-height: 44px;
+}
+.ty-link:hover { border-color: #475569; }
+.ty-toggle {
+  display: flex; align-items: center; gap: 10px; width: 100%; padding: 11px 12px; border: 2px solid var(--border); border-radius: 12px;
+  background: var(--card-bg); color: var(--text); font-size: 0.84rem; font-weight: 600; text-align: left; cursor: pointer; font-family: inherit; min-height: 44px; line-height: 1.35;
+}
+.ty-toggle.active { border-color: #475569; background: #f1f5f9; }
+.ty-check { width: 20px; height: 20px; flex-shrink: 0; border: 2px solid #94a3b8; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800; color: white; background: white; }
+.ty-toggle.active .ty-check { background: #475569; border-color: #475569; }
+.ty-section { font-size: 0.74rem; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.04em; margin: 16px 0 6px 2px; }
+.ty-stages { display: flex; flex-direction: column; gap: 6px; }
+.ty-stage {
+  display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 12px; border: 2px solid var(--border); border-radius: 12px;
+  background: var(--card-bg); cursor: pointer; font-family: inherit; text-align: left; min-height: 64px;
+}
+.ty-stage:hover { border-color: #475569; background: #f8fafc; }
+.ty-stage.done { border-color: #cbd5e1; }
+.ty-stage-next { border-color: #475569; background: #f1f5f9; }
+.ty-stage-num { flex-shrink: 0; width: 28px; text-align: center; font-size: 0.95rem; font-weight: 800; color: var(--gray); }
+.ty-stage-text { display: flex; flex-direction: column; flex: 1; min-width: 0; gap: 1px; }
+.ty-stage-letters { font-size: 1.05rem; font-weight: 800; color: #1e293b; letter-spacing: 0.04em; }
+.ty-stage-title { font-size: 0.88rem; font-weight: 700; color: var(--text); }
+.ty-stage-sub { font-size: 0.74rem; color: var(--gray); }
+.ty-stage-status { flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; font-size: 0.95rem; font-weight: 800; color: #15803d; }
+.ty-stage-status small { font-size: 0.7rem; font-weight: 700; color: var(--gray); white-space: nowrap; }
+.ty-stage-next .ty-stage-status { color: #475569; }
+
+/* Cards */
+.ty-card { background: var(--card-bg); border-radius: 14px; padding: 18px 16px; margin-bottom: 14px; box-shadow: 0 1px 8px rgba(0,0,0,0.07); text-align: center; }
+.ty-intro { border: 2px solid #cbd5e1; background: #f8fafc; }
+.ty-badge { display: inline-block; font-size: 0.74rem; font-weight: 700; color: #1e293b; background: #e2e8f0; padding: 3px 10px; border-radius: 6px; margin-bottom: 8px; }
+.ty-label { font-size: 0.78rem; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px; }
+.ty-letter { font-size: 3rem; font-weight: 800; color: #1e293b; line-height: 1.15; }
+.ty-letter .vc-say-inline { font-size: 1.3rem; }
+.ty-letter-latin { font-size: 2.2rem; }
+.ty-sound { font-size: 0.95rem; color: var(--gray); margin-top: 4px; }
+.ty-sound b { color: var(--text); }
+.ty-ask { font-size: 0.82rem; color: var(--gray); margin-top: 8px; }
+.ty-tip { font-size: 0.84rem; line-height: 1.4; color: #92400e; background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 8px 10px; margin: 8px 0; text-align: left; }
+/* The line to copy: a word never breaks, each letter can be coloured on its own. */
+.ty-target { font-size: 1.7rem; font-weight: 800; line-height: 1.5; color: #1e293b; }
+.ty-word { display: inline-block; white-space: nowrap; }
+.ty-ch { border-radius: 4px; padding: 0 1px; }
+.ty-sp { display: inline-block; width: 0.5em; height: 1.1em; vertical-align: middle; }
+.ty-ok { color: #16a34a; }
+.ty-bad { color: #dc2626; background: #fee2e2; }
+.ty-sp.ty-bad { background: #fecaca; }
+.ty-next { box-shadow: inset 0 -3px 0 #475569; }
+.ty-gloss { font-size: 0.82rem; line-height: 1.4; color: var(--gray); margin-top: 8px; }
+
+/* The keyboard on screen */
+.ty-kb { margin: 0 auto 14px; max-width: 560px; padding: 10px 8px 8px; background: #e2e8f0; border-radius: 12px; user-select: none; }
+.ty-kb-row { display: flex; justify-content: center; gap: 4px; margin-bottom: 4px; }
+.ty-key {
+  position: relative; flex: 0 1 40px; min-width: 0; height: 40px; display: flex; align-items: center; justify-content: center;
+  background: white; border-radius: 6px; box-shadow: 0 1px 0 #94a3b8; color: #1e293b;
+}
+.ty-key b { font-size: 1.05rem; font-weight: 700; }
+.ty-key i { position: absolute; top: 1px; left: 4px; font-size: 0.56rem; font-style: normal; font-weight: 600; color: #94a3b8; }
+.ty-key-shift { flex-basis: 52px; background: #cbd5e1; }
+.ty-key-space { flex: 0 1 260px; height: 30px; }
+.ty-key.on { background: #1e293b; color: white; box-shadow: 0 0 0 3px #fbbf24; }
+.ty-key.on i { color: #cbd5e1; }
+.ty-kb-cap { min-height: 1.3em; text-align: center; font-size: 0.82rem; font-weight: 700; color: #1e293b; padding-top: 4px; }
+
+@media (max-width: 500px) {
+  .ty-target { font-size: 1.45rem; }
+  .ty-letter { font-size: 2.6rem; }
+  .ty-kb { padding: 6px 4px; }
+  .ty-kb-row { gap: 2px; }
+  .ty-key { height: 34px; }
+  .ty-key b { font-size: 0.9rem; }
+  .ty-key i { display: none; }
+}

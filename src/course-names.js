@@ -5,7 +5,7 @@
 import { state } from './state.js';
 
 export const COURSE_ICON = {
-  path: '🗺️', vocab: '🧠', verbs: '✍️', cases: '📌', prefixes: '🔗', numbers: '🔢', sentences: '🧩', dialogues: '🎧',
+  path: '🗺️', vocab: '🧠', verbs: '✍️', cases: '📌', prefixes: '🔗', numbers: '🔢', sentences: '🧩', dialogues: '🎧', typing: '⌨️',
 };
 
 const NAMES = {
@@ -18,6 +18,7 @@ const NAMES = {
   numbers:   { en: 'Numbers & Time',   nl: 'Getallen & Tijd' },
   sentences: { en: 'Sentence Builder', nl: 'Zinnen bouwen' },
   dialogues: { en: 'Dialogues',        nl: 'Dialogen' },
+  typing:    { en: 'Typing course',    nl: 'Typcursus' },
 };
 
 export const courseName = id => (NAMES[id] ? NAMES[id][state.nativeLanguage === 'nl' ? 'nl' : 'en'] : id);

@@ -65,10 +65,11 @@ function helpHtml() {
     ${mine ? `<div class="kb-mine"><div class="kb-mine-title">${nameOf(DEVICES[mine])}</div>${stepsHtml(DEVICES[mine])}</div>
               <div class="kb-others-label">${L('Another device', 'Een ander apparaat')}</div>` : ''}
     ${others.map(fold).join('')}
-    <p class="kb-note">${L('Do not know the letters yet? You do not have to: the first units show every word and you copy it, letter by letter. The table of all 33 letters is one tap away.',
-                           'Ken je de letters nog niet? Dat hoeft niet: de eerste units laten elk woord zien en jij typt het na, letter voor letter. De tabel met alle 33 letters staat één tik verderop.')}</p>
+    <p class="kb-note">${L('Do not know the letters yet? You do not have to: the first units show every word and you copy it, letter by letter. The alphabet table lists all 33; the typing course lets you practise them a few at a time.',
+                           'Ken je de letters nog niet? Dat hoeft niet: de eerste units laten elk woord zien en jij typt het na, letter voor letter. De alfabettabel toont ze alle 33; in de typcursus oefen je ze met een paar tegelijk.')}</p>
     <div class="kb-actions">
       <button class="kb-btn" id="kbAlphabet" type="button">🔤 ${L('The alphabet', 'Het alfabet')}</button>
+      <button class="kb-btn" id="kbTyping" type="button">⌨️ ${L('Typing course', 'Typcursus')}</button>
       <button class="kb-btn kb-btn-primary" id="kbDone" type="button">${L('Got it', 'Begrepen')} →</button>
     </div>`;
 }
@@ -81,6 +82,7 @@ export function openKeyboardHelp() {
     onOpen(root) {
       root.querySelector('#kbDone').addEventListener('click', closeSheet);
       root.querySelector('#kbAlphabet').addEventListener('click', () => { closeSheet(); window.closeSettingsDrawer(); window.openAlphabetScreen(); });
+      root.querySelector('#kbTyping').addEventListener('click', () => { closeSheet(); window.closeSettingsDrawer(); window.openTypingScreen(); });
     },
   });
 }

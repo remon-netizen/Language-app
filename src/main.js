@@ -28,6 +28,8 @@ import { openPathScreen, startPathReview, startPathWeak } from './grammar/path-u
 import { weakSpotCount, openWeakSpots } from './weak-spots.js';
 import { openReviewScreen, startReviewAll, getDueTotal } from './review.js';
 import { openAlphabetScreen } from './alphabet-ui.js';
+import { openTypingScreen } from './grammar/typing-ui.js';
+import { typingStats } from './data/typing-progress.js';
 import { nextOpenUnit, pathStats, unitStarted, unitDone } from './data/path-progress.js';
 import { openKeyboardHelp } from './keyboard-help.js';
 import { renderBackupSection } from './backup-ui.js';
@@ -196,6 +198,10 @@ function renderTodayCard() {
   // until then the letters are one tap away.
   if (!unitDone('a1-02') && rows.length < 3) {
     rows.push({ icon: '🔤', title: nl ? 'Het cyrillische alfabet' : 'The Cyrillic alphabet', sub: nl ? 'De 33 letters en hoe ze klinken' : 'The 33 letters and how they sound', onclick: 'openAlphabetScreen()' });
+  }
+  // And so is the typing course, until its letter steps are done.
+  if (!unitDone('a1-02') && typingStats().done < 6 && rows.length < 3) {
+    rows.push({ icon: '⌨️', title: nl ? 'Leren typen' : 'Learn to type', sub: nl ? 'Typcursus: de letters en waar ze zitten' : 'Typing course: the letters and where they are', onclick: 'openTypingScreen()' });
   }
   if (!rows.length) { card.style.display = 'none'; return; }
 
@@ -407,6 +413,7 @@ window.startDeHetDrill       = startDeHetDrill;
 window.answerDeHet           = answerDeHet;
 window.showConversationSummary = showConversationSummary;
 window.openAlphabetScreen  = openAlphabetScreen;
+window.openTypingScreen    = openTypingScreen;
 window.openReviewScreen    = openReviewScreen;
 window.openVerbAspectScreen = openVerbAspectScreen;
 window.openVerbDrillScreen    = openVerbDrillScreen;

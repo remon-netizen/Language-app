@@ -16,7 +16,6 @@ import { unitItems, entryOf, recordItem, regradeItem, dueItems, learnedDueItems,
 import { meaning, gradeMeaning } from './vocab-drill-ui.js';
 import { runSession } from './course-engine.js';
 import { L, loc, shuffle, grade, normalise, wireSpeakButtons } from './drill-core.js';
-import { openKeyboardHelp } from '../keyboard-help.js';
 
 const COURSE = { icon: '🗺️', get name() { return L('Course path', 'Leerpad'); } };
 const ACCENT = { main: '#0d9488', dark: '#115e59', soft: '#f0fdfa', border: '#99f6e4' };
@@ -210,7 +209,7 @@ function showUnit(unit) {
     ${ALPHABET_UNITS.includes(unit.id) ? `
     <div class="pt-aid-row">
       <button class="pt-aid" id="ptAlphabet" type="button">🔤 ${L('The alphabet', 'Het alfabet')}</button>
-      <button class="pt-aid" id="ptKeyboard" type="button">⌨️ ${L('Ukrainian keyboard', 'Oekraïens toetsenbord')}</button>
+      <button class="pt-aid" id="ptTyping" type="button">⌨️ ${L('Learn to type', 'Leren typen')}</button>
     </div>` : ''}
 
     ${resume ? `<button class="pt-resume" id="ptResume">
@@ -264,7 +263,7 @@ function showUnit(unit) {
   wireSpeakButtons(s);
   s.querySelector('#ptUnitBack').addEventListener('click', () => { pt.level = unit.level; savePrefs(); showMenu(); });
   s.querySelector('#ptAlphabet')?.addEventListener('click', () => window.openAlphabetScreen());
-  s.querySelector('#ptKeyboard')?.addEventListener('click', openKeyboardHelp);
+  s.querySelector('#ptTyping')?.addEventListener('click', () => window.openTypingScreen());
   s.querySelector('#ptResume')?.addEventListener('click', () => startStep(unit, resume.step, resume));
   s.querySelector('#ptWords').addEventListener('click', () => startStep(unit, 'words'));
   s.querySelector('#ptSentences').addEventListener('click', () => startStep(unit, 'sentences'));

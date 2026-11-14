@@ -39,6 +39,9 @@ import { keyboardHelpFirstTime, openKeyboardHelp, latinTypedNote } from '../keyb
 //                ({ res, compare }) => string when it depends on what is already on screen
 //   say          text behind the Listen button; with sayAfter it is also played once answered
 //   missed       { left, right, extra, say } row for the end-of-round list
+//   mount({ root, input, submit })  optional, called once the card is on screen: for a
+//                card that reacts while the learner types (the typing course colours
+//                each letter and submits by itself when the line is complete)
 
 const DEFAULT_ACCENT = { main: '#7c3aed', dark: '#5b21b6', soft: '#f5f3ff', border: '#c4b5fd' };
 
@@ -65,7 +68,8 @@ function warmUpCards(n, own, source) {
 // own card number `at` (the warm-up is skipped) with the score so far.
 // onProgress({ at, score, missed }) reports after every answered card of the
 // round itself, so the caller can keep that position.
-export function runSession({ screen, icon, title, accent = DEFAULT_ACCENT, cards, mixed = false, warmUp = 0, warmUpSource = null, resume = null, onProgress = null, onExit, again, scoreSubtitle }) {
+// scoreNote() → html: a line of the round's own on the score card (typing speed).
+export function runSession({ screen, icon, title, accent = DEFAULT_ACCENT, cards, mixed = false, warmUp = 0, warmUpSource = null, resume = null, onProgress = null, onExit, again, scoreSubtitle, scoreNote = null }) {
   const s = screen;
   const startAt = resume ? Math.max(0, Math.min(resume.at || 0, cards.length - 1)) : 0;
   const warm = startAt ? [] : warmUpCards(warmUp, cards, warmUpSource);
@@ -167,6 +171,7 @@ export function runSession({ screen, icon, title, accent = DEFAULT_ACCENT, cards
     input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); submit(); } });
     input.focus();
     if (card.input.speak) wireSpeak(card, input, check);
+    if (card.mount) card.mount({ root: s, input, submit });
   }
 
   // The microphone is a second way to give the same answer: what was heard is
@@ -285,6 +290,7 @@ export function runSession({ screen, icon, title, accent = DEFAULT_ACCENT, cards
         <div class="ex-score-fraction">${run.score} / ${total}</div>
         <div class="ex-score-bar-wrap"><div class="ex-score-bar-fill" style="width: ${pct}%"></div></div>
         <div class="ex-score-pct">${pct}%</div>
+        ${scoreNote ? `<div class="ce-score-note">${scoreNote()}</div>` : ''}
         <div class="ex-score-actions">
           ${more ? `<button class="ex-next-btn" id="ceAgain" type="button">${escHtml(more.label)}</button>` : ''}
           <button class="ex-back-btn" id="ceMenu" type="button">← Menu</button>

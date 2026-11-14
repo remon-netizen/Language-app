@@ -5,6 +5,7 @@ import { generateExercises } from '../api/exercises.js';
 import { languageName } from '../i18n.js';
 import { hasApiKey } from '../api/model.js';
 import { courseName } from '../course-names.js';
+import { typingStats } from '../data/typing-progress.js';
 
 // A small helper so every string in this file is available in both native languages.
 const NL = () => state.nativeLanguage === 'nl';
@@ -178,7 +179,7 @@ function showTopicPicker() {
   const lblSentence = courseName('sentences');
   const lblDialog   = courseName('dialogues');
   const lblAlphabet = native === 'nl' ? 'Alfabet' : 'Alphabet';
-  const lblKeyboard = native === 'nl' ? 'Oekraïens toetsenbord' : 'Ukrainian keyboard';
+  const lblKeyboard = native === 'nl' ? 'Toetsenbord toevoegen' : 'Add the keyboard';
   const isUK        = state.currentLanguage === 'uk';
   const lblLevel    = native === 'nl' ? 'Niveau:' : 'Level:';
   const keyOk       = hasApiKey();
@@ -239,14 +240,19 @@ function showTopicPicker() {
       </button>
     </div>
 
-    <div class="ex-section-label">${native === 'nl' ? '📖 Naslag — de letters en hoe je ze typt' : '📖 Reference — the letters and how to type them'}</div>
-    <div class="ex-tools-row">
+    <div class="ex-section-label">${native === 'nl' ? '🔤 Letters en toetsenbord — lezen en typen' : '🔤 Letters and keyboard — reading and typing'}</div>
+    <div class="ex-tools-row ex-tools-wrap">
       <button class="ex-tool-btn ex-tool-alphabet" id="exAlphabetBtn">
         <span class="ex-tool-icon">🔤</span>
         <span>${lblAlphabet}</span>
       </button>
-      <button class="ex-tool-btn ex-tool-alphabet" id="exKeyboardBtn">
+      <button class="ex-tool-btn ex-tool-typing" id="exTypingBtn">
         <span class="ex-tool-icon">⌨️</span>
+        <span>${courseName('typing')}</span>
+        <span class="ex-tool-meta">${typingStats().done} / ${typingStats().total}</span>
+      </button>
+      <button class="ex-tool-btn ex-tool-alphabet" id="exKeyboardBtn">
+        <span class="ex-tool-icon">🔧</span>
         <span>${lblKeyboard}</span>
       </button>
     </div>` : ''}
@@ -310,6 +316,8 @@ function showTopicPicker() {
   if (alphabetBtn) alphabetBtn.addEventListener('click', () => window.openAlphabetScreen());
   const keyboardBtn = s.querySelector('#exKeyboardBtn');
   if (keyboardBtn) keyboardBtn.addEventListener('click', () => window.openKeyboardHelp());
+  const typingBtn = s.querySelector('#exTypingBtn');
+  if (typingBtn) typingBtn.addEventListener('click', () => window.openTypingScreen());
   const vocabBtn = s.querySelector('#exVocabBtn');
   if (vocabBtn) vocabBtn.addEventListener('click', () => window.openVocabDrillScreen());
   const numbersDrillBtn = s.querySelector('#exNumbersDrillBtn');

@@ -1,6 +1,6 @@
 {
-  "name": "Taal-chat — Language Practice",
-  "short_name": "Taal-chat",
+  "name": "Ukrainian Language App",
+  "short_name": "Ukrainian",
   "description": "Learn Ukrainian from A1 to B2: a course path, vocabulary and grammar courses on one review schedule, speech, and AI conversation",
   "start_url": "./index.html",
   "display": "standalone",

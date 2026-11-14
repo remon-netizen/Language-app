@@ -13,6 +13,7 @@ import { currentStreak, lastDays, totalAnswers, activeDays } from './data/activi
 import { COURSE_ICON, courseName } from './course-names.js';
 import { weakSpots } from './weak-spots.js';
 import { backupStatus, backupDue } from './backup-ui.js';
+import { typingStats } from './data/typing-progress.js';
 
 // ── One screen with every number the app keeps ───────────────────────────────
 // A course is listed once: what was learned and is scheduled, and under it what
@@ -97,6 +98,7 @@ export function openProgressScreen() {
 
   const words = getWordsCount(), dueWords = getDueWords().length;
   const due = backupDue();
+  const typing = typingStats();
 
   s.innerHTML = `
     <div class="lesson-header">
@@ -120,6 +122,17 @@ export function openProgressScreen() {
 
     <div class="pg-section">${L('Courses', 'Cursussen')}</div>
     ${getCourses().map(courseRow).join('')}
+    ${isUK ? `
+    <button class="pg-card pg-row" onclick="openTypingScreen()">
+      <span class="pg-row-icon">${COURSE_ICON.typing}</span>
+      <span class="pg-row-text">
+        <span class="pg-row-title">${escHtml(courseName('typing'))}</span>
+        <span class="pg-row-sub">${typing.started
+          ? `${typing.done} / ${typing.total} ${L('steps', 'stappen')}${typing.best ? ` · ${L('best', 'beste')} ${typing.best} ${L('characters a minute', 'tekens per minuut')}` : ''}`
+          : L('Not started — the letters and where they are on the keyboard', 'Nog niet gestart — de letters en waar ze op het toetsenbord zitten')}</span>
+        ${typing.started ? bar(typing.done / typing.total * 100, 'pg-fill-pink') : ''}
+      </span>
+    </button>` : ''}
 
     ${applied.length ? `<div class="pg-section">${L('Whole sentences and listening', 'Hele zinnen en luisteren')}</div>` : ''}
     ${applied.map(appliedRow).join('')}

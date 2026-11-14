@@ -97,7 +97,8 @@
 .kb-other summary { padding: 11px 12px; font-weight: 700; cursor: pointer; min-height: 44px; }
 .kb-other .kb-steps { padding: 0 12px 12px 32px; }
 .kb-note { margin: 12px 0; color: var(--gray); font-size: 0.86rem; }
-.kb-actions { display: flex; gap: 8px; }
+.kb-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.kb-btn-primary { flex-basis: 100%; }
 .kb-btn { flex: 1; padding: 12px; border: 2px solid var(--border); border-radius: 12px; background: var(--card-bg); color: var(--text); font-size: 0.92rem; font-weight: 700; cursor: pointer; font-family: inherit; min-height: 48px; }
 .kb-btn:hover { border-color: var(--blue); color: var(--blue); }
 .kb-btn-primary { background: var(--blue); border-color: var(--blue); color: white; }

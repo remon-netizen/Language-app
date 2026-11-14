@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Taal-chat</title>
+  <title>Ukrainian Language App</title>
 
   <!-- PWA manifest -->
   <link rel="manifest" href="manifest.json" />
@@ -12,7 +12,7 @@
   <!-- iOS home screen support -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="apple-mobile-web-app-title" content="Taal-chat" />
+  <meta name="apple-mobile-web-app-title" content="Ukrainian" />
   <link rel="apple-touch-icon" href="icon.svg" />
 
   <!-- Styles -->
@@ -36,6 +36,7 @@
   <link rel="stylesheet" href="styles/dialogue.css" />
   <link rel="stylesheet" href="styles/progress.css" />
   <link rel="stylesheet" href="styles/path.css" />
+  <link rel="stylesheet" href="styles/typing.css" />
 </head>
 <body>
 
@@ -378,6 +379,11 @@
   <!-- ══════════ COURSE PATH SCREEN ══════════ -->
   <div class="screen" id="pathScreen">
     <!-- Content populated dynamically by path-ui.js -->
+  </div>
+
+  <!-- ══════════ TYPING COURSE SCREEN ══════════ -->
+  <div class="screen" id="typingScreen">
+    <!-- Content populated dynamically by typing-ui.js -->
   </div>
 
   <!-- ══════════ PROGRESS SCREEN ══════════ -->

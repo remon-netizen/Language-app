@@ -76,3 +76,6 @@
 .ce-header ~ .ex-score-card .ex-next-btn { background: var(--ce-main); }
 .ce-header ~ .ex-score-card .ex-next-btn:hover { background: var(--ce-dark); }
 .ce-header ~ .ex-score-card .ex-back-btn:hover { border-color: var(--ce-main); color: var(--ce-dark); }
+
+/* A round's own line on the score card (the typing course reports speed there). */
+.ce-score-note { font-size: 0.95rem; font-weight: 700; color: var(--text); margin: 0 0 14px; line-height: 1.5; }
