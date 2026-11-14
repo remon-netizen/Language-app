@@ -355,6 +355,8 @@ function showTopicPicker() {
 
 // ── Load exercises ────────────────────────────────────────────────────────────
 
+let loadSeq = 0;   // the quiz being made now: an older answer arriving late is dropped
+
 async function startExercises(topic) {
   ex = { ...ex, topic, list: [], current: 0, score: 0, answered: false };
   const s = getScreen();
@@ -377,10 +379,17 @@ async function startExercises(topic) {
     showTopicPicker();
   });
 
+  // Making the exercises takes a few seconds, in which the learner may have left
+  // (or started another quiz): then this answer has nowhere to go.
+  const mine = ++loadSeq;
+  const stillHere = () => mine === loadSeq && !!document.getElementById('exBody') && !!document.getElementById('exSubtitle');
   try {
-    ex.list = await generateExercises(topic.id, topic.title, ex.level, ex.includeOpen);
+    const list = await generateExercises(topic.id, topic.title, ex.level, ex.includeOpen);
+    if (!stillHere()) return;
+    ex.list = list;
     renderQuestion();
   } catch (err) {
+    if (!stillHere()) return;
     document.getElementById('exSubtitle').textContent = L('The exercises could not be made', 'De oefeningen konden niet worden gemaakt');
     document.getElementById('exBody').innerHTML = `
       <div class="ex-error">⚠️ ${escHtml(aiErrorText(err))}</div>

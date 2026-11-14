@@ -364,3 +364,13 @@ All 122 units were played as whole rounds, every card answered with the answer f
 
 - **Two course words for one meaning** (книга and книжка, поїзд and потяг, магазин and крамниця, теж and також): typing the other one on a "meaning → word" card is not a mistake. `synonymIn()` in `vocab-drill-ui.js` finds it among the course's words and the vocabulary deck, and the card asks again without a penalty, as the vocabulary deck already did. The same word in its other spelling (увечері / ввечері, учитель / вчитель: у- and в- alternate) simply counts as right. A meaning with the very same gloss twice ("to ask (a question)") counts as shared.
 - **Brackets in a meaning are optional parts** (`bracketForms()`): "(aan) haar" is *haar* and *aan haar*, "laat (hem / haar / ze) maar" also *laat hem maar*, "to wake (someone) up" with and without *someone*. A meaning typed with its brackets is read both ways.
+
+## Random presses (2026-11)
+
+A test that presses random buttons and types random text all over the app for thousands of steps, with every uncaught error reported, found three things:
+
+- **The router could step out of the app** (`src/router.js`). When a sheet on Home is closed by an action that opens a screen (the keyboard help's "Alphabet" button, an entry of the weak-spots list), the app steps back in the history and pushes a new entry in the same instant. The browser finishes the step back after the push, so the app stood on the base entry while it believed its trap entry was in place, and the next return to Home stepped out of the app. `sync()` now waits for its own step back to land (`ownBack`) before it pushes anything; the popstate handler calls it again.
+- **AI quiz**: leaving the screen while the exercises are being made no longer ends in an error when they arrive (`loadSeq` in `exercises-ui.js`).
+- **Copy translation**: when the clipboard refuses, the text goes into the chat's field.
+
+Also: a chat reply that arrives after the learner has started a new conversation (another level) stays out of the new one.

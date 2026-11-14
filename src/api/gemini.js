@@ -57,19 +57,22 @@ export async function callGeminiAPI(userMessage, isUkrainian) {
   const apiKey = getApiKey();
   if (!apiKey) return null;
 
-  state.conversationHistory.push({ role: 'user', content: userMessage });
-  const sent = state.conversationHistory.length;
+  // This conversation: a reply that comes in after the learner started a new one
+  // (another level) belongs to the old one and must not land in the new.
+  const history = state.conversationHistory;
+  history.push({ role: 'user', content: userMessage });
+  const sent = history.length;
   try {
-    return await askGemini(apiKey, isUkrainian);
+    return await askGemini(apiKey, isUkrainian, history);
   } catch (err) {
     // The message got no answer: it must not stay in what the next request sends.
-    if (state.conversationHistory.length === sent) state.conversationHistory.pop();
+    if (history.length === sent) history.pop();
     throw err;
   }
 }
 
-async function askGemini(apiKey, isUkrainian) {
-  const contents = state.conversationHistory.slice(-12).map(m => ({
+async function askGemini(apiKey, isUkrainian, history) {
+  const contents = history.slice(-12).map(m => ({
     role: m.role === 'assistant' ? 'model' : 'user',
     parts: [{ text: m.content }]
   }));
@@ -115,6 +118,6 @@ async function askGemini(apiKey, isUkrainian) {
     throw new Error('Could not parse Gemini response');
   }
 
-  state.conversationHistory.push({ role: 'assistant', content: parsed.response_uk });
+  history.push({ role: 'assistant', content: parsed.response_uk });
   return parsed;
 }

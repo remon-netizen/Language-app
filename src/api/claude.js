@@ -8,15 +8,18 @@ export async function callClaudeAPI(userMessage, isUkrainian) {
   const apiKey = getApiKey();
   if (!apiKey) return null;
 
-  state.conversationHistory.push({ role: 'user', content: userMessage });
-  const sent = state.conversationHistory.length;
+  // This conversation: a reply that comes in after the learner started a new one
+  // (another level) belongs to the old one and must not land in the new.
+  const history = state.conversationHistory;
+  history.push({ role: 'user', content: userMessage });
+  const sent = history.length;
 
   try {
     const body = {
       model: ANTHROPIC_MODEL,
       max_tokens: 1024,
       system: buildSystemPrompt(isUkrainian),
-      messages: state.conversationHistory.slice(-12)
+      messages: history.slice(-12)
     };
 
     const res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -44,11 +47,11 @@ export async function callClaudeAPI(userMessage, isUkrainian) {
     const parsed = extractJSON(text);
     if (!parsed || !parsed.response_uk) throw new Error('Could not parse AI response');
 
-    state.conversationHistory.push({ role: 'assistant', content: parsed.response_uk });
+    history.push({ role: 'assistant', content: parsed.response_uk });
     return parsed;
   } catch (err) {
     // The message got no answer: it must not stay in what the next request sends.
-    if (state.conversationHistory.length === sent) state.conversationHistory.pop();
+    if (history.length === sent) history.pop();
     throw err;
   }
 }

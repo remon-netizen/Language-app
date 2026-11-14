@@ -355,6 +355,7 @@ export async function processUserInput(text, { spoken = false } = {}) {
   saveProgress();
 
   showTypingIndicator();
+  const conversation = state.conversationHistory;   // replaced when the learner starts a new one
 
   try {
     const grammarPromise = checkGrammar
@@ -370,15 +371,16 @@ export async function processUserInput(text, { spoken = false } = {}) {
     } else {
       convPromise = new Promise(r => setTimeout(() => {
         const result = getFallbackResponse(text);
-        if (!state.conversationHistory.find(m => m.content === text)) {
-          state.conversationHistory.push({ role: 'user', content: text });
+        if (!conversation.find(m => m.content === text)) {
+          conversation.push({ role: 'user', content: text });
         }
-        state.conversationHistory.push({ role: 'assistant', content: result.response_uk });
+        conversation.push({ role: 'assistant', content: result.response_uk });
         r(result);
       }, 600));
     }
 
     const [grammarResult, convResult] = await Promise.all([grammarPromise, convPromise]);
+    if (state.conversationHistory !== conversation) return;   // a new conversation began meanwhile: this reply is not part of it
     hideTypingIndicator();
 
     // Prefer AI grammar feedback (context-aware) over LanguageTool (rule-based only).
@@ -405,6 +407,7 @@ export async function processUserInput(text, { spoken = false } = {}) {
     if (state.conversationHistory.length >= 4) showSummaryButton();
 
   } catch(err) {
+    if (state.conversationHistory !== conversation) return;
     hideTypingIndicator();
     addErrorMessage(err);
   }

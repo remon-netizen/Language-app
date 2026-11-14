@@ -66,10 +66,19 @@ export function updateTranslatorLabel() {
 
 export function copyTranslation(btn) {
   const text = btn.dataset.text;
-  navigator.clipboard.writeText(text).then(() => {
+  const done = () => {
     btn.textContent = t('chat.copied');
     setTimeout(() => { btn.textContent = t('chat.copy'); }, 1500);
-  });
+  };
+  // The clipboard can refuse (no permission, page not in front): then the text
+  // goes into the chat's own field, which is where it was headed anyway.
+  const intoField = () => {
+    const input = document.getElementById('talkInput');
+    if (input) { input.value = text; input.focus(); }
+    done();
+  };
+  if (!navigator.clipboard?.writeText) { intoField(); return; }
+  navigator.clipboard.writeText(text).then(done, intoField);
 }
 
 function escHtml(s) {
