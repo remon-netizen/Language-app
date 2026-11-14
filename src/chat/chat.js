@@ -25,11 +25,29 @@ function updateNoKeyNotice() {
 }
 document.addEventListener('apiKeyChanged', updateNoKeyNotice);
 
+// The chat fills what is left of the window under its header, so the field to type
+// in sits at the bottom edge whatever is above it (the notice comes and goes).
+// On a phone that is the chat itself, with the suggestions below it; on a wide
+// screen it is the two columns together.
+function fitChat() {
+  const screen = document.getElementById('chatScreen');
+  if (!screen || !screen.classList.contains('active')) return;
+  const wide = window.innerWidth > 700;
+  const main = screen.querySelector('.chat-main'), layout = screen.querySelector('.chat-layout');
+  const box = wide ? layout : main;
+  (wide ? main : layout).style.height = '';
+  const top = box.getBoundingClientRect().top + window.scrollY;
+  box.style.height = Math.max(wide ? 400 : 280, window.innerHeight - top - (wide ? 24 : 12)) + 'px';
+}
+window.addEventListener('resize', fitChat);
+document.addEventListener('apiKeyChanged', fitChat);
+
 export function openFreeChat() {
   state.freeChatLang = state.currentLanguage; // match speech recognition to current language
   showScreen('chatScreen');
   loadApiKey();
   updateNoKeyNotice();
+  fitChat();
   const chatArea = document.getElementById('chatArea');
   if (chatArea.children.length === 0 && state.conversationHistory.length === 0) {
     startConversation();

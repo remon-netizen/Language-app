@@ -144,6 +144,20 @@ body.drawer-open { overflow: hidden; }
 .app { max-width: 1100px; margin: 0 auto; padding: 24px 16px; }
 @media (max-width: 500px) { .app { padding: 16px 12px; } }
 
+/* Inside a screen the app's own header makes way: every screen has a header of
+   its own, and two of them pushed a question card half-way down a phone. The
+   way to Settings is the gear in the screen header (main.js puts it there). */
+body:not(.on-home) > header { display: none; }
+body:not(.on-home) .app { padding-top: calc(24px + env(safe-area-inset-top, 0px)); }
+@media (max-width: 500px) { body:not(.on-home) .app { padding-top: calc(12px + env(safe-area-inset-top, 0px)); } }
+.lesson-settings {
+  position: relative; margin-left: auto; flex-shrink: 0; width: 36px; height: 36px; padding: 0;
+  border: none; border-radius: 10px; background: rgba(255,255,255,0.18); color: white;
+  font-size: 1.05rem; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+.lesson-settings::after { content: ''; position: absolute; inset: -6px; }
+.lesson-settings:hover { background: rgba(255,255,255,0.32); }
+
 /* ── Screens ── */
 .screen { display: none; }
 .screen.active { display: block; }

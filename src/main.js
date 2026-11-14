@@ -60,6 +60,27 @@ function toggleSettingsDrawer() {
   setSettingsDrawer(!document.getElementById('settingsDrawer').classList.contains('open'));
 }
 
+// ── The gear in every screen header ───────────────────────────────────────────
+// Inside a screen the app's own header is hidden (the screen has one of its own,
+// and on a phone the room is better spent on the card), so the way to Settings
+// moves into the screen header. Screens write their header out again with every
+// view and every card; rather than have each of them add the button, it is put
+// in whenever a header appears without one.
+function dressHeaders() {
+  document.querySelectorAll('.screen .lesson-header').forEach(h => {
+    if (h.querySelector('.lesson-settings')) return;
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'lesson-settings';
+    b.textContent = '⚙️';
+    b.title = t('header.settings');
+    b.setAttribute('aria-label', t('header.settings'));
+    h.appendChild(b);
+  });
+}
+new MutationObserver(dressHeaders).observe(document.querySelector('.app'), { childList: true, subtree: true });
+document.addEventListener('click', e => { if (e.target.closest('.lesson-settings')) toggleSettingsDrawer(); });
+
 // ── i18n re-render of static strings ──────────────────────────────────────────
 // Anything keyed off the user's native language gets re-applied here.
 function applyStaticI18n() {
@@ -131,6 +152,8 @@ function applyStaticI18n() {
   // Settings button title
   const settingsBtn = document.getElementById('settingsToggleBtn');
   if (settingsBtn) settingsBtn.title = t('header.settings');
+  document.querySelectorAll('.lesson-settings').forEach(b => { b.title = t('header.settings'); b.setAttribute('aria-label', t('header.settings')); });
+  dressHeaders();
 
   // Chat screen subtitle (the title is updated in switchLanguage)
   const chatSub = document.querySelector('#chatScreen .lesson-subtitle');

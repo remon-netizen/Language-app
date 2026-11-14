@@ -66,6 +66,8 @@ if (typeof history !== 'undefined' && history.replaceState) {
 function render(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  // The app's own header shows on Home only; a screen has a header of its own (base.css).
+  document.body.classList.toggle('on-home', id === 'homeScreen');
   window.scrollTo({ top: 0 });
   // Stop any ongoing speech synthesis when leaving the chat (not when entering it)
   if (id !== 'chatScreen') state.synth.cancel();
