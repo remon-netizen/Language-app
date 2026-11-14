@@ -374,3 +374,9 @@ A test that presses random buttons and types random text all over the app for th
 - **Copy translation**: when the clipboard refuses, the text goes into the chat's field.
 
 Also: a chat reply that arrives after the learner has started a new conversation (another level) stays out of the new one.
+
+## A device without a Ukrainian voice (2026-11)
+
+Chrome and Firefox on Windows have no Ukrainian voice. Besides the toast on 🔊, the listening exercises now say so instead of running silent (`hasNoVoice()` / `noVoiceReason()` in `src/voice.js`): the dictation mode of Vocabulary, the two listening modes of Numbers and the dictation switch of the Verb and Case Drill are switched off with the reason on them, a round that would have been dictated is typed, and the Dialogues menu has a notice with the way to Settings. The learner's stored choice is kept (`qMode()` gives the mode in use), so it is back on a device that can speak.
+
+The keyboard help for the Mac now says to add the plain "Ukrainian" layout: on the "Legacy" and "QWERTY" variants the keys sit elsewhere than in the keyboard picture (checked against the layouts macOS ships).

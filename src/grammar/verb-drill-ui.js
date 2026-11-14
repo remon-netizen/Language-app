@@ -1,5 +1,6 @@
 import { state } from '../state.js';
 import { escHtml } from '../utils.js';
+import { hasNoVoice, noVoiceReason } from '../voice.js';
 import { CONJUGATIONS, buildDrillSet, findVerb, verbForms, syntheticFuture } from '../data/verb-conjugations.js';
 import { VERB_PAIRS } from '../data/verb-aspects.js';
 import { ASPECT_TIPS } from '../data/aspect-tips.js';
@@ -29,6 +30,8 @@ const COURSE = { icon: '✍️', get name() { return L('Verbs', 'Werkwoorden'); 
 const ACCENT = { main: '#0891b2', dark: '#155e75', soft: '#ecfeff', border: '#a5f3fc' };
 
 function getScreen() { return document.getElementById('verbDrillScreen'); }
+// Dictation is on when chosen and when there is a voice to dictate with.
+const dictOn = () => vd.dictation && !hasNoVoice();
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -191,9 +194,9 @@ function showMenu() {
         <button class="vd-filter-btn ${vd.tenseFilter === 'imperative' ? 'active' : ''} ${!allowedTenses.includes('imperative') ? 'disabled' : ''}" data-tense="imperative">${nl ? 'Gebiedend' : 'Imperative'}</button>
       </div>
 
-      <button type="button" class="vd-weak-toggle vd-dictation-toggle ${vd.dictation ? 'active' : ''}" id="vdDictToggle" aria-pressed="${!!vd.dictation}">
-        <span class="vd-weak-check">${vd.dictation ? '✓' : ''}</span>
-        <span>👂 ${nl ? 'Dictee: hoor de vorm, typ wat je hoort' : 'Dictation: hear the form, type what you hear'}</span>
+      <button type="button" class="vd-weak-toggle vd-dictation-toggle ${dictOn() ? 'active' : ''}" id="vdDictToggle" aria-pressed="${dictOn()}" ${hasNoVoice() ? 'disabled' : ''}>
+        <span class="vd-weak-check">${dictOn() ? '✓' : ''}</span>
+        <span>👂 ${nl ? 'Dictee: hoor de vorm, typ wat je hoort' : 'Dictation: hear the form, type what you hear'}${hasNoVoice() ? ` (${escHtml(noVoiceReason())})` : ''}</span>
       </button>
       ${hasWeak ? `
         <button type="button" class="vd-weak-toggle ${vd.focusWeak ? 'active' : ''}" id="vdWeakToggle" aria-pressed="${!!vd.focusWeak}">
@@ -513,7 +516,7 @@ function startDrill() {
   const units = makeUnits({ onlySeen: true });
   runSession({
     screen: getScreen(), icon: COURSE.icon, title: L('Verb Drill', 'Werkwoord Drill'), accent: ACCENT,
-    cards: picked.map(q => formCard(q, { dictation: vd.dictation, units })),
+    cards: picked.map(q => formCard(q, { dictation: dictOn(), units })),
     onExit: showMenu,
     again: () => ({ label: '🔄 ' + L('Try again (new questions)', 'Opnieuw (nieuwe vragen)'), run: startDrill }),
   });

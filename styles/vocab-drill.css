@@ -31,6 +31,7 @@
 .vc-mode-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 14px; }
 .vc-mode-btn { grid-column: span 2; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 10px 6px; border: 2px solid var(--border); border-radius: 12px; background: var(--card-bg); cursor: pointer; font-family: inherit; }
 .vc-mode-btn.active { border-color: #db2777; background: #fdf2f8; }
+.vc-mode-btn:disabled { opacity: 0.55; cursor: default; }
 .vc-mode-btn.vc-mode-wide { grid-column: span 3; }
 .vc-mode-icon { font-size: 1.3rem; line-height: 1; }
 .vc-mode-label { font-size: 0.84rem; font-weight: 700; color: var(--text); }

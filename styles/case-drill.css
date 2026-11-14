@@ -204,6 +204,7 @@
   cursor: pointer; font: inherit; font-size: 0.82rem; font-weight: 700; color: #92400e; text-align: left; transition: all 0.15s;
 }
 .cd-weak-toggle:hover { background: #fde68a; }
+.cd-weak-toggle:disabled { opacity: 0.55; cursor: default; }
 .cd-weak-toggle.active { border-color: #f59e0b; background: #fde68a; }
 .cd-weak-check {
   width: 18px; height: 18px; border: 2px solid #d97706; border-radius: 4px;

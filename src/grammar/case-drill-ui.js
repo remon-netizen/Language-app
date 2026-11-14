@@ -1,5 +1,6 @@
 import { state } from '../state.js';
 import { escHtml } from '../utils.js';
+import { hasNoVoice, noVoiceReason } from '../voice.js';
 import { CASES, CASE_LABELS, NOUNS, CASE_SENTENCES, ADJECTIVE_NOUNS, buildCaseDrillSet, findNoun, nounForms } from '../data/case-declensions.js';
 import { PERSONAL, POSSESSIVE, PRON_CASES, GENDER_LABELS, INDECLINABLE_NOTE } from '../data/pronouns-uk.js';
 import { recordAnswer, getNounMastery, getAllMastery, getWeakItems, hasWeaknessData, getWeakNounCount } from '../data/case-weakness.js';
@@ -27,6 +28,8 @@ const COURSE = { icon: '📌', get name() { return L('Cases', 'Naamvallen'); } }
 const ACCENT = { main: '#059669', dark: '#065f46', soft: '#ecfdf5', border: '#a7f3d0' };
 
 function getScreen() { return document.getElementById('caseDrillScreen'); }
+// Dictation is on when chosen and when there is a voice to dictate with.
+const dictOn = () => cd.dictation && !hasNoVoice();
 
 function getNounsForLevel(level) {
   const levels = { A1: ['A1'], A2: ['A1', 'A2'], B1: ['A1', 'A2', 'B1'] };
@@ -123,9 +126,9 @@ function showMenu() {
         <button class="cd-filter-btn ${cd.genderFilter === 'n' ? 'active' : ''}" data-gen="n">${nl ? 'Onz.' : 'Neut'}</button>
       </div>
 
-      <button type="button" class="cd-weak-toggle cd-adj-toggle ${cd.dictation ? 'active' : ''}" id="cdDictToggle" aria-pressed="${!!cd.dictation}">
-        <span class="cd-weak-check">${cd.dictation ? '✓' : ''}</span>
-        <span>👂 ${nl ? 'Dictee: hoor de vorm, typ wat je hoort' : 'Dictation: hear the form, type what you hear'}</span>
+      <button type="button" class="cd-weak-toggle cd-adj-toggle ${dictOn() ? 'active' : ''}" id="cdDictToggle" aria-pressed="${dictOn()}" ${hasNoVoice() ? 'disabled' : ''}>
+        <span class="cd-weak-check">${dictOn() ? '✓' : ''}</span>
+        <span>👂 ${nl ? 'Dictee: hoor de vorm, typ wat je hoort' : 'Dictation: hear the form, type what you hear'}${hasNoVoice() ? ` (${escHtml(noVoiceReason())})` : ''}</span>
       </button>
       <div class="cd-filter-label" style="margin-top:12px">${nl ? 'Wat:' : 'What:'}</div>
       <button type="button" class="cd-weak-toggle cd-adj-toggle ${!cd.adjMode && !cd.pronMode ? 'active' : ''}" id="cdNounToggle" aria-pressed="${!cd.adjMode && !cd.pronMode}">
@@ -349,7 +352,7 @@ function play(questions) {
   const units = makeUnits({ onlySeen: true });
   runSession({
     screen: getScreen(), icon: COURSE.icon, title: L('Case Drill', 'Naamvallen Drill'), accent: ACCENT,
-    cards: questions.map(q => formCard(q, { dictation: cd.dictation, units })),
+    cards: questions.map(q => formCard(q, { dictation: dictOn(), units })),
     onExit: showMenu,
     again: () => ({ label: '🔄 ' + L('Try again (new questions)', 'Opnieuw (nieuwe vragen)'), run: startDrill }),
   });

@@ -433,6 +433,7 @@
   transition: all 0.15s;
 }
 .vd-weak-toggle:hover { background: #fde68a; }
+.vd-weak-toggle:disabled { opacity: 0.55; cursor: default; }
 .vd-weak-toggle.active { border-color: #f59e0b; background: #fde68a; }
 .vd-weak-check {
   width: 18px; height: 18px;

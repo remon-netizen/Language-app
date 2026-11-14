@@ -87,6 +87,11 @@ export function hasNoVoice() {
   return voicesSettled && getVoices().length === 0;
 }
 
+// For menus: a listening exercise cannot be done where nothing can be heard.
+export function noVoiceReason() {
+  return L(`no ${getLangLabel()} voice on this device`, `geen ${getLangLabel()} stem op dit apparaat`);
+}
+
 export function applyVoice(idx) {
   const v = getVoices()[idx];
   if (!v) return;

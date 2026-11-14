@@ -1,6 +1,6 @@
 import { state } from '../state.js';
 import { escHtml, levenshtein } from '../utils.js';
-import { speakText } from '../voice.js';
+import { speakText, hasNoVoice, noVoiceReason } from '../voice.js';
 import { THEMES as CORE_THEMES, WORK_THEMES, POS_LABEL } from '../data/vocab-uk.js';
 import { deck, myWords, recordVocab, regradeVocab, dueVocab, unseenVocab, weakVocab, vocabStats, getVocabProgress } from '../data/vocab-progress.js';
 import { L, loc, isNL, targetCode, shuffle, byKeyboard, grade, normalise, wireSpeakButtons } from './drill-core.js';
@@ -29,6 +29,9 @@ function loadPrefs() {
   } catch { /* ignore */ }
 }
 function savePrefs() { localStorage.setItem(PREFS_KEY, JSON.stringify({ theme: vc.theme, qMode: vc.qMode })); }
+// The mode in use. Dictation needs a voice: without one a round is typed. The
+// learner's choice (vc.qMode) stays what it was, for a device that can speak.
+const qMode = () => (hasNoVoice() && vc.qMode === 'dictate' ? 'type' : vc.qMode);
 
 function getScreen() { return document.getElementById('vocabDrillScreen'); }
 
@@ -191,12 +194,17 @@ function showMenu() {
   const chips = ['all', ...Object.keys(themes())].map(t => `
     <button class="vc-chip ${vc.theme === t ? 'active' : ''}" data-theme="${t}">${t === 'all' ? '🌐' : themes()[t].icon} ${escHtml(themeName(t))}${t === 'mine' ? ` (${mineCount})` : ''}</button>`).join('');
 
-  const modeBtn = (id, icon, label, sub, wide = false) => `
-    <button class="vc-mode-btn ${wide ? 'vc-mode-wide' : ''} ${vc.qMode === id ? 'active' : ''}" data-mode="${id}">
+  // Dictation needs a voice: without one the cards would be silent.
+  const silent = hasNoVoice();
+  const modeBtn = (id, icon, label, sub, wide = false) => {
+    const off = silent && id === 'dictate';
+    return `
+    <button class="vc-mode-btn ${wide ? 'vc-mode-wide' : ''} ${qMode() === id ? 'active' : ''}" data-mode="${id}" ${off ? 'disabled' : ''}>
       <span class="vc-mode-icon">${icon}</span>
       <span class="vc-mode-label">${label}</span>
-      <span class="vc-mode-sub">${sub}</span>
+      <span class="vc-mode-sub">${off ? escHtml(noVoiceReason()) : sub}</span>
     </button>`;
+  };
 
   s.innerHTML = `
     <div class="lesson-header">
@@ -256,7 +264,7 @@ function showMenu() {
   s.querySelectorAll('[data-theme]').forEach(btn => btn.addEventListener('click', () => { vc.theme = btn.dataset.theme; savePrefs(); showMenu(); }));
   s.querySelectorAll('[data-mode]').forEach(btn => btn.addEventListener('click', () => {
     vc.qMode = btn.dataset.mode; savePrefs();
-    s.querySelectorAll('[data-mode]').forEach(b => b.classList.toggle('active', b.dataset.mode === vc.qMode));
+    s.querySelectorAll('[data-mode]').forEach(b => b.classList.toggle('active', b.dataset.mode === qMode()));
   }));
   s.querySelector('#vcNew').addEventListener('click', () => startSession('new'));
   s.querySelector('#vcDue').addEventListener('click', () => startSession('due'));
@@ -337,17 +345,17 @@ function startSession(kind) {
 
   // A translate card shows the perfective partner now and then: in real text a
   // verb turns up in either aspect, and зробити has to ring the same bell as робити.
-  const card = (w, dir) => (dir === 'translate' ? translateCard(w) : produceCard(w, { dictation: vc.qMode === 'dictate' }));
-  const dirOf = () => (vc.qMode === 'translate' ? 'translate'
-    : vc.qMode === 'mixed' ? (Math.random() < 0.5 ? 'translate' : 'produce') : 'produce');
+  const card = (w, dir) => (dir === 'translate' ? translateCard(w) : produceCard(w, { dictation: qMode() === 'dictate' }));
+  const dirOf = () => (qMode() === 'translate' ? 'translate'
+    : qMode() === 'mixed' ? (Math.random() < 0.5 ? 'translate' : 'produce') : 'produce');
 
   let cards;
-  if (vc.qMode === 'choose') {
+  if (qMode() === 'choose') {
     cards = words.map(chooseCard);
   } else if (kind === 'new') {
     // first the word shown and copied, then from memory: one pass in the chosen
     // direction, or word → meaning followed by meaning → word in 'mixed'
-    const passes = vc.qMode === 'mixed' ? ['translate', 'produce'] : [dirOf()];
+    const passes = qMode() === 'mixed' ? ['translate', 'produce'] : [dirOf()];
     cards = [
       ...words.map(w => produceCard(w, { intro: true })),
       ...passes.flatMap(dir => shuffle(words).map(w => card(w, dir))),

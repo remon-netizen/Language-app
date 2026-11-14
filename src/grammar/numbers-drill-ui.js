@@ -1,6 +1,6 @@
 import { state } from '../state.js';
 import { escHtml } from '../utils.js';
-import { speakText } from '../voice.js';
+import { speakText, hasNoVoice, noVoiceReason } from '../voice.js';
 import { CATEGORIES, getCategory, referenceRows, TIME_PATTERNS, ordinalSuffix, GENDER_LABEL, timeGloss, MONTHS } from '../data/numbers-time.js';
 import { recordAnswer, weight, weakKeys, totalAttempts } from '../data/numbers-weakness.js';
 import { STAGES } from '../data/numbers-course.js';
@@ -35,6 +35,10 @@ function loadPrefs() {
   } catch { /* ignore */ }
   if (!nd.cats.length) nd.cats = ['small'];
 }
+// The mode in use. Without a voice the two listening modes cannot be done, so a
+// round is typed instead; the learner's choice (nd.qMode) stays what it was, for
+// a device that can speak.
+const qMode = () => (hasNoVoice() && (nd.qMode === 'listen' || nd.qMode === 'dictate') ? 'type' : nd.qMode);
 function savePrefs() {
   localStorage.setItem(PREFS_KEY, JSON.stringify({ cats: nd.cats, qMode: nd.qMode, total: nd.total }));
 }
@@ -143,12 +147,17 @@ function showMenu() {
       <button class="nd-cat-study" type="button" data-study="${c.id}" title="${nl ? 'Bekijk de tabel' : 'Study the table'}" aria-label="${nl ? 'Bekijk de tabel' : 'Study the table'}: ${escHtml(loc(c.title))}">📖</button>
     </div>`).join('');
 
-  const modeBtn = (id, icon, label, sub) => `
-    <button class="nd-mode-btn ${nd.qMode === id ? 'active' : ''}" data-mode="${id}">
+  // The two listening modes need a voice: without one the cards would be silent.
+  const silent = hasNoVoice();
+  const modeBtn = (id, icon, label, sub) => {
+    const off = silent && (id === 'listen' || id === 'dictate');
+    return `
+    <button class="nd-mode-btn ${qMode() === id ? 'active' : ''}" data-mode="${id}" ${off ? 'disabled' : ''}>
       <span class="nd-mode-icon">${icon}</span>
       <span class="nd-mode-label">${label}</span>
-      <span class="nd-mode-sub">${sub}</span>
+      <span class="nd-mode-sub">${off ? escHtml(noVoiceReason()) : sub}</span>
     </button>`;
+  };
 
   s.innerHTML = `
     <div class="lesson-header">
@@ -238,7 +247,7 @@ function showMenu() {
     btn.addEventListener('click', () => {
       nd.qMode = btn.dataset.mode;
       savePrefs();
-      s.querySelectorAll('[data-mode]').forEach(b => b.classList.toggle('active', b.dataset.mode === nd.qMode));
+      s.querySelectorAll('[data-mode]').forEach(b => b.classList.toggle('active', b.dataset.mode === qMode()));
     });
   });
   s.querySelectorAll('[data-total]').forEach(btn => {
@@ -361,7 +370,7 @@ function nextStage() {
 
 // How a question is asked when the mode leaves a choice.
 function modeFor() {
-  return nd.qMode === 'mixed' ? (Math.random() < 0.5 ? 'read' : 'type') : nd.qMode;
+  return qMode() === 'mixed' ? (Math.random() < 0.5 ? 'read' : 'type') : qMode();
 }
 
 // 'new': the next stage, at most 12 items. Each is shown with its word first
@@ -376,8 +385,8 @@ function startCourse(kind) {
     const items = stage.fresh.slice(0, MAX_NEW);
     const pool = stage.items;
     const ask = mode => shuffle(items).map(item => ({ item, pool, catId: stage.id, mode }));
-    const passes = nd.qMode === 'mixed' ? ['read', 'type'] : [nd.qMode];
-    questions = nd.qMode === 'choose'
+    const passes = qMode() === 'mixed' ? ['read', 'type'] : [qMode()];
+    questions = qMode() === 'choose'
       ? ask('choose')
       : [...items.map(item => ({ item, pool, catId: stage.id, mode: 'type', intro: true })), ...passes.flatMap(ask)];
   } else {

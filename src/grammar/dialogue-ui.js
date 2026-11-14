@@ -1,6 +1,6 @@
 import { state, getTTSLang } from '../state.js';
 import { escHtml } from '../utils.js';
-import { speakText, speakTextCb } from '../voice.js';
+import { speakText, speakTextCb, hasNoVoice, noVoiceReason } from '../voice.js';
 import { DIALOGUES } from '../data/dialogues-uk.js';
 import { makeTracker } from '../data/flat-weakness.js';
 import { keyboardHelpFirstTime, wrongKeyboard } from '../keyboard-help.js';
@@ -54,6 +54,8 @@ function showMenu() {
         <div class="lesson-subtitle">${L('Listen without the text, then answer', 'Luister zonder tekst, beantwoord dan de vragen')}</div>
       </div>
     </div>
+    ${hasNoVoice() ? `<div class="ex-nokey"><span>🔇 ${L('These are listening exercises, and there is', 'Dit zijn luisteroefeningen, en er is')} ${escHtml(noVoiceReason())}.</span>
+      <button class="ex-nokey-btn" id="dgVoiceHelp" type="button">${L('What now?', 'Wat nu?')}</button></div>` : ''}
     <div class="dg-howto">
       ${L('Each dialogue plays with the transcript hidden. Then you type two words you heard and answer one question. The text appears only at the end.',
           'Elke dialoog wordt afgespeeld zonder tekst. Daarna typ je twee woorden die je hoorde en beantwoord je één vraag. De tekst verschijnt pas aan het eind.')}
@@ -74,6 +76,7 @@ function showMenu() {
         </button>`; }).join('')}
     </div>`;
   s.querySelector('#dgBack').addEventListener('click', () => window.openExercisesScreen());
+  s.querySelector('#dgVoiceHelp')?.addEventListener('click', () => window.toggleSettingsDrawer());
   s.querySelectorAll('[data-id]').forEach(b => b.addEventListener('click', () => startDialogue(DIALOGUES.find(d => d.id === b.dataset.id))));
 }
 

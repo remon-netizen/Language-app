@@ -47,8 +47,8 @@ const DEVICES = {
   mac: {
     name: { en: 'Mac', nl: 'Mac' },
     steps: {
-      en: ['Open <b>System Settings</b> → <b>Keyboard</b> → <b>Text Input</b> → <b>Edit…</b>.', 'Click <b>+</b> and add <b>Ukrainian</b>.', 'Switch with the <b>🌐 key</b> (or <b>Control + space</b>).'],
-      nl: ['Open <b>Systeeminstellingen</b> → <b>Toetsenbord</b> → <b>Tekstinvoer</b> → <b>Wijzig…</b>.', 'Klik op <b>+</b> en voeg <b>Oekraïens</b> toe.', 'Wissel met de <b>🌐-toets</b> (of <b>Control + spatie</b>).'],
+      en: ['Open <b>System Settings</b> → <b>Keyboard</b> → <b>Text Input</b> → <b>Edit…</b>.', 'Click <b>+</b> and add <b>Ukrainian</b>: the plain one, not a variant such as “Legacy” or “QWERTY” (the keys sit elsewhere on those).', 'Switch with the <b>🌐 key</b> (or <b>Control + space</b>).'],
+      nl: ['Open <b>Systeeminstellingen</b> → <b>Toetsenbord</b> → <b>Tekstinvoer</b> → <b>Wijzig…</b>.', 'Klik op <b>+</b> en voeg <b>Oekraïens</b> toe: de gewone, niet een variant met een toevoeging als “QWERTY” (daar zitten de toetsen anders).', 'Wissel met de <b>🌐-toets</b> (of <b>Control + spatie</b>).'],
     },
   },
 };

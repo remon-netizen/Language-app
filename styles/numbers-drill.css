@@ -65,6 +65,7 @@
 }
 .nd-mode-btn:hover { border-color: #fdba74; }
 .nd-mode-btn.active { border-color: #ea580c; background: #fff7ed; }
+.nd-mode-btn:disabled { opacity: 0.55; cursor: default; }
 .nd-mode-icon { font-size: 1.4rem; line-height: 1; }
 .nd-mode-label { font-size: 0.85rem; font-weight: 700; color: var(--text); }
 .nd-mode-sub { font-size: 0.75rem; color: var(--gray); }
