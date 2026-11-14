@@ -11,10 +11,25 @@ import { addUserMessage, addBotMessage, addGrammarFeedback, addErrorMessage, add
 import { updateSuggestions } from './suggestions.js';
 import { t } from '../i18n.js';
 
+// Without an API key the tutor only has canned replies. The screen says so, instead
+// of letting the learner find out from answers that ignore what they wrote.
+function updateNoKeyNotice() {
+  const box = document.getElementById('chatNoKey');
+  if (!box) return;
+  const nl = state.nativeLanguage === 'nl';
+  box.style.display = getApiKey() ? 'none' : '';
+  document.getElementById('chatNoKeyText').textContent = nl
+    ? 'Zonder API-sleutel krijg je standaardantwoorden: de tutor herkent een paar woorden en gaat niet echt in op wat je zegt. Met een sleutel wordt het een echt gesprek, met uitleg bij je fouten.'
+    : 'Without an API key the replies are canned: the tutor recognises a few words and does not really respond to what you say. With a key it becomes a real conversation, with your mistakes explained.';
+  document.getElementById('chatNoKeyBtn').textContent = nl ? 'Sleutel toevoegen →' : 'Add key →';
+}
+document.addEventListener('apiKeyChanged', updateNoKeyNotice);
+
 export function openFreeChat() {
   state.freeChatLang = state.currentLanguage; // match speech recognition to current language
   showScreen('chatScreen');
   loadApiKey();
+  updateNoKeyNotice();
   const chatArea = document.getElementById('chatArea');
   if (chatArea.children.length === 0 && state.conversationHistory.length === 0) {
     startConversation();

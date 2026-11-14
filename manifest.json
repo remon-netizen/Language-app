@@ -1,7 +1,7 @@
 {
   "name": "Taal-chat — Language Practice",
   "short_name": "Taal-chat",
-  "description": "Learn Ukrainian, Dutch, English or French with speech, drills, grammar feedback and AI conversation",
+  "description": "Learn Ukrainian from A1 to B2: a course path, vocabulary and grammar courses on one review schedule, speech, and AI conversation",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",

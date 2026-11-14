@@ -103,6 +103,16 @@
 .kb-btn-primary { background: var(--blue); border-color: var(--blue); color: white; }
 .kb-btn-primary:hover { background: #003d80; border-color: #003d80; color: white; }
 
+/* Weak spots (weak-spots.js) */
+.ws-lead { color: var(--gray); font-size: 0.86rem; margin-bottom: 10px; }
+.ws-row { display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px; margin-bottom: 8px; border: 2px solid var(--border); border-radius: 12px; background: var(--card-bg); text-align: left; cursor: pointer; font-family: inherit; min-height: 56px; }
+.ws-row:hover, .ws-row:active { border-color: var(--blue); background: var(--light-blue); }
+.ws-icon { font-size: 1.4rem; flex-shrink: 0; }
+.ws-text { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.ws-title { font-size: 0.92rem; font-weight: 700; color: var(--text); }
+.ws-sub { font-size: 0.76rem; color: var(--gray); }
+.ws-count { flex-shrink: 0; font-size: 0.85rem; font-weight: 800; color: #92400e; background: #fef3c7; border-radius: 10px; padding: 4px 10px; }
+
 .wl-loading { color: var(--gray); font-style: italic; padding: 12px 0; }
 .wl-error   { color: #dc2626; font-size: 0.85rem; padding: 8px 0; }
 
@@ -206,6 +216,10 @@
   font-size: 0.9rem;
   padding: 50px 20px;
   line-height: 1.7;
+}
+.words-empty-key {
+  margin: 16px auto 0; max-width: 420px; padding: 10px 14px; border-radius: 10px;
+  background: #fffbeb; border: 1px solid #fde68a; color: #92400e; font-size: 0.84rem; line-height: 1.45;
 }
 
 .word-card {

@@ -114,7 +114,9 @@ function getMasteryColor(inf1, inf2) {
 
 // ── Public entry ─────────────────────────────────────────────────────────────
 
-export function openVerbDrillScreen() {
+// focusWeak: arrive with "focus on weak verbs" switched on (from the weak-spots list).
+export function openVerbDrillScreen({ focusWeak = false } = {}) {
+  if (focusWeak) vd.focusWeak = true;
   window.showScreen('verbDrillScreen');
   showMenu();
 }
@@ -403,6 +405,14 @@ function showReference(index) {
       </div>
     </div>
 
+    <div class="dc-jump">
+      <button class="dc-jump-step" id="vdPrevTop" type="button" aria-label="${nl ? 'Vorige' : 'Previous'}" ${pairIdx === 0 ? 'disabled' : ''}>←</button>
+      <select class="dc-jump-select" id="vdJump" aria-label="${nl ? 'Kies een werkwoord' : 'Choose a verb'}">
+        ${Array.from({ length: totalPairs }, (_, i) => `<option value="${i}" ${i === pairIdx ? 'selected' : ''}>${escHtml(verbs[i * 2].infinitive)} / ${escHtml(verbs[i * 2 + 1].infinitive)} — ${escHtml(loc(verbs[i * 2].meaning))}</option>`).join('')}
+      </select>
+      <button class="dc-jump-step" id="vdNextTop" type="button" aria-label="${nl ? 'Volgende' : 'Next'}" ${pairIdx >= totalPairs - 1 ? 'disabled' : ''}>→</button>
+    </div>
+
     <div class="vd-ref-tables">
       <div class="vd-ref-col vd-imp-col">${renderTable(imp, nl ? 'Onvoltooid' : 'Imperfective', false)}</div>
       <div class="vd-ref-col vd-perf-col">${renderTable(perf, nl ? 'Voltooid' : 'Perfective', false)}</div>
@@ -414,8 +424,9 @@ function showReference(index) {
     </div>`;
 
   s.querySelector('#vdRefBack').addEventListener('click', showMenu);
-  if (pairIdx > 0) s.querySelector('#vdPrev').addEventListener('click', () => showReference(pairIdx - 1));
-  if (pairIdx < totalPairs - 1) s.querySelector('#vdNext').addEventListener('click', () => showReference(pairIdx + 1));
+  s.querySelector('#vdJump').addEventListener('change', e => showReference(Number(e.target.value)));
+  for (const id of ['#vdPrev', '#vdPrevTop']) if (pairIdx > 0) s.querySelector(id).addEventListener('click', () => showReference(pairIdx - 1));
+  for (const id of ['#vdNext', '#vdNextTop']) if (pairIdx < totalPairs - 1) s.querySelector(id).addEventListener('click', () => showReference(pairIdx + 1));
 }
 
 // ── Drill session ────────────────────────────────────────────────────────────

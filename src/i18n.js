@@ -143,7 +143,7 @@ const dict = {
     'home.lessonsSub':    'Oefen woorden en zinnen met spraak',
     'home.pathBtnTitle':  'Leerpad',
     'home.pathBtnSub':    'Oekraïens van A1 tot B2',
-    'home.reviewTitle':   'Herhaling',
+    'home.reviewTitle':   'Herhalen',
     'home.reviewSub':     'Vandaag aan de beurt',
     'home.hwTitle':       'Huiswerk uploaden',
     'home.hwSub':         'Upload een .docx of .txt en oefen de woordenschat met spreken',

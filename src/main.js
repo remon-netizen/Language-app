@@ -20,22 +20,19 @@ import { openVerbDrillScreen, startVerbReview } from './grammar/verb-drill-ui.js
 import { openCaseDrillScreen, startCaseReview } from './grammar/case-drill-ui.js';
 import { openPrefixDrillScreen, startPrefixReview } from './grammar/prefix-drill-ui.js';
 import { openNumbersDrillScreen, startNumbersReview } from './grammar/numbers-drill-ui.js';
-import { openVocabDrillScreen, startVocabReview } from './grammar/vocab-drill-ui.js';
-import { openSentenceBuildScreen, tracker as sentenceTracker } from './grammar/sentence-build-ui.js';
-import { openDialogueScreen, tracker as dialogueTracker } from './grammar/dialogue-ui.js';
+import { openVocabDrillScreen, startVocabReview, startVocabWeak } from './grammar/vocab-drill-ui.js';
+import { openSentenceBuildScreen } from './grammar/sentence-build-ui.js';
+import { openDialogueScreen } from './grammar/dialogue-ui.js';
 import { openProgressScreen } from './progress-ui.js';
-import { openPathScreen, startPathReview } from './grammar/path-ui.js';
-import { weakVocab } from './data/vocab-progress.js';
+import { openPathScreen, startPathReview, startPathWeak } from './grammar/path-ui.js';
+import { weakSpotCount, openWeakSpots } from './weak-spots.js';
 import { openReviewScreen, startReviewAll, getDueTotal } from './review.js';
 import { openAlphabetScreen } from './alphabet-ui.js';
 import { nextOpenUnit, pathStats, unitStarted, unitDone } from './data/path-progress.js';
 import { openKeyboardHelp } from './keyboard-help.js';
+import { renderBackupSection } from './backup-ui.js';
 import { unitIndex } from './data/path/index.js';
 import { loc } from './grammar/drill-core.js';
-import { getWeakVerbCount as weakVerbs } from './data/verb-weakness.js';
-import { getWeakNounCount as weakNouns } from './data/case-weakness.js';
-import { getWeakVerbCount as weakPrefixVerbs } from './data/prefix-weakness.js';
-import { weakKeys as weakNumberKeys } from './data/numbers-weakness.js';
 
 // ── Speech speed ──────────────────────────────────────────────────────────────
 function setSpeechRate(rate) {
@@ -51,6 +48,8 @@ function setSettingsDrawer(open) {
   document.getElementById('settingsDrawer').classList.toggle('open', open);
   document.getElementById('drawerOverlay').classList.toggle('open', open);
   document.body.classList.toggle('drawer-open', open);
+  // The backup section shows when the last one was: fill it in as the drawer opens.
+  if (open) renderBackupSection(document.getElementById('backupSection'));
   // The back gesture closes an open drawer instead of leaving the screen behind it.
   if (open) sheetOpened(closeSettingsDrawer); else sheetClosed(closeSettingsDrawer);
 }
@@ -171,14 +170,6 @@ function updateReviewCount() {
   renderTodayCard();
 }
 
-// How many weak items the offline drills are tracking for the current target.
-function weakSpotCount() {
-  if (state.currentLanguage !== 'uk') return 0;
-  try { return weakVerbs() + weakNouns() + weakPrefixVerbs() + weakNumberKeys().length + weakVocab().length + pathStats().ownWeak + sentenceTracker.weakKeys().length + dialogueTracker.weakKeys().length; }
-  catch { return 0; }
-}
-
-
 // One card at the top of Home that answers "what should I do now?".
 function renderTodayCard() {
   const card = document.getElementById('todayCard');
@@ -194,7 +185,7 @@ function renderTodayCard() {
     rows.push({ icon: '🔄', title: nl ? 'Herhalen' : 'Review', sub: nl ? `${due} aan de beurt, in één ronde` : `${due} due, in one round`, onclick: 'openReviewScreen()', hot: true });
   }
   if (weak > 0) {
-    rows.push({ icon: '🎯', title: nl ? 'Zwakke plekken' : 'Weak spots', sub: nl ? `${weak} ${weak === 1 ? 'vorm' : 'vormen'} die je eerder fout had` : `${weak} form${weak === 1 ? '' : 's'} you got wrong before`, onclick: 'openExercisesScreen()' });
+    rows.push({ icon: '🎯', title: nl ? 'Zwakke plekken' : 'Weak spots', sub: nl ? `${weak} ${weak === 1 ? 'vorm' : 'vormen'} die je eerder fout had` : `${weak} form${weak === 1 ? '' : 's'} you got wrong before`, onclick: 'openWeakSpots()' });
   }
   if (next) {
     const started = unitStarted(next.id);
@@ -446,3 +437,6 @@ window.openProgressScreen     = openProgressScreen;
 window.openPathScreen         = openPathScreen;
 window.startPathReview        = startPathReview;
 window.startVocabReview       = startVocabReview;
+window.startVocabWeak         = startVocabWeak;
+window.startPathWeak          = startPathWeak;
+window.openWeakSpots          = openWeakSpots;

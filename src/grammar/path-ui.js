@@ -493,6 +493,21 @@ function startLearnedReview(unit) {
   });
 }
 
+// The path's own words and sentences that go wrong more often than right, as a
+// round (weak-spots list). Core words are the vocabulary course's to practise.
+export function startPathWeak() {
+  loadPrefs();
+  showScreen('pathScreen');
+  const weak = UNITS.flatMap(u => unitItems(u).all).filter(i => { if (i.core) return false; const e = entryOf(i); return e && e.a > 0 && e.c / e.a < 0.5; });
+  if (!weak.length) { showMenu(); return; }
+  runSession({
+    screen: getScreen(), icon: '🎯', title: L('Weak spots', 'Zwakke plekken'), accent: ACCENT,
+    cards: shuffle(weak).slice(0, 25).map(anyCard),
+    onExit: showMenu,
+    again: () => null,
+  });
+}
+
 // ── Practise what you learned ────────────────────────────────────────────────
 // The exercises of units whose exercise step is done, as a mixed round. They are
 // not scheduled (the words and sentences are), so this is the free practice.

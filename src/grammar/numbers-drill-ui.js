@@ -154,7 +154,7 @@ function showMenu() {
     <div class="lesson-header">
       <button class="back-btn" id="ndBack">←</button>
       <div>
-        <div class="lesson-title">🔢 ${nl ? 'Getallen & Tijd Drill' : 'Numbers & Time Drill'}</div>
+        <div class="lesson-title">🔢 ${nl ? 'Getallen & Tijd' : 'Numbers & Time'}</div>
         <div class="lesson-subtitle">${nl ? 'Eén woord per keer: getallen, rangtelwoorden, kloktijden' : 'One word at a time: numbers, ordinals, clock times'}</div>
       </div>
     </div>

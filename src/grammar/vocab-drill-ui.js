@@ -146,6 +146,13 @@ export function startVocabReview() {
   startSession('due');
 }
 
+// Weak-spots entry: the words answered wrong more often than right.
+export function startVocabWeak() {
+  loadPrefs();
+  window.showScreen('vocabDrillScreen');
+  startSession('weak');
+}
+
 // ── Menu ─────────────────────────────────────────────────────────────────────
 
 function showMenu() {

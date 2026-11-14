@@ -1,7 +1,7 @@
 // Language App — Service Worker
 // Cache the app shell so it works offline after first load.
 // Bump CACHE version whenever shell file list changes or content updates.
-const CACHE = 'language-app-v73';
+const CACHE = 'language-app-v74';
 const SHELL = [
   './index.html',
   './manifest.json',
@@ -21,6 +21,9 @@ const SHELL = [
   './src/sheet.js',
   './src/toast.js',
   './src/keyboard-help.js',
+  './src/course-names.js',
+  './src/weak-spots.js',
+  './src/backup-ui.js',
   './src/speech.js',
   './src/voice.js',
   './src/words.js',

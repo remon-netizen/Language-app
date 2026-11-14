@@ -49,7 +49,9 @@ function getMasteryColor(noun) {
 
 // ── Public entry ─────────────────────────────────────────────────────────────
 
-export function openCaseDrillScreen() {
+// focusWeak: arrive with "focus on weak nouns" switched on (from the weak-spots list).
+export function openCaseDrillScreen({ focusWeak = false } = {}) {
+  if (focusWeak) cd.focusWeak = true;
   window.showScreen('caseDrillScreen');
   showMenu();
 }
@@ -232,6 +234,13 @@ function showReference(index) {
         <div class="lesson-subtitle">${escHtml(loc(noun.meaning))} — ${index + 1}/${nouns.length}</div>
       </div>
     </div>
+    <div class="dc-jump">
+      <button class="dc-jump-step" id="cdPrevTop" type="button" aria-label="${nl ? 'Vorige' : 'Previous'}" ${index === 0 ? 'disabled' : ''}>←</button>
+      <select class="dc-jump-select" id="cdJump" aria-label="${nl ? 'Kies een woord' : 'Choose a noun'}">
+        ${nouns.map((n, i) => `<option value="${i}" ${i === index ? 'selected' : ''}>${escHtml(n.nom_s)} — ${escHtml(loc(n.meaning))}</option>`).join('')}
+      </select>
+      <button class="dc-jump-step" id="cdNextTop" type="button" aria-label="${nl ? 'Volgende' : 'Next'}" ${index >= nouns.length - 1 ? 'disabled' : ''}>→</button>
+    </div>
     <div class="cd-ref-tables">${tableHtml}</div>
     <div class="cd-ref-nav">
       <button class="cd-nav-btn" id="cdPrev" ${index === 0 ? 'disabled' : ''}>← ${nl ? 'Vorige' : 'Previous'}</button>
@@ -239,8 +248,9 @@ function showReference(index) {
     </div>`;
 
   s.querySelector('#cdRefBack').addEventListener('click', showMenu);
-  if (index > 0) s.querySelector('#cdPrev').addEventListener('click', () => showReference(index - 1));
-  if (index < nouns.length - 1) s.querySelector('#cdNext').addEventListener('click', () => showReference(index + 1));
+  s.querySelector('#cdJump').addEventListener('change', e => showReference(Number(e.target.value)));
+  for (const id of ['#cdPrev', '#cdPrevTop']) if (index > 0) s.querySelector(id).addEventListener('click', () => showReference(index - 1));
+  for (const id of ['#cdNext', '#cdNextTop']) if (index < nouns.length - 1) s.querySelector(id).addEventListener('click', () => showReference(index + 1));
 }
 
 // ── Drill ────────────────────────────────────────────────────────────────────

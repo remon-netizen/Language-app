@@ -2,6 +2,7 @@ import { lookupWord } from './api/word-lookup.js';
 import { escHtml } from './utils.js';
 import { state } from './state.js';
 import { sheetOpened, sheetClosed } from './router.js';
+import { hasApiKey } from './api/model.js';
 
 const STORAGE_KEY = 'savedWords';
 let _currentLookup = null;
@@ -172,6 +173,7 @@ export function renderWordsScreen() {
       <div class="words-empty">
         ${L('No saved words yet.', 'Nog geen opgeslagen woorden.')}<br>
         ${L('Tap any word in a conversation to look it up and save it.', 'Tik op een woord in een gesprek om het op te zoeken en op te slaan.')}
+        ${hasApiKey() ? '' : `<div class="words-empty-key">🔑 ${L('Looking a word up uses AI, so it needs an API key. Add one in Settings (⚙️).', 'Een woord opzoeken gebruikt AI en heeft dus een API-sleutel nodig. Voeg er een toe bij Instellingen (⚙️).')}</div>`}
       </div>`;
     return;
   }

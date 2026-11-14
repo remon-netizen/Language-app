@@ -4,6 +4,7 @@ import { escHtml } from '../utils.js';
 import { generateExercises } from '../api/exercises.js';
 import { languageName } from '../i18n.js';
 import { hasApiKey } from '../api/model.js';
+import { courseName } from '../course-names.js';
 
 // A small helper so every string in this file is available in both native languages.
 const NL = () => state.nativeLanguage === 'nl';
@@ -169,16 +170,17 @@ function showTopicPicker() {
   const lblPracVerb = native === 'nl' ? 'Werkwoord opzoeken' : 'Verb Lookup';
   const lblDissect  = native === 'nl' ? 'Zin ontleden' : 'Dissect a Sentence';
   const lblDeHet    = native === 'nl' ? 'De of Het?' : 'De or Het?';
-  const lblDrill    = native === 'nl' ? 'Werkwoord Drill' : 'Verb Drill';
-  const lblCases    = native === 'nl' ? 'Naamvallen Drill' : 'Case Drill';
-  const lblPrefix   = native === 'nl' ? 'Voorvoegsel Drill' : 'Prefix Drill';
-  const lblNumbers  = native === 'nl' ? 'Getallen & Tijd' : 'Numbers & Time';
-  const lblVocab    = native === 'nl' ? 'Woordenschat' : 'Vocabulary';
-  const lblSentence = native === 'nl' ? 'Zinnen bouwen' : 'Sentence Builder';
-  const lblDialog   = native === 'nl' ? 'Dialogen' : 'Dialogues';
+  const lblDrill    = courseName('verbs');
+  const lblCases    = courseName('cases');
+  const lblPrefix   = courseName('prefixes');
+  const lblNumbers  = courseName('numbers');
+  const lblVocab    = courseName('vocab');
+  const lblSentence = courseName('sentences');
+  const lblDialog   = courseName('dialogues');
   const lblAlphabet = native === 'nl' ? 'Alfabet' : 'Alphabet';
+  const lblKeyboard = native === 'nl' ? 'Oekraïens toetsenbord' : 'Ukrainian keyboard';
   const isUK        = state.currentLanguage === 'uk';
-  const lblLevel    = native === 'nl' ? 'Niveau (AI-onderwerpen):' : 'Level (AI topics):';
+  const lblLevel    = native === 'nl' ? 'Niveau:' : 'Level:';
   const keyOk       = hasApiKey();
   const aiTag       = `<span class="ex-ai-tag" title="${native === 'nl' ? 'Gebruikt AI — API-sleutel nodig' : 'Uses AI — needs an API key'}">🔑</span>`;
   const aiCls       = keyOk ? 'ex-tool-ai' : 'ex-tool-ai ex-tool-locked';
@@ -191,7 +193,7 @@ function showTopicPicker() {
   const courseStats = Object.fromEntries(getCourses().map(c => [c.id, c.stats()]));
   const tile = (id, cls, icon, label, courseId) => {
     const st = courseStats[courseId];
-    const meta = !st ? '' : st.seen ? `${st.learned} / ${st.total}${st.due ? ` · ${st.due} ${native === 'nl' ? 'nu' : 'due'}` : ''}` : (native === 'nl' ? 'start hier' : 'start here');
+    const meta = !st ? '' : `${st.learned} / ${st.total}${st.due ? ` · ${st.due} ${native === 'nl' ? 'nu' : 'due'}` : ''}`;
     return { id, cls, icon, label, meta, due: !!(st && st.due) };
   };
   const courseTiles = [
@@ -235,13 +237,21 @@ function showTopicPicker() {
         <span class="ex-tool-icon">🎧</span>
         <span>${lblDialog}</span>
       </button>
+    </div>
+
+    <div class="ex-section-label">${native === 'nl' ? '📖 Naslag — de letters en hoe je ze typt' : '📖 Reference — the letters and how to type them'}</div>
+    <div class="ex-tools-row">
       <button class="ex-tool-btn ex-tool-alphabet" id="exAlphabetBtn">
         <span class="ex-tool-icon">🔤</span>
         <span>${lblAlphabet}</span>
       </button>
+      <button class="ex-tool-btn ex-tool-alphabet" id="exKeyboardBtn">
+        <span class="ex-tool-icon">⌨️</span>
+        <span>${lblKeyboard}</span>
+      </button>
     </div>` : ''}
 
-    <div class="ex-section-label">${native === 'nl' ? '🤖 AI-hulpmiddelen en quizzen — met je API-sleutel' : '🤖 AI tools and quizzes — with your API key'}</div>
+    <div class="ex-section-label">${native === 'nl' ? '🤖 AI-hulpmiddelen — met je API-sleutel' : '🤖 AI tools — with your API key'}</div>
     ${keyOk ? '' : `
       <div class="ex-nokey">
         <span>🔑 ${native === 'nl' ? 'Zonder API-sleutel staan de AI-onderdelen uit.' : 'Without an API key the AI parts are off.'}</span>
@@ -262,6 +272,7 @@ function showTopicPicker() {
       </button>
     </div>
 
+    <div class="ex-section-label">${native === 'nl' ? '📝 AI-quiz — kies een niveau en een onderwerp' : '📝 AI quiz — pick a level and a topic'}</div>
     <div class="ex-controls-bar">
       <div class="ex-level-bar">
         <span class="ex-level-label">${lblLevel}</span>
@@ -297,6 +308,8 @@ function showTopicPicker() {
   if (sentenceBtn) sentenceBtn.addEventListener('click', () => window.openSentenceBuildScreen());
   const alphabetBtn = s.querySelector('#exAlphabetBtn');
   if (alphabetBtn) alphabetBtn.addEventListener('click', () => window.openAlphabetScreen());
+  const keyboardBtn = s.querySelector('#exKeyboardBtn');
+  if (keyboardBtn) keyboardBtn.addEventListener('click', () => window.openKeyboardHelp());
   const vocabBtn = s.querySelector('#exVocabBtn');
   if (vocabBtn) vocabBtn.addEventListener('click', () => window.openVocabDrillScreen());
   const numbersDrillBtn = s.querySelector('#exNumbersDrillBtn');

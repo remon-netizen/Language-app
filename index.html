@@ -108,6 +108,9 @@
     </div>
     <div class="api-status" id="apiStatus"></div>
   </div>
+
+  <!-- Backup: one file with all progress, and back (filled by backup-ui.js) -->
+  <div class="drawer-section" id="backupSection"></div>
 </div>
 
 <div class="app">
@@ -202,6 +205,12 @@
     </div>
 
     <div class="screen-inner">
+
+      <!-- Shown while there is no API key: the replies are canned, and the screen says so -->
+      <div class="api-notice chat-nokey" id="chatNoKey" style="display:none">
+        <span id="chatNoKeyText"></span>
+        <button class="ex-nokey-btn" id="chatNoKeyBtn" type="button" onclick="toggleSettingsDrawer()"></button>
+      </div>
 
       <!-- Difficulty bar -->
       <div class="chat-settings">

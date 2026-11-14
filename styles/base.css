@@ -98,6 +98,12 @@ header p { font-size: 0.8rem; opacity: 0.8; }
   border-bottom: 1px solid var(--border);
   display: flex; flex-direction: column; gap: 10px;
 }
+/* Backup section of the drawer (backup-ui.js) */
+.bk-status { font-weight: 700; font-size: 0.9rem; color: var(--text); }
+.bk-status.bk-due { color: #92400e; }
+.bk-explain { font-size: 0.78rem; line-height: 1.45; color: var(--gray); }
+.settings-drawer .pg-backup-actions { margin-top: 0; }
+
 /* A plain action inside the drawer: opens a help sheet, downloads a file. */
 .drawer-link-btn {
   width: 100%; padding: 11px 12px; border: 2px solid var(--border); border-radius: 10px;
@@ -141,6 +147,10 @@ body.drawer-open { overflow: hidden; }
 /* ── Screens ── */
 .screen { display: none; }
 .screen.active { display: block; }
+/* A column for reading and typing stays a comfortable width on a wide screen: an
+   answer field does not need 1000px. Only the conversation, with its side panel,
+   uses the full width (Home has its own, narrower column). */
+.screen:not(#chatScreen):not(#homeScreen) { max-width: 760px; margin-left: auto; margin-right: auto; }
 
 /* ── Shared ── */
 .section-title {
@@ -163,7 +173,10 @@ body.drawer-open { overflow: hidden; }
 .back-btn {
   background: none; border: none; font-size: 1.4rem; cursor: pointer; padding: 4px; line-height: 1;
   min-width: 36px; min-height: 36px; display: inline-flex; align-items: center; justify-content: center;
+  position: relative;
 }
+/* The button is 36px to keep the header low; the touch target around it is 48px. */
+.back-btn::after { content: ''; position: absolute; inset: -6px; }
 
 /* ── Small speaker buttons ──
    The icon sits in a line of text or at the end of a list row and stays small;

@@ -512,6 +512,19 @@
 }
 .ex-nokey-btn:hover { background: #92400e; }
 
+/* ── Jump bar above a reference table: step, or pick any entry ── */
+.dc-jump { display: flex; gap: 8px; margin-bottom: 12px; }
+.dc-jump-select {
+  flex: 1; min-width: 0; padding: 10px 12px; border: 2px solid var(--border); border-radius: 10px;
+  background: var(--card-bg); color: var(--text); font-size: 0.9rem; font-weight: 600; font-family: inherit; min-height: 44px;
+}
+.dc-jump-step {
+  flex-shrink: 0; width: 44px; min-height: 44px; border: 2px solid var(--border); border-radius: 10px;
+  background: var(--card-bg); color: var(--text); font-size: 1.1rem; font-weight: 700; cursor: pointer; font-family: inherit;
+}
+.dc-jump-step:hover:not(:disabled), .dc-jump-select:hover { border-color: var(--blue); }
+.dc-jump-step:disabled { opacity: 0.35; cursor: default; }
+
 /* ── Shared "missed this round" list (drill-core.js) ── */
 .dc-missed {
   background: var(--card-bg); border: 2px solid var(--border); border-radius: 14px;

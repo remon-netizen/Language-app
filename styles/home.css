@@ -406,6 +406,7 @@
   background: var(--bg); border-radius: 10px; padding: 4px 10px; flex-shrink: 0;
 }
 .rv-row-due { background: #8b5cf6; color: white; }
+.rv-empty-note { font-size: 0.86rem; line-height: 1.5; color: var(--gray); padding: 6px 4px; }
 .rv-empty { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
 .rv-empty-btn {
   flex: 1; padding: 12px; border: 2px solid var(--border); border-radius: 12px;
