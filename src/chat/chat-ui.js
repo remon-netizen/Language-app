@@ -3,6 +3,7 @@ import { speakText, speakTextCb, speakSlow } from '../voice.js';
 import { state, getTutorName, getTTSLang } from '../state.js';
 import { setupRecognition } from '../speech.js';
 import { openWordLookup } from '../words.js';
+import { aiErrorText } from '../api/model.js';
 
 // Interface text in the learner's own language.
 const L = (en, nl) => (state.nativeLanguage === 'nl' ? nl : en);
@@ -19,7 +20,9 @@ function wrapWordsInSpans(rawText) {
   }).join('');
 }
 
-export function addUserMessage(text) {
+// spoken: the message came from the microphone (its "again" button listens again;
+// for a typed one it puts the text back in the field).
+export function addUserMessage(text, { spoken = false } = {}) {
   const chatArea = document.getElementById('chatArea');
   const div = document.createElement('div');
   div.className = 'chat-msg user';
@@ -29,7 +32,7 @@ export function addUserMessage(text) {
     <div class="msg-bubble">${escHtml(text)}</div>
     <div class="user-msg-actions">
       ${hasCyrillic ? `<button class="user-pronounce-btn pronounce-btn" data-text="${escHtml(text)}">${practiseLabel()}</button>` : ''}
-      <button class="redo-btn" title="${L('Mic got it wrong? Try again', 'Verstond de microfoon je verkeerd? Probeer het opnieuw')}">🔄 ${L('Redo', 'Opnieuw')}</button>
+      <button class="redo-btn" title="${spoken ? L('Mic got it wrong? Try again', 'Verstond de microfoon je verkeerd? Probeer het opnieuw') : L('Take this message back and change it', 'Haal dit bericht terug en pas het aan')}">🔄 ${L('Redo', 'Opnieuw')}</button>
     </div>`;
 
   if (hasCyrillic) {
@@ -168,19 +171,12 @@ export function addGrammarFeedback(fb, original) {
   chatArea.scrollTop = chatArea.scrollHeight;
 }
 
-export function addErrorMessage(msg) {
+// err: the error itself, or its message.
+export function addErrorMessage(err) {
   const chatArea = document.getElementById('chatArea');
   const div = document.createElement('div');
   div.className = 'chat-msg bot';
-  // The providers word a rejected key differently: Anthropic "invalid x-api-key",
-  // Gemini "API key not valid", either one a bare 401 / 403.
-  const provider = state.currentProvider === 'anthropic' ? 'Anthropic' : 'Gemini';
-  const badKey = /\b40[13]\b|api[ _-]?key|authentication|permission/i.test(msg);
-  const text = badKey ? L(`The ${provider} API key was not accepted. Check it in Settings (⚙️).`, `De ${provider}-API-sleutel is niet geaccepteerd. Controleer hem bij Instellingen (⚙️).`)
-    : /\b429\b|rate limit|quota|overloaded/i.test(msg) ? L('The AI service is busy or your limit is reached. Wait a moment and try again.', 'De AI-dienst is druk of je limiet is bereikt. Wacht even en probeer het opnieuw.')
-    : /Failed to fetch|NetworkError|Load failed/i.test(msg) ? L('Network error. Check your internet connection.', 'Netwerkfout. Controleer je internetverbinding.')
-    : L('Error: ', 'Fout: ') + escHtml(msg);
-  div.innerHTML = `<div class="msg-bubble" style="background:#fee2e2;color:#b91c1c">⚠️ ${text}</div>`;
+  div.innerHTML = `<div class="msg-bubble" style="background:#fee2e2;color:#b91c1c">⚠️ ${escHtml(aiErrorText(err))}</div>`;
   chatArea.appendChild(div);
   chatArea.scrollTop = chatArea.scrollHeight;
 }

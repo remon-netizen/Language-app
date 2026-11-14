@@ -29,6 +29,37 @@ export function noKeyMessage() {
     : 'No API key. Add your Gemini or Anthropic key in Settings (⚙️).';
 }
 
+// What to tell the learner when a request to the AI fails: which of the usual
+// reasons it was, in their language, instead of the provider's own text
+// ("invalid x-api-key", "Failed to fetch"). Plain text: the caller escapes it.
+export function aiErrorText(err) {
+  const msg = String(err?.message ?? err ?? '');
+  const nl = state.nativeLanguage === 'nl';
+  if (err instanceof NoApiKeyError || msg === noKeyMessage()) return msg;   // already a sentence for the learner
+  // The providers word a rejected key differently: Anthropic "invalid x-api-key",
+  // Gemini "API key not valid", either one a bare 401 / 403.
+  if (/\b40[13]\b|api[ _-]?key|authentication|permission/i.test(msg)) {
+    return nl ? `De ${providerName()}-API-sleutel is niet geaccepteerd. Controleer hem bij Instellingen (⚙️).`
+              : `The ${providerName()} API key was not accepted. Check it in Settings (⚙️).`;
+  }
+  if (/\b429\b|\bHTTP 5\d\d\b|rate limit|quota|overloaded|exhausted/i.test(msg)) {
+    return nl ? 'De AI-dienst is druk of je limiet is bereikt. Wacht even en probeer het opnieuw.'
+              : 'The AI service is busy or your limit is reached. Wait a moment and try again.';
+  }
+  if (/Failed to fetch|NetworkError|Load failed/i.test(msg)) {
+    return nl ? 'Netwerkfout. Controleer je internetverbinding.' : 'Network error. Check your internet connection.';
+  }
+  if (/Empty response/i.test(msg)) {
+    return nl ? 'De AI gaf dit keer geen antwoord. Probeer het nog eens, of zeg het anders.'
+              : 'The AI gave no answer this time. Try again, or say it differently.';
+  }
+  if (/Could not parse/i.test(msg)) {
+    return nl ? 'Het antwoord van de AI was niet te lezen. Probeer het nog eens.'
+              : 'The AI\'s answer could not be read. Try again.';
+  }
+  return (nl ? 'Fout: ' : 'Error: ') + msg;
+}
+
 // Raw text from the model. `system` is optional.
 export async function generateText({ system, prompt, maxTokens = 2048, temperature = 0.4 }) {
   const apiKey = getApiKey();

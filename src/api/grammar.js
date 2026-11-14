@@ -210,7 +210,7 @@ export async function conjugateVerb(verb) {
 
   const schemaByLang = { uk: ukSchema, nl: nlSchema, en: enSchema, fr: frSchema };
   const schema = schemaByLang[targetCode] || ukSchema;
-  const prompt = `You are a ${lang} grammar expert teaching a ${nativeName}-speaking learner. The user provides a verb. Return ONLY a valid JSON object matching this exact schema with real ${lang} conjugations filled in. Write any prose ("notes") in ${nativeName}. No markdown, no explanation outside the JSON.\n\nSchema:\n${schema}`;
+  const prompt = `You are a ${lang} grammar expert teaching a ${nativeName}-speaking learner. The user provides a verb. Return ONLY a valid JSON object matching this exact schema with real ${lang} conjugations filled in. "verb_target" is the ${lang} infinitive; "verb_infinitive" is its meaning as a ${nativeName} infinitive. Write any prose ("notes") in ${nativeName}. No markdown, no explanation outside the JSON.\n\nSchema:\n${schema}`;
   return callGrammarAPI(prompt, `Conjugate the ${lang} verb: "${verb}"`);
 }
 

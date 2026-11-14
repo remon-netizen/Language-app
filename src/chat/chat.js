@@ -7,6 +7,7 @@ import { callGeminiAPI } from '../api/gemini.js';
 import { callClaudeAPI } from '../api/claude.js';
 import { checkGrammarLanguageTool } from '../api/languagetool.js';
 import { generateConversationSummary } from '../api/conversation-summary.js';
+import { aiErrorText } from '../api/model.js';
 import { addUserMessage, addBotMessage, addGrammarFeedback, addErrorMessage, addSystemNotice, showTypingIndicator, hideTypingIndicator } from './chat-ui.js';
 import { updateSuggestions } from './suggestions.js';
 import { t } from '../i18n.js';
@@ -329,7 +330,8 @@ export async function sendText() {
   await processUserInput(text);
 }
 
-export async function processUserInput(text) {
+// spoken: the text came from the microphone.
+export async function processUserInput(text, { spoken = false } = {}) {
   // inTargetLang: true when user is writing in the language they're learning.
   // For Ukrainian: detect Cyrillic — easy.
   // For Dutch/English target: both use Latin and so does the only valid native
@@ -342,7 +344,11 @@ export async function processUserInput(text) {
     : true;
   const checkGrammar = inTargetLang;
 
-  const userMsgDiv = addUserMessage(text);
+  const userMsgDiv = addUserMessage(text, { spoken });
+  // Where the conversation stood before this message, for taking it back.
+  userMsgDiv.dataset.histAt = state.conversationHistory.length;
+  userMsgDiv.dataset.errAt = state.grammarErrors.length;
+  userMsgDiv.dataset.spoken = spoken ? '1' : '';
   userMsgDiv.querySelector('.redo-btn').addEventListener('click', () => redoFromMessage(userMsgDiv));
 
   state.totalPoints += 3;
@@ -400,7 +406,7 @@ export async function processUserInput(text) {
 
   } catch(err) {
     hideTypingIndicator();
-    addErrorMessage(err.message);
+    addErrorMessage(err);
   }
 }
 
@@ -543,20 +549,27 @@ export function getFallbackResponse(userText) {
 
 export function redoFromMessage(msgDiv) {
   const chatArea = document.getElementById('chatArea');
+  const text = msgDiv.querySelector('.msg-bubble').textContent;
   // Remove the user message and everything added after it (speech feedback, grammar, bot reply)
   while (msgDiv.nextSibling) chatArea.removeChild(msgDiv.nextSibling);
   chatArea.removeChild(msgDiv);
 
-  // Roll back conversation history — remove assistant entry first, then user entry
-  if (state.conversationHistory.length && state.conversationHistory[state.conversationHistory.length - 1].role === 'assistant') {
-    state.conversationHistory.pop();
-  }
-  if (state.conversationHistory.length && state.conversationHistory[state.conversationHistory.length - 1].role === 'user') {
-    state.conversationHistory.pop();
-  }
+  // The conversation goes back to where it stood before this message. (A message
+  // whose request failed is not in the history at all: nothing is cut then.)
+  const histAt = Number(msgDiv.dataset.histAt), errAt = Number(msgDiv.dataset.errAt);
+  if (state.conversationHistory.length > histAt) state.conversationHistory.length = histAt;
+  if (state.grammarErrors.length > errAt) state.grammarErrors.length = errAt;
+  if (state.conversationHistory.length < 4) hideSummaryPanel();
 
-  // Open the mic so they can try again immediately
-  toggleFreeSpeak();
+  if (msgDiv.dataset.spoken) {
+    // Spoken: listen again straight away.
+    toggleFreeSpeak();
+  } else {
+    // Typed: the text goes back into the field, to change and send again.
+    const input = document.getElementById('talkInput');
+    input.value = text;
+    input.focus();
+  }
 }
 
 export function toggleFreeSpeak() {
@@ -569,6 +582,9 @@ export function toggleFreeSpeak() {
   state.freeSpeechChunks = []; // accumulate transcript across continuous chunks
   updateFreeMicBtn();
   const lang = getTTSLang();
+  // Not listening after all (no speech recognition here, or it would not start):
+  // the button must not stay on "recording", where a second press does nothing.
+  const notListening = () => { state.freeRecording = false; state.freeRecognition = null; updateFreeMicBtn(); };
   state.freeRecognition = setupRecognition(lang, (event) => {
     // Collect every finalised chunk while recording
     for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -581,9 +597,10 @@ export function toggleFreeSpeak() {
     state.freeRecording = false;
     updateFreeMicBtn();
     const text = (state.freeSpeechChunks || []).join(' ').trim();
-    if (text) await processUserInput(text);
+    if (text) await processUserInput(text, { spoken: true });
   });
-  if (state.freeRecognition) state.freeRecognition.start();
+  if (!state.freeRecognition) { notListening(); return; }
+  try { state.freeRecognition.start(); } catch { notListening(); }
 }
 
 export function updateFreeMicBtn() {
@@ -659,7 +676,7 @@ export async function showConversationSummary() {
       ${s.encouragement ? `<div class="sum-encouragement">${escHtml(s.encouragement)}</div>` : ''}
     `;
   } catch (err) {
-    body.innerHTML = `<div style="color:#dc2626;font-size:0.85rem;padding:8px">${escHtml(err.message)}</div>`;
+    body.innerHTML = `<div style="color:#dc2626;font-size:0.85rem;padding:8px">${escHtml(aiErrorText(err))}</div>`;
   } finally {
     btn.disabled = false;
     btn.textContent = t('chat.refreshSummary');

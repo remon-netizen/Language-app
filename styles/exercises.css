@@ -257,7 +257,7 @@
   transition: background 0.2s;
 }
 .ex-open-check-btn:hover:not(:disabled) { background: #5b21b6; }
-.ex-open-check-btn:disabled { opacity: 0.5; cursor: default; }
+.ex-open-check-btn:disabled { display: none; }   /* answered: the verdict takes its place */
 
 /* Open question answer reveal */
 .ex-open-your-answer,

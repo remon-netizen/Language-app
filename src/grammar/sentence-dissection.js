@@ -2,6 +2,14 @@ import { state, flagImg } from '../state.js';
 import { showScreen } from '../router.js';
 import { dissectSentence } from '../api/grammar.js';
 import { escHtml } from '../utils.js';
+import { languageName } from '../i18n.js';
+import { aiErrorText } from '../api/model.js';
+import { posName } from '../words.js';
+
+const L = (en, nl) => (state.nativeLanguage === 'nl' ? nl : en);
+// The model answers with these English labels (they pick the colour too).
+const ROLE_NL = { subject: 'onderwerp', predicate: 'gezegde', object: 'lijdend voorwerp', modifier: 'bepaling', adverbial: 'bijwoordelijke bepaling', other: 'overig' };
+const roleName = role => (state.nativeLanguage === 'nl' && ROLE_NL[String(role || '').trim().toLowerCase()]) || role || '—';
 
 const POS_COLOURS = {
   verb:        'pos-verb',
@@ -20,10 +28,7 @@ export function openDissectScreen() {
   if (input) { input.value = ''; input.focus(); }
   document.getElementById('dissectResult').innerHTML = '';
   const sub = document.getElementById('dissectScreenSub');
-  if (sub) {
-    const meta = { uk: 'Ukrainian', nl: 'Dutch', en: 'English', fr: 'French' };
-    sub.innerHTML = `${flagImg(state.currentLanguage, 16)} ${meta[state.currentLanguage] || meta.uk}`;
-  }
+  if (sub) sub.innerHTML = `${flagImg(state.currentLanguage, 16)} ${languageName(state.currentLanguage)}`;
 }
 
 export async function submitDissect() {
@@ -32,7 +37,7 @@ export async function submitDissect() {
   if (!sentence) return;
 
   const resultEl = document.getElementById('dissectResult');
-  resultEl.innerHTML = `<div class="grammar-loading">⏳ Analysing sentence…</div>`;
+  resultEl.innerHTML = `<div class="grammar-loading">⏳ ${L('Analysing the sentence…', 'Zin ontleden…')}</div>`;
 
   const btn = document.getElementById('dissectSubmitBtn');
   if (btn) btn.disabled = true;
@@ -41,7 +46,7 @@ export async function submitDissect() {
     const data = await dissectSentence(sentence);
     renderDissection(data, resultEl);
   } catch (err) {
-    resultEl.innerHTML = `<div class="grammar-error">⚠️ ${escHtml(err.message)}</div>`;
+    resultEl.innerHTML = `<div class="grammar-error">⚠️ ${escHtml(aiErrorText(err))}</div>`;
   } finally {
     if (btn) btn.disabled = false;
   }
@@ -70,12 +75,12 @@ function renderDissection(data, container) {
 
   // Detail panel (starts empty, filled on pill click)
   const detailHtml = `<div class="word-detail-panel" id="wordDetailPanel">
-    <div class="detail-hint">Tap a word above to see its grammar breakdown</div>
+    <div class="detail-hint">${L('Tap a word above to see its grammar', 'Tik op een woord hierboven voor de grammatica')}</div>
   </div>`;
 
   // Translation + note
   const translationHtml = data.sentence_translation
-    ? `<div class="dissect-translation">${flagImg('en', 16)} ${escHtml(data.sentence_translation)}</div>` : '';
+    ? `<div class="dissect-translation">${flagImg(state.nativeLanguage, 16)} ${escHtml(data.sentence_translation)}</div>` : '';
   const noteHtml = data.grammar_note
     ? `<div class="grammar-note-box">📝 ${escHtml(data.grammar_note)}</div>` : '';
 
@@ -101,23 +106,23 @@ function showWordDetail(word, panel) {
     <div class="detail-word">${escHtml(word.word)}</div>
     <div class="detail-grid">
       <div class="detail-row">
-        <span class="detail-label">Base form</span>
+        <span class="detail-label">${L('Base form', 'Basisvorm')}</span>
         <span class="detail-value">${escHtml(word.lemma || '—')}</span>
       </div>
       <div class="detail-row">
-        <span class="detail-label">Part of speech</span>
-        <span class="detail-value">${escHtml(word.part_of_speech_target || word.part_of_speech || '—')}</span>
+        <span class="detail-label">${L('Part of speech', 'Woordsoort')}</span>
+        <span class="detail-value">${escHtml([word.part_of_speech_target, posName(word.part_of_speech)].filter(Boolean).join(' · ') || '—')}</span>
       </div>
       <div class="detail-row">
-        <span class="detail-label">Role in sentence</span>
-        <span class="detail-value">${escHtml(word.role_in_sentence || '—')}</span>
+        <span class="detail-label">${L('Role in the sentence', 'Rol in de zin')}</span>
+        <span class="detail-value">${escHtml(roleName(word.role_in_sentence))}</span>
       </div>
       <div class="detail-row">
-        <span class="detail-label">Grammar details</span>
+        <span class="detail-label">${L('Grammar', 'Grammatica')}</span>
         <span class="detail-value">${escHtml(word.details || '—')}</span>
       </div>
       <div class="detail-row">
-        <span class="detail-label">Translation</span>
+        <span class="detail-label">${L('Translation', 'Vertaling')}</span>
         <span class="detail-value">${escHtml(word.translation || '—')}</span>
       </div>
     </div>`;

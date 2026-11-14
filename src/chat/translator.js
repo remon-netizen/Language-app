@@ -1,5 +1,6 @@
 import { state } from '../state.js';
 import { t, languageName } from '../i18n.js';
+import { aiErrorText } from '../api/model.js';
 
 // MyMemory free API expects 2-letter codes for our supported languages.
 function shortCode(lang) {
@@ -43,7 +44,7 @@ export async function translateText() {
       <button class="translate-copy-btn" onclick="copyTranslation(this)" data-text="${escHtml(translation)}">${t('chat.copy')}</button>`;
   } catch (err) {
     output.className = 'translate-output error';
-    output.textContent = '⚠️ ' + err.message;
+    output.textContent = '⚠️ ' + aiErrorText(err);
   }
 }
 

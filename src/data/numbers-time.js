@@ -142,6 +142,18 @@ export function ordinal(n, gender = 'm') {
   return ordinalGender(ORDINAL_BASE[n], gender);
 }
 
+// A year is said with an ordinal on its last word: 2026 → дві тисячі двадцять
+// шостий (рік). Returns null for a year whose last word has no ordinal here
+// (2000, 1900: двотисячний, тисяча дев'ятисотий).
+export function yearOrdinal(n) {
+  const rest = n % 100;
+  const last = rest < 20 || rest % 10 === 0 ? rest : rest % 10;   // the number the last word stands for
+  if (!last || !ORDINAL_BASE[last]) return null;
+  const words = cardinal(n).split(' ');
+  words[words.length - 1] = ORDINAL_BASE[last];
+  return words.join(' ');
+}
+
 export function ordinalSuffix(n, native) {
   if (native === 'nl') return `${n}e`;
   const l2 = n % 100, l = n % 10;

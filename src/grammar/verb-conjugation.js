@@ -1,6 +1,7 @@
 import { state, flagImg } from '../state.js';
 import { showScreen } from '../router.js';
 import { conjugateVerb } from '../api/grammar.js';
+import { aiErrorText } from '../api/model.js';
 import { escHtml } from '../utils.js';
 import { languageName } from '../i18n.js';
 
@@ -145,11 +146,21 @@ export async function submitVerb() {
     const data = await conjugateVerb(verb);
     renderConjugation(data, resultEl);
   } catch (err) {
-    resultEl.innerHTML = `<div class="grammar-error">⚠️ ${escHtml(err.message)}</div>`;
+    resultEl.innerHTML = `<div class="grammar-error">⚠️ ${escHtml(aiErrorText(err))}</div>`;
   } finally {
     if (btn) btn.disabled = false;
   }
 }
+
+// The model fills in a schema whose tense names and pronoun glosses are English.
+// In the Dutch interface they are shown in Dutch; a name not listed stays as it is.
+const TENSE_NL = { present: 'Tegenwoordige tijd', past: 'Verleden tijd', future: 'Toekomst', imperative: 'Gebiedende wijs',
+  'present perfect': 'Voltooid tegenwoordige tijd', 'past perfect': 'Voltooid verleden tijd', conditional: 'Voorwaardelijke wijs',
+  'past simple': 'Verleden tijd', 'present simple': 'Tegenwoordige tijd', 'present continuous': 'Duurvorm tegenwoordige tijd' };
+const PRONOUN_NL = { i: 'ik', you: 'jij', 'he/she': 'hij/zij', 'he/she/it': 'hij/zij/het', 'he/she/one': 'hij/zij/men', we: 'wij', they: 'zij',
+  'you (pl/formal)': 'jullie / u', 'you (pl./formal)': 'jullie / u', 'you (pl.)': 'jullie', 'you (formal)': 'u',
+  'he (masc.)': 'hij (m.)', 'she (fem.)': 'zij (v.)', 'it (neut.)': 'het (o.)', 'they (pl.)': 'zij (mv.)' };
+const inDutch = (table, text) => (state.nativeLanguage === 'nl' && table[String(text || '').trim().toLowerCase()]) || text || '';
 
 function renderConjugation(data, container) {
   const tenses = data.tenses || [];
@@ -163,7 +174,7 @@ function renderConjugation(data, container) {
     html += `
       <div class="tense-card">
         <div class="tense-title">
-          ${escHtml(tense.tense_name)}
+          ${escHtml(inDutch(TENSE_NL, tense.tense_name))}
           <span class="tense-title-target">${escHtml(tense.tense_name_target || '')}</span>
         </div>
         <div class="conjugation-table">`;
@@ -171,7 +182,7 @@ function renderConjugation(data, container) {
       html += `
           <div class="conjugation-row">
             <span class="conj-pronoun">${escHtml(f.pronoun)}</span>
-            <span class="conj-pronoun-en">${escHtml(f.pronoun_en)}</span>
+            <span class="conj-pronoun-en">${escHtml(inDutch(PRONOUN_NL, f.pronoun_en))}</span>
             <span class="conj-form">${escHtml(f.form)}</span>
           </div>`;
     }

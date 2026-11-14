@@ -2,10 +2,17 @@ import { lookupWord } from './api/word-lookup.js';
 import { escHtml } from './utils.js';
 import { state } from './state.js';
 import { sheetOpened, sheetClosed } from './router.js';
-import { hasApiKey } from './api/model.js';
+import { hasApiKey, aiErrorText } from './api/model.js';
+import { showToast } from './toast.js';
 
 const STORAGE_KEY = 'savedWords';
 let _currentLookup = null;
+let _lookupSeq = 0;   // the lookup whose answer may still be shown
+
+// The model names the kind of word with one of these English labels.
+const POS_NL = { verb: 'werkwoord', noun: 'zelfstandig naamwoord', adjective: 'bijvoeglijk naamwoord', adverb: 'bijwoord',
+  pronoun: 'voornaamwoord', preposition: 'voorzetsel', conjunction: 'voegwoord', particle: 'partikel', numeral: 'telwoord', other: 'overig' };
+export const posName = pos => (state.nativeLanguage === 'nl' && POS_NL[String(pos || '').trim().toLowerCase()]) || pos || '';
 
 const L = (en, nl) => (state.nativeLanguage === 'nl' ? nl : en);
 
@@ -117,6 +124,7 @@ export async function openWordLookup(rawWord) {
   if (!word) return;
 
   _currentLookup = null;
+  const mine = ++_lookupSeq;
   wordEl.textContent = word;
   content.innerHTML = `<div class="wl-loading">${L('Looking up…', 'Opzoeken…')}</div>`;
   overlay.classList.add('open');
@@ -124,6 +132,7 @@ export async function openWordLookup(rawWord) {
 
   try {
     const data = await lookupWord(word);
+    if (mine !== _lookupSeq) return;   // another word was tapped meanwhile: its answer is the one to show
     _currentLookup = data;
     const saved = isWordSaved(data.word);
 
@@ -131,7 +140,7 @@ export async function openWordLookup(rawWord) {
       <div class="wl-translation">${escHtml(data.translation)}</div>
       <div class="wl-meta">
         <span class="wl-pos-badge">${escHtml(data.part_of_speech_target || data.part_of_speech)}</span>
-        <span class="wl-pos-en">${escHtml(data.part_of_speech)}</span>
+        <span class="wl-pos-en">${escHtml(posName(data.part_of_speech))}</span>
       </div>
       ${data.details ? `<div class="wl-details">${escHtml(data.details)}</div>` : ''}
       <div class="wl-base">${L('Base form', 'Basisvorm')}: <strong>${escHtml(data.word)}</strong></div>
@@ -146,7 +155,8 @@ export async function openWordLookup(rawWord) {
       this.classList.add('saved');
     });
   } catch (err) {
-    content.innerHTML = `<div class="wl-error">${L('Could not look up word', 'Kon het woord niet opzoeken')}: ${escHtml(err.message)}</div>`;
+    if (mine !== _lookupSeq) return;
+    content.innerHTML = `<div class="wl-error">${L('Could not look up the word.', 'Het woord kon niet worden opgezocht.')} ${escHtml(aiErrorText(err))}</div>`;
   }
 }
 
@@ -204,11 +214,27 @@ export function renderWordsScreen() {
       <button class="wc-delete" data-word="${escHtml(w.word)}" title="${L('Remove', 'Verwijderen')}">🗑</button>
     </div>`).join('');
 
-  // Attach delete listeners
+  // Removing a word also removes what was learned about it: one tap can be taken back.
   container.querySelectorAll('.wc-delete').forEach(btn => {
     btn.addEventListener('click', function() {
+      const all = loadAllWords();
+      const at = all.findIndex(w => w.word === this.dataset.word && wordLang(w) === state.currentLanguage);
+      const removed = all[at];
       deleteWord(this.dataset.word);
       renderWordsScreen();
+      if (!removed) return;
+      showToast(`${L('Removed', 'Verwijderd')}: ${removed.word}`, {
+        action: L('Undo', 'Ongedaan maken'),
+        onAction() {
+          const now = loadAllWords();
+          if (!now.some(w => w.word === removed.word && wordLang(w) === wordLang(removed))) {
+            now.splice(Math.min(at, now.length), 0, removed);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(now));
+          }
+          updateWordsCount();
+          renderWordsScreen();
+        },
+      });
     });
   });
 }

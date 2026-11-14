@@ -58,7 +58,17 @@ export async function callGeminiAPI(userMessage, isUkrainian) {
   if (!apiKey) return null;
 
   state.conversationHistory.push({ role: 'user', content: userMessage });
+  const sent = state.conversationHistory.length;
+  try {
+    return await askGemini(apiKey, isUkrainian);
+  } catch (err) {
+    // The message got no answer: it must not stay in what the next request sends.
+    if (state.conversationHistory.length === sent) state.conversationHistory.pop();
+    throw err;
+  }
+}
 
+async function askGemini(apiKey, isUkrainian) {
   const contents = state.conversationHistory.slice(-12).map(m => ({
     role: m.role === 'assistant' ? 'model' : 'user',
     parts: [{ text: m.content }]

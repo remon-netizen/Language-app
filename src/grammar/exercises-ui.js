@@ -3,7 +3,9 @@ import { getCourses } from '../review.js';
 import { escHtml } from '../utils.js';
 import { generateExercises } from '../api/exercises.js';
 import { languageName } from '../i18n.js';
-import { hasApiKey } from '../api/model.js';
+import { hasApiKey, aiErrorText } from '../api/model.js';
+import { wrongKeyboard } from '../keyboard-help.js';
+import { normalise } from './drill-core.js';
 import { courseName } from '../course-names.js';
 import { typingStats } from '../data/typing-progress.js';
 
@@ -183,7 +185,8 @@ function showTopicPicker() {
   const isUK        = state.currentLanguage === 'uk';
   const lblLevel    = native === 'nl' ? 'Niveau:' : 'Level:';
   const keyOk       = hasApiKey();
-  const aiTag       = `<span class="ex-ai-tag" title="${native === 'nl' ? 'Gebruikt AI — API-sleutel nodig' : 'Uses AI — needs an API key'}">🔑</span>`;
+  // The key mark says "needs a key": with a key in place there is nothing to say.
+  const aiTag       = keyOk ? '' : `<span class="ex-ai-tag" title="${native === 'nl' ? 'Gebruikt AI — API-sleutel nodig' : 'Uses AI — needs an API key'}">🔑</span>`;
   const aiCls       = keyOk ? 'ex-tool-ai' : 'ex-tool-ai ex-tool-locked';
   const lblOpen     = native === 'nl' ? '✏️ Open vragen:' : '✏️ Open questions:';
   const lblOn       = native === 'nl' ? 'AAN' : 'ON';
@@ -378,8 +381,9 @@ async function startExercises(topic) {
     ex.list = await generateExercises(topic.id, topic.title, ex.level, ex.includeOpen);
     renderQuestion();
   } catch (err) {
+    document.getElementById('exSubtitle').textContent = L('The exercises could not be made', 'De oefeningen konden niet worden gemaakt');
     document.getElementById('exBody').innerHTML = `
-      <div class="ex-error">⚠️ ${escHtml(err.message)}</div>
+      <div class="ex-error">⚠️ ${escHtml(aiErrorText(err))}</div>
       <button class="ex-action-btn" id="exErrBack">← ${L('Back to topics', 'Terug naar onderwerpen')}</button>`;
     document.getElementById('exErrBack').addEventListener('click', () => {
       window.showScreen('exercisesScreen');
@@ -469,14 +473,22 @@ function renderOpenQuestion() {
         placeholder="${L('Type your answer here…', 'Typ hier je antwoord…')}" rows="3" autocomplete="off" autocorrect="off" spellcheck="false"></textarea>
       <button class="ex-open-check-btn" id="exOpenCheck">${L('Check', 'Controleer')} ✓</button>
     </div>
+    <div class="ce-retry-note" id="exKbNote" hidden></div>
     <div id="exFeedback"></div>`;
 
   const input    = body.querySelector('#exOpenInput');
   const checkBtn = body.querySelector('#exOpenCheck');
+  const note     = body.querySelector('#exKbNote');
+  // The answer is Ukrainian when it has Cyrillic letters and no Latin ones.
+  const expected = q.correct_answer || '';
+  const lang = /[\u0400-\u04FF]/.test(expected) && !/[a-z]/i.test(expected) ? 'uk' : 'own';
 
   const submit = () => {
     const answer = input.value.trim();
     if (!answer) { input.focus(); return; }
+    // Typed on the wrong keyboard: not an answer yet, the learner switches and tries again.
+    if (wrongKeyboard({ answer, expected, lang, note, input })) return;
+    note.hidden = true;
     handleOpenAnswer(answer);
   };
 
@@ -499,6 +511,13 @@ function handleOpenAnswer(userAnswer) {
   document.getElementById('exOpenCheck').disabled = true;
 
   const fb = document.getElementById('exFeedback');
+  // Word for word the answer on the card: no need to ask whether it was right.
+  const bare = s => normalise(s).replace(/[.!?…]+$/, '').trim();
+  if (bare(userAnswer) === bare(q.correct_answer || '')) {
+    ex.score++;
+    showFeedback(true, q.explanation);
+    return;
+  }
   fb.innerHTML = `
     <div class="ex-open-your-answer">
       <span class="ex-open-your-label">${L('Your answer:', 'Jouw antwoord:')}</span>

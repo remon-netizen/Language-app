@@ -8,9 +8,19 @@
 // the random drill is where the patterns get applied to numbers never seen before.
 // Items keep the drill's keys ("card:17"), so both feed the same weak spots.
 
-import { cardinalItem, ordinalItem, dateItem, timeItem } from './numbers-time.js';
+import { cardinalItem, ordinalItem, dateItem, timeItem, yearOrdinal } from './numbers-time.js';
 
 const range = (a, b, step = 1) => { const r = []; for (let i = a; i <= b; i += step) r.push(i); return r; };
+
+// A year as a number, with a line on how it is said as a year (an ordinal, not this cardinal).
+function yearItem(n) {
+  const item = cardinalItem(n), y = yearOrdinal(n);
+  if (!y) return item;
+  return { ...item, note: {
+    en: `${item.note ? item.note.en + ' ' : ''}Said as a year, the last word is an ordinal: ${y} рік.`,
+    nl: `${item.note ? item.note.nl + ' ' : ''}Als jaartal is het laatste woord een rangtelwoord: ${y} рік.`,
+  } };
+}
 
 export const STAGES = [
   { id: 'zero-ten',  icon: '🔢', title: { en: '0 – 10', nl: '0 – 10' },
@@ -26,7 +36,7 @@ export const STAGES = [
   { id: 'thousands', icon: '🏔️', title: { en: 'Thousands', nl: 'Duizendtallen' },
     items: [1000, 2000, 5000, 10000, 21000, 100000].map(cardinalItem) },
   { id: 'years',     icon: '📆', title: { en: 'Big numbers and years', nl: 'Grote getallen en jaartallen' },
-    items: [101, 150, 365, 999, 1991, 2014, 2022, 2026].map(cardinalItem) },
+    items: [...[101, 150, 365, 999].map(cardinalItem), ...[1991, 2014, 2022, 2026].map(yearItem)] },
   { id: 'ordinals',  icon: '🥇', title: { en: 'First to twelfth', nl: 'Eerste tot twaalfde' },
     items: range(1, 12).map(n => ordinalItem(n, 'm')) },
   { id: 'ordinals-fn', icon: '🥈', title: { en: 'Ordinals: feminine and neuter', nl: 'Rangtelwoorden: vrouwelijk en onzijdig' },
