@@ -22,6 +22,7 @@ import { backupStatus, backupDue } from './backup-ui.js';
 const L = (en, nl) => (state.nativeLanguage === 'nl' ? nl : en);
 // "1 day" / "3 days"
 const count = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+const answers = n => L(count(n, 'answer', 'answers'), count(n, 'antwoord', 'antwoorden'));
 
 // Totals of a drill's per-item record: { attempts, pct }
 function sumMastery(m) {
@@ -53,7 +54,7 @@ export function openProgressScreen() {
   const courseRow = c => {
     const st = c.stats(), d = drillOf[c.id];
     const weak = weakOf[c.id === 'mywords' ? 'vocab' : c.id] || 0;
-    const drillLine = d && d.attempts ? `${L('Free drill', 'Vrije drill')}: ${d.attempts} ${L('answers', 'antwoorden')}${d.pct != null ? ` · ${d.pct}% ${L('right', 'goed')}` : ''}` : '';
+    const drillLine = d && d.attempts ? `${L('Free drill', 'Vrije drill')}: ${answers(d.attempts)}${d.pct != null ? ` · ${d.pct}% ${L('right', 'goed')}` : ''}` : '';
     const learnedLine = st.seen
       ? `${st.learned} / ${st.total} ${c.unit[lang]} ${L('learned', 'geleerd')} · ${st.seen} ${L('seen', 'gezien')}`
       : c.fresh[lang];
@@ -82,7 +83,7 @@ export function openProgressScreen() {
         <span class="pg-row-icon">${COURSE_ICON[d.id]}</span>
         <span class="pg-row-text">
           <span class="pg-row-title">${escHtml(courseName(d.id))} ${pct != null ? `<span class="pg-pct">${pct}%</span>` : ''}</span>
-          <span class="pg-row-sub">${d.attempts ? `${d.attempts} ${L('answers', 'antwoorden')}${d.extra}${weakText(weakOf[d.id] || 0)}` : L('Not started', 'Nog niet begonnen')}</span>
+          <span class="pg-row-sub">${d.attempts ? `${answers(d.attempts)}${d.extra}${weakText(weakOf[d.id] || 0)}` : L('Not started', 'Nog niet begonnen')}</span>
           ${pct != null ? bar(pct, pct >= 80 ? 'pg-fill-green' : pct >= 50 ? 'pg-fill-amber' : 'pg-fill-red') : ''}
         </span>
       </button>`;

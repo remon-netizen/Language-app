@@ -68,3 +68,11 @@
 .ce-speak-btn { width: 100%; padding: 12px; margin-bottom: 14px; border: 2px solid var(--ce-border); border-radius: 11px; background: var(--ce-soft); color: var(--ce-dark); font-size: 0.95rem; font-weight: 700; cursor: pointer; font-family: inherit; min-height: 44px; }
 .ce-speak-btn.recording { border-color: #dc2626; background: #fee2e2; color: #991b1b; }
 .ce-speak-btn:disabled { opacity: 0.5; }
+
+/* The score card at the end of a round wears the colour of its course, like the
+   round did (the card itself is shared with the AI quiz, which is blue). */
+.ce-header ~ .ex-score-card .ex-score-fraction { color: var(--ce-dark); }
+.ce-header ~ .ex-score-card .ex-score-bar-fill { background: var(--ce-main); }
+.ce-header ~ .ex-score-card .ex-next-btn { background: var(--ce-main); }
+.ce-header ~ .ex-score-card .ex-next-btn:hover { background: var(--ce-dark); }
+.ce-header ~ .ex-score-card .ex-back-btn:hover { border-color: var(--ce-main); color: var(--ce-dark); }

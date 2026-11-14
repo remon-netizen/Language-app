@@ -213,20 +213,7 @@ document.addEventListener('screenShown', e => { if (e.detail.id === 'homeScreen'
 
 // ── Language switchers ────────────────────────────────────────────────────────
 
-// Refresh the highlight + disabled state of the target picker so it always
-// reflects the current `state.currentLanguage` and the current
-// `state.nativeLanguage` (the target matching the native is disabled).
-function refreshTargetPicker() {
-  document.querySelectorAll('#targetLangOptions .lang-choice-btn').forEach(btn => {
-    const isTarget = btn.dataset.lang === state.currentLanguage;
-    const isNative = btn.dataset.lang === state.nativeLanguage;
-    btn.classList.toggle('active',  isTarget);
-    btn.classList.toggle('disabled', isNative);
-    btn.disabled = isNative;
-  });
-}
-
-// Refresh the highlight on the native picker.
+// Refresh the highlight on the native picker (Settings).
 function refreshNativePicker() {
   document.querySelectorAll('#nativeLangOptions .lang-choice-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.native === state.nativeLanguage);
@@ -254,8 +241,6 @@ function switchNativeLanguage(native) {
     const fallback = validTargetsFor(native)[0];
     switchLanguage(fallback);
   } else {
-    // Target stays the same, but its disabled flag may have flipped.
-    refreshTargetPicker();
     refreshConditionalFlows();
   }
 
@@ -267,6 +252,11 @@ function switchNativeLanguage(native) {
   loadVoices();
   updateHeaderAndChat();
   updateTranslatorLabel();
+  renderBackupSection(document.getElementById('backupSection'));
+  // The language is switched from Settings, over whatever screen is open. Screens
+  // are written out when they are opened, so the one underneath would stay in the
+  // old language: go Home, which has just been redone in the new one.
+  if (!document.getElementById('homeScreen').classList.contains('active')) showScreen('homeScreen');
 }
 
 function switchLanguage(lang) {
@@ -276,7 +266,6 @@ function switchLanguage(lang) {
   state.currentLanguage = lang;
   localStorage.setItem('appLanguage', lang);
 
-  refreshTargetPicker();
   refreshConditionalFlows();
 
   // Reload TTS voices for the new target
@@ -326,9 +315,8 @@ function init() {
   // Apply native-language UI strings first so labels are correct on first paint.
   applyStaticI18n();
 
-  // Highlight pickers from the persisted state.
+  // Highlight the picker from the persisted state.
   refreshNativePicker();
-  refreshTargetPicker();
   refreshConditionalFlows();
 
   // switchLanguage early-returns if the target equals native, so we call

@@ -299,6 +299,8 @@ export function setDifficulty(diff) {
   hideSummaryPanel();
   const labels = DIFF_LABELS[state.nativeLanguage] || DIFF_LABELS.en;
   addSystemNotice(labels[diff]);
+  // The chat was emptied: let the tutor open the new conversation, as on arrival.
+  startConversation();
 }
 
 export async function sendText() {
