@@ -379,4 +379,6 @@ Also: a chat reply that arrives after the learner has started a new conversation
 
 Chrome and Firefox on Windows have no Ukrainian voice. Besides the toast on 🔊, the listening exercises now say so instead of running silent (`hasNoVoice()` / `noVoiceReason()` in `src/voice.js`): the dictation mode of Vocabulary, the two listening modes of Numbers and the dictation switch of the Verb and Case Drill are switched off with the reason on them, a round that would have been dictated is typed, and the Dialogues menu has a notice with the way to Settings. The learner's stored choice is kept (`qMode()` gives the mode in use), so it is back on a device that can speak.
 
+Whatever waits for the end of a spoken sentence (`speakTextCb()`: the next line of a dialogue, the microphone of the pronunciation practice) no longer waits for ever when speech fails or never starts: an error or a timer ends the wait. The pronunciation button goes back to itself when the browser cannot listen.
+
 The keyboard help for the Mac now says to add the plain "Ukrainian" layout: on the "Legacy" and "QWERTY" variants the keys sit elsewhere than in the keyboard picture (checked against the layouts macOS ships).

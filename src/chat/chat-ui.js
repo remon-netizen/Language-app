@@ -144,7 +144,11 @@ export function practicePronunciation(btn) {
       }
     });
 
-    if (rec) rec.start();
+    // Not listening after all (no speech recognition here, or it would not start):
+    // the button must not go on saying that it records.
+    const notListening = () => { panel.remove(); btn.classList.remove('pronounce-active'); btn.textContent = practiseLabel(); };
+    if (!rec) { notListening(); return; }
+    try { rec.start(); } catch { notListening(); }
   });
 }
 

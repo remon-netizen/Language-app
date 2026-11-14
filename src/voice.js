@@ -174,7 +174,16 @@ export function speakTextCb(text, lang, onEnd) {
   utt.rate = state.speechRate;
   const voice = getSelectedVoice(utt.lang);
   if (voice) utt.voice = voice;
-  if (onEnd) utt.onend = onEnd;
+  if (onEnd) {
+    // Whatever waits for the end of the sentence (the next line of a dialogue, the
+    // microphone of the pronunciation practice) must not wait for ever: speech can
+    // fail, or never start (no voice, a browser that wants a tap first).
+    let done = false;
+    const finish = () => { if (done) return; done = true; clearTimeout(timer); onEnd(); };
+    const timer = setTimeout(finish, Math.max(6000, text.length * 220));
+    utt.onend = finish;
+    utt.onerror = finish;
+  }
   state.synth.speak(utt);
 }
 
