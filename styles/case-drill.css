@@ -84,7 +84,7 @@
 .cd-q-case { font-size: 1.1rem; font-weight: 800; color: #065f46; }
 .cd-q-number { font-size: 0.85rem; font-weight: 700; color: #059669; text-transform: uppercase; letter-spacing: 0.04em; }
 .cd-gender-tag {
-  display: inline-block; font-size: 0.65rem; font-weight: 800;
+  display: inline-block; font-size: 0.75rem; font-weight: 800;
   padding: 2px 7px; border-radius: 6px; letter-spacing: 0.05em; margin-right: 6px;
 }
 .cd-gender-m { background: #dbeafe; color: #1e40af; }
@@ -203,7 +203,7 @@
 .cd-weak-check {
   width: 18px; height: 18px; border: 2px solid #d97706; border-radius: 4px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 0.7rem; background: white; flex-shrink: 0;
+  font-size: 0.75rem; background: white; flex-shrink: 0;
 }
 .cd-weak-toggle.active .cd-weak-check { background: #d97706; color: white; }
 
@@ -214,10 +214,10 @@
   .cd-menu-icon { font-size: 1.5rem; }
   .cd-learn-actions { flex-direction: column; }
   .cd-level-row { flex-wrap: wrap; }
-  .cd-filter-btn { padding: 5px 8px; font-size: 0.7rem; }
+  .cd-filter-btn { padding: 5px 8px; font-size: 0.75rem; }
   .cd-filter-row { gap: 4px; }
   .cd-decl-row { font-size: 0.75rem; gap: 4px; padding: 4px 4px; }
-  .cd-decl-case { min-width: 60px; font-size: 0.7rem; }
+  .cd-decl-case { min-width: 60px; font-size: 0.75rem; }
   .cd-q-card { padding: 14px; }
   .cd-sentence-card { padding: 14px; }
   .cd-q-case { font-size: 0.9rem; }
@@ -247,4 +247,4 @@
 }
 .cd-review-btn:hover:not(:disabled) { background: #d1fae5; }
 .cd-review-btn:disabled { border-color: var(--border); background: var(--card-bg); color: var(--gray); cursor: default; }
-.cd-review-sub { font-size: 0.72rem; font-weight: 600; opacity: 0.8; }
+.cd-review-sub { font-size: 0.75rem; font-weight: 600; opacity: 0.8; }

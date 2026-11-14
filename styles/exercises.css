@@ -98,7 +98,7 @@
   margin-right: 2px;
 }
 .ex-level-btn {
-  min-height: 34px;
+  min-height: 36px;
   padding: 5px 13px;
   border: 2px solid var(--border);
   border-radius: 8px;
@@ -157,7 +157,7 @@
 .ex-topic-card:hover .ex-topic-title { color: var(--blue); }
 .ex-topic-icon  { font-size: 1.7rem; line-height: 1; }
 .ex-topic-title { font-size: 0.9rem; font-weight: 700; color: var(--text); line-height: 1.25; }
-.ex-topic-sub   { font-size: 0.7rem; color: var(--gray); line-height: 1.35; }
+.ex-topic-sub   { font-size: 0.75rem; color: var(--gray); line-height: 1.35; }
 
 /* ── Home screen exercises button ── */
 .grammar-exercises-btn {
@@ -474,7 +474,7 @@
   .ex-topic-card  { padding: 12px 10px; flex-direction: row; gap: 10px; align-items: center; }
   .ex-topic-icon  { font-size: 1.5rem; }
   .ex-topic-title { font-size: 0.85rem; }
-  .ex-topic-sub   { font-size: 0.7rem; }
+  .ex-topic-sub   { font-size: 0.75rem; }
   .ex-tools-row   { flex-wrap: wrap; gap: 6px; }
   .ex-tool-btn    { padding: 8px 10px; font-size: 0.78rem; }
   .ex-question    { font-size: 0.95rem; padding: 13px 14px; }
@@ -488,14 +488,14 @@
 
 /* ── Hub sections: offline drills vs AI tools ── */
 .ex-section-label {
-  font-size: 0.74rem; font-weight: 700; color: var(--gray);
+  font-size: 0.75rem; font-weight: 700; color: var(--gray);
   text-transform: uppercase; letter-spacing: 0.04em; margin: 0 0 8px 2px;
 }
 .ex-tools-row + .ex-section-label { margin-top: 18px; }
 .ex-tools-empty { font-size: 0.82rem; color: var(--gray); padding: 10px 4px; }
 .ex-tool-btn { position: relative; }
 .ex-ai-tag {
-  position: absolute; top: 6px; right: 8px; font-size: 0.7rem; line-height: 1;
+  position: absolute; top: 6px; right: 8px; font-size: 0.75rem; line-height: 1;
   opacity: 0.8;
 }
 .ex-tool-locked, .ex-topic-locked { opacity: 0.55; }
@@ -561,5 +561,5 @@
 /* Hub: course tiles carry their progress; the row wraps on a phone */
 .ex-tools-wrap { flex-wrap: wrap; }
 .ex-tools-wrap .ex-tool-btn { flex: 1 1 120px; }
-.ex-tool-meta { font-size: 0.68rem; font-weight: 600; color: var(--gray); min-height: 0.9em; }
+.ex-tool-meta { font-size: 0.75rem; font-weight: 600; color: var(--gray); min-height: 0.9em; }
 .ex-tool-due { color: #6d28d9; }

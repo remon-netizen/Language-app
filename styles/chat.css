@@ -46,7 +46,7 @@
 }
 .chat-settings-left { display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 220px; }
 .chat-settings-right { display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 220px; }
-.settings-label { font-size: 0.72rem; font-weight: 600; color: var(--gray); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
+.settings-label { font-size: 0.75rem; font-weight: 600; color: var(--gray); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
 
 /* Difficulty */
 .difficulty-selector { display: flex; gap: 6px; }
@@ -122,7 +122,7 @@
 .chat-msg.bot .msg-bubble { background: var(--light-blue); border-bottom-left-radius: 4px; }
 .chat-msg.user .msg-bubble { background: var(--blue); color: white; border-bottom-right-radius: 4px; }
 
-.msg-label { font-size: 0.68rem; font-weight: 600; color: var(--gray); margin-bottom: 4px; text-transform: uppercase; }
+.msg-label { font-size: 0.75rem; font-weight: 600; color: var(--gray); margin-bottom: 4px; text-transform: uppercase; }
 .chat-msg.user .msg-label { text-align: right; }
 .msg-translation { font-size: 0.78rem; color: var(--gray); margin-top: 5px; font-style: italic; }
 .chat-msg.user .msg-translation { text-align: right; color: rgba(255,255,255,0.7); }

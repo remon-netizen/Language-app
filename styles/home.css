@@ -123,7 +123,7 @@
 }
 .home-tool-icon  { font-size: 1.6rem; }
 .home-tool-title { font-weight: 700; font-size: 0.9rem; color: var(--text); }
-.home-tool-sub   { font-size: 0.72rem; color: var(--gray); }
+.home-tool-sub   { font-size: 0.75rem; color: var(--gray); }
 
 /* Badge inside tool card */
 .home-tool-card .review-btn-count,
@@ -133,7 +133,7 @@
   right: 8px;
   background: #8b5cf6;
   color: white;
-  font-size: 0.65rem;
+  font-size: 0.75rem;
   font-weight: 700;
   padding: 2px 6px;
   border-radius: 8px;
@@ -179,7 +179,7 @@
 .lesson-review-text { flex: 1; text-align: left; }
 .lesson-review-btn .review-btn-count {
   background: #8b5cf6; color: white;
-  font-size: 0.7rem; font-weight: 700;
+  font-size: 0.75rem; font-weight: 700;
   padding: 2px 7px; border-radius: 8px;
 }
 
@@ -246,7 +246,7 @@
 .category-card .icon { font-size: 2rem; margin-bottom: 8px; }
 .category-card .name { font-weight: 700; font-size: 0.95rem; color: var(--text); }
 .category-card .count { font-size: 0.75rem; color: var(--gray); margin-top: 4px; }
-.category-card .tag { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+.category-card .tag { font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
 .tag-beginner { background: #e8f5e9; color: #2e7d32; }
 .tag-intermediate { background: #fff3e0; color: #e65100; }
 .tag-gevorderd { background: #fff3e0; color: #e65100; }
@@ -302,7 +302,7 @@
   margin-top: 4px;
 }
 .letter-card .sound {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   color: var(--gray);
   font-style: italic;
   margin-top: 2px;
@@ -335,7 +335,7 @@
   padding: 12px 12px 6px; margin-top: 10px;
 }
 .today-title {
-  font-size: 0.74rem; font-weight: 800; color: var(--gray);
+  font-size: 0.75rem; font-weight: 800; color: var(--gray);
   text-transform: uppercase; letter-spacing: 0.04em; margin: 0 4px 8px;
 }
 .today-row {
@@ -349,7 +349,7 @@
 .today-icon { font-size: 1.3rem; flex-shrink: 0; }
 .today-text { display: flex; flex-direction: column; min-width: 0; flex: 1; }
 .today-row-title { font-size: 0.9rem; font-weight: 700; color: var(--text); }
-.today-row-sub { font-size: 0.74rem; color: var(--gray); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.today-row-sub { font-size: 0.75rem; color: var(--gray); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .today-arrow { color: var(--gray); font-weight: 700; }
 /* The conversation card: same shape as the others, a touch of the brand yellow,
    and a small tag saying it needs an AI key. */
@@ -357,7 +357,7 @@
 .home-tool-chat:hover { border-color: #f59e0b; }
 .home-tool-title .flag-icon { vertical-align: -1px; margin-right: 2px; border-radius: 2px; }
 .home-tool-ai {
-  position: absolute; top: 8px; right: 8px; font-size: 0.62rem; font-weight: 700;
+  position: absolute; top: 8px; right: 8px; font-size: 0.75rem; font-weight: 700;
   background: rgba(0,0,0,0.07); color: var(--gray); padding: 2px 7px; border-radius: 8px;
 }
 

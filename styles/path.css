@@ -19,7 +19,7 @@
 .pt-stat { font-size: 0.78rem; font-weight: 600; color: var(--gray); background: var(--card-bg); padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border); }
 .pt-stat-due { color: #6d28d9; border-color: #c4b5fd; background: #f5f3ff; }
 
-.pt-section-label { font-size: 0.74rem; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.04em; margin: 14px 0 6px 2px; }
+.pt-section-label { font-size: 0.75rem; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.04em; margin: 14px 0 6px 2px; }
 .pt-level-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px; }
 .pt-level-btn {
   display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px;
@@ -28,7 +28,7 @@
 .pt-level-btn.active { border-color: #0d9488; background: #f0fdfa; }
 .pt-level-id { font-size: 0.95rem; font-weight: 800; color: var(--text); }
 .pt-level-btn.active .pt-level-id { color: #115e59; }
-.pt-level-meta { font-size: 0.66rem; color: var(--gray); font-weight: 600; }
+.pt-level-meta { font-size: 0.75rem; color: var(--gray); font-weight: 600; }
 .pt-level-sub { font-size: 0.8rem; color: var(--gray); margin: -6px 2px 12px; }
 
 .pt-continue {
@@ -46,12 +46,12 @@
 }
 .pt-unit:hover { border-color: #5eead4; }
 .pt-unit.done { border-color: #99f6e4; background: #f0fdfa; }
-.pt-unit-num { font-size: 0.74rem; font-weight: 800; color: var(--gray); }
+.pt-unit-num { font-size: 0.75rem; font-weight: 800; color: var(--gray); }
 .pt-unit-icon { font-size: 1.25rem; line-height: 1; }
 .pt-unit-title { font-size: 0.9rem; font-weight: 700; color: var(--text); }
-.pt-unit-grammar { font-size: 0.74rem; color: var(--gray); }
-.pt-track { display: inline-block; font-size: 0.64rem; font-weight: 800; color: #0f766e; background: #ccfbf1; padding: 1px 7px; border-radius: 999px; vertical-align: middle; text-transform: uppercase; letter-spacing: 0.04em; }
-.pt-unit-status { font-size: 0.72rem; font-weight: 700; color: var(--gray); white-space: nowrap; }
+.pt-unit-grammar { font-size: 0.75rem; color: var(--gray); }
+.pt-track { display: inline-block; font-size: 0.75rem; font-weight: 800; color: #0f766e; background: #ccfbf1; padding: 1px 7px; border-radius: 999px; vertical-align: middle; text-transform: uppercase; letter-spacing: 0.04em; }
+.pt-unit-status { font-size: 0.75rem; font-weight: 700; color: var(--gray); white-space: nowrap; }
 .pt-unit.done .pt-unit-status { color: #0f766e; }
 .pt-unit-bar { grid-column: 3 / 5; height: 4px; border-radius: 2px; background: var(--border); overflow: hidden; }
 .pt-unit-bar > div { height: 100%; background: #0d9488; }
@@ -104,7 +104,7 @@
 .pt-word { display: grid; grid-template-columns: 1fr 1fr 30px; gap: 8px; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
 .pt-word:last-child { border-bottom: none; }
 .pt-word-uk { font-weight: 800; color: var(--text); }
-.pt-word-tag { display: block; font-size: 0.7rem; color: var(--gray); font-weight: 600; }
+.pt-word-tag { display: block; font-size: 0.75rem; color: var(--gray); font-weight: 600; }
 .pt-word-meaning { color: var(--text); }
 .pt-word-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 6px; vertical-align: middle; background: #d1d5db; }
 .pt-dot-green { background: #22c55e; } .pt-dot-yellow { background: #f59e0b; } .pt-dot-red { background: #ef4444; }
@@ -116,7 +116,7 @@
 .pt-sentence-note { font-size: 0.8rem; color: #115e59; margin-top: 4px; }
 
 .pt-due-row { display: flex; flex-direction: column; gap: 2px; width: 100%; padding: 10px 14px; margin-top: 12px; border: 2px solid #fdba74; border-radius: 12px; background: #fff7ed; color: #9a3412; font-family: inherit; font-size: 0.88rem; font-weight: 700; text-align: left; cursor: pointer; }
-.pt-due-hint { font-size: 0.72rem; font-weight: 600; color: #c2410c; }
+.pt-due-hint { font-size: 0.75rem; font-weight: 600; color: #c2410c; }
 .pt-practise { margin-bottom: 12px; }
 .pt-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 14px 0; }
 .pt-action {
@@ -128,12 +128,12 @@
 .pt-action-next { border-color: #0d9488; background: #f0fdfa; }
 .pt-action-icon { font-size: 1.4rem; line-height: 1; }
 .pt-action-title { font-size: 0.9rem; font-weight: 700; color: var(--text); }
-.pt-action-sub { font-size: 0.72rem; color: var(--gray); text-align: center; }
+.pt-action-sub { font-size: 0.75rem; color: var(--gray); text-align: center; }
 
 /* Cards in a session */
 .pt-q-card { background: var(--card-bg); border-radius: 14px; padding: 20px; margin-bottom: 14px; box-shadow: 0 1px 8px rgba(0,0,0,0.07); text-align: center; }
 .pt-q-intro { border: 2px solid #99f6e4; background: #f0fdfa; }
-.pt-q-badge { display: inline-block; font-size: 0.74rem; font-weight: 700; color: #115e59; background: #ccfbf1; padding: 3px 10px; border-radius: 6px; margin-bottom: 10px; }
+.pt-q-badge { display: inline-block; font-size: 0.75rem; font-weight: 700; color: #115e59; background: #ccfbf1; padding: 3px 10px; border-radius: 6px; margin-bottom: 10px; }
 .pt-q-label { font-size: 0.78rem; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px; }
 .pt-q-main { font-size: 1.5rem; font-weight: 800; color: var(--text); line-height: 1.3; }
 .pt-q-word { font-size: 2rem; font-weight: 800; color: #115e59; margin-top: 10px; }

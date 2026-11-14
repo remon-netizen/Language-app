@@ -133,7 +133,7 @@
 .vd-imp-col .vd-table-header  { color: #1e40af; }
 .vd-perf-col .vd-table-header { color: #9d174d; }
 .vd-tense-label {
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: #0891b2;
   text-transform: uppercase;
@@ -158,7 +158,7 @@
 .vd-conj-gloss {
   flex-basis: 100%;
   text-align: right;
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-style: italic;
   color: var(--gray);
   line-height: 1.25;
@@ -173,7 +173,7 @@
   margin-bottom: 16px;
 }
 .vd-examples-title {
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 800;
   color: #0891b2;
   text-transform: uppercase;
@@ -292,7 +292,7 @@
 /* Aspect tags */
 .vd-aspect-tag {
   display: inline-block;
-  font-size: 0.65rem;
+  font-size: 0.75rem;
   font-weight: 800;
   padding: 2px 7px;
   border-radius: 6px;
@@ -354,7 +354,7 @@
 .vd-full-gloss {
   flex-basis: 100%;
   text-align: right;
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-style: italic;
   color: var(--gray);
   line-height: 1.25;
@@ -362,7 +362,7 @@
 .vd-highlight-row .vd-full-gloss { color: #15803d; }
 /* Usage note under the feedback table header. */
 .vd-full-note {
-  font-size: 0.68rem;
+  font-size: 0.75rem;
   line-height: 1.35;
   color: var(--gray);
   margin: -4px 0 8px;
@@ -433,7 +433,7 @@
   border: 2px solid #d97706;
   border-radius: 4px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   background: white;
   flex-shrink: 0;
 }
@@ -671,7 +671,7 @@
 
 /* Tense divider in learn mode */
 .vd-tense-divider {
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 800;
   color: #0891b2;
   text-transform: uppercase;
@@ -746,7 +746,7 @@
 /* Usage note under each tense label: the per-row gloss shows one English
    reading, this states the range the Ukrainian form actually covers. */
 .vd-tense-note {
-  font-size: 0.68rem;
+  font-size: 0.75rem;
   line-height: 1.35;
   color: var(--gray);
   margin: -2px 0 6px;
@@ -776,5 +776,5 @@
 }
 .vd-review-btn:hover:not(:disabled) { background: #cffafe; }
 .vd-review-btn:disabled { border-color: var(--border); background: var(--card-bg); color: var(--gray); cursor: default; }
-.vd-review-sub { font-size: 0.72rem; font-weight: 600; opacity: 0.8; }
+.vd-review-sub { font-size: 0.75rem; font-weight: 600; opacity: 0.8; }
 .vd-aspect-why { margin-bottom: 10px; }

@@ -94,7 +94,7 @@
 .va-imp-bg  { background: #dbeafe; }
 .va-perf-bg { background: #fce7f3; }
 .va-ref-pair-label {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -157,7 +157,7 @@
 /* Aspect tags */
 .va-aspect-tag {
   display: inline-block;
-  font-size: 0.65rem;
+  font-size: 0.75rem;
   font-weight: 800;
   padding: 2px 7px;
   border-radius: 6px;

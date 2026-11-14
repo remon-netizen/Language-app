@@ -18,15 +18,15 @@
 .ce-header-text { flex: 1; min-width: 0; }
 .ce-progress-wrap { width: 100%; max-width: 200px; height: 6px; background: rgba(255,255,255,0.2); border-radius: 4px; overflow: hidden; margin-bottom: 4px; }
 .ce-progress-bar { height: 100%; background: rgba(255,255,255,0.85); border-radius: 4px; transition: width 0.3s ease; }
-.ce-progress-text { font-size: 0.7rem; color: rgba(255,255,255,0.75); }
+.ce-progress-text { font-size: 0.75rem; color: rgba(255,255,255,0.75); }
 
 .ce-warmup-banner { display: flex; flex-direction: column; gap: 3px; margin: 0 0 10px; padding: 9px 12px; border-radius: 12px; background: #fff7ed; border: 1px solid #fdba74; }
 .ce-warmup-title { font-size: 0.82rem; font-weight: 800; color: #9a3412; }
-.ce-warmup-sub { font-size: 0.74rem; color: #c2410c; display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
-.ce-warmup-skip { background: none; border: none; color: #9a3412; font-size: 0.74rem; font-weight: 700; text-decoration: underline; cursor: pointer; font-family: inherit; padding: 0; }
+.ce-warmup-sub { font-size: 0.75rem; color: #c2410c; display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ce-warmup-skip { background: none; border: none; color: #9a3412; font-size: 0.75rem; font-weight: 700; text-decoration: underline; cursor: pointer; font-family: inherit; padding: 0; }
 .ce-course-chip {
   display: inline-block; margin: 0 0 8px 2px; padding: 3px 10px; border-radius: 999px;
-  font-size: 0.74rem; font-weight: 700; color: var(--ce-dark); background: var(--ce-soft); border: 1px solid var(--ce-border);
+  font-size: 0.75rem; font-weight: 700; color: var(--ce-dark); background: var(--ce-soft); border: 1px solid var(--ce-border);
 }
 
 .ce-input-area { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }

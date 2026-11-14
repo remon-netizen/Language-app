@@ -68,7 +68,7 @@
   margin-bottom: 20px;
 }
 .grammar-text-input {
-  flex: 1;
+  flex: 1; min-width: 0; /* a text field's own minimum pushed the button off a 320px screen */
   padding: 11px 14px;
   border: 2px solid var(--border);
   border-radius: 10px;
@@ -85,6 +85,7 @@
   font-size: 0.9rem; font-weight: 700;
   cursor: pointer; transition: background 0.2s; white-space: nowrap;
 }
+.grammar-submit-btn { flex-shrink: 0; white-space: nowrap; }
 .grammar-submit-btn:hover:not(:disabled) { background: #003d80; }
 .grammar-submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
@@ -93,7 +94,7 @@
 
 /* ── Common verb chips ── */
 .common-verbs-label {
-  font-size: 0.72rem; font-weight: 600; color: var(--gray);
+  font-size: 0.75rem; font-weight: 600; color: var(--gray);
   text-transform: uppercase; letter-spacing: 0.05em;
   margin-bottom: 10px;
 }
@@ -110,7 +111,7 @@
 }
 .common-verb-chip:hover { border-color: var(--blue); background: var(--light-blue); }
 .cv-verb { font-size: 0.88rem; font-weight: 700; color: var(--text); line-height: 1.2; }
-.cv-en   { font-size: 0.68rem; color: var(--gray); }
+.cv-en   { font-size: 0.75rem; color: var(--gray); }
 .common-verb-chip:hover .cv-verb { color: var(--blue); }
 
 /* ── Verb conjugation result ── */
@@ -192,7 +193,7 @@
   margin-bottom: 16px;
 }
 .legend-item {
-  font-size: 0.72rem; font-weight: 600; padding: 3px 10px;
+  font-size: 0.75rem; font-weight: 600; padding: 3px 10px;
   border-radius: 12px; text-transform: uppercase; letter-spacing: 0.04em;
 }
 
@@ -242,7 +243,7 @@
     gap: 2px;
   }
   .detail-label {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.04em;
     margin-bottom: 0;

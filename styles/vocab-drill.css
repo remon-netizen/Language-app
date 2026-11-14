@@ -19,7 +19,7 @@
 .vc-stat-due { color: #6d28d9; border-color: #c4b5fd; background: #f5f3ff; }
 .vc-stat-weak { color: #be123c; border-color: #fda4af; background: #fff1f2; }
 
-.vc-section-label { font-size: 0.74rem; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.04em; margin: 0 0 6px 2px; }
+.vc-section-label { font-size: 0.75rem; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.04em; margin: 0 0 6px 2px; }
 .vc-chip-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
 .vc-chip {
   padding: 6px 10px; border: 2px solid var(--border); border-radius: 999px; background: var(--card-bg);
@@ -34,7 +34,7 @@
 .vc-mode-btn.vc-mode-wide { grid-column: span 3; }
 .vc-mode-icon { font-size: 1.3rem; line-height: 1; }
 .vc-mode-label { font-size: 0.84rem; font-weight: 700; color: var(--text); }
-.vc-mode-sub { font-size: 0.68rem; color: var(--gray); }
+.vc-mode-sub { font-size: 0.75rem; color: var(--gray); }
 
 .vc-session-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
 .vc-session-card {
@@ -46,13 +46,13 @@
 .vc-session-primary { border-color: #db2777; background: #fdf2f8; }
 .vc-session-icon { font-size: 1.5rem; line-height: 1; }
 .vc-session-title { font-size: 0.9rem; font-weight: 700; color: var(--text); }
-.vc-session-sub { font-size: 0.72rem; color: var(--gray); text-align: center; }
+.vc-session-sub { font-size: 0.75rem; color: var(--gray); text-align: center; }
 .vc-browse-btn { width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 12px; background: var(--card-bg); font-weight: 700; cursor: pointer; font-family: inherit; color: var(--text); min-height: 44px; }
 .vc-browse-btn:hover { border-color: #db2777; color: #9d174d; }
 
 .vc-q-card { background: var(--card-bg); border-radius: 14px; padding: 20px; margin-bottom: 14px; box-shadow: 0 1px 8px rgba(0,0,0,0.07); text-align: center; }
 .vc-q-intro { border: 2px solid #f9a8d4; background: #fdf2f8; }
-.vc-q-badge { display: inline-block; font-size: 0.74rem; font-weight: 700; color: #9d174d; background: #fce7f3; padding: 3px 10px; border-radius: 6px; margin-bottom: 10px; }
+.vc-q-badge { display: inline-block; font-size: 0.75rem; font-weight: 700; color: #9d174d; background: #fce7f3; padding: 3px 10px; border-radius: 6px; margin-bottom: 10px; }
 .vc-q-meaning { font-size: 1.8rem; font-weight: 800; color: var(--text); line-height: 1.2; }
 .vc-q-word { font-size: 2rem; font-weight: 800; color: #9d174d; margin-top: 10px; }
 .vc-q-hint { font-size: 0.82rem; color: var(--gray); margin-top: 6px; }
@@ -75,7 +75,7 @@
 .vc-dot-gray { background: #d1d5db; } .vc-dot-green { background: #22c55e; } .vc-dot-yellow { background: #f59e0b; } .vc-dot-red { background: #ef4444; }
 .vc-ref-uk { font-weight: 800; color: var(--text); }
 .vc-ref-meaning { color: var(--text); }
-.vc-ref-tag { font-size: 0.72rem; color: var(--gray); }
+.vc-ref-tag { font-size: 0.75rem; color: var(--gray); }
 .vc-ref-speak { background: none; border: 1px solid var(--border); border-radius: 8px; font-size: 0.85rem; padding: 3px 6px; cursor: pointer; min-height: 30px; }
 .vc-ref-nav { display: flex; gap: 8px; }
 .vc-nav-btn { flex: 1; padding: 11px; border: 2px solid var(--border); border-radius: 10px; background: none; color: var(--text); font-size: 0.88rem; font-weight: 700; cursor: pointer; font-family: inherit; min-height: 44px; }

@@ -30,7 +30,7 @@
 .ty-toggle.active { border-color: #475569; background: #f1f5f9; }
 .ty-check { width: 20px; height: 20px; flex-shrink: 0; border: 2px solid #94a3b8; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800; color: white; background: white; }
 .ty-toggle.active .ty-check { background: #475569; border-color: #475569; }
-.ty-section { font-size: 0.74rem; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.04em; margin: 16px 0 6px 2px; }
+.ty-section { font-size: 0.75rem; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.04em; margin: 16px 0 6px 2px; }
 .ty-stages { display: flex; flex-direction: column; gap: 6px; }
 .ty-stage {
   display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 12px; border: 2px solid var(--border); border-radius: 12px;
@@ -43,15 +43,15 @@
 .ty-stage-text { display: flex; flex-direction: column; flex: 1; min-width: 0; gap: 1px; }
 .ty-stage-letters { font-size: 1.05rem; font-weight: 800; color: #1e293b; letter-spacing: 0.04em; }
 .ty-stage-title { font-size: 0.88rem; font-weight: 700; color: var(--text); }
-.ty-stage-sub { font-size: 0.74rem; color: var(--gray); }
+.ty-stage-sub { font-size: 0.75rem; color: var(--gray); }
 .ty-stage-status { flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; font-size: 0.95rem; font-weight: 800; color: #15803d; }
-.ty-stage-status small { font-size: 0.7rem; font-weight: 700; color: var(--gray); white-space: nowrap; }
+.ty-stage-status small { font-size: 0.75rem; font-weight: 700; color: var(--gray); white-space: nowrap; }
 .ty-stage-next .ty-stage-status { color: #475569; }
 
 /* Cards */
 .ty-card { background: var(--card-bg); border-radius: 14px; padding: 18px 16px; margin-bottom: 14px; box-shadow: 0 1px 8px rgba(0,0,0,0.07); text-align: center; }
 .ty-intro { border: 2px solid #cbd5e1; background: #f8fafc; }
-.ty-badge { display: inline-block; font-size: 0.74rem; font-weight: 700; color: #1e293b; background: #e2e8f0; padding: 3px 10px; border-radius: 6px; margin-bottom: 8px; }
+.ty-badge { display: inline-block; font-size: 0.75rem; font-weight: 700; color: #1e293b; background: #e2e8f0; padding: 3px 10px; border-radius: 6px; margin-bottom: 8px; }
 .ty-label { font-size: 0.78rem; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px; }
 .ty-letter { font-size: 3rem; font-weight: 800; color: #1e293b; line-height: 1.15; }
 .ty-letter .vc-say-inline { font-size: 1.3rem; }

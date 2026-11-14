@@ -11,15 +11,15 @@
 .pg-days { grid-column: 1 / -1; display: flex; gap: 4px; align-items: flex-end; height: 44px; margin-top: 6px; }
 .pg-day { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
 .pg-day-bar { width: 100%; background: #93c5fd; border-radius: 3px 3px 0 0; min-height: 2px; }
-.pg-day-label { font-size: 0.6rem; color: var(--gray); margin-top: 2px; }
-.pg-section { font-size: 0.74rem; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.04em; margin: 14px 0 6px 2px; }
+.pg-day-label { font-size: 0.75rem; color: var(--gray); margin-top: 2px; }
+.pg-section { font-size: 0.75rem; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.04em; margin: 14px 0 6px 2px; }
 .pg-row { display: flex; align-items: center; gap: 12px; width: 100%; cursor: pointer; text-align: left; font-family: inherit; min-height: 60px; }
 .pg-row:hover { border-color: var(--blue); }
 .pg-row-icon { font-size: 1.5rem; flex-shrink: 0; }
 .pg-row-text { display: flex; flex-direction: column; flex: 1; gap: 2px; min-width: 0; }
 .pg-row-title { font-weight: 700; color: var(--text); font-size: 0.92rem; }
 .pg-row-sub { font-size: 0.76rem; color: var(--gray); }
-.pg-due { font-size: 0.7rem; font-weight: 800; color: white; background: #8b5cf6; border-radius: 8px; padding: 1px 7px; margin-left: 4px; }
+.pg-due { font-size: 0.75rem; font-weight: 800; color: white; background: #8b5cf6; border-radius: 8px; padding: 1px 7px; margin-left: 4px; }
 .pg-pct { font-size: 0.78rem; font-weight: 800; color: var(--gray); margin-left: 6px; }
 .pg-bar { height: 6px; background: var(--border); border-radius: 4px; overflow: hidden; margin-top: 4px; }
 .pg-bar-fill { height: 100%; background: var(--blue); border-radius: 4px; }

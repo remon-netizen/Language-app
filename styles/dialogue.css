@@ -10,7 +10,7 @@
 .dg-card-icon { font-size: 1.5rem; }
 .dg-card-text { display: flex; flex-direction: column; flex: 1; }
 .dg-card-title { font-size: 0.95rem; font-weight: 700; color: var(--text); }
-.dg-card-sub { font-size: 0.74rem; color: var(--gray); }
+.dg-card-sub { font-size: 0.75rem; color: var(--gray); }
 .dg-card-arrow { color: #0f766e; font-weight: 800; }
 .dg-stage { background: var(--card-bg); border-radius: 14px; padding: 18px; margin-bottom: 12px; box-shadow: 0 1px 8px rgba(0,0,0,0.07); text-align: center; }
 .dg-speakers { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
@@ -27,7 +27,7 @@
 .dg-ready-btn { width: 100%; padding: 13px; border: 2px solid #0f766e; border-radius: 12px; background: var(--card-bg); color: #0f766e; font-size: 0.95rem; font-weight: 800; cursor: pointer; font-family: inherit; min-height: 48px; }
 .dg-ready-btn:disabled { opacity: 0.45; cursor: default; }
 .dg-task-card { background: var(--card-bg); border-radius: 14px; padding: 18px 20px; margin-bottom: 12px; box-shadow: 0 1px 8px rgba(0,0,0,0.07); }
-.dg-task-label { font-size: 0.74rem; font-weight: 700; color: #0f766e; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px; }
+.dg-task-label { font-size: 0.75rem; font-weight: 700; color: #0f766e; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px; }
 .dg-gap-line { font-size: 1.15rem; font-weight: 700; color: var(--text); line-height: 1.5; }
 .dg-blank { display: inline-block; min-width: 70px; border-bottom: 3px solid #0f766e; }
 .dg-gap-trans { font-size: 0.85rem; color: var(--gray); margin: 6px 0 10px; }

@@ -49,7 +49,7 @@
 .nd-cat-icon { font-size: 1.4rem; line-height: 1; flex-shrink: 0; }
 .nd-cat-text { display: flex; flex-direction: column; min-width: 0; flex: 1; }
 .nd-cat-title { font-size: 0.88rem; font-weight: 700; color: var(--text); overflow-wrap: anywhere; }
-.nd-cat-sub { font-size: 0.72rem; color: var(--gray); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nd-cat-sub { font-size: 0.75rem; color: var(--gray); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .nd-cat-study {
   background: none; border: 1px solid var(--border); border-radius: 8px;
   font-size: 0.95rem; padding: 4px 7px; cursor: pointer; flex-shrink: 0; transition: all 0.15s;
@@ -67,7 +67,7 @@
 .nd-mode-btn.active { border-color: #ea580c; background: #fff7ed; }
 .nd-mode-icon { font-size: 1.4rem; line-height: 1; }
 .nd-mode-label { font-size: 0.85rem; font-weight: 700; color: var(--text); }
-.nd-mode-sub { font-size: 0.7rem; color: var(--gray); }
+.nd-mode-sub { font-size: 0.75rem; color: var(--gray); }
 
 .nd-length-row { display: flex; align-items: center; gap: 6px; margin-bottom: 16px; }
 .nd-length-label { font-size: 0.78rem; font-weight: 700; color: var(--gray); margin-right: 4px; }
@@ -219,7 +219,7 @@
 .nd-course-primary { border-color: #ea580c; background: #fff7ed; }
 .nd-course-icon { font-size: 1.5rem; line-height: 1; }
 .nd-course-title { font-size: 0.9rem; font-weight: 700; color: var(--text); text-align: center; }
-.nd-course-sub { font-size: 0.72rem; color: var(--gray); text-align: center; }
+.nd-course-sub { font-size: 0.75rem; color: var(--gray); text-align: center; }
 .nd-path-btn { width: 100%; padding: 10px; margin-bottom: 18px; border: 2px solid var(--border); border-radius: 12px; background: var(--card-bg); font-weight: 700; font-size: 0.85rem; cursor: pointer; font-family: inherit; color: var(--text); min-height: 44px; }
 .nd-path-btn:hover { border-color: #ea580c; color: #c2410c; }
 .nd-path-count { float: right; font-weight: 600; color: var(--gray); }
@@ -227,7 +227,7 @@
 
 /* Introduction card and the word shown on a word → digits card */
 .nd-q-intro { border: 2px solid #fdba74; background: #fff7ed; }
-.nd-q-badge { display: inline-block; font-size: 0.74rem; font-weight: 700; color: #c2410c; background: #ffedd5; padding: 3px 10px; border-radius: 6px; margin-bottom: 8px; }
+.nd-q-badge { display: inline-block; font-size: 0.75rem; font-weight: 700; color: #c2410c; background: #ffedd5; padding: 3px 10px; border-radius: 6px; margin-bottom: 8px; }
 .nd-q-word { font-size: 1.7rem; font-weight: 800; color: #c2410c; margin-top: 10px; line-height: 1.25; }
 .nd-q-word-read { margin-top: 4px; }
 .nd-say-inline { background: none; border: none; font-size: 1.1rem; cursor: pointer; vertical-align: middle; }
