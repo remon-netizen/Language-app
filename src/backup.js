@@ -6,6 +6,10 @@
 // file's and reloads, so a browser reset or a new phone costs nothing.
 
 const SECRETS = new Set(['geminiKey', 'anthropicKey']);
+// Keys that belong to another app at the same web address (a browser keeps one
+// storage per address, and the Dutch course lives next door under 'dutch.').
+// They are not this app's to back up, and above all not to wipe on a restore.
+const isForeign = k => k.startsWith('dutch.');
 const LAST = 'lastBackup';
 const FORMAT = 'language-app-backup';
 
@@ -13,7 +17,7 @@ export function backupData() {
   const data = {};
   for (let i = 0; i < localStorage.length; i++) {
     const k = localStorage.key(i);
-    if (!SECRETS.has(k) && k !== LAST) data[k] = localStorage.getItem(k);
+    if (!SECRETS.has(k) && k !== LAST && !isForeign(k)) data[k] = localStorage.getItem(k);
   }
   return { format: FORMAT, version: 1, exported: new Date().toISOString(), keys: Object.keys(data).length, data };
 }
@@ -45,7 +49,7 @@ export function parseBackup(text) {
 export function restoreBackup(b) {
   const keep = {};
   for (const k of SECRETS) { const v = localStorage.getItem(k); if (v) keep[k] = v; }
-  localStorage.clear();
-  for (const [k, v] of Object.entries(b.data)) if (typeof v === 'string') localStorage.setItem(k, v);
+  for (const k of Object.keys(localStorage)) if (!isForeign(k)) localStorage.removeItem(k);
+  for (const [k, v] of Object.entries(b.data)) if (typeof v === 'string' && !isForeign(k)) localStorage.setItem(k, v);
   for (const [k, v] of Object.entries(keep)) localStorage.setItem(k, v);
 }

@@ -1,7 +1,7 @@
 // Language App — Service Worker
 // Cache the app shell so it works offline after first load.
 // Bump CACHE version whenever shell file list changes or content updates.
-const CACHE = 'language-app-v85';
+const CACHE = 'language-app-v86';
 const SHELL = [
   './index.html',
   './manifest.json',
@@ -121,11 +121,13 @@ self.addEventListener('install', event => {
   self.skipWaiting();
 });
 
-// Activate: delete old caches
+// Activate: delete this app's old caches. The site shares its address (…github.io)
+// with other apps, and a browser keeps one cache store per address: a cache that
+// is not ours (another app's offline copy) must be left alone.
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE && k !== CACHE + '-flags').map(k => caches.delete(k)))
+      Promise.all(keys.filter(k => k.startsWith('language-app-') && k !== CACHE && k !== CACHE + '-flags').map(k => caches.delete(k)))
     )
   );
   self.clients.claim();
