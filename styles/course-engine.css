@@ -82,3 +82,7 @@
 
 /* The keyboard changes at this card (Ukrainian answers, then the learner's own language). */
 .ce-kb-switch { margin: 0 0 10px; padding: 9px 12px; border-radius: 12px; background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; font-size: 0.84rem; font-weight: 700; line-height: 1.35; }
+
+/* The answer field is a textarea for every card (see course-engine.js): one line
+   high, it grows with what is typed. */
+textarea.ce-text-input { display: block; resize: none; overflow: hidden; min-height: 54px; line-height: 1.35; }

@@ -628,7 +628,7 @@ function showVerbPicker() {
       </div>
     </div>
 
-    <input type="text" class="vd-search-input" id="vdSearch"
+    <input type="search" class="vd-search-input" id="vdSearch"
       placeholder="${nl ? 'Zoek werkwoord...' : 'Search verb...'}"
       autocomplete="off" />
 
@@ -708,7 +708,7 @@ function showSelectionPicker() {
       </div>
     </div>
 
-    <input type="text" class="vd-search-input" id="vdPickSearch"
+    <input type="search" class="vd-search-input" id="vdPickSearch"
       placeholder="${nl ? 'Zoek werkwoord...' : 'Search verb...'}" autocomplete="off" />
 
     <div class="vd-pick-list">${listHtml}</div>

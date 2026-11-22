@@ -130,9 +130,9 @@ export function runSession({ screen, icon, title, accent = DEFAULT_ACCENT, cards
           ${card.input.options.map((o, i) => `<button class="ce-option-btn" type="button" data-idx="${i}">${escHtml(o.label)}</button>`).join('')}
         </div>` : `
         <div class="ce-input-area">
-          <input type="text" class="ce-text-input" id="ceInput" lang="${card.input.lang || 'uk'}" inputmode="${card.input.inputmode || 'text'}"
+          <textarea class="ce-text-input" id="ceInput" rows="1" enterkeyhint="go" lang="${card.input.lang || 'uk'}" inputmode="${card.input.inputmode || 'text'}"
             placeholder="${escHtml(card.input.placeholder || '')}"
-            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
           <button class="ce-check-btn" id="ceCheck" type="button">${L('Check', 'Controleer')} ✓</button>
         </div>
         ${card.input.speak ? `
@@ -141,12 +141,16 @@ export function runSession({ screen, icon, title, accent = DEFAULT_ACCENT, cards
         <div class="ce-retry-note" id="ceRetry" hidden></div>`}
       <div id="ceFeedback"></div>`;
 
+    // A new card starts at the top of the page, before its field takes the focus.
+    window.scrollTo({ top: 0 });
     s.querySelector('#ceBack').addEventListener('click', exit);
-    s.querySelector('#ceSkipWarm')?.addEventListener('click', () => { run.current = warm.length; renderCard(); s.scrollTo({ top: 0 }); });
+    s.querySelector('#ceSkipWarm')?.addEventListener('click', () => { run.current = warm.length; renderCard(); });
     wireSpeakButtons(s);
     if (card.autoSay) setTimeout(() => speakText(card.autoSay, state.currentLanguage), card.intro ? 200 : 0);
 
     if (isChoice) wireChoice(card); else wireText(card);
+    // For whoever wants to know which card is on screen (a check that answers every card with its own answer).
+    document.dispatchEvent(new CustomEvent('cardShown', { detail: { card } }));
     // A new learner's first typed Ukrainian answer: say how to get the letters, once.
     if (!isChoice && card.input.lang === 'uk' && keyboardHelpFirstTime()) s.querySelector('#ceInput')?.blur();
   }
@@ -177,6 +181,12 @@ export function runSession({ screen, icon, title, accent = DEFAULT_ACCENT, cards
     };
     check.addEventListener('click', submit);
     input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); submit(); } });
+    // The answer field is a textarea, one line high, that grows with the text: Safari
+    // on an iPhone offers to fill in contact details (the AutoFill bar above the
+    // keyboard, with the owner's name) in a text input, not in a textarea.
+    const fit = () => { input.style.height = 'auto'; input.style.height = input.scrollHeight + 'px'; };
+    input.addEventListener('input', fit);
+    fit();
     input.focus();
     if (card.input.speak) wireSpeak(card, input, check);
     if (card.mount) card.mount({ root: s, input, submit });
@@ -287,7 +297,7 @@ export function runSession({ screen, icon, title, accent = DEFAULT_ACCENT, cards
     const isLast = run.current + 1 >= cards.length;
     appendNext(fb, { isLast, className: 'ce-next-btn', onNext: () => {
       if (isLast) showScore();
-      else { run.current++; renderCard(); s.scrollTo({ top: 0, behavior: 'smooth' }); }
+      else { run.current++; renderCard(); }
     } });
   }
 

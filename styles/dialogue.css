@@ -33,7 +33,7 @@
 .dg-gap-trans { font-size: 0.85rem; color: var(--gray); margin: 6px 0 10px; }
 .dg-replay { padding: 8px 14px; border: 2px solid #99f6e4; border-radius: 10px; background: #f0fdfa; color: #0f766e; font-weight: 700; cursor: pointer; font-family: inherit; }
 .dg-input-area { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
-.dg-text-input { width: 100%; padding: 14px 16px; border: 2px solid var(--border); border-radius: 11px; font-size: 1.15rem; font-family: inherit; outline: none; text-align: center; background: var(--card-bg); }
+.dg-text-input { display: block; resize: none; overflow: hidden; line-height: 1.35; width: 100%; padding: 14px 16px; border: 2px solid var(--border); border-radius: 11px; font-size: 1.15rem; font-family: inherit; outline: none; text-align: center; background: var(--card-bg); }
 .dg-text-input:focus { border-color: #0f766e; }
 .dg-text-input.correct { border-color: #16a34a; background: #dcfce7; } .dg-text-input.close { border-color: #f59e0b; background: #fffbeb; } .dg-text-input.wrong { border-color: #dc2626; background: #fee2e2; }
 .dg-check-btn { padding: 12px; background: #0f766e; color: white; border: none; border-radius: 11px; font-weight: 700; cursor: pointer; font-family: inherit; }

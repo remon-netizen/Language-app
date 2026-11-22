@@ -91,7 +91,7 @@ export function alsoFineHtml(forms, { res, answer }, cls) {
 // Append a Next / See results button and focus it, so Enter advances.
 export function appendNext(container, { isLast, className, onNext }) {
   const btn = document.createElement('button');
-  btn.className = className;
+  btn.className = `${className} dc-next-btn`;
   btn.type = 'button'; // not 'submit': Enter activates this button by design
   btn.textContent = isLast ? '🏁 ' + L('See results', 'Resultaten') : L('Next →', 'Volgende →');
   btn.addEventListener('click', onNext);

@@ -39,6 +39,7 @@
   <link rel="stylesheet" href="styles/progress.css" />
   <link rel="stylesheet" href="styles/path.css" />
   <link rel="stylesheet" href="styles/typing.css" />
+  <link rel="stylesheet" href="styles/phone.css" />
 </head>
 <body class="on-home">
 
@@ -233,9 +234,9 @@
         <div class="chat-main">
           <div class="chat-area" id="chatArea"></div>
           <div class="chat-input-bar">
-            <input class="talk-input" id="talkInput" type="text"
+            <textarea class="talk-input" id="talkInput" rows="1" enterkeyhint="send"
               placeholder="Type or speak…"
-              onkeydown="if(event.key==='Enter') sendText()" />
+              onkeydown="if(event.key==='Enter'){event.preventDefault();sendText()}"></textarea>
             <button class="mic-btn" id="talkMicBtn" onclick="toggleFreeSpeak()" title="Speak">🎙️</button>
             <button class="send-btn" onclick="sendText()">Send →</button>
           </div>
@@ -284,7 +285,7 @@
       </div>
     </div>
     <div class="grammar-input-bar">
-      <input class="grammar-text-input" id="verbInput" type="text"
+      <input class="grammar-text-input" id="verbInput" type="search" enterkeyhint="search" autocomplete="off"
         placeholder="Enter a verb, e.g. писати / schrijven…"
         onkeydown="if(event.key==='Enter') submitVerb()" />
       <button class="grammar-submit-btn" id="verbSubmitBtn" onclick="submitVerb()">Look up →</button>
@@ -325,7 +326,7 @@
       </div>
     </div>
     <div class="grammar-input-bar">
-      <input class="grammar-text-input" id="dissectInput" type="text"
+      <input class="grammar-text-input" id="dissectInput" type="search" enterkeyhint="search" autocomplete="off"
         placeholder="Enter a sentence to analyse…"
         onkeydown="if(event.key==='Enter') submitDissect()" />
       <button class="grammar-submit-btn" id="dissectSubmitBtn" onclick="submitDissect()">Analyse →</button>

@@ -235,3 +235,14 @@ body:not(.on-home) .app { padding-top: calc(24px + env(safe-area-inset-top, 0px)
 @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); } 50% { box-shadow: 0 0 0 10px rgba(239,68,68,0); } }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 @keyframes typingBounce { 0%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-6px); } }
+
+/* ── Text fields on a phone ──
+   Safari on an iPhone zooms the page into a field whose text is under 16px when it
+   is tapped, and does not zoom back out. Every field is 16px or more there. */
+@media (hover: none) and (pointer: coarse) {
+  :is(input, textarea, select):is(.api-key-input, .cd-search-input, .dc-jump-select, .ex-open-input, .grammar-text-input, .ib-open-input, .ib-writing-input, .talk-input, .translate-input, .vd-search-input, .voice-select) { font-size: 16px; }
+}
+/* The lookups and searches are search fields (no contact AutoFill on an iPhone);
+   they keep the look of the other fields. */
+input[type="search"] { -webkit-appearance: none; appearance: none; }
+input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; }

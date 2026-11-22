@@ -477,7 +477,7 @@ function showNounPicker() {
         <div class="lesson-subtitle">${nl ? 'Leer alle vormen' : 'Learn all case forms'}</div>
       </div>
     </div>
-    <input type="text" class="cd-search-input" id="cdSearch" placeholder="${nl ? 'Zoek...' : 'Search...'}" autocomplete="off" />
+    <input type="search" class="cd-search-input" id="cdSearch" placeholder="${nl ? 'Zoek...' : 'Search...'}" autocomplete="off" />
     <div id="cdNounList">${listHtml}</div>`;
 
   s.querySelector('#cdPickerBack').addEventListener('click', showMenu);

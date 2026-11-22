@@ -581,7 +581,7 @@ function showFeedback(isRight, explanation) {
 function showNextButton(container, isLastOverride) {
   const isLast = isLastOverride !== undefined ? isLastOverride : ex.current + 1 >= ex.list.length;
   const btn = document.createElement('button');
-  btn.className = 'ex-next-btn';
+  btn.className = 'ex-next-btn dc-next-btn';
   btn.textContent = isLast ? '🏁 ' + L('See results', 'Resultaten') : L('Next →', 'Volgende →');
   btn.type = 'button';
   btn.addEventListener('click', () => {

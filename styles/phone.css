@@ -1,0 +1,44 @@
+/* ── The app on a phone or tablet ─────────────────────────────────────────────
+   Loaded last, so that these rules win over the screens' own. Everything here is
+   for touch screens only: a computer keeps its layout. */
+
+/* ── On a phone ──────────────────────────────────────────────────────────────
+   The answer is typed with the keyboard up and checked with its Return key; the
+   keyboard then goes down. The next step waits at the bottom edge of the screen,
+   where the thumb already is, instead of somewhere in the middle. */
+@media (hover: none) and (pointer: coarse) {
+  .dc-next-btn {
+    position: fixed; z-index: 60; margin: 0;
+    left: 50%; transform: translateX(-50%);
+    bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    width: min(736px, calc(100% - 24px));
+    min-height: 52px; font-size: 1rem;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+  }
+  /* Room for it at the end of the page, so it never covers the last line. */
+  .screen.active { padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
+  body:has(.dc-next-btn) .app-toast { bottom: calc(80px + env(safe-area-inset-bottom, 0px)); }
+  /* Buttons react at once: no double-tap zoom, no waiting for one. */
+  button, textarea, summary { touch-action: manipulation; }
+  /* The headings that fold a card open are a full finger high. */
+  .pt-fold > summary { min-height: 44px; }
+}
+/* With the keyboard up, about half the screen is left. The header and the card are
+   kept low, so that the question and the answer field both fit above it. */
+@media (hover: none) and (pointer: coarse) and (max-width: 600px) {
+  /* !important: every screen sets its own header padding with an id selector. */
+  .ce-header { padding: 10px 12px !important; margin-bottom: 10px !important; gap: 10px; }
+  .ce-header .lesson-title { font-size: 0.98rem; }
+  .ce-warmup-banner, .ce-kb-switch { padding: 7px 10px; margin-bottom: 8px; }
+  .ce-course-chip { margin-bottom: 6px; }
+  .pt-q-card { padding: 14px; margin-bottom: 10px; }
+  .pt-q-badge { margin-bottom: 6px; }
+  .pt-q-label { margin-bottom: 4px; }
+  .pt-q-main { font-size: 1.22rem; }
+  .pt-q-word { font-size: 1.6rem; margin-top: 6px; }
+  .pt-q-sentence { font-size: 1.12rem; margin-top: 6px; }
+  .pt-q-note { margin-top: 8px; padding: 6px 9px; }
+  .pt-q-hint { margin-top: 4px; }
+  .pt-hint-row { margin-top: 8px; }
+  .ce-input-area { gap: 8px; margin-bottom: 10px; }
+}

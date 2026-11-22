@@ -163,7 +163,7 @@ function renderTask() {
         <button class="dg-replay" id="dgReplay" type="button">🔊 ${L('Hear this line', 'Hoor deze regel')}</button>
       </div>
       <div class="dg-input-area">
-        <input type="text" class="dg-text-input" id="dgInput" lang="uk" placeholder="${L('Type the missing word…', 'Typ het ontbrekende woord…')}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+        <textarea class="dg-text-input" id="dgInput" rows="1" enterkeyhint="go" lang="uk" placeholder="${L('Type the missing word…', 'Typ het ontbrekende woord…')}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
         <button class="dg-check-btn" id="dgCheck" type="button">${L('Check', 'Controleer')} ✓</button>
       </div>
       <div class="ce-retry-note" id="dgRetry" hidden></div>
